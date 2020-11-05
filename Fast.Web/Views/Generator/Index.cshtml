@@ -1,0 +1,99 @@
+﻿@model Fast.Web.Models.ChecklistModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc{
+            background-color: inherit;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}
+
+<div class="content content-fixed">
+    <div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">CMS Checklist</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">CMS Checklist</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <a class="btn btn-sm pd-x-15 btn-outline-primary btn-uppercase" href="@Url.Action("Create","Generator")"><i data-feather="plus" class="wd-10 mg-r-5"></i> Add</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="df-example demo-table">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered" id="do_datatable">
+                                <thead class="thead-primary font-weight-bold">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Menu Title</th>
+                                        <th>Header</th>
+                                        <th width="300px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Checklists != null)
+                                    {
+                                        foreach (Fast.Web.Models.ChecklistModel checklist in ViewBag.Checklists)
+                                        {
+                                            <tr>
+                                                <td>@checklist.ID</td>
+                                                <td>@checklist.MenuTitle</td>
+                                                <td>@checklist.Header</td>
+                                                <td class="text-center">
+                                                    <a class="btn btn-xs btn-info mg-r-3" href="@Url.Action("Generated/"+checklist.ID,"Generator")"><i data-feather="eye"></i> View</a>
+                                                    <a class="btn btn-xs btn-warning mg-r-3" href="@Url.Action("Content/"+checklist.ID,"Generator")"><i data-feather="settings"></i> Edit</a>
+                                                    <a class="btn btn-xs btn-danger" href="@Url.Action("Delete/"+checklist.ID,"Generator")" onclick="return confirm('Do you really want to delete this item?')"><i data-feather="trash-2"></i> Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#do_datatable').DataTable({
+                responsive: true,
+                language: {
+                    searchPlaceholder: 'Search...',
+                    sSearch: '',
+                    lengthMenu: '_MENU_ items/page',
+                }
+            });
+            $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+        });
+    </script>
+}

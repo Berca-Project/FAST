@@ -1,0 +1,121 @@
+﻿@model Fast.Web.Models.Report.DataKPICRRModel
+@using Fast.Web.Resources;
+
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<!-- Specific Page Vendor CSS -->
+<style>
+    .dataTables_scrollHead table, .dataTables_scrollBody table {
+        width: 1800px !important;
+    }
+</style>
+
+<div class="card-header">
+    <div class="row pd-r-10-f">
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Production Center</label>
+            <select class="form-control select2" id="PC" name="PC">
+                <option value="">All Production Center</option>
+                <option value="PB" @(ViewBag.PC == "PB" ? "selected" : "")>PB - SIS Sukorejo</option>
+                <option value="PJ" @(ViewBag.PC == "PJ" ? "selected" : "")>PJ - Sampoerna Sukorejo</option>
+                <option value="PK" @(ViewBag.PC == "PK" ? "selected" : "")>PK - Sampoerna Karawang</option>
+                <option value="PI" @(ViewBag.PC == "PI" ? "selected" : "")>PI - PMID Karawang</option>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Year</label>
+            <input class="form-control text-right" id="year" type="number" value="@ViewBag.Year">
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Week</label>
+            <input class="form-control text-right" id="week" type="number" value="@ViewBag.Week" placeholder="Empty = All Week">
+        </div>
+
+        <div class="col-sm-2 mg-t-30"><button onclick="refresh()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-search mg-r-10"></i> Search</button></div>
+        <div class="col-sm-2 mg-t-30"><button onclick="downloadData('CRR')" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-download mg-r-10"></i> Download</button></div>
+        <div class="col-sm-2 mg-t-30"><button onclick="modalUploadData('CRR')" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-upload mg-r-10"></i> Upload Data</button></div>
+
+    </div>
+</div>
+<div class="card-body">
+    <table class="table table-bordered dodatatable">
+        <thead class="thead-primary font-weight-bold">
+            <tr>
+                <td>Production Center</td>
+                <th>Year</th>
+                <th>Week</th>
+                <th>Posting Date</th>
+                <td>Machine</td>
+                <td>Machine Type</td>
+                <td>Shift</td>
+                <td>Order Number</td>
+                <td>PO Lead Material</td>
+                <td>Reject Material</td>
+                <td>Material Description</td>
+                <td>Quantity</td>
+                <td>Base Unit</td>
+                <th>Inserted By</th>
+                <th>Inserted Date</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in Model.Data)
+            {
+                <tr>
+                    <td>@data.ProductionCenter</td>
+                    <td>@data.Year</td>
+                    <td>@data.Week</td>
+                    <td>@(data.PostingDate.ToString("dd-MMM-yy"))</td>
+                    <td>@data.Machine</td>
+                    <td>@data.MachineType</td>
+                    <td>@data.Shift</td>
+                    <td>@data.OrderNumber</td>
+                    <td>@data.POLeadMaterial</td>
+                    <td>@data.RejectMaterial</td>
+                    <td>@data.MaterialDescription</td>
+                    <td>@data.Quantity</td>
+                    <td>@data.BaseUnit</td>
+                    <td>@data.ModifiedBy</td>
+                    <td>@(((DateTime)data.ModifiedDate).ToString("dd-MMM-yy HH:mm"))</td>
+                    <td><a class="btn-default tx-black" title="Delete Data" href="#" onclick="deletedata(@(data.ID))"><i class="fa fa-trash"></i></a></td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function refresh() {
+        $('#loading_overlay').removeClass('d-none');
+        $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/DataCRR?year=" + $('#year').val() + "&week=" + $('#week').val()+ "&PC=" + $('#PC').val(), function () {
+            $('#loading_overlay').addClass('d-none');
+        });
+    }
+
+    function deletedata(id) {
+        if (confirm("Do you really want to delete this data?")) {
+            $.get(fastApp.BaseUrl + "/ReportKPI/DeleteCRR/" + id, function( data ) {
+                refresh();
+            });
+        }
+
+    }
+
+    function downloadData(data) {
+        window.open(fastApp.BaseUrl + "/ReportKPI/DownloadXls?data=" + data + "&year=" + $('#year').val() + "&week=" + $('#week').val()+ "&PC=" + $('#PC').val(), '_blank');
+    }
+
+    $('.dodatatable').DataTable({
+        scrollX: true,
+        order: [],
+        //responsive: true,
+        language: {
+            searchPlaceholder: 'Search...',
+            sSearch: '',
+            lengthMenu: '_MENU_ items/page',
+        }
+    });
+    $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+
+</script>

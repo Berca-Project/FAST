@@ -1,0 +1,55 @@
+﻿.btn-menu {
+	display: inline-block;
+	font-weight: 400;
+	color: #001737;
+	text-align: center;
+	vertical-align: middle;
+	user-select: none;
+	background-color: transparent;
+	border: 1px solid transparent;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	border-radius: 0.25rem;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	padding: 0px !important;
+	margin-left: 20px !important;
+}
+
+.dtButton {
+	margin-right: 8px;
+}
+
+.dtAddButton {
+	margin-right: 15px;
+}
+
+.dtMarginTop {
+	margin-top: 20px;
+}
+
+.dtMarginTop2 {
+	margin-top: 24px;
+}
+
+.dtMarginBottom {
+	margin-bottom: 30px;
+}
+
+.table-fast th {
+	padding: 4px 10px !important;
+	color: #fff !important;
+	background-color: #0168fa !important;
+}
+
+.table-fast td {
+	padding: 4px 10px !important;
+	line-height: 1.5;
+	vertical-align: middle !important;
+}
+
+.headerTree {
+	background-color: #0168fa;
+	border-bottom: 1px solid #111111;
+	font-weight: bold;
+	color: white !important;
+}

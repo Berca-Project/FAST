@@ -1,0 +1,156 @@
+﻿@model Fast.Web.Models.MenuModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Edit", "Menu", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.ID, new { @Id = "ID" })
+	@Html.HiddenFor(x => x.IsDeleted, new { @Id = "IsDeleted" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">Edit Menu</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Name <span style="color:red">*</span></label>
+				</div>
+				<div class="col-7">
+					@Html.TextBoxFor(x => x.Name, null, new { @class = "form-control", @id = "tbName", @required = "required" })
+				</div>
+			</div>
+			<div class="row col-6">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageController </label>
+				</div>
+				<div class="col-7">
+					@Html.TextBoxFor(x => x.PageController, null, new { @class = "form-control", @id = "tbPageController" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageAction </label>
+				</div>
+				<div class="col-7">
+					@Html.TextBoxFor(x => x.PageAction, null, new { @class = "form-control", @id = "tbPageAction" })
+				</div>
+			</div>
+			<div class="row col-6">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageSlug </label>
+				</div>
+				<div class="col-7">
+					@Html.TextBoxFor(x => x.PageSlug, null, new { @class = "form-control", @id = "tbslug" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageIcon</label>
+				</div>
+				<div class="col-7">					
+					@Html.DropDownListFor(x => x.PageIcon, (IEnumerable<SelectListItem>)ViewBag.IconList, new { @class = "form-control", @id = "ddlIconEdit" })
+				</div>
+			</div>
+			<div class="row col-6">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.DisplayOrder</label>
+				</div>
+				<div class="col-7">
+					@Html.TextBoxFor(x => x.DisplayOrder, null, new { @class = "form-control", @id = "tbDisplayOrder", @type = "number" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+				<div class="form-group col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Status</label>
+				</div>
+				<div class="col-7">
+					@Html.DropDownListFor(x => x.IsActive, (IEnumerable<SelectListItem>)ViewBag.UserStatusList, new { @class = "form-control", @id = "ddlStatus" })
+				</div>
+			</div>
+			<div class="row col-6">
+				<div class="form-group col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Description</label>
+				</div>
+				<div class="col-7">
+					@Html.TextBoxFor(x => x.Description, null, new { @class = "form-control", @id = "desc" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="row col-sm-6" style="margin-top:-25px;margin-right:10px;margin-left:10px;">
+				<div class="form-group col-6" id="divParent">
+					@Html.CheckBoxFor(x => x.IsParent, new { @class = "checkbox-fast", @id = "cbIsParentEdit" })
+					<label class="form-check-label" for="cbIsParent">@UIResources.IsParentMenu</label>
+				</div>
+				<div class="form-group col-6" id="divTopMenu">
+					@Html.CheckBoxFor(x => x.IsTopMenu, new { @class = "checkbox-fast", @id = "cbIsTopMenuEdit" })
+					<label class="form-check-label" for="cbIsTopMenu">@UIResources.IsTopMenu</label>
+				</div>
+			</div>
+			<div class="row col-6" id="divParentMenuEdit">
+				<div class="col-sm-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ParentMenu</label>
+				</div>
+				<div class="col-7">
+					@Html.DropDownListFor(p => p.ParentID, (IEnumerable<SelectListItem>)ViewBag.ParentMenuList, new { @class = "form-control", @id = "ddlParentMenuEdit" })
+				</div>
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		if ($("#cbIsParentEdit").is(':checked')) {
+			$("#divParentMenuEdit").hide();
+			$("#cbIsTopMenuEdit").attr("disabled", true);			
+		} else {
+			if ($("#cbIsTopMenuEdit").is(':checked')) {
+				$("#divParentMenuEdit").hide();
+				$("#cbIsParentEdit").attr("disabled", true);
+			} else {
+				$("#divParentMenuEdit").show();
+				$("#cbIsParentEdit").removeAttr("disabled");
+			}
+		}
+
+		$("#cbIsParentEdit").click(function (e) {
+			if ($("#cbIsParentEdit").is(':checked')) {
+				$("#cbIsTopMenuEdit").attr("disabled", true);
+				$("#divParentMenuEdit").hide();
+			} else {
+				$("#cbIsTopMenuEdit").removeAttr("disabled", true);
+				$("#divParentMenuEdit").show();
+			}
+		});
+
+		$("#cbIsTopMenuEdit").click(function (e) {
+			if ($("#cbIsTopMenuEdit").is(':checked')) {
+				$("#divParentMenuEdit").hide();
+				$("#cbIsParentEdit").attr("disabled", true);
+			} else {
+				$("#divParentMenuEdit").show();
+				$("#cbIsParentEdit").removeAttr("disabled");
+			}
+		});
+	});
+</script>

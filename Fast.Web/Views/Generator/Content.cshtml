@@ -1,0 +1,191 @@
+﻿@using Fast.Web.Resources;
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/dashforge/assets/css/dashforge.mail.css">
+
+    <style>
+        body.dragging, body.dragging * {
+            cursor: move !important;
+        }
+
+        .btn-container{
+            position:relative;
+            display: inline;
+        }
+
+        .btn-icon{
+            padding:1px 6px 0 !important;
+            position: absolute;
+        }
+
+        .btn-icon.delete{
+            top: -1px;
+            right: -1px;
+        }
+
+        .dragged {
+            position: absolute;
+            opacity: 0.7;
+            z-index: 2000;
+        }
+
+        ol {
+            margin: 0;
+            padding: 0;
+        }
+
+            ol.dragable li {
+                display: block;
+                margin: 5px;
+                padding: 5px;
+                border: 1px solid #cccccc;
+                color: #0088cc;
+                background: #eeeeee;
+                cursor: move;
+            }
+
+                ol.dragable li.placeholder {
+                    position: relative;
+                    margin: 0;
+                    padding: 0;
+                    border: none;
+                }
+
+                    ol.dragable li.placeholder:before {
+                        position: absolute;
+                        content: "";
+                        width: 0;
+                        height: 0;
+                        margin-top: -5px;
+                        left: -5px;
+                        top: -4px;
+                        border: 5px solid transparent;
+                        border-left-color: red;
+                        border-right: none;
+                    }
+    </style>
+}
+
+<div class="mail-wrapper">
+    <div class="mail-sidebar">
+        <div class="mail-sidebar-body">
+            <div class="pd-20">
+                <button class="btn btn-primary btn-block tx-uppercase tx-10 tx-medium tx-sans tx-spacing-4" disabled>COMPONENTS</button>
+            </div>
+            <div class="pd-b-10 pd-x-10">
+                <ol class='dragable drag_only'>
+                    <li data-id="container_full">Container Full Width<ol></ol></li>
+                    <li data-id="container_divider">Container Divider<ol></ol></li>
+                    <li data-id="group">Group<ol></ol></li>
+                    <li data-id="button_ok">Button OK</li>
+                    <li data-id="button_nok">Button NOK</li>
+                    <li data-id="input_text">Input Text</li>
+                    <li data-id="input_number">Input Number</li>
+                    <li data-id="input_date">Input Date</li>
+                    <li data-id="input_checkbox">Input Checkbox</li>
+                    <li data-id="label">Label</li>
+                    <li data-id="images">Images</li>
+                </ol>
+            </div>
+        </div><!-- mail-sidebar-body -->
+    </div><!-- mail-sidebar -->
+
+    <div class="mail-content">
+        <div class="mail-content-header">
+            <div class="media">
+                <div class="media-body mg-l-10">
+                    <h6 class="mg-b-2 tx-13">[@ViewBag.Checklist.MenuTitle] @ViewBag.Checklist.Header</h6>
+                    <span class="d-block tx-11 tx-color-03"><b>Locations: </b>@( String.Join(", ", ViewBag.Locations) )</span>
+                </div><!-- media-body -->
+            </div><!-- media -->
+        </div><!-- mail-content-header -->
+        <div class="mail-content-body">
+            <div class="card">
+                <div class="card-body">
+                    <ol class='dragable dragdrop' style="min-height:100px">
+                        <li data-id="container_full">Container Full Width
+                            <ol>
+                                <li data-id="container_divider"><div class='btn-container float-right'><button type='button' class='btn btn-sm btn-outline-light btn-icon delete'><i class='icon ion-md-close'></i></button></div>Container Divider<ol></ol></li>
+                                <li data-id="container_divider"><div class='btn-container float-right'><button type='button' class='btn btn-sm btn-outline-light btn-icon delete'><i class='icon ion-md-close'></i></button></div>Container Divider<ol></ol></li>
+                                <li data-id="container_divider"><div class='btn-container float-right'><button type='button' class='btn btn-sm btn-outline-light btn-icon delete'><i class='icon ion-md-close'></i></button></div>Container Divider<ol></ol></li>
+                            </ol>
+                        </li>
+                        
+                    </ol>
+                    @using (Html.BeginForm("Content", "Generator", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("ID", (long)ViewBag.Checklist.ID)
+                        @Html.Hidden("result")
+
+                        <button type="submit" class="btn btn-primary float-right mg-t-20 mg-b-80">Save &amp; Next <i data-feather="arrow-right-circle" class="wd-10 mg-l-5"></i></button>
+                    }
+
+                </div><!-- card-body -->
+            </div><!-- card -->
+        </div><!-- mail-content-body -->
+    </div><!-- mail-content -->
+</div><!-- mail-wrapper -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/jquery-sortable/js/jquery-sortable-min.js"></script>
+
+    <script type="text/javascript">
+        /*
+        $('[data-toggle="tooltip"]').tooltip()
+
+        new PerfectScrollbar('.mail-sidebar-body', {
+          suppressScrollX: true
+        });
+		*/
+		
+        new PerfectScrollbar('.mail-content-body', {
+          suppressScrollX: true
+        });
+        
+
+        $(document).ready(function () {
+
+            $("ol.dragable.dragdrop").on('click', '.delete', function () {
+                $(this).parent().parent().remove();
+                $('#result').val(JSON.stringify(group.sortable("serialize").get()));
+            });
+
+            var group = $("ol.dragable.dragdrop").sortable({
+                group: 'no-drop',
+                onDragStart: function ($item, container, _super) {
+                    // Duplicate items of the no drop area
+                    if (!container.options.drop)
+                        $item.clone().insertAfter($item);
+                    _super($item, container);
+                },
+                onMousedown: function ($item, _super, event) {
+                    if (!event.target.nodeName.match(/^(i|button|input|select|textarea)$/i)) {
+                        event.preventDefault()
+                        return true
+                    }
+                },
+                onDrop: function ($item, container, _super) {
+                    if ($item.find('.btn-container').length !== 0) {
+
+                    } else if ($item.hasClass('static')) {
+
+                    }
+                    else {
+                        $item = $item.prepend( "<div class='btn-container float-right'><button type='button' class='btn btn-sm btn-outline-light btn-icon delete'><i class='icon ion-md-close'></i></button></div>" );
+                    }
+                    
+                    $('#result').val(JSON.stringify(group.sortable("serialize").get()));
+                    _super($item, container);
+                }
+            });
+
+            $("ol.dragable.drag_only").sortable({
+                group: 'no-drop',
+                drop: false
+            });
+
+        });
+
+    </script>
+}

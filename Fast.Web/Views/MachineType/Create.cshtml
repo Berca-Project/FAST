@@ -1,0 +1,119 @@
+﻿@model Fast.Web.Models.LocationMachineTypeModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Create", "MachineType", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-plus-square" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewMachineType</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Country</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry1" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.ProductionCenter</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Department</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment1" })
+			</div>
+			@*<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.SubDepartment</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment1" })
+			</div>*@
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.MachineTypeList</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.MachineTypeIDs, (MultiSelectList)ViewBag.MachineTypeList, new { @multiple = "multiple", @class = "form-control", @id = "ddlMachineType", @style = "width: 100%" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+
+		$('#ddlCountry1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/MachineType/GetProductionCenterByCountryID",
+				data: { id: $('#ddlCountry1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlProdCenter1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlProdCenter1').html(ddlTemp);
+					$('#ddlDepartment1').html("<select id='ddlDepartment1'><option value='0'>- Please Select -</option></select>");
+					$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlProdCenter1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/MachineType/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenter1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartment1').html(ddlTemp);
+					$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlDepartment1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/MachineType/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartment1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartment1').html(ddlTemp);
+				}
+			});
+		});
+	});
+</script>

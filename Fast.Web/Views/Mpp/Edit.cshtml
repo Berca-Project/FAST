@@ -1,0 +1,171 @@
+﻿@model Fast.Web.Models.MppModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Edit", "Mpp", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.ID, new { @Id = "ID" })
+	@Html.HiddenFor(x => x.LocationID, new { @Id = "LocationID" })
+	@Html.HiddenFor(x => x.LocID, new { @Id = "LocID" })
+	@Html.HiddenFor(x => x.LocType, new { @Id = "LocType" })
+	@Html.HiddenFor(x => x.Date, new { @Id = "Date" })
+	@Html.HiddenFor(x => x.EmployeeMachine, new { @Id = "EmployeeMachine" })
+	@Html.HiddenFor(x => x.Shift, new { @Id = "Shift" })
+	@Html.HiddenFor(x => x.JobTitle, new { @Id = "JobTitle" })
+	@Html.HiddenFor(x => x.GroupType, new { @Id = "GroupType" })
+	@Html.HiddenFor(x => x.GroupName, new { @Id = "GroupName" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.EditMPP</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<h6>Previous</h6>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Date</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.Date, "{0:dd-MMM-yy}", new { @class = "form-control", @id = "txtEmpID", @disabled = "disabled" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Machine</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.EmployeeMachine, null, new { @class = "form-control", @id = "tbEmployeeMachine", @disabled = "disabled" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Shift</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.Shift, null, new { @class = "form-control", @id = "tbShift", @disabled = "disabled" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Employee</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.EmployeeName, null, new { @class = "form-control", @id = "txtEmpName", @disabled = "disabled" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Status</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.StatusMPP, null, new { @class = "form-control", @id = "txtStatus", @disabled = "disabled" })
+			</div>
+		</div>
+		<br />
+		<h6>Replaced By</h6>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Status</label>
+			</div>
+			<div class="col-4">
+				<label class="form-check-label"> <input type="radio" id="rbNormal" checked> Normal</label>
+				@Html.TextBoxFor(x => x.StatusMPP, null, new { @class = "form-control d-none", @id = "tbStatusMPP" })
+			</div>
+			<div class="col-4">
+				<label class="form-check-label"> <input type="radio" id="rbLongShift"> Long Shift</label>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppNormal">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Normal</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.IDNormal, (IEnumerable<SelectListItem>)ViewBag.UserList, new { @class = "form-control", @id = "ddlUserNormalList" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppLS d-none">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.EmpShiftOneList</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.IDLS1, (IEnumerable<SelectListItem>)ViewBag.UserLS1List, new { @class = "form-control", @id = "ddlUserLS1List" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppLS d-none">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.EmpShiftThreeList</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.IDLS2, (IEnumerable<SelectListItem>)ViewBag.UserLS2List, new { @class = "form-control", @id = "ddlUserLS2List" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+
+	$('#rbNormal').on('click', function () {
+		$('.mppNormal').removeClass('d-none');
+		$('.mppLS').addClass('d-none');
+		$('#rbLongShift').prop('checked', false);
+		$('#tbStatusMPP').val('Normal');
+		LoadUserList();
+	});
+
+	$('#rbLongShift').on('click', function () {
+		$('#rbNormal').prop('checked', false);
+		$('.mppLS').removeClass('d-none');
+		$('.mppNormal').addClass('d-none');
+		$('#tbStatusMPP').val('LongShift');
+		LoadUserList();
+	});
+
+	function LoadUserList() {
+		var statusMpp = "LongShift";
+
+		if ($('#rbNormal').prop('checked')) {
+			statusMpp = "Normal";
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "@Url.Action("GetUserListOnEdit", "MPP")",
+			data: { mppID : '@Model.ID', status : statusMpp},
+			datatype: "json",
+			traditional: true,
+			success: function (data) {
+				if ($('#tbStatusMPP').val() == "Normal") {
+					var ddlTemp = "";
+					for (var i = 0; i < data[0].length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					$('#ddlUserNormalList').html(ddlTemp);
+				} else {
+					var ddlTemp = "<option value='0'>- Please Select -</option>";
+					for (var i = 0; i < data[0].length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[0][i].Value + '>' + data[0][i].Text + '</option>';
+					}
+					$('#ddlUserLS1List').html(ddlTemp);
+
+					ddlTemp = "<option value='0'>- Please Select -</option>";
+					for (var i = 0; i < data[1].length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[1][i].Value + '>' + data[1][i].Text + '</option>';
+					}
+					$('#ddlUserLS2List').html(ddlTemp);
+				}
+			}
+		});
+	}
+
+</script>

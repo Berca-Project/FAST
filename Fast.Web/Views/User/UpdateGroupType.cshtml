@@ -1,0 +1,272 @@
+﻿@model Fast.Web.Models.UserModel
+@using Fast.Web.Resources;
+
+<!-- Specific Page Vendor CSS -->
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link href="~/Content/theme/css/jquery-ui-1.9.2.css" rel="stylesheet" />
+<style>
+	.fixedHeight {
+		font-size: 14px;
+		max-height: 300px;
+		margin-bottom: 10px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.ui-helper-hidden-accessible {
+		display: none;
+	}
+</style>
+
+@using (Html.BeginForm("UpdateGroupType", "User", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm", @encType = "multipart/form-data" }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-random fa-3x"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.MassUpload</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.UpdateGroupTypeUsingExcel</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Supervisor</label>
+			</div>
+			<div class="col-8">
+				@Html.TextBoxFor(x => x.FullName, null, new { @class = "form-control", @id = "tbFullName2", @placeholder = "Type SPV name or ID here...", @onkeypress="return blockSpecialChar(event)" })
+			</div>
+			<div class="col-4">
+			</div>
+			<div class="col-8">
+				<p id="empty-message"></p>
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Country</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry2" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.ProductionCenter</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter2" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Department</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment2" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.SubDepartment</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment2" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.DownloadTemplate</label>
+			</div>
+			<div class="col-8">
+				<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton btn-block" data-dismiss="modal" id="btnGenerate">
+					<i data-feather="download" class="mg-r-5"></i> @UIResources.Download
+				</button>
+			</div>
+			<div class="col-4">
+			</div>
+			<div class="col-8">
+				<p id="error-message"></p>
+			</div>
+			<div class="progress col-12" id="loadingbar" style="visibility:hidden; height: 30px;">
+				<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Please wait a few seconds...</div>
+			</div>
+			<div class="col-12 dtMarginTop">
+				<div class="form-control-static">
+					<span class="btn btn-success fileinput-button btn-block">
+						@Html.TextBoxFor(x => x.PostedFilename, null, new { @type = "file", @accept = ".xls, .xlsx", @id = "customFile" })
+					</span>
+				</div>
+			</div>
+			<div class="row">
+				<input type="text" name="fname" id="tbEmployeeID2" style="display:none">
+				<input type="text" name="fname" id="tbLocationID2" style="display:none">
+				<input type="text" name="fname" id="tbLocationType2" style="display:none">
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal" onclick="OnCancel()" id="btnCancel">@UIResources.Cancel</button>
+		<button type="button" class="btn btn-primary" onclick="Validate()" id="btnSubmit">@UIResources.Upload</button>
+	</div>
+}
+
+<script src="~/Content/theme/js/jquery-1.10.0.min.js"></script>
+<script src="~/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#loadingbar').hide();
+
+		$('#tbFullName2').keyup(function () {
+			$("#error-message").text("");
+			if ($("#tbFullName2").val() == '') {
+				$("#empty-message").text("");
+			}
+		});
+
+		$("#tbFullName2").autocomplete({
+			delay: 750,
+			source: function (request, response) {
+				$.ajax({
+					url: fastApp.BaseUrl + '/User/AutoCompleteSpv/',
+					data: "{ 'prefix': '" + request.term + "'}",
+					dataType: "json",
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.length == 0) {
+							$("#empty-message").css('color', 'red');
+							$("#empty-message").text("Data does not exist in Employee List");
+						} else {
+							$("#empty-message").text("");
+							response($.map(data, function (item) {
+								return $.trim(item.EmployeeID) + " - " + item.FullName;
+							}))
+						}
+					},
+					error: function (response) {
+						alert(response.responseText);
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					}
+				});
+			},
+			select: function (e, i) {
+				var res = i.item.label.split(" - ");
+				if (res[0]) {
+					$("#tbEmployeeID2").val(res[0]);
+				}
+			},
+			minLength: 1
+		});
+
+		$("#tbFullName2").autocomplete("widget").addClass("fixedHeight");
+
+		$('#ddlProdCenter2').change(function () {
+			$("#empty-message").text("");
+			$("#error-message").text("");
+			if ($('#ddlProdCenter2').val() != "0") {
+				$("#tbLocationID2").val($('#ddlProdCenter2').val());
+				$("#tbLocationType2").val('productioncenter');
+			} else {
+				$("#tbLocationType2").val('country');
+			}
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/User/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenter2').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartment2').html(ddlTemp);
+					$('#ddlSubDepartment2').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlDepartment2').change(function () {
+			$("#empty-message").text("");
+			$("#error-message").text("");
+			if ($('#ddlDepartment2').val() != "0") {
+				$("#tbLocationID2").val($('#ddlDepartment2').val());
+				$("#tbLocationType2").val('department');
+			} else {
+				$("#tbLocationType2").val('productioncenter');
+			}
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/User/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartment2').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartment2').html(ddlTemp);
+				}
+			});
+		});
+
+		$('#ddlSubDepartment2').change(function () {
+			$("#empty-message").text("");
+			$("#error-message").text("");
+			if ($('#ddlSubDepartment2').val() != "0") {
+				$("#tbLocationID2").val($('#ddlSubDepartment2').val());
+				$("#tbLocationType2").val('subdepartment');
+			} else {
+				$("#tbLocationType2").val('department');
+			}
+		});
+	});
+
+	$('#btnGenerate').on('click', function (e) {
+
+		if ($('#ddlProdCenter2').val() == "0" && $('#tbEmployeeID2').val() == '') {
+			$("#error-message").css('color', 'red');
+			$("#error-message").text("No supervisor or production center is selected");
+			return (false);
+		}
+
+		e.preventDefault();
+		var notice = new PNotify({
+			title: "Generating Excel file",
+			text: "Please wait a few seconds....",
+			addclass: 'stack-bottomright',
+			width: "400px",
+			type: 'success',
+			stack: stack_bottomright,
+		});
+
+		notice.get().click(function () {
+			notice.remove();
+		});
+
+		var spvID = $('#tbEmployeeID2').val();
+		var locID = $("#tbLocationID2").val();
+		var locType = $("#tbLocationType2").val();
+		var url = fastApp.BaseUrl + '/User/GenerateExcel?supervisorID=' + spvID + '&locationID=' + locID + '&locationType=' + locType;
+		window.location.href = url;
+	});
+
+	function OnCancel() {
+		window.location.href = fastApp.BaseUrl + '/User/Index';
+	};
+
+	function Validate() {
+		if ($('#customFile').is(":visible") && $('#customFile').val() == "") {
+			$("#error-message").css('color', 'red');
+			$("#error-message").text("No file is selected");
+			return (false);
+		}
+
+		$('#loadingbar').show();
+		$("#btnSubmit").attr("disabled", true);
+		$("#btnCancel").attr("disabled", true);
+
+		document.getElementById('AddModalForm').submit();
+		return (true);
+	}
+</script>

@@ -1,0 +1,1395 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">TRS Report</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">TRS Report</h4>
+            </div>
+            <div class="d-none d-md-block">
+                @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                    <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                    <button id="btnSave" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group d-flex">
+                                <label class="col-2" style="flex:1">Date</label>
+                                <div style="flex:3">
+                                    <div class="input-group col-12">
+                                        <input type="week" class="form-control" name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="week" class="form-control" name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Country</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="country">
+                                        <option label="Select Country"></option>
+                                        <option value="id">ID - Indonesia</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" data-mock-width="150px" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        <option value="pi">PI - PMID Karawang</option>
+                                        <option value="pk">PK - SKM Karawang</option>
+                                        <option value="pb">PB - SIS Sukorejo</option>
+                                        <option value="pj">PJ - SKM Sukorejo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand</label>
+                                <div class="col-9">
+                                    <select class="form-control select2" data-mock-width="310px" name="brand">
+                                        <option label="Select Brand"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Sampling Protocol</div>
+                    <div class="card-body row">
+                        <!--div class="col-12 row" id="collapseExample" style="display:none;">
+                            <div class="content col-9">
+                                <canvas id="chrph1" height="100"></canvas>
+                            </div>
+
+                            <div class="divider-text divider-vertical" style="height:280px; margin:2em 5em 0em 2em;"></div>
+
+                            <div class="card col-2 pd-l-10 pd-t-10 mg-t-20" style="height:180px;">
+                                <label style="font-weight:bold;">Legend</label>
+                                <div class="mg-b-0 mg-l-10">
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; TRS Recovery Rate</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Confidence interval &#64; 95% conf. =</span>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 tx-center">
+                            <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHide" style="margin: auto 0 15px 0;">Show Chart</button>
+                        </div-->
+
+                        <div class="tableWrapper col-12" style="min-height:350px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th colspan="2" style="min-width:100px;">Affiliate: PT SIS</th>
+                                        <th colspan="3" style="min-width:260px;">Maker Model : Protos 70 <br /> TRS Model : TRS 20 <br /> Mesh Size : 0,75mm / mesh 25</th>
+                                        <th colspan="2" style="min-width:110px;">LU # : All Maker</th>
+                                        <th colspan="1" style="min-width:190px;">Sampling Time (min) : 3</th>
+                                        <th rowspan="2" style="min-width:160px;">TRS Recovery rate, <br> %</th>
+                                        <th rowspan="2" style="min-width:200px;">Confidence interval <br> @@ 95% conf.</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:110px;">Sampling #</th>
+                                        <th style="min-width:140px;">Date</th>
+
+                                        <th style="min-width:90px;">Time</th>
+                                        <th style="min-width:90px;">Speed, CPM</th>
+                                        <th style="min-width:90px;">CTW, Miligram</th>
+
+                                        <th style="min-width:90px;">TRS Sample Weight, Gram</th>
+                                        <th style="min-width:90px;">Recovery Rate, %</th>
+
+                                        <th style="min-width:90px;">Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="yield" class="tx-center">
+                                    <tr>
+                                        <td style=min-width:50px>4</td>
+                                        <td style=min-width:50px>23 Sep 2019</td>
+                                        <td style=min-width:50px>0.28194444444444444</td>
+                                        <td style=min-width:50px>6720</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>255.49</td>
+                                        <td style=min-width:50px>1.7675195368710015</td>
+                                        <td style=min-width:50px>M57 (Shift 1)</td>
+                                        <td style=min-width:50px>1.514812880815221</td>
+                                        <td style=min-width:50px>0.448706964914586</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>5</td>
+                                        <td style=min-width:50px>23 Sep 2019</td>
+                                        <td style=min-width:50px>0.59722222222222221</td>
+                                        <td style=min-width:50px>6720</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>180.1</td>
+                                        <td style=min-width:50px>1.2459597972150274</td>
+                                        <td style=min-width:50px>M57 (Shift 2)</td>
+                                        <td style=min-width:50px>1.514812880815221</td>
+                                        <td style=min-width:50px>0.448706964914586</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>6</td>
+                                        <td style=min-width:50px>23 Sep 2019</td>
+                                        <td style=min-width:50px>0.93333333333333324</td>
+                                        <td style=min-width:50px>6780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>208.6</td>
+                                        <td style=min-width:50px>1.4303561902332591</td>
+                                        <td style=min-width:50px>M57 (Shift 3)</td>
+                                        <td style=min-width:50px>1.514812880815221</td>
+                                        <td style=min-width:50px>0.448706964914586</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>7</td>
+                                        <td style=min-width:50px>23 Sep 2019</td>
+                                        <td style=min-width:50px>0.36388888888888887</td>
+                                        <td style=min-width:50px>5400</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>97.69</td>
+                                        <td style=min-width:50px>0.84103862114089922</td>
+                                        <td style=min-width:50px>M59 (Shift 1)</td>
+                                        <td style=min-width:50px>1.514812880815221</td>
+                                        <td style=min-width:50px>0.448706964914586</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>8</td>
+                                        <td style=min-width:50px>23 Sep 2019</td>
+                                        <td style=min-width:50px>0.6069444444444444</td>
+                                        <td style=min-width:50px>5580</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>117.72</td>
+                                        <td style=min-width:50px>0.98078913033697757</td>
+                                        <td style=min-width:50px>M59 (Shift 2)</td>
+                                        <td style=min-width:50px>1.514812880815221</td>
+                                        <td style=min-width:50px>0.448706964914586</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>9</td>
+                                        <td style=min-width:50px>23 Sep 2019</td>
+                                        <td style=min-width:50px>0.94930555555555562</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>109.12</td>
+                                        <td style=min-width:50px>0.91901980204690781</td>
+                                        <td style=min-width:50px>M59 (Shift 3)</td>
+                                        <td style=min-width:50px>1.514812880815221</td>
+                                        <td style=min-width:50px>0.448706964914586</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>4</td>
+                                        <td style=min-width:50px>24 Sep 2019</td>
+                                        <td style=min-width:50px>0.28263888888888888</td>
+                                        <td style=min-width:50px>6720</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>318.82</td>
+                                        <td style=min-width:50px>2.2056463217551086</td>
+                                        <td style=min-width:50px>M57 (Shift 1)</td>
+                                        <td style=min-width:50px>1.4439431652678278</td>
+                                        <td style=min-width:50px>0.46776645486415058</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>5</td>
+                                        <td style=min-width:50px>24 Sep 2019</td>
+                                        <td style=min-width:50px>0.59791666666666665</td>
+                                        <td style=min-width:50px>6720</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>165.69</td>
+                                        <td style=min-width:50px>1.1462691771269178</td>
+                                        <td style=min-width:50px>M57 (Shift 2)</td>
+                                        <td style=min-width:50px>1.4439431652678278</td>
+                                        <td style=min-width:50px>0.46776645486415058</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>6</td>
+                                        <td style=min-width:50px>24 Sep 2019</td>
+                                        <td style=min-width:50px>0.9375</td>
+                                        <td style=min-width:50px>6780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>240.16</td>
+                                        <td style=min-width:50px>1.6467609906348011</td>
+                                        <td style=min-width:50px>M57 (Shift 3)</td>
+                                        <td style=min-width:50px>1.4439431652678278</td>
+                                        <td style=min-width:50px>0.46776645486415058</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>7</td>
+                                        <td style=min-width:50px>24 Sep 2019</td>
+                                        <td style=min-width:50px>0.28611111111111115</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>117.45</td>
+                                        <td style=min-width:50px>0.98917591413498274</td>
+                                        <td style=min-width:50px>M59 (Shift 1)</td>
+                                        <td style=min-width:50px>1.4439431652678278</td>
+                                        <td style=min-width:50px>0.46776645486415058</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>8</td>
+                                        <td style=min-width:50px>24 Sep 2019</td>
+                                        <td style=min-width:50px>0.59097222222222223</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>62.01</td>
+                                        <td style=min-width:50px>0.5222545630950215</td>
+                                        <td style=min-width:50px>M59 (Shift 2)</td>
+                                        <td style=min-width:50px>1.4439431652678278</td>
+                                        <td style=min-width:50px>0.46776645486415058</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>9</td>
+                                        <td style=min-width:50px>24 Sep 2019</td>
+                                        <td style=min-width:50px>0.9375</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>118.4</td>
+                                        <td style=min-width:50px>0.99717691131189401</td>
+                                        <td style=min-width:50px>M59 (Shift 3)</td>
+                                        <td style=min-width:50px>1.4439431652678278</td>
+                                        <td style=min-width:50px>0.46776645486415058</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>1</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.27499999999999997</td>
+                                        <td style=min-width:50px>7200</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>362.82</td>
+                                        <td style=min-width:50px>2.342708817604215</td>
+                                        <td style=min-width:50px>M51 (Shift 1)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>2</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.59444444444444444</td>
+                                        <td style=min-width:50px>7000</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>314.8</td>
+                                        <td style=min-width:50px>2.0907219233579069</td>
+                                        <td style=min-width:50px>M51 (Shift 2)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>3</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.94027777777777777</td>
+                                        <td style=min-width:50px>6740</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>267.48</td>
+                                        <td style=min-width:50px>1.8449772171386714</td>
+                                        <td style=min-width:50px>M51 (Shift 3)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>4</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.27986111111111112</td>
+                                        <td style=min-width:50px>6780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>384.4</td>
+                                        <td style=min-width:50px>2.6358049833445101</td>
+                                        <td style=min-width:50px>M57 (Shift 1)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>5</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.60555555555555551</td>
+                                        <td style=min-width:50px>6780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>291.52</td>
+                                        <td style=min-width:50px>1.9989330612502385</td>
+                                        <td style=min-width:50px>M57 (Shift 2)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>6</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.93680555555555556</td>
+                                        <td style=min-width:50px>6780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>284.3</td>
+                                        <td style=min-width:50px>1.9494260061520401</td>
+                                        <td style=min-width:50px>M57 (Shift 3)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>7</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.30555555555555552</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>128.86000000000001</td>
+                                        <td style=min-width:50px>1.0852721012808335</td>
+                                        <td style=min-width:50px>M59 (Shift 1)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>8</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.60138888888888886</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>118.28</td>
+                                        <td style=min-width:50px>0.99616625903691569</td>
+                                        <td style=min-width:50px>M59 (Shift 2)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>9</td>
+                                        <td style=min-width:50px>25 Sep 2019</td>
+                                        <td style=min-width:50px>0.94236111111111109</td>
+                                        <td style=min-width:50px>5580</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>104.18</td>
+                                        <td style=min-width:50px>0.86798005095571118</td>
+                                        <td style=min-width:50px>M59 (Shift 3)</td>
+                                        <td style=min-width:50px>1.7568878244578936</td>
+                                        <td style=min-width:50px>0.48237100144318024</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>1</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>M51 (Shift 1)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>2</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px>0.62222222222222223</td>
+                                        <td style=min-width:50px>7200</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>394.12</td>
+                                        <td style=min-width:50px>2.5448111989255646</td>
+                                        <td style=min-width:50px>M51 (Shift 2)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>3</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px>0.9506944444444444</td>
+                                        <td style=min-width:50px>7200</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>355.21</td>
+                                        <td style=min-width:50px>2.2935714654682577</td>
+                                        <td style=min-width:50px>M51 (Shift 3)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>4</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>M57 (Shift 1)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>5</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px>0.59722222222222221</td>
+                                        <td style=min-width:50px>6720</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>210.41</td>
+                                        <td style=min-width:50px>1.45564908901729</td>
+                                        <td style=min-width:50px>M57 (Shift 2)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>6</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px>0.94097222222222221</td>
+                                        <td style=min-width:50px>4780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>288.3</td>
+                                        <td style=min-width:50px>2.8039891925328106</td>
+                                        <td style=min-width:50px>M57 (Shift 3)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>7</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>M59 (Shift 1)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>8</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px>0.62152777777777779</td>
+                                        <td style=min-width:50px>5280</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>107.51</td>
+                                        <td style=min-width:50px>0.94661749996478028</td>
+                                        <td style=min-width:50px>M59 (Shift 2)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>9</td>
+                                        <td style=min-width:50px>26 Sep 2019</td>
+                                        <td style=min-width:50px>0.93402777777777779</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>135.38</td>
+                                        <td style=min-width:50px>1.1401842082213194</td>
+                                        <td style=min-width:50px>M59 (Shift 3)</td>
+                                        <td style=min-width:50px>1.8641371090216703</td>
+                                        <td style=min-width:50px>0.82149638495830524</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>1</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.27777777777777779</td>
+                                        <td style=min-width:50px>7200</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>290.3</td>
+                                        <td style=min-width:50px>1.8744511596673381</td>
+                                        <td style=min-width:50px>M51 (Shift 1)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>2</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.59236111111111112</td>
+                                        <td style=min-width:50px>7000</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>322.81</td>
+                                        <td style=min-width:50px>2.1439197715348346</td>
+                                        <td style=min-width:50px>M51 (Shift 2)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>3</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.9555555555555556</td>
+                                        <td style=min-width:50px>7200</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>310.04000000000002</td>
+                                        <td style=min-width:50px>2.0019112557466814</td>
+                                        <td style=min-width:50px>M51 (Shift 3)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>4</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.26874999999999999</td>
+                                        <td style=min-width:50px>6660</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>199.13</td>
+                                        <td style=min-width:50px>1.3900232170803999</td>
+                                        <td style=min-width:50px>M57 (Shift 1)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>5</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.59791666666666665</td>
+                                        <td style=min-width:50px>6680</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>175.24</td>
+                                        <td style=min-width:50px>1.2195970680674912</td>
+                                        <td style=min-width:50px>M57 (Shift 2)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>6</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.93333333333333324</td>
+                                        <td style=min-width:50px>6780</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>186.2</td>
+                                        <td style=min-width:50px>1.2767608946377413</td>
+                                        <td style=min-width:50px>M57 (Shift 3)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>4</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.28125</td>
+                                        <td style=min-width:50px>5220</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>103.12</td>
+                                        <td style=min-width:50px>0.91840024509672957</td>
+                                        <td style=min-width:50px>M59 (Shift 1)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>5</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.59583333333333333</td>
+                                        <td style=min-width:50px>5640</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>132.76</td>
+                                        <td style=min-width:50px>1.094328549149167</td>
+                                        <td style=min-width:50px>M59 (Shift 2)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>6</td>
+                                        <td style=min-width:50px>27 Sep 2019</td>
+                                        <td style=min-width:50px>0.93888888888888899</td>
+                                        <td style=min-width:50px>5520</td>
+                                        <td style=min-width:50px>717</td>
+                                        <td style=min-width:50px>126.82</td>
+                                        <td style=min-width:50px>1.0680910126062026</td>
+                                        <td style=min-width:50px>M59 (Shift 3)</td>
+                                        <td style=min-width:50px>1.443053685954065</td>
+                                        <td style=min-width:50px>0.34456404418121861</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--Sampling Protocol-->
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script>
+        /* chart.js chart examples */
+
+        // chart colors
+        var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+        var chBar = document.getElementById("chrph1");
+        var chartData = {
+            labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+            datasets: [{
+                data: [1.51, 1.44, 1.76, 1.86, 1.44, 1.73, 1.53],
+                backgroundColor: colors[0]
+            },
+            {
+                data: [0.44, 0.47, 0.48, 0.82, 0.34, 0.61, 0.42],
+                backgroundColor: colors[1]
+            }]
+        };
+
+        if (chBar) {
+            new Chart(chBar, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            barPercentage: 0.4,
+                            categoryPercentage: 0.5
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        }
+    </script> @*chrph1*@
+
+
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().toggleClass("active");
+                const index = $(this).index() + 1;
+                $("#lines .carousel-item.active").removeClass("active");
+                const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                $(carouselItem).toggleClass("active");
+                $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+                ieFix();
+            });
+        });
+    </script> @*tabbel wrapper*@
+
+    <script>
+        $("#btnShowHide").click(function () {
+            var x = document.getElementById("collapseExample");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+
+        $("#btnShowHiderph").click(function () {
+            var x = document.getElementById("collapseExamplerph");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+
+        $("#btnShowHidelph").click(function () {
+            var x = document.getElementById("collapseExamplelph");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+    </script> @*hide button*@
+
+
+    <!------------------------ STICKY ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        });
+    </script>
+
+
+    <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+    <script>
+        const loc = {
+            pi: [
+                "[FA000963.01] MARLBORO MNT KS SOF 20",
+                "[FA000963.03] MARLBORO MNT KS SOF 20",
+            ],
+            pk: [
+                "[FA044121.18] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045300.06] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA045796.17] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA048259.10] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA069010.04] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA071690.00] - PHILIP MORRIS BOLD LTK BOX 12",
+            ],
+            pb: [
+                "[FG102151.01] - RYO CRAFTSMAN EXPRESSO P17 15.0",
+                "[FA071650.01] - SAMPOERNA U BOLD LTK BOX 12",
+                "[FA067815.06] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA068324.04] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.08] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.03] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.09] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068849.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FG102194.01] - RYO CRAFTSMAN SAILORS RUM P21 25",
+                "[FG102194.00] - RYO CRAFTSMAN SAILORS RUM P21 25",
+                "[FG102195.01] - RYO CRAFTSMAN BRUNSWICK BLEND P21 25",
+                "[FG102196.01] - RYO CRAFTSMAN SAILORS RUM P21 15",
+                "[FG102196.00] - RYO CRAFTSMAN SAILORS RUM P21 15",
+                "[FG102195.00] - RYO CRAFTSMAN BRUNSWICK BLEND P21 25",
+                "[FG102200.01] - RYO CHOICE FULL RED P21 25.0",
+                "[FG102201.01] - RYO CRAFTSMAN EXPRESSO P21 15.0",
+                "[FG102198.00] - RYO CHOICE ORIGINAL BLUE P21 25",
+                "[FG102200.00] - RYO CHOICE FULL RED P21 25.0",
+                "[FG102198.01] - RYO CHOICE ORIGINAL BLUE P21 25",
+                "[FG102201.00] - RYO CRAFTSMAN EXPRESSO P21 15.0",
+                "[FG102203.00] - RYO LONGBEACH RICH P21 25",
+                "[FG102199.01] - RYO CHOICE RICH GOLD P21 25.0",
+                "[FG102197.01] - RYO CRAFTSMAN BRUNSWICK BLEND P21 15",
+                "[FG102203.01] - RYO LONGBEACH RICH P21 25",
+                "[FG102197.00] - RYO CRAFTSMAN BRUNSWICK BLEND P21 15",
+                "[FG102202.01] - RYO CRAFTSMAN EXPRESSO P21 25.0",
+                "[FG102202.00] - RYO CRAFTSMAN EXPRESSO P21 25.0",
+                "[FG102199.00] - RYO CHOICE RICH GOLD P21 25.0",
+                "[FG102205.00] - RYO PETER JACKSON BLUE P21 15",
+                "[FG102204.00] - RYO LONGBEACH ORIGINAL YELLOW P21 25",
+                "[FG102205.01] - RYO PETER JACKSON BLUE P21 15",
+                "[FG102206.00] - RYO PETER JACKSON BLUE P21 25",
+                "[FG102204.01] - RYO LONGBEACH ORIGINAL YELLOW P21 25",
+                "[FG102206.01] - RYO PETER JACKSON BLUE P21 25",
+                "[FG102331.01] - RYO BOND STREET GOLD P21 15.0",
+                "[FG102329.01] - RYO BOND STREET RED P21 15.0",
+                "[FG102330.01] - RYO BOND STREET BLUE P21 15.0",
+                "[FG102371.00] - RYO BOND STREET RED P21 25.0",
+                "[FG102371.01] - RYO BOND STREET RED  25.0",
+                "[FG102372.00] - RYO BOND STREET BLUE P21 25.0",
+                "[FG102372.01] - RYO BOND STREET BLUE P21 25.0",
+                "[FG102373.01] - RYO BOND STREET GOLD P21 25.0",
+                "[FG102373.00] - RYO BOND STREET GOLD P21 25.0",
+                "[FG102318.00] - RYO MARLBORO P31 25.0",
+                "[FG102210.01] - RYO CRAFTSMAN ORIGINAL BATCH P11 30",
+                "[FG102209.01] - RYO CRAFTSMAN SAILORS RUM P11 30.0",
+                "[FG102329.00] - RYO BOND STREET RED P21 15.0",
+                "[FG102330.00] - RYO BOND STREET BLUE P21 15.0",
+                "[FG102336.00] - RYO AITO NOIR P31 30.0",
+                "[FG102337.00] - RYO MARLBORO P31 30.0",
+                "[FG102210.00] - RYO CRAFTSMAN ORIGINAL BATCH P11 30",
+                "[FG102328.00] - RYO LONGBEACH BYCRAFTS P11 30.0",
+                "[FG102209.00] - RYO CRAFTSMAN SAILORS RUM P11 30.0",
+                "[FG102331.00] - RYO BOND STREET GOLD P21 15.0",
+                "[FG102334.00] - RYO CRAFTSMAN FINE CUT P11 30.0",
+                "[FG102334.01] - RYO CRAFTSMAN FINE CUT P11 30.0",
+                "[FG102375.00] - RYO MARLBORO P31 25.0",
+                "[FC100365.07] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FC100309.03] - CIGRILL L&M RED LABEL KS BOX 12",
+                "[FA067814.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FC100319.15] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FC100689.00] - CIGRILL CRAFTSMAN NATURAL KS BOX 12",
+                "[FC100310.03] - CIGRILL L&M BLUE LABEL KS BOX 12",
+                "[FC100365.08] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FG102191.00] - RYO CHOICE ORIGINAL BLUE P21 15.0",
+                "[FG102192.01] - RYO CHOICE RICH GOLD P21 15.0",
+                "[FG102191.01] - RYO CHOICE ORIGINAL BLUE P21 15.0",
+                "[FG102193.00] - RYO CHOICE FULL RED P21 15.0",
+                "[FG102192.00] - RYO CHOICE RICH GOLD P21 15.0",
+                "[FG102193.01] - RYO CHOICE FULL RED P21 15.0",
+                "[FC100319.16] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FG102384.01] - RYO LONGBEACH ORIGINAL YELLOW P22 45.0",
+                "[FG102384.00] - RYO LONGBEACH ORIGINAL YELLOW P22 45.0",
+                "[FG102385.00] - RYO LONGBEACH RICH P22 45.0",
+                "[FG102385.01] - RYO LONGBEACH RICH P22 45.0",
+                "[FC100278.09] - CIGRILL L&M CIGARILOS KS BOX 12",
+                "[FG102151.00] - RYO CRAFTSMAN EXPRESSO P17 15.0",
+                "[FG102176.00] - RYO PETER JACKSON BLUE P17 15.0",
+                "[FC100307.09] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 12",
+                "[FC100365.10] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FC100319.17] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FG102177.00] - RYO PETER JACKSON BLUE P17 25.0",
+                "[FG102120.01] - RYO CRAFTSMAN BRUNSWICK BLEND P17 15.0",
+                "[FG102106.01] - RYO CRAFTSMAN SAILORS RUM P17 25.0",
+                "[FG102104.01] - RYO CRAFTSMAN BRUNSWICK BLEND P17 25.0",
+                "[FG102166.00] - RYO CHOICE RICH GOLD P17 25.0",
+                "[FG102119.01] - RYO CRAFTSMAN SAILORS RUM P17 15.0",
+                "[FG102165.00] - RYO CHOICE ORIGINAL BLUE P17 25.0",
+                "[FG102150.01] - RYO CRAFTSMAN EXPRESSO P17 25.0",
+                "[FG102175.00] - RYO LONGBEACH ORIGINAL YELLOW P17 25.0",
+                "[FG102174.00] - RYO LONGBEACH RICH P17 25.0",
+                "[FG102167.00] - RYO CHOICE FULL RED P17 25.0",
+                "[FG102168.00] - RYO CHOICE ORIGINAL BLUE P17 15.0",
+                "[FG102170.00] - RYO CHOICE FULL RED P17 15.0",
+                "[FC100319.18] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FA071197.01] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FG100848.03] - RYO LONGBEACH ORIGINAL YELLOW POU 55",
+                "[FA067815.01] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA067814.06] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA071196.00] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.04] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA067815.04] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA068849.01] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068849.02] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA071197.00] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA071649.00] - SAMPOERNA U BOLD LTK BOX 12",
+                "[FA067814.10] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.05] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067815.07] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+
+            ],
+            pj: [
+                "[FA067629.04] - DJI SAM SOE NF LS SOF 12",
+                "[FA073805.00] - SAMPOERNA HIJAU SPECIAL NF LS SOF 12",
+                "[FA073804.00] - SAMPOERNA HIJAU ORIGINAL NF LS SOF 12",
+                "[FA070756.01] - SAMPOERNA HIJAU NF LS SOF 12",
+                "[FA071130.01] - DJI SAM SOE NF LS SOF 12",
+                "[FA049104.02] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA045796.11] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA050466.03] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA072334.00] - DJI SAM SOE LTK TIN 12 MAG",
+                "[FA073632.00] - SAMPOERNA U MNT KS BOX 20",
+                "[FA073634.00] - SAMPOERNA A KS BOX 20",
+                "[FA073635.00] - SAMPOERNA A MNT KS BOX 20",
+                "[FA044773.07] - SAMPOERNA HIJAU ORIGINAL NF LS SOF 12",
+                "[FA050597.06] - DJI SAM SOE NF LS SOF 12",
+                "[FA034649.12] - SAMPOERNA HIJAU NF LS SOF 12",
+                "[FA054807.05] - SAMPOERNA HIJAU SPECIAL NF LS SOF 12",
+                "[FA044182.08] - MARLBORO ULTRA LIGHTS KS BOX 20",
+                "[FA044428.08] - MARLBORO FILTER KS BOX 20",
+                "[FA073563.00] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA043509.08] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA073564.00] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044314.07] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA073565.00] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA070976.01] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA071127.03] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA048259.09] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA048258.10] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA073509.00] - SAMPOERNA A MILD LTK BOX 50 SLI",
+                "[FA068849.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA069779.03] - SAMPOERNA HIJAU NF LS SOF 10",
+                "[FA035621.19] - DJI SAM SOE SUPER PREMIUM NF LS SHO 12",
+                "[FA071115.05] - PANAMAS KUNING NF LS SOF 12",
+                "[FA067629.03] - DJI SAM SOE NF LS SOF 12",
+                "[FA072610.00] - SAMPOERNA A SPLASHTR MIX LTK BOX 16 SLI",
+                "[FA072611.00] - SAMPOERNA A SPLASHSU MIX LTK BOX 16 SLI",
+                "[FA061183.04] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.03] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA052576.18] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA061183.05] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069772.03] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.02] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA068715.07] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069748.06] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069772.02] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA010784.19] - DJI SAM SOE NF LS SOF 16",
+                "[FA064382.05] - DJI SAM SOE NF LS SOF 12",
+                "[FA068324.03] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.08] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.04] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067815.06] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA029605.10] - MARLBORO MENTHOL MNT KS BOX 20",
+                "[FA044121.24] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA048258.09] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA045796.17] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA045300.06] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA048259.08] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA045795.17] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA071271.02] - DJI SAM SOE MILD LTK OCT 20 SLI",
+                "[FA069010.04] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA062333.10] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA061184.04] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA073151.01] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA048258.08] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.03] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA044121.20] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045795.14] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA048258.07] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA031149.06] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA044504.06] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA048258.06] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.05] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.02] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA069393.00] - SAMPOERNA A PLATINUM LTK BOX 16 SLI",
+                "[FA069010.00] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA041433.05] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044504.05] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA045300.02] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA053179.02] - U BOLD LTK OCT 12 MAG",
+                "[FA048258.03] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.01] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA041433.04] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044504.04] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA061184.00] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA048258.01] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.00] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA050466.00] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA030853.03] - KRATON DALEM KRETEK NF LS SOF 12",
+                "[FA030853.02] - KRATON DALEM KRETEK NF LS SOF 12",
+                "[FA073563.01] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA073564.01] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA043509.09] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA073565.01] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA044314.08] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA071271.03] - DJI SAM SOE MILD LTK OCT 20 SLI",
+                "[FA045795.18] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA045300.07] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA073151.06] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA045796.18] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA062333.11] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA061184.06] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA072610.01] - SAMPOERNA A SPLASHTR MIX LTK BOX 16 SLI",
+                "[FA072611.01] - SAMPOERNA A SPLASHSU MIX LTK BOX 16 SLI",
+                "[FA044121.26] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA035621.21] - DJI SAM SOE SUPER PREMIUM NF LS SHO 12",
+                "[FA067629.05] - DJI SAM SOE NF LS SOF 12",
+                "[FA010784.21] - DJI SAM SOE NF LS SOF 16",
+                "[FA048258.11] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA052576.17] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA073151.02] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.04] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.03] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.05] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA062333.02] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA060147.00] - SAMPOERNA A KLIK MNT KS BOX 20 SLI",
+                "[FA052943.00] - MARLBORO FUSION KS BOX 20",
+                "[FA066705.00] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA066704.00] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA068877.00] - MARLBORO MILD TOUCH LTK BOX 16 SLI",
+                "[FA052565.00] - MARLBORO FUSION (C) KS BOX 20",
+                "[FA066530.00] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA061183.12] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA071530.05] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA069772.10] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.10] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA068774.00] - DJI SAM SOE MILD LTK BOX 12 SLI",
+                "[FA069393.02] - SAMPOERNA A PLATINUM LTK BOX 16 SLI",
+                "[FA050607.00] - DJI SAM SOE RED LTK OCT 12 MAG",
+                "[FA069010.01] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA069744.00] - MARLBORO MILD BLACK KS BOX 20 SLI",
+                "[FA050615.00] - MARLBORO FLAVOR PLUS KS BOX 20",
+                "[FA049647.14] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA056040.00] - SAMPOERNA KLIK KS BOX 20 SLI",
+                "[FA050583.00] - PHILIP MORRIS WHITE (1MG) KS RCB 20",
+                "[FA066531.00] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA050613.00] - MARLBORO REFINE KS BOS 20",
+                "[FA066530.01] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA069783.00] - SAMPOERNA MNT KS BOX 10 SLI",
+                "[FA069782.00] - SAMPOERNA KS BOX 10 SLI",
+                "[FA044504.03] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA066531.01] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA069074.01] - SAMPOERNA A REGULAR KS BOX 20 SLI",
+                "[FA067816.03] - SAMPOERNA U BOLD LTK OCT 12 MAG",
+                "[FA062631.00] - L&M MIXX KS BOX 20",
+                "[FA062632.00] - L&M GREEN MIXX MNT KS BOX 20",
+                "[FA058600.00] - SAMPOERNA HIJAU FILTER LTK OCT 12 MAG",
+                "[FA057763.00] - SAMPOERNA A KLIK KS BOX 20 SLI",
+                "[FA068351.00] - SAMPOERNA A ABSOLSEN LTK BOX 16 SLI",
+                "[FA071720.00] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA069732.01] - MARLBORO MILD BLACK LTK BOX 16 SLI",
+                "[FG100848.03] - RYO LONGBEACH ORIGINAL YELLOW POU 55",
+                "[FA058183.00] - SAMPOERNA A MILD KS BOX 20 SLI",
+                "[FA067816.02] - SAMPOERNA U BOLD LTK OCT 12 MAG",
+                "[FA065417.00] - SAMPOERNA A ABSOLSEN LTK RCS 20 SLI",
+                "[FA049646.13] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.27] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.35] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.12] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.33] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.35] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.27] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.33] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.34] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA050602.01] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA071719.00] - MARLBORO FILTER BLACK LTK BOX 50",
+                "[FA043582.04] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA042526.05] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA049104.01] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA050599.00] - SAMPOERNA A VOLUTION 100 TIN 20 SSL",
+                "[FA049505.08] - SAMPOERNA KS BOX 20 SLI",
+                "[FA053959.00] - MARLBORO CLOVE MIX KS BOX 20",
+                "[FA055165.00] - MARLBORO FLAVOR PLUS KS BOS 20",
+                "[FA056983.00] - MARLBORO CLOVE MIX (2.0) KS BOX 20",
+                "[FA049170.00] - MARLBORO FRESH FUSION MNT KS BOX 20",
+                "[FA050484.00] - SAMPOERNA A MILD MNT LTK BOS 16 SLI",
+                "[FA050840.00] - FORTUNE KRETEK KS BOX 20",
+                "[FA049646.26] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050602.00] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA050601.00] - SAMPOERNA A BLUE LTK BOX 16 SLI",
+                "[FA050863.01] - SAMPOERNA KS BOX 20 SLI",
+                "[FA044121.10] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA050939.00] - MARLBORO REFINED KS BOX 20",
+                "[FA049171.00] - MARLBORO FUSION KS BOX 20",
+                "[FA051598.00] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA053457.00] - MARLBORO SPICE KS BOX 20",
+                "[FA050789.00] - FORTUNE KRETEK MINT MNT KS BOX 20",
+                "[FA050770.00] - MARLBORO KRETEK MNT KS BOX 20",
+                "[FA050858.00] - SAMPOERNA NEW RED FLAVOR KS BOX 20 SLI",
+                "[FA050940.00] - MARLBORO REFINED KS BOS 20",
+                "[FA053959.01] - MARLBORO CLOVE MIX KS BOX 20",
+                "[FA049647.19] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.36] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA067202.00] - SAMPOERNA KLIK MNT LTK OCT 20 SLI",
+                "[FA049678.01] - MARLBORO X-FUSION KS BOX 20",
+                "[FA069697.00] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA065407.01] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA044123.11] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA057592.00] - L&M M-FUSION MNT KS BOX 20",
+                "[FA029426.13] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA061036.00] - SAMPOERNA U (WHITE) KS BOX 20 SLI",
+                "[FA064563.00] - DJI SAM SOE BLUE LTK OCT 20 SLI",
+                "[FA065407.00] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA029426.11] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA044314.03] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA045373.04] - SAMPOERNA A VOLUTION 100 LSB 16 SSL",
+                "[FA029426.12] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA029426.14] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA041433.03] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA045300.00] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA045372.06] - SAMPOERNA A VOLUTION MNT 100 LSB 16 SSL",
+                "[FA041433.06] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA045373.06] - SAMPOERNA A VOLUTION 100 LSB 16 SSL",
+                "[FA019622.00] - SAMPOERNA A MILD MNT KS BOX 20 SLI",
+                "[FA045372.04] - SAMPOERNA A VOLUTION MNT 100 LSB 16 SSL",
+                "[FA045796.07] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA049646.14] - SAMPOERNA KS BOX 20 SLI",
+                "[FA044121.17] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA050857.00] - SAMPOERNA TROPICAL MNT KS BOX 20 SLI",
+                "[FA029426.10] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA049646.34] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050435.00] - SAMPOERNA A VOLUTION KS BOX 20",
+                "[FA050582.00] - MARLBORO (RED FWD) 100 BOX 20",
+                "[FA053212.00] - MARLBORO FUSION KS BOX 20",
+                "[FA049646.30] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050863.00] - SAMPOERNA KS BOX 20 SLI",
+                "[FA056040.01] - SAMPOERNA KLIK KS BOX 20 SLI",
+                "[FA045796.05] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA049646.10] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.31] - SAMPOERNA KS BOX 20 SLI",
+                "[FA057591.00] - L&M FUSION KS BOX 20",
+                "[FA048258.04] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.02] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA049646.29] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.25] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.32] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.11] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.31] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.20] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA048259.03] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA049646.20] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.12] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA043509.04] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA049506.07] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.25] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.28] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.30] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.04] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA050466.02] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA049647.32] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA058184.00] - SAMPOERNA A MILD KS BOX 20 SLI",
+                "[FA065392.00] - MARLBORO MILD LTK RCS 20 SLI",
+                "[FA049646.19] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.26] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.13] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA061184.05] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA071530.04] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA061183.11] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.09] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.09] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA044121.25] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA071127.04] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA010784.20] - DJI SAM SOE NF LS SOF 16",
+                "[FA074380.00] - PHILIP MORRIS BOLD LTK BOX 16",
+                "[FA074381.00] - SAMPOERNA A FILTER LTK BOX 16",
+                "[FA074277.00] - SAMPOERNA A KS BOX 20 SLI",
+                "[FA074279.00] - SAMPOERNA A MNT KS BOX 20 SLI",
+                "[FA074278.00] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA071530.03] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA050466.04] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045795.12] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA049104.00] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA049104.03] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA044121.18] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA062333.04] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA074125.00] - DJI SAM SOE NF LS SOF 16",
+                "[FA069772.07] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.07] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA061183.09] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA061183.08] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.06] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.06] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA071530.02] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA045796.16] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA069773.05] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA061183.07] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069772.05] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA073954.00] - PANAMAS KUNING NF LS BOX 12",
+                "[FA073904.00] - PANAMAS KUNING NF LS BOX 12",
+                "[FA061183.06] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.04] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.04] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA071530.01] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[34.C24J] - HCD RIG NPO",
+                "[34.C24JC] - HCD RIG NPO",
+                "[34.C28B] - HCD RIG NPO",
+                "[34.C2LV] - HCD RIG NPO",
+                "[34.C2LVC] - HCD RIG NPO",
+                "[33.B0QW] - MONO STD",
+                "[33.B0YV] - HAT STD",
+                "[34.C1LIC] - C1LIC",
+            ],
+        }
+        $(document).ready(function () {
+            $("[name=prodCenter]").on("change", function () {
+                let opt = '<option label="Select Brand"></option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < loc[val].length; i++)
+                    opt += `<option value="${loc[val][i]}">${loc[val][i]}</option>`;
+                $("[name=brand]").html(opt);
+            })
+        });
+    </script>
+
+    <!------------------------ SELECT 2 ---------------------------------->
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.select2[data-mock-width]').on("select2:open", function () {
+                $(".select2-dropdown.select2-dropdown--below").css("min-width", $(this).data("mock-width"));
+            });
+        });
+    </script>
+
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                //format: 'D, dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+}

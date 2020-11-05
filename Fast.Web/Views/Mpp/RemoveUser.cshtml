@@ -1,0 +1,97 @@
+﻿@model Fast.Web.Models.MppAllocationModel
+@using Fast.Web.Resources;
+
+@section Styles{
+	<link href="~/Content/dashforge/assets/css/dashforge.css" rel="stylesheet" />
+	<link href="~/Content/dashforge/assets/css/dashforge.dashboard.css" rel="stylesheet" />
+	<style>
+		.tableWrapper thead th {
+			position: sticky;
+			top: 0;
+		}
+
+		.tableWrapper {
+			overflow-y: auto;
+			max-height: 150px;
+		}
+
+			.tableWrapper table {
+				border-collapse: collapse;
+				width: 100%;
+			}
+
+			.tableWrapper thead th, .tableWrapper thead td {
+				position: sticky;
+				background: #066fcb;
+				z-index: 100;
+				border: none;
+			}
+
+			.tableWrapper table tfoot td {
+				position: sticky;
+				bottom: 0;
+				z-index: 100;
+			}
+
+			.tableWrapper .input td {
+				background: white;
+			}
+
+			.tableWrapper .summary-body td {
+				font-weight: bold;
+				background-color: #d8eafe;
+				color: #000;
+			}
+
+		.fa {
+			padding: 5px;
+			cursor: pointer;
+		}
+	</style>
+}
+
+<div class="content bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="mg-b-5">MPP Allocation</h4>
+            </div>
+            <div class="text-right">
+                <button type="button" class="btn-menu btn-default" onclick="AddUserModel('@(ViewBag.MachineCode)')" data-toggle="modal" data-target="#modalEditMpp" title="Edit"><i class="fa fa-edit"></i></button>
+                <button type="button" class="btn-menu btn-default" onclick="RemoveUserModel('@(ViewBag.MachineCode)')" data-toggle="modal" data-target="#modalLeaveMpp" title="Taking Leave"><i class="fa fa-user-minus"></i></button>
+                <button type="button" class="btn-menu btn-default" data-dismiss="modal" title="Close"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+		<div class="table-responsive">
+			<table class="table table-sm tx-13 mg-b-0">
+				<thead>
+					<tr class="tx-10 tx-spacing-1 tx-color-03 tx-uppercase">
+						<th colspan="2" class="align-middle text-center">Machine Allocation</th>
+						<th colspan="2" class="align-middle text-center">MPP status</th>
+					</tr>
+					<tr class="tx-10 tx-spacing-1 tx-color-03 tx-uppercase">
+						<th>Job Position</th>
+						<th>Allocation</th>
+						<th>Employee</th>
+						<th>Job Position</th>
+					</tr>
+				</thead>
+				<tbody>
+					@{int x = 0;}
+					@foreach (var item in Model.AllocationList)
+					{
+						<tr>
+							<td class="align-middle text-left">@item.MachineCategory</td>
+							<td class="align-middle text-left">@item.Value</td>
+							<td class="align-middle text-left">@Model.MppList[x].EmployeeName</td>
+							<td class="align-middle text-left">@Model.MppList[x++].JobTitle</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+

@@ -1,0 +1,127 @@
+﻿@model Fast.Web.Models.ChecklistSubmitModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: inherit;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        table.dataTable thead th, table.dataTable thead td {
+            vertical-align: middle;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">My Approval</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">My Approval</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="df-example demo-table">
+                    <div class="card">
+                        <div class="card-header">
+                            @UIResources.Ch_ApproverFor: 
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered" id="do_datatable">
+                                <thead class="thead-primary font-weight-bold">
+                                    <tr>
+                                        <th>Checklist Menu Title</th>
+                                        <th>Author</th>
+                                        <th width="70px">Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Comment</th>
+                                        <th width="100px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Histories != null)
+                                    {
+                                        foreach (Fast.Web.Models.ChecklistSubmitModel checklist in ViewBag.Histories)
+                                        {
+                                            if (checklist.isApprover)
+                                            {
+                                                string submitterName = "Unregistered User";
+                                                if (checklist.Submiter != null)
+                                                {
+                                                    submitterName = "["+checklist.Submiter.EmployeeID.Trim() +"] "+ checklist.Submiter.FullName;
+                                                }
+
+                                    <tr>
+                                        <td>@checklist.Checklist.MenuTitle</td>
+                                        <td>@submitterName</td>
+                                        <td>@checklist.CompleteDate.ToString("dd-MMM-yy")</td>
+                                        <td>@checklist.CompleteDate.ToString("HH:mm")</td>
+                                        <td>@checklist.Status</td>
+                                        <td>@checklist.Comment</td>
+                                        <td class="text-center">
+                                            @if (checklist.Status.Contains("Waiting for Approval") && checklist.Status.Contains(ViewBag.MyEmployeeID))
+                                            {
+                                                <a class="btn-default tx-black" title="Edit Status Approval" href="@Url.Action("Submitted/"+checklist.ID,"Checklist")"><i class="fa fa-edit"></i></a>
+                                            }
+                                            else
+                                            {
+                                                <a class="btn-default tx-black" title="View Submission" href="@Url.Action("ViewOnly/"+checklist.ID,"Checklist")"><i class="fa fa-eye"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#do_datatable').DataTable({
+                //responsive: true,
+                order: [[0, "desc"]],
+                ordering: false,
+                language: {
+                    searchPlaceholder: '@(UIResources.Search)...',
+                    sSearch: '',
+                    lengthMenu: '_MENU_ items/page',
+                }
+            });
+            $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+        });
+    </script>
+}

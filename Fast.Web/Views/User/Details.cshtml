@@ -1,0 +1,93 @@
+﻿@model Fast.Web.Models.UserModel
+@using Fast.Web.Resources;
+
+<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+	<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</a>
+	<div class="media align-items-center">
+		<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-users" style="font-size:48px;"></i></span>
+		<div class="media-body mg-sm-l-20">
+			<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.UserExtraRoleList</h4>
+		</div>
+	</div><!-- media -->
+</div><!-- modal-header -->
+
+<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+	<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="extraRoleTable">
+		<thead>
+			<tr>
+				<th>@UIResources.Role</th>
+				<th>@UIResources.ModifiedBy</th>
+				<th>@UIResources.ModifiedDate</th>
+			</tr>
+		</thead>
+	</table>
+</div><!-- modal-body -->
+
+<div class="modal-footer pd-x-20 pd-y-15">
+	<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+</div>
+
+<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#extraRoleTable').DataTable({
+			"bFilter": false,			
+			"autoWidth": false,
+			"lengthChange": false,
+			"processing": true,
+			"serverSide": true,
+			"filter": true,
+			"bInfo": false,
+			"bPaginate": false,
+			"orderMulti": false,
+			"pageLength": 10,
+			"ajax": {
+				"url": fastApp.BaseUrl + "/User/GetExtraRoles",
+				"data": { userId : @Model.ID },
+				"type": "POST",
+				"datatype": "json"
+			},
+
+			"columnDefs":
+				[
+					{
+						"targets": [0],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": false,
+						"orderable": false
+					}
+				],
+
+			"columns": [
+				{ "data": "Role", "name": "Role", "autoWidth": false },
+				{ "data": "ModifiedBy", "name": "ModifiedBy", "autoWidth": true },
+				{
+					"data": "ModifiedDate",
+					render: function (data, type, row) {
+						if (data)
+							return moment(data).format("DD-MMM-YY");
+						else
+							return '';
+					}
+				}
+			]
+		});
+	});
+</script>
+

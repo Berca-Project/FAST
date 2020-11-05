@@ -1,0 +1,2958 @@
+﻿@using Fast.Web.Models;
+@using Fast.Web.Resources;
+
+@{
+	ViewBag.Title = "Index";
+}
+
+@section CSS_lib {
+	<!-- vendor css -->
+	<link href="~/Content/dashforge/lib/jqvmap/jqvmap.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/simple-calendar/vanilla-calendar.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+}
+
+@section Styles{
+	<style>
+
+		.tooltip-inner {
+			text-align: left;
+		}
+
+		.dropdown .btn-sm {
+			font-size: 12px;
+			padding: 3px 5px;
+		}
+
+		#user-list .list-group-item {
+			padding: 13.5px 20px;
+		}
+
+		#machine-list .list-group-item {
+			padding: 13px 20px;
+		}
+
+		/*html {
+			scroll-behavior: smooth;
+		}*/
+
+		#btnTop {
+			position: fixed;
+			bottom: 50px;
+			right: 50px;
+			width: 50px;
+			height: 50px;
+			border-radius: 50px;
+			background: aliceblue;
+			box-shadow: 2px 3px 5px #ccc;
+			padding: 16px 20px;
+		}
+	</style>
+}
+
+<div class="content content-fixed">
+	<div class="pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div id="topSection" class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+			<div>
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb breadcrumb-style1 mg-b-10">
+						<li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Superadmin</li>
+					</ol>
+				</nav>
+				<br />
+				@{
+					if (Session["UserLogon"] != null)
+					{
+						UserModel user = (UserModel)Session["UserLogon"];
+						<h4 class="mg-b-0 tx-spacing--1">
+							Welcome @user.FullName
+						</h4>
+					}
+				}
+			</div>
+		</div>
+
+		<div class="row row-xs">
+
+			<a href="#topSection" class="btn-large" style="z-index:900;">
+				<div id="btnTop">
+					<i class="fa fa-arrow-up"></i>
+				</div>
+			</a>
+
+			<div class="col-12 mg-t-10">
+				<div class="card">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<div class="mg-b-10 mg-sm-b-0">
+							<h6 class="mg-b-5">FAST Current Status</h6>
+
+							<div class="d-flex mg-t-10">
+								<p class="flex-1 tx-12 tx-color-03 mg-b-0 mg-t-5">Filtered by &nbsp;</p>
+
+								<select class="flex-1 btn btn-primary pd-y-3 mg-l-5" id="timeSelect">
+									<option value="daily">Daily</option>
+									<option value="weekly">Weekly</option>
+								</select>
+
+
+							</div>
+
+						</div>
+						<ul class="list-inline tx-uppercase tx-10 tx-medium tx-spacing-1 tx-color-03 mg-b-0">
+							<li class="list-inline-item">
+								<span class="d-inline-block wd-7 ht-7 bg-gray-900 rounded-circle mg-r-5"></span>
+								<span class="d-none d-md-inline">All</span>
+							</li>
+							<li class="list-inline-item mg-l-10">
+								<span class="d-inline-block wd-7 ht-7 bg-primary rounded-circle mg-r-5"></span>
+								<span class="d-none d-md-inline">Primary</span>
+							</li>
+							<li class="list-inline-item mg-l-10">
+								<span class="d-inline-block wd-7 ht-7 bg-orange rounded-circle mg-r-5"></span>
+								<span class="d-none d-md-inline"> Secondary</span>
+							</li>
+						</ul>
+
+					</div><!-- card-header -->
+					<div class="card-body pd-0">
+						<div class="d-flex flex-wrap no-gutters" style="padding:10px;" id="locationBlock">
+
+						</div><!-- row -->
+					</div><!-- card-body -->
+				</div><!-- card -->
+			</div><!-- Location List -->
+
+			<div class="col-8">
+				<div class="row">
+					<div class="col-6 mg-t-10" style="padding-right:5px;">
+						<div class="card mg-b-10 ht-100p">
+							<div class="card-header d-flex align-items-center justify-content-between">
+								<h6 class="mg-b-0" style="color:#007BFF;">LPH Primary</h6>
+								<div>
+									@*<button type="button" class="btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title="322 Submission need your approval" style="border-radius: 5px; font-size: 12px; margin-right:15px;">
+											<b>322</b> &nbsp; <i class="fas fa-bell"></i>
+										</button>*@
+
+									<a target="_blank" href="@Url.Action("Index", "HistoryPrimary")" class="link-03">View All</a>
+								</div>
+							</div>
+
+							<div class="content ">
+								<canvas height="120px;" id="chlphpp"></canvas>
+							</div>
+
+							<div class="card-footer row" style="width: 100%; margin-left: 0px;">
+								<div class="col-3">&nbsp;</div>
+								<div class="col-3">
+									<div class="d-flex align-items-center">
+										<div class="wd-15 ht-15 rounded-circle bg-primary mg-r-5"></div>
+										<small class="tx-sm-12 tx-color-02 lph-first-data">Last Week</small>
+									</div>
+								</div><!-- row -->
+								<div class="col-3">
+									<div class="d-flex align-items-center">
+										<div class="wd-15 ht-15 rounded-circle bg-success mg-r-5"></div>
+										<small class="tx-sm-12 tx-color-02 lph-second-data">This Week</small>
+									</div>
+								</div><!-- row -->
+								<div class="col-3">&nbsp;</div>
+							</div><!-- card-footer -->
+
+						</div><!-- card -->
+
+
+					</div> <!-- LPH PP-->
+
+					<div class="col-6 mg-t-10" style="padding-left:5px;">
+						<div class="card mg-b-10 ht-100p">
+							<div class="card-header d-flex align-items-center justify-content-between">
+								<h6 class="mg-b-0" style="color:#FD7E14;">LPH Secondary</h6>
+
+								<div>
+									@*<button type="button" class="btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title="301 Submission need your approval" style="border-radius: 5px; font-size: 12px; margin-right:15px;">
+											<b>301</b> &nbsp; <i class="fas fa-bell"></i>
+										</button>*@
+
+
+									<a target="_blank" href="@Url.Action("Index", "History")" class="link-03">View All</a>
+								</div>
+							</div>
+
+							<div class="content">
+								<canvas height="120" id="chlphsp"></canvas>
+							</div>
+
+							<div class="card-footer row" style="width: 100%; margin-left: 0px;">
+								<div class="col-3">&nbsp;</div>
+								<div class="col-3">
+									<div class="d-flex align-items-center">
+										<div class="wd-15 ht-15 rounded-circle bg-primary mg-r-5"></div>
+										<small class="tx-sm-12 tx-color-02 lph-first-data">Last Week</small>
+									</div>
+								</div><!-- row -->
+								<div class="col-3">
+									<div class="d-flex align-items-center">
+										<div class="wd-15 ht-15 rounded-circle bg-success mg-r-5"></div>
+										<small class="tx-sm-12 tx-color-02 lph-second-data">This Week</small>
+									</div>
+								</div><!-- row -->
+								<div class="col-3">&nbsp;</div>
+							</div><!-- card-footer -->
+
+						</div><!-- card -->
+
+
+					</div> <!-- LPH SP -->
+					<br />
+					<div class="col-4 mg-t-10" id="user-list" style="padding-right:10px;">
+						<div class="card" style="height:365px;">
+							<div class="card-header d-flex align-items-center justify-content-between">
+								<h6 class="mg-b-0">Checklist Adherence</h6>
+								<a target="_blank" href="@Url.Action("Catalog", "Checklist", new { show = "list" })" class="link-03">View All</a>
+							</div>
+							<div class="content pd-15">
+								<canvas id="chclad" height="200"></canvas>
+							</div>
+							<div class="card-footer row" style="width: 100%; margin-left: 0px;">
+								<div class="col-6">
+
+									<div class="d-flex align-items-center">
+										<div class="wd-15 ht-15 rounded-circle mg-r-5" style="background-color:#fe9900;"></div>
+										<small class="tx-sm-12 tx-color-02">Submitted</small>
+									</div>
+
+								</div><!-- row -->
+								<div class="col-6">
+
+									<div class="d-flex align-items-center">
+										<div class="wd-15 ht-15 rounded-circle mg-r-5" style="background-color:#349CFB;"></div>
+										<small class="tx-sm-12 tx-color-02">Approved</small>
+									</div>
+
+								</div><!-- row -->
+							</div><!-- card-footer -->
+						</div><!-- card -->
+					</div> <!-- Checklist Adherence -->
+
+					<div class="col-4 mg-t-10" id="user-list" style="padding:0;">
+						<div class="card" style="height:365px;">
+							<div class="card-header d-flex align-items-center justify-content-between">
+								<div class="wd-10 ht-10 rounded-circle bg-secondary" style="margin-right:-50px;" data-toggle="tooltip" data-placement="top" title="Fixed Data"></div>
+								<h6 class="mg-b-0 mg-l-50">Overtime (in thousands)</h6>
+								<div class="col-6 tx-right" style="padding-right:0">
+									<a target="_blank" href="@Url.Action("Index", "EmployeeOvertime")" class="link-03">View All</a>
+								</div>
+							</div>
+							<div class="content pd-15">
+								<canvas id="canvasRE" height="230"></canvas>
+							</div>
+						</div><!-- card -->
+					</div> <!-- Employee Overtime -->
+
+					<div class="col-4 mg-t-10" style="padding-left:10px;">
+						<div class="card">
+							<div class="card-header">
+								<div class="row">
+									<div class="col-6 tx-left" style="padding-right:0">
+										<h6 class="mg-b-0">MPP Daily</h6>
+									</div>
+									<div class="col-6 tx-right" style="padding-right:10">
+										<a target="_blank" href="@Url.Action("Index", "MPP")" class="link-03">View All</a>
+
+										<select class="flex-1 btn btn-primary pd-y-3 mg-l-5" id="groupSelect">
+											<option value="1">4G</option>
+											<option value="2">3G</option>
+											<option value="3">2G</option>
+											<option value="4">NS</option>
+											<option value="21199">1G</option>
+										</select>
+									</div>
+								</div>
+							</div><!-- card-header -->
+
+							<div class="card-body pd-lg-20 row" style="height:auto">
+								<div class="col-6 tx-center pd-0">
+									<p class="tx-9 tx-uppercase tx-medium tx-color-03 tx-spacing-1 tx-nowrap">MACHINE</p>
+								</div>
+								<div class="col-6 tx-center pd-0">
+									<p class="tx-9 tx-uppercase tx-medium tx-color-03 tx-spacing-1 tx-nowrap">PEOPLE</p>
+								</div>
+
+								<div class="chart-seven col-6" style="height:150px;"><canvas id="chartDonut"></canvas></div>
+								<div class="divider-text divider-vertical" style="margin-left:-8px; margin-right:-4px;"></div>
+								<div class="chart-seven col-6" style="height:150px;"><canvas id="chartDonutPeople"></canvas></div>
+							</div>
+
+
+							<div class="card-footer pd-00 row" style="width: 100%; margin-left: 0px;">
+								<div class="col-6">
+									<p class="col-12 tx-9 tx-uppercase tx-medium tx-color-03 tx-spacing-1 tx-nowrap mg-b-5">MACHINE</p>
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle bg-secondary mg-r-5"></div>
+											<small class="tx-sm-9 tx-color-02">No WPP</small>
+										</div>
+									</div><!-- col -->
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle bg-dark mg-r-5"></div>
+											<small class="tx-sm-9 tx-color-02">Unallocated</small>
+										</div>
+									</div><!-- col -->
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle bg-success mg-r-5" data-toggle="tooltip" data-placement="top" title="Full Assigned"></div>
+											<small class="tx-sm-9 tx-color-02">Fully A.</small>
+										</div>
+									</div>
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle bg-danger mg-r-5" data-toggle="tooltip" data-placement="top" title="Half Assigned"></div>
+											<small class="tx-sm-9 tx-color-02">Half A.</small>
+										</div>
+									</div>
+								</div><!-- row -->
+								<div class="col-6">
+									<p class="col-12 tx-9 tx-uppercase tx-medium tx-color-03 tx-spacing-1 tx-nowrap mg-b-5">PEOPLE</p>
+									<div class="col-12">
+
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#feff99;"></div>
+											<small class="tx-sm-9 tx-color-02">Available</small>
+										</div>
+									</div><!-- col -->
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#fe9900;" data-toggle="tooltip" data-placement="top" title="Half Assigned"></div>
+											<small class="tx-sm-9 tx-color-02" data-toggle="tooltip" data-placement="top" title="Half Assigned">Half A.</small>
+										</div>
+									</div><!-- col -->
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#33cc33;" data-toggle="tooltip" data-placement="top" title="Full Assigned"></div>
+											<small class="tx-sm-9 tx-color-02" data-toggle="tooltip" data-placement="top" title="Full Assigned">Full A.</small>
+										</div>
+									</div><!-- col -->
+									<div class="col-12">
+										<div class="d-flex align-items-center">
+											<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#cd3301;"></div>
+											<small class="tx-sm-9 tx-color-02">Overload</small>
+										</div>
+									</div><!-- col -->
+								</div><!-- row -->
+							</div><!-- card-footer -->
+
+						</div><!-- card -->
+						@*FUNGSI MPP ADALAH MENEMPATKAN ORANG DI POSISI MESIN*@
+
+					</div>  <!-- MPP -->
+
+				</div>
+			</div>
+
+			<div class="col-4">
+				<div class="card mg-t-10" style="height:385px">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<h6 class="mg-b-0">Notification</h6>
+						@*<a href="" class="link-03">View All</a>*@
+					</div>
+					<div class="card-body pd-10 tx-12" style="height:125px; overflow-y:auto;" id="notifications">
+					</div><!-- card-body -->
+				</div><!-- card -->
+
+
+				<div class="card mg-t-10" style="height:370px">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<h6 class="mg-b-0">Calendar Holiday</h6>
+						<a target="_blank" href="@Url.Action("Holiday", "Calendar")" class="link-03">View All</a>
+					</div>
+					<div class="card-body pd-20" style="height:125px; overflow-y:auto;">
+						<div id="divHoliday">
+						</div>
+					</div><!-- card-body -->
+				</div><!-- card -->
+			</div> <!-- Calendar Holiday -->
+			<!-- ga dipake -->
+			<div class="col-12 mg-t-10 d-none">
+				<div class="card">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<h6 class="mg-b-0">KPI</h6>
+						<a href="" class="link-03">View All</a>
+					</div>
+					<div class="table-responsive mg-t-10">
+						<div class="col-12 mg-b-20">
+							<div name="chart" class="row pd-0">
+								<div class="content col-2 pd-15">
+									<label style="font-weight:bold; color:#FD7E14;">Prod Volume</label>
+									<hr style="margin:0 0 10px 0;" />
+									<canvas id="chsisallpvolume" height="200"></canvas>
+								</div>
+								<div class="content col-2 pd-15">
+									<label style="font-weight:bold; color:#FD7E14;">Uptime</label>
+									<hr style="margin:0 0 10px 0;" />
+									<canvas id="chsisallup" height="200"></canvas>
+								</div>
+								<div class="content col-2 pd-15">
+									<div class="wd-10 ht-10 rounded-circle bg-secondary" style="margin-right:0px; margin-top:5px;" data-toggle="tooltip" data-placement="top" title="Fixed Data">
+										<label style="font-weight:bold; color:#FD7E14; margin-left:30px; margin-top:-15px;">MTBF</label>
+									</div>
+									<hr style="margin:15px 0 10px 0;" />
+									<canvas id="chsisallmtrf" height="200"></canvas>
+								</div>
+								<div class="content col-2 pd-15">
+									<label style="font-weight:bold; color:#FD7E14;">CRR</label>
+									<hr style="margin:0 0 10px 0;" />
+									<canvas id="chsisallcrr" height="200"></canvas>
+								</div>
+								<div class="content col-2 pd-15">
+									<div class="wd-10 ht-10 rounded-circle bg-secondary" style="margin-right:0px; margin-top:5px;" data-toggle="tooltip" data-placement="top" title="Fixed Data">
+										<label style="font-weight:bold; margin-left:30px; margin-top:-15px; color:#007BFF;">Yield</label>
+									</div>
+									<hr style="margin:15px 0 10px 0;" />
+									<canvas id="chsisallvqi" height="200"></canvas>
+								</div>
+								<div class="content col-2 pd-15">
+									<div class="wd-10 ht-10 rounded-circle bg-secondary" style="margin-right:0px; margin-top:5px;" data-toggle="tooltip" data-placement="top" title="Fixed Data">
+										<label style="font-weight:bold; margin-left:30px; margin-top:-15px; color:#007BFF;">DIM</label>
+									</div>
+									<hr style="margin:15px 0 10px 0;" />
+									<canvas id="chsisallstrs" height="200"></canvas>
+								</div>
+							</div> <!--SIS ALL-->
+						</div><!-- table-responsive -->
+					</div><!-- card -->
+				</div>
+			</div> <!-- REPORT KPI -->
+			<!-- end ga dipake -->
+
+			<div class="col-3 mg-t-10">
+				<div class="card mg-b-10 ht-100p">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<h6 class="mg-b-0" style="color:#FD7E14;">Claimable</h6>
+						<a target="_blank" href="@Url.Action("Index", "ReportPemakaianBandrol")" class="link-03">View All</a>
+					</div>
+					<div class="table-responsive">
+						<div class="content" style="padding-left:20px; padding-right:20px;">
+							@*<label style="font-weight:bold;">Overall</label>*@
+							<hr style="margin:0 0 10px 0;" />
+							<canvas id="chbaroverallsis" height="150"></canvas>
+						</div>
+					</div><!-- table-responsive -->
+					<div class="card-footer pd-00 row" style="width: 100%; margin-left: 0px;">
+						<div class="col-2">&nbsp;</div>
+						<div class="col-8 row">
+							<div class="d-flex align-items-center r-10">
+								<div class="wd-10 ht-10 rounded-circle bg-primary mg-r-5"></div>
+								<small class="tx-sm-12 tx-color-02">Submitted</small>
+							</div>
+							&nbsp; &nbsp;
+							<div class="d-flex align-items-center l-10">
+								<div class="wd-10 ht-10 rounded-circle bg-success mg-r-5"></div>
+								<small class="tx-sm-12 tx-color-02">Approved</small>
+							</div>
+						</div><!-- row -->
+						<div class="col-2">&nbsp;</div>
+					</div><!-- card -->
+				</div><!-- card -->
+
+			</div> <!-- Claimable -->
+
+			<div class="col-3 mg-t-10">
+				<div class="card mg-b-10 ht-100p">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<h6 class="mg-b-0" style="color:#FD7E14;">Report Bandrol</h6>
+						<a target="_blank" href="@Url.Action("Index", "ReportPemakaianBandrol")" class="link-03">View All</a>
+					</div>
+					<div class="table-responsive">
+						<div class="content" style="padding-left:20px; padding-right:20px;">
+							<hr style="margin:0 0 10px 0;" />
+							<canvas id="chbandrol" height="150"></canvas>
+						</div>
+					</div><!-- table-responsive -->
+					<div class="card-footer pd-00 row" style="width: 100%; margin-left: 0px;">
+						<div class="col-2">&nbsp;</div>
+						<div class="col-8 row">
+							<div class="d-flex align-items-center r-10">
+								<div class="wd-10 ht-10 rounded-circle bg-primary mg-r-5"></div>
+								<small class="tx-sm-12 tx-color-02">Submitted</small>
+							</div>
+							&nbsp; &nbsp;
+							<div class="d-flex align-items-center l-10">
+								<div class="wd-10 ht-10 rounded-circle bg-success mg-r-5"></div>
+								<small class="tx-sm-12 tx-color-02">Approved</small>
+							</div>
+						</div><!-- row -->
+						<div class="col-2">&nbsp;</div>
+					</div><!-- card -->
+					@*<div class="card-footer row" style="width: 100%; margin-left: 0px;">
+							<div class="col-2">&nbsp;</div>
+							<div class="col-8 row justify-content-around">
+								<div class="col-4 row align-items-center">
+									<div class="wd-11 ht-11 rounded-circle mg-r-5" style="background-color:#007bff;"></div>
+									<small class="tx-sm-11 tx-color-02">Submitted</small>
+								</div>
+								<div class="col-4 row align-items-center">
+									<div class="wd-11 ht-11 rounded-circle mg-r-5" style="background-color:#5bd276;"></div>
+									<small class="tx-sm-11 tx-color-02">Approved</small>
+								</div>
+							</div>
+							<div class="col-2">&nbsp;</div>
+						</div> card-footer*@
+				</div><!-- card -->
+
+
+			</div> <!-- REPORT BANDROL -->
+
+			<div class="col-3 mg-t-10">
+				<div class="card mg-b-10 ht-100p">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<div class="wd-10 ht-10 rounded-circle bg-secondary" style="margin-right:-50px;" data-toggle="tooltip" data-placement="top" title="Fixed Data"></div>
+
+
+						<h6 class="mg-b-0 mg-l-0" style="color:#007BFF;">Waste</h6>
+						<div class="col-6 tx-right" style="padding-right:0">
+							<a target="_blank" href="@Url.Action("Index", "ReportPPWaste")" class="link-03">View All</a>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<div class="content" style="padding-left:20px; padding-right:20px;">
+							<canvas id="chwaste" height="160"></canvas>
+						</div>
+					</div><!-- table-responsive -->
+
+
+					<div class="card-footer pd-00 row" style="width: 100%; margin-left: 0px;">
+						<div class="col-6 pd-r-0">
+							<div class="col-12">
+								<div class="d-flex align-items-center">
+									<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#F77E7E;"></div>
+									<small class="tx-sm-9 tx-color-02">Wet Waste</small>
+								</div>
+							</div><!-- col -->
+							<div class="col-12">
+								<div class="d-flex align-items-center">
+									<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#FFA34D;"></div>
+									<small class="tx-sm-9 tx-color-02">Dry Waste / Heaviest</small>
+								</div>
+							</div><!-- col -->
+						</div><!-- row -->
+						<div class="col-6 pd-l-0">
+
+							<div class="col-12">
+
+								<div class="d-flex align-items-center">
+									<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#8BD7D1;"></div>
+									<small class="tx-sm-9 tx-color-02">Dust Waste</small>
+								</div>
+							</div><!-- col -->
+							<div class="col-12">
+
+								<div class="d-flex align-items-center">
+									<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#6C757D;"></div>
+									<small class="tx-sm-9 tx-color-02">Hot Dust</small>
+								</div>
+							</div><!-- col -->
+
+						</div><!-- row -->
+					</div><!-- card-footer -->
+				</div><!-- card -->
+
+
+			</div> <!-- REPORT WASTE -->
+
+			<div class="col-3 mg-t-10">
+				<div class="card mg-b-10 ht-100p">
+					<div class="card-header d-flex align-items-center justify-content-between">
+						<div class="wd-10 ht-10 rounded-circle bg-secondary" style="margin-right:-50px;" data-toggle="tooltip" data-placement="top" title="Fixed Data"></div>
+
+
+						<h6 class="mg-b-0 mg-l-30" style="color:#007BFF;">Yield Governant</h6>
+						<div class="col-6 tx-right" style="padding-right:0">
+							<a target="_blank" href="@Url.Action("Index", "Yield")" class="link-03">View All</a>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<div class="content" style="padding-left:20px; padding-right:20px;">
+							<canvas id="chyieldgov" height="160"></canvas>
+						</div>
+					</div><!-- table-responsive -->
+
+
+					<div class="card-footer pd-00 row" style="width: 100%; margin-left: 0px;">
+						<div class="col-3">&nbsp;</div>
+						<div class="col-3">
+							<div class="d-flex align-items-center">
+								<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#f67575;"></div>
+								<small class="tx-sm-12 tx-color-02">Wet</small>
+							</div>
+						</div><!-- row -->
+						<div class="col-3">
+							<div class="d-flex align-items-center">
+								<div class="wd-10 ht-10 rounded-circle mg-r-5" style="background-color:#ffa34d;"></div> @*f67575*@ @*ffa34d*@
+								<small class="tx-sm-12 tx-color-02">Dry</small>
+							</div>
+						</div><!-- card-footer -->
+						<div class="col-3">&nbsp;</div>
+					</div><!-- card -->
+
+
+				</div> <!-- REPORT YIELD GOVERNANT -->
+
+			</div><!-- YIELD GOVERNANT -->
+		</div><!-- container -->
+	</div><!-- content -->
+</div>
+
+@section Scripts{
+	<script src="~/Content/dashforge/lib/amcharts/core.js"></script>
+	<script src="~/Content/dashforge/lib/amcharts/charts.js"></script>
+	<script src="~/Content/dashforge/lib/amcharts/themes/animated.js"></script>
+	<script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+
+	<script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+	<script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+	<script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+	<script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+	<script src="~/Content/dashforge/lib/chart.js/chartjs-plugin-annotation.js"></script>
+	@*<script src="~/Content/dashforge/lib/chart.js/chartjs-plugin-labels.js"></script>*@
+
+	<script src="~/Content/dashforge/lib/jqvmap/jquery.vmap.min.js"></script>
+	<script src="~/Content/dashforge/lib/jqvmap/maps/jquery.vmap.usa.js"></script>
+	<script src="~/Content/dashforge/lib/simple-calendar/vanilla-calendar.js"></script>
+
+	<script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+	<script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+	<script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+	<script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+	<script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+	<script>
+
+		function updateData(chart, data, additional = {}) {
+			for (let i = 0; i < data.length; i++) {
+				chart.data.datasets[i].data = data[i];
+			}
+			if (additional.labels) chart.data.labels = additional.labels;
+			//if (additional.target) {
+			//	chart.options.annotation.annotations[0].value = additional.target.value;
+			//	chart.options.annotation.annotations[0].label.content = additional.target.label;
+			//}
+			chart.update();
+		}
+
+		let filter = {
+			isDaily: true,
+			location: "All",
+		};
+
+		$(document).ready(function () {
+
+			$('body').on('change', 'input[name="select-location"]', function () {
+				filter.location = $("[name='select-location']:checked").data("location");
+				updateViews();
+				generatePrimaryReportView();
+				//if ($("#timeSelect").val() == "daily") {
+					getMppMachineSection();
+					getMppPeopleSection();
+				//}
+				getOvertimeSection();
+			});
+			$("#groupSelect").on("change", function () {
+                if ($("#timeSelect").val() == "weekly") {
+                    $.ajax({
+						type: "POST",
+						url: "@Url.Action("DashboardWeekly", "Checklist")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chclad, [data.Submitted, data.Approved]);
+						},
+					});
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetBandrolWeekly", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbandrol, [data.Submitted, data.Approved]);
+						},
+                    });
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetClaimableWeekly", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbaroverallsis, [data.Submitted, data.Approved]);
+						},
+					});
+
+                    //Cek Adherence
+					//updateData(chlphpp, [[44, 23, 56, 98], [23, 54, 55, 77]], {
+					//	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					//	target: {
+					//		value: 80,
+					//		label: "Target : 80"
+					//	},
+					//}); //LPHPP
+					//updateData(chlphsp, [[23, 44, 51, 65], [53, 12, 34, 23]], {
+					//	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					//	target: {
+					//		value: 120,
+					//		label: "Target : 120"
+					//	},
+					//}); //LPHSP
+					@*updateData(myMppDonutChart, [[225, 575, 200]]); //MPP
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetAllStatusDashboard", "MPP")",
+						data: JSON.stringify({ isDaily: $('#timeSelect').find('option:selected').val() == 'daily'}),
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(myPeopleDonutChart, [[data.Available, data.HalfAssigned, data.FullyAssigned, data.Overload]]); //MPP pEOPLE
+						},
+					});*@
+					////updateData(chsisallpvolume, [[129, 125, 131, 535]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI Prod Volume
+					////updateData(chsisallup, [[231, 355, 463, 234]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI Uptime
+					////updateData(chsisallmtrf, [[555, 666, 232, 344]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI MTBF
+					////updateData(chsisallcrr, [[241, 134, 653, 123]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI CRR
+					////updateData(chbaroverallsis, [[241, 134, 232, 123], [142, 124, 142, 111]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //Report CRR
+
+				} else {
+					//DATA UNTUK DAILY
+                    $.ajax({
+						type: "POST",
+						url: "@Url.Action("DashboardDaily", "Checklist")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+                            updateData(chclad, [data.Submitted, data.Approved]);
+						},
+                    });
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetBandrolDaily", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbandrol, [data.Submitted, data.Approved]);
+						},
+                    });
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetClaimableDaily", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbaroverallsis, [data.Submitted, data.Approved]);
+						},
+					});
+
+
+					////updateData(chsisallpvolume, [[72.2, 77.6, 70, 51.2]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI Prod Volume
+					////updateData(chsisallup, [[39, 45, 77.6, 66.1]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI Uptime
+					////updateData(chsisallmtrf, [[6.31, 0, 45, 77.6]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI MTBF
+					////updateData(chsisallcrr, [[33, 0, 80, 34]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI CRR
+					////updateData(chbaroverallsis, [[0.59, 0.50, 0.62, 0.68, 0.62, 0.45, 0.48, 0.55], [1.32, 1.13, 0.95, 1.24, 1.04, 0.94, 0.97, 1.08]], {
+					////	labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "WTD"],
+					////	target: {
+					////		value: 0.70,
+					////		label: "Target : 0.70"
+					////	},
+					////}); //Report CRR
+
+				}
+			});
+
+
+			$("#timeSelect").on("change", function () {
+
+                if ($(this).val() == "weekly") {
+                    $.ajax({
+						type: "POST",
+						url: "@Url.Action("DashboardWeekly", "Checklist")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chclad, [data.Submitted, data.Approved]);
+						},
+					});
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetBandrolWeekly", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbandrol, [data.Submitted, data.Approved]);
+						},
+                    });
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetClaimableWeekly", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbaroverallsis, [data.Submitted, data.Approved]);
+						},
+					});
+
+                    //Cek Adherence
+					//updateData(chlphpp, [[44, 23, 56, 98], [23, 54, 55, 77]], {
+					//	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					//	target: {
+					//		value: 80,
+					//		label: "Target : 80"
+					//	},
+					//}); //LPHPP
+					//updateData(chlphsp, [[23, 44, 51, 65], [53, 12, 34, 23]], {
+					//	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					//	target: {
+					//		value: 120,
+					//		label: "Target : 120"
+					//	},
+					//}); //LPHSP
+					@*updateData(myMppDonutChart, [[225, 575, 200]]); //MPP
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetAllStatusDashboard", "MPP")",
+						data: JSON.stringify({ isDaily: $('#timeSelect').find('option:selected').val() == 'daily'}),
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(myPeopleDonutChart, [[data.Available, data.HalfAssigned, data.FullyAssigned, data.Overload]]); //MPP pEOPLE
+						},
+					});*@
+
+					////updateData(chsisallpvolume, [[129, 125, 131, 535]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI Prod Volume
+					////updateData(chsisallup, [[231, 355, 463, 234]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI Uptime
+					////updateData(chsisallmtrf, [[555, 666, 232, 344]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI MTBF
+					////updateData(chsisallcrr, [[241, 134, 653, 123]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //KPI CRR
+					////updateData(chbaroverallsis, [[241, 134, 232, 123], [142, 124, 142, 111]], {
+					////	labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+					////	target: {
+					////		value: 150,
+					////		label: "Target : 150"
+					////	},
+					////}); //Report CRR
+
+				} else {
+					//DATA UNTUK DAILY
+                    $.ajax({
+						type: "POST",
+						url: "@Url.Action("DashboardDaily", "Checklist")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+                            updateData(chclad, [data.Submitted, data.Approved]);
+						},
+                    });
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetBandrolDaily", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbandrol, [data.Submitted, data.Approved]);
+						},
+                    });
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetClaimableDaily", "ReportPemakaianBandrol")",
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(chbaroverallsis, [data.Submitted, data.Approved]);
+						},
+					});
+
+                    //Cek Adherence
+					//updateData(chlphpp, [[23, 55, 87, 12, 34, 42, 13], [76, 43, 23, 76, 22, 62, 88]], {
+					//	labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+					//	target: {
+					//		value: 70,
+					//		label: "Target : 70"
+					//	},
+					//}); //LPHPP
+					//updateData(chlphsp, [[60, 50, 70, 80, 90, 85, 92], [99, 91, 88, 95, 70, 70, 40]], {
+					//	labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+					//	target: {
+					//		value: 70,
+					//		label: "Target : 70"
+					//	},
+					//}); //LPHSP
+					@*updateData(myMppDonutChart, [[25, 75, 20]]); //MPP
+
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetAllStatusDashboard", "MPP")",
+						data: JSON.stringify({ isDaily: $('#timeSelect').find('option:selected').val() == 'daily'}),
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						success: function (data) {
+							updateData(myPeopleDonutChart, [[data.Available, data.HalfAssigned, data.FullyAssigned, data.Overload]]); //MPP pEOPLE
+						},
+					});*@
+
+					////updateData(chsisallpvolume, [[72.2, 77.6, 70, 51.2]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI Prod Volume
+					////updateData(chsisallup, [[39, 45, 77.6, 66.1]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI Uptime
+					////updateData(chsisallmtrf, [[6.31, 0, 45, 77.6]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI MTBF
+					////updateData(chsisallcrr, [[33, 0, 80, 34]], {
+					////	labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+					////	target: {
+					////		value: 70,
+					////		label: "Target : 70"
+					////	},
+					////}); //KPI CRR
+					////updateData(chbaroverallsis, [[0.59, 0.50, 0.62, 0.68, 0.62, 0.45, 0.48, 0.55], [1.32, 1.13, 0.95, 1.24, 1.04, 0.94, 0.97, 1.08]], {
+					////	labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "WTD"],
+					////	target: {
+					////		value: 0.70,
+					////		label: "Target : 0.70"
+					////	},
+					////}); //Report CRR
+
+				}
+			});
+		});
+	</script>
+
+	<script>
+		$(function () {
+			$('[data-toggle="tooltip"]').tooltip()
+		})
+	</script>
+
+	<script>
+		$(function () {
+			var $btn = $('#btnTop');
+			var $home = $('#topSection');
+			var startpoint = $home.scrollTop() + $home.height();
+
+			$(window).on('scroll', function () {
+				if ($(window).scrollTop() > startpoint) {
+					$btn.show();
+				} else {
+					$btn.hide();
+				}
+			});
+		});
+	</script>
+
+	<script>
+		let idTimeOut = null;
+		function removeAlert(event) {
+			console.log("mouseleave before " + idTimeOut);
+			const alert = event.data.item;
+			if (idTimeOut == null)
+				idTimeOut = setTimeout(function () {
+					$(alert).fadeTo(1000, 0, function () {
+						$(alert).hide();
+					});
+				}, 2000);
+			console.log("mouseleave after " + idTimeOut);
+		}
+		function holdAlert() {
+			console.log("mouseover " + idTimeOut);
+			if (idTimeOut) {
+				clearTimeout(idTimeOut);
+				idTimeOut = null;
+			}
+		}
+		function show(id) {
+			console.log("show");
+			let alert = $(id);
+			//$(alert).off("mouseover", holdAlert).on("mouseover", holdAlert);
+			$(alert).show().fadeTo(500, 1, function () {
+				//idTimeOut = setTimeout(function () {
+				//	removeAlert(alert);
+				//}, 5000);
+				//console.log("start " + idTimeOut);
+				//$(alert).off("mouseleave", removeAlert).on("mouseleave", { item: alert }, removeAlert);
+			});
+		};
+		$(document).ready(function () {
+			show("#needApproval");
+			show("#needApproval1");
+			show("#needApproval2");
+		});
+	</script>
+
+	<script>
+        const map = {
+            All: {
+                display:"Sampoerna ID"
+            },
+            PJ: {
+                display:"SAMPOERNA SKJ"
+            },
+            PK: {
+                display:"SAMPOERNA KRW"
+            },
+            PI: {
+                display:"PT PMID KRW"
+            },
+            PB: {
+                display:"PT SIS SKJ"
+            },
+        };
+        var data = {};
+        function getLphNotificationData(param = {}) {
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("LPHNotificationData", "Home")",
+                data: JSON.stringify({
+                    date:(param.moment || moment()).format("YYYY-MM-DD"),
+			    }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: param.success || function (result) {
+                    console.log(result);
+                    data.lphNotification = result;
+                    generateLphNotificationView();
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        }
+        function getPrimaryReportData(param = {}) {
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("PrimaryReportData", "Home")",
+                data: JSON.stringify({
+                    date:(param.moment || moment()).format("YYYY-MM-DD"),
+			    }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: param.success || function (result) {
+                    console.log(result);
+                    data.primaryReport = result;
+                    generatePrimaryReportView();
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        }
+        function getLPHData(param = {}) {
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("LPHData", "Home")",
+                data: JSON.stringify({
+                    date:(param.moment || moment()).format("YYYY-MM-DD"),
+			    }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: param.success || function (result) {
+                    console.log(result);
+                    data.lph = result;
+                    generateLPHView();
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        }
+        function getLocationData(param = {}) {
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("LocationData", "Home")",
+                data: JSON.stringify({
+                    date:(param.moment || moment()).format("YYYY-MM-DD"),
+			    }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: param.success || function (result) {
+                    console.log(result);
+                    data.location = result;
+                    generateLocationView();
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        }
+
+		$(document).ready(function () {
+            $("#timeSelect").on("change", function () {
+                filter.isDaily = $(this).val() == "daily";
+                updateViews();
+			});
+
+			$("#groupSelect").on("change", function () {
+                updateViews();
+                getMppPeopleSection();
+            });
+
+            const m = moment();
+            filter.date = m;
+            getLocationData({
+                moment : m,
+                success : function(result) {
+                    console.log(result);
+                    data.location = result;
+                    generateLocationView();
+                    getLPHData({
+                        moment: m,
+                        success: function (result) {
+                            console.log(result);
+                            data.lph = result;
+                            generateLPHView();
+                            getPrimaryReportData({
+                                moment : m,
+                                success: function (result) {
+                                    console.log(result);
+                                    data.primaryReport = result;
+                                    generatePrimaryReportView();
+                                    getLphNotificationData({
+                                        moment : m
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+			});
+        });
+    //    function setLocationListener() {
+    //        $("[name='select-location']").on('input', function () {
+    //            filter.location = $("[name='select-location']:checked").data("location");
+    //            updateViews();
+				//generatePrimaryReportView();
+				//getMppMachineSection();
+				//getMppPeopleSection();
+				//getOvertimeSection();
+    //        });
+    //    }
+        function updateViews() {
+            generateLocationView();
+            generateLPHView();
+			generateLphNotificationView();
+        }
+        const generateNotif = (title, text, link) => `<div class="alert alert-info mg-b-10 mg-lg-b-10" role="alert" style="padding: 20px 30px 20px 30px; width:100%;">
+			<div class="media">
+				<div class="media-body mg-l-20">
+					<h6 class="mg-b-8">${title}</h6>
+					${text}
+				</div>
+				<a href="${link}"><button class="btn btn-outline-info btn mg-r-10" type="button" aria-haspopup="true" aria-expanded="false" style="position: absolute;right: 30px;top: 50%;transform: translateY(-50%);">View Detail </button></a>
+			</div>
+		</div>`;
+        function generateLphNotificationView() {
+            if (!data.lphNotification) return;
+            const dataPp = data.lphNotification.lphPp[filter.location];
+            const dataSp = data.lphNotification.lphSp[filter.location];
+            const now = filter.date.format("YYYY-MM-DD");
+            let totalPp = dataPp[now];
+            let totalSp = dataPp[now];
+            if (!filter.isDaily) for (var prop in dataSp) {
+                if (Object.prototype.hasOwnProperty.call(dataSp, prop)) {
+                    totalPp += dataPp[prop];
+                    totalSp += dataSp[prop];
+                }
+            }
+            $("#notifications").html("");
+            $("#notifications").append(generateNotif("LPH Primary", `<strong>${totalPp} Submission</strong> &nbsp; Need your approval!`, "@Url.Action("Index", "ApprovalPrimary")"));
+            $("#notifications").append(generateNotif("LPH Secondary", `<strong>${totalSp} Submission</strong> &nbsp; Need your approval!`, "@Url.Action("Index", "Approval")"));
+        }
+        function generatePrimaryReportView() {
+            if (!data.primaryReport) return;
+            const yg = data.primaryReport.yieldGovernance[filter.location];
+            let ygChartData = [[],[]];
+            for (let i = 0; i < yg.length; i++) {
+                ygChartData[0].push(yg[i].WetYield);
+                ygChartData[1].push(yg[i].DryYield);
+            }
+            updateData(chyieldgov, ygChartData);
+            const waste = data.primaryReport.waste[filter.location];
+            let wasteChartData = [[],[],[],[]];
+            for (let i = 0; i < waste.length; i++) {
+                wasteChartData[0].push(waste[i].Wet);
+                wasteChartData[1].push(waste[i].Dry);
+                wasteChartData[2].push(waste[i].Dust);
+                wasteChartData[3].push(waste[i].Hot);
+            }
+            updateData(chwaste, wasteChartData);
+        }
+        function generateLPHView() {
+            if (!data.lph) return;
+            const index = filter.isDaily ? 7 : 4;
+            const label = filter.isDaily ?
+                ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] :
+                ["Week 1", "Week 2", "Week 3", "Week 4"];
+            const dataLPH = data.lph.lph[filter.location][filter.isDaily ? "Dailies" : "Weeks"];
+            let ppData = dataLPH.PP.map(x => x.Approved);
+            updateData(chlphpp, [ppData.slice(0, index), ppData.slice(index)], {
+                labels: label,
+            }); //LPHPP
+            let spData = dataLPH.SP.map(x => x.Approved);
+            updateData(chlphsp, [spData.slice(0, index), spData.slice(index)], {
+                labels: label,
+            }); //LPHSP
+            $(".lph-first-data").html(filter.isDaily ? "Last Week" : "Last Month");
+            $(".lph-second-data").html(filter.isDaily ? "This Week" : "This Month");
+        }
+        function generateLocationView() {
+            if (!data.location) return;
+            let dataLocation = filter.isDaily ? data.location.locationDailies : data.location.locationWeeks;
+            let block = "";
+            for (let i = 0; i < dataLocation.length; i++) {
+                const d = dataLocation[i];
+                block += `
+                    <div class="flex-grow-1">
+                        <div class="crypto" style="padding:10px;">
+                            <div class="media mg-b-10">
+                                <div class="crypto-icon ${d.Trend < 0 ? "bg-danger" : "bg-success"}">
+                                    <b class="icon ${d.Trend == 0 ? "ion-md-arrow-forward" : d.Trend > 0 ? "ion-md-arrow-up" : "ion-md-arrow-down"}" style="margin-top: 2px;"></b>
+                                </div>
+                                <div class="media-body pd-l-8">
+                                    <h6 class="tx-11 tx-spacing-1 tx-uppercase tx-semibold mg-b-5">${map[d.Location].display} <span class="tx-color-03 tx-normal">(${d.Location})</span></h6>
+                                    <div class="d-flex align-items-center tx-rubik">
+                                        <h4 class="tx-25">${parseFloat(d.All).toFixed(0)}%</h4>
+                                        <button class="btn btn-outline-primary btn-xs tx-10 mg-b-0 mg-l-10 mg-t--10" data-toggle="tooltip" data-placement="top" title="Primary"><span class="tx-medium">${parseFloat(d.Primary).toFixed(0)}%</span></button>
+                                        <button class="btn btn-outline-warning btn-xs tx-10 mg-b-0 mg-l-10 mg-t--10" data-toggle="tooltip" data-placement="top" title="Secondary"><span class="tx-medium">${parseFloat(d.Secondary).toFixed(0)}%</span></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr style="margin-top:-5px; background-color:#DC3545;" />
+                            <div class="d-flex tx-medium">
+                                <div class="flex-1">
+                                    <label class="tx-9 tx-uppercase tx-sans tx-color-03">
+                                        <a href="#" class="link-01 tx-semibold">ALL</a>
+                                    </label>
+                                    <label class="tx-9 tx-uppercase tx-sans tx-color-03 mg-l-10">
+                                        <a href="#" class="link-01 tx-semibold" style="color:#277FFB;">PRIMARY</a>
+                                    </label>
+                                    <label class="tx-9 tx-uppercase tx-sans tx-color-03 mg-l-10">
+                                        <a href="#" class="link-01 tx-semibold" style="color:#FFC107;">SECONDARY</a>
+                                    </label>
+                                </div>
+                                <div class="tx-right">
+                                    <input type="radio" class="form-control custom-radio" data-location="${d.Location}" style="width:20px; height:20px;" name="select-location">
+                                </div>
+                            </div>
+                        </div><!-- crypto -->
+                    </div>`;
+            }
+            $("#locationBlock").html(block);
+            $(`#locationBlock input[type='radio'][data-location='${filter.location}']`).prop("checked", true);
+            //setLocationListener();
+        }
+	</script> @*Main Function*@
+
+	<script>
+		function getHolidaySection() {
+			$('#loading_overlay').removeClass('d-none');
+			$.ajax({
+				type: "POST",
+				url: "@Url.Action("GetHolidayList", "Calendar")",
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (data) {
+
+					var holidayList = '<ul class="list-group list-group-flush tx-13" style="margin-bottom:25px;">';
+					for (var i = 0; i < data.length; i++) {
+						holidayList = holidayList + '<li class="activity-item"><div class="activity-icon bg-primary-light tx-primary"><i class="fa fa-calendar"></i></div><div class="activity-body"><p class="mg-b-2"><strong>' + data[i].HolidayType + '</strong> because of an event <a href="" class="link-02"><strong>' + data[i].Description + '</strong></a></p><small class="tx-color-03">' + data[i].DateStr + '</small></div></li>';
+					}
+					holidayList += '</ul>';
+
+					$('#divHoliday').html(holidayList);
+
+					$('#loading_overlay').addClass('d-none');
+				},
+			});
+		};
+	</script> @*Calendar Holiday Section*@
+
+	<script>
+		function getMppPeopleSection() {
+			$('#loading_overlay').removeClass('d-none');
+			$.ajax({
+				type: "POST",
+				url: "@Url.Action("GetAllStatusDashboard", "MPP")",
+                data: JSON.stringify({ location: filter.location, isDaily: filter.isDaily, gtype: $('#groupSelect').find('option:selected').val() }),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (data) {
+
+					updateData(myPeopleDonutChart, [[data.Available, data.HalfAssigned, data.FullyAssigned, data.Overload]]);
+
+					$('#loading_overlay').addClass('d-none');
+				},
+			});
+		};
+	</script> @*MPP People Section*@
+
+	<script>
+		function getMppMachineSection() {
+			$('#loading_overlay').removeClass('d-none');
+			$.ajax({
+				type: "POST",
+				url: "@Url.Action("GetAllMachineDashboard", "MPP")",
+				data: JSON.stringify({ location: filter.location, isDaily: filter.isDaily,  }),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (data) {
+
+					updateData(myMppDonutChart, [[data.HalfAssigned, data.FullyAssigned, data.Unallocated, data.NotExistInWPP]]);
+
+					$('#loading_overlay').addClass('d-none');
+				},
+			});
+		};
+	</script> @*MPP Machine Section*@
+
+	<script>
+		function getOvertimeSection() {
+			$('#loading_overlay').removeClass('d-none');
+			$.ajax({
+				type: "POST",
+				url: "@Url.Action("OvertimeDashboard", "EmployeeOvertime")",
+				data: JSON.stringify({ location: filter.location }),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (data) {
+
+					updateData(overtimeChart,
+						[[data.LastThreeMonth.Blank, data.LastTwoMonth.Blank, data.LastMonth.Blank],
+							[data.LastThreeMonth.BackupLeave, data.LastTwoMonth.BackupLeave, data.LastMonth.BackupLeave],
+							[data.LastThreeMonth.Daily, data.LastTwoMonth.Daily, data.LastMonth.Daily],
+							[data.LastThreeMonth.Emergency, data.LastTwoMonth.Emergency, data.LastMonth.Emergency],
+							[data.LastThreeMonth.Leave, data.LastTwoMonth.Leave, data.LastMonth.Leave],
+							[data.LastThreeMonth.Maintenance, data.LastTwoMonth.Maintenance, data.LastMonth.Maintenance],
+							[data.LastThreeMonth.Other, data.LastTwoMonth.Other, data.LastMonth.Other],
+							[data.LastThreeMonth.Project, data.LastTwoMonth.Project, data.LastMonth.Project],
+							[data.LastThreeMonth.Rework, data.LastTwoMonth.Rework, data.LastMonth.Rework],
+							[data.LastThreeMonth.Training, data.LastTwoMonth.Training, data.LastMonth.Training]],
+						{
+							labels: [data.LastThreeMonthName, data.LastTwoMonthName, data.LastMonthName]
+						});
+
+					$('#loading_overlay').addClass('d-none');
+				},
+			});
+		};
+	</script> @*Overtime Section*@
+
+	<script>
+		$(document).ready(function () {
+			let calendar = new VanillaCalendar({
+				selector: "#myCalendar",
+			});
+			$("[data-toggle='tooltip']").tooltip();
+
+			$('.dropdown-toggle').dropdown();
+
+			getHolidaySection();
+			if ($("#timeSelect").val() == "daily") {
+				getMppPeopleSection();
+				getMppMachineSection();
+			}
+			getOvertimeSection();
+		});
+	</script>
+
+	<script>
+		//$(function () {
+		//    //'use strict'
+
+		//    var plot = $.plot('#flotChart', [{
+		//        data: df3,
+		//        color: '#69b2f8'
+		//    }, {
+		//        data: df1,
+		//        color: '#d1e6fa'
+		//    }, {
+		//        data: df2,
+		//        color: '#d1e6fa',
+		//        lines: {
+		//            fill: false,
+		//            lineWidth: 1.5
+		//        }
+		//    }], {
+		//        series: {
+		//            stack: 0,
+		//            shadowSize: 0,
+		//            lines: {
+		//                show: true,
+		//                lineWidth: 0,
+		//                fill: 1
+		//            }
+		//        },
+		//        grid: {
+		//            borderWidth: 0,
+		//            aboveData: true
+		//        },
+		//        yaxis: {
+		//            show: false,
+		//            min: 0,
+		//            max: 350
+		//        },
+		//        xaxis: {
+		//            show: true,
+		//            ticks: [[0, ''], [8, 'Jan'], [20, 'Feb'], [32, 'Mar'], [44, 'Apr'], [56, 'May'], [68, 'Jun'], [80, 'Jul'], [92, 'Aug'], [104, 'Sep'], [116, 'Oct'], [128, 'Nov'], [140, 'Dec']],
+		//            color: 'rgba(255,255,255,.2)'
+		//        }
+		//    });
+
+
+		//    $.plot('#flotChart2', [{
+		//        data: [[0, 55], [1, 38], [2, 20], [3, 70], [4, 50], [5, 15], [6, 30], [7, 50], [8, 40], [9, 55], [10, 60], [11, 40], [12, 32], [13, 17], [14, 28], [15, 36], [16, 53], [17, 66], [18, 58], [19, 46]],
+		//        color: '#69b2f8'
+		//    }, {
+		//        data: [[0, 80], [1, 80], [2, 80], [3, 80], [4, 80], [5, 80], [6, 80], [7, 80], [8, 80], [9, 80], [10, 80], [11, 80], [12, 80], [13, 80], [14, 80], [15, 80], [16, 80], [17, 80], [18, 80], [19, 80]],
+		//        color: '#f0f1f5'
+		//    }], {
+		//        series: {
+		//            stack: 0,
+		//            bars: {
+		//                show: true,
+		//                lineWidth: 0,
+		//                barWidth: .5,
+		//                fill: 1
+		//            }
+		//        },
+		//        grid: {
+		//            borderWidth: 0,
+		//            borderColor: '#edeff6'
+		//        },
+		//        yaxis: {
+		//            show: false,
+		//            max: 80
+		//        },
+		//        xaxis: {
+		//            ticks: [[0, 'Jan'], [4, 'Feb'], [8, 'Mar'], [12, 'Apr'], [16, 'May'], [19, 'Jun']],
+		//            color: '#fff',
+		//        }
+		//    });
+
+		//    $.plot('#flotChart3', [{
+		//        data: df4,
+		//        color: '#9db2c6'
+		//    }], {
+		//        series: {
+		//            shadowSize: 0,
+		//            lines: {
+		//                show: true,
+		//                lineWidth: 2,
+		//                fill: true,
+		//                fillColor: { colors: [{ opacity: 0 }, { opacity: .5 }] }
+		//            }
+		//        },
+		//        grid: {
+		//            borderWidth: 0,
+		//            labelMargin: 0
+		//        },
+		//        yaxis: {
+		//            show: false,
+		//            min: 0,
+		//            max: 60
+		//        },
+		//        xaxis: { show: false }
+		//    });
+
+		//    $.plot('#flotChart4', [{
+		//        data: df5,
+		//        color: '#9db2c6'
+		//    }], {
+		//        series: {
+		//            shadowSize: 0,
+		//            lines: {
+		//                show: true,
+		//                lineWidth: 2,
+		//                fill: true,
+		//                fillColor: { colors: [{ opacity: 0 }, { opacity: .5 }] }
+		//            }
+		//        },
+		//        grid: {
+		//            borderWidth: 0,
+		//            labelMargin: 0
+		//        },
+		//        yaxis: {
+		//            show: false,
+		//            min: 0,
+		//            max: 80
+		//        },
+		//        xaxis: { show: false }
+		//    });
+
+		//    $.plot('#flotChart5', [{
+		//        data: df6,
+		//        color: '#9db2c6'
+		//    }], {
+		//        series: {
+		//            shadowSize: 0,
+		//            lines: {
+		//                show: true,
+		//                lineWidth: 2,
+		//                fill: true,
+		//                fillColor: { colors: [{ opacity: 0 }, { opacity: .5 }] }
+		//            }
+		//        },
+		//        grid: {
+		//            borderWidth: 0,
+		//            labelMargin: 0
+		//        },
+		//        yaxis: {
+		//            show: false,
+		//            min: 0,
+		//            max: 80
+		//        },
+		//        xaxis: { show: false }
+		//    });
+
+		//    $.plot('#flotChart6', [{
+		//        data: df4,
+		//        color: '#9db2c6'
+		//    }], {
+		//        series: {
+		//            shadowSize: 0,
+		//            lines: {
+		//                show: true,
+		//                lineWidth: 2,
+		//                fill: true,
+		//                fillColor: { colors: [{ opacity: 0 }, { opacity: .5 }] }
+		//            }
+		//        },
+		//        grid: {
+		//            borderWidth: 0,
+		//            labelMargin: 0
+		//        },
+		//        yaxis: {
+		//            show: false,
+		//            min: 0,
+		//            max: 60
+		//        },
+		//        xaxis: { show: false }
+		//    });
+
+		//    $('#vmap').vectorMap({
+		//        map: 'usa_en',
+		//        showTooltip: true,
+		//        backgroundColor: '#fff',
+		//        color: '#d1e6fa',
+		//        colors: {
+		//            fl: '#69b2f8',
+		//            ca: '#69b2f8',
+		//            tx: '#69b2f8',
+		//            wy: '#69b2f8',
+		//            ny: '#69b2f8'
+		//        },
+		//        selectedColor: '#00cccc',
+		//        enableZoom: false,
+		//        borderWidth: 1,
+		//        borderColor: '#fff',
+		//        hoverOpacity: .85
+		//    });
+
+
+		//    var ctxLabel = ['Maintenance Activity', 'Daily Work', 'Other', 'Emergency/Force Major', 'Back Up Leave', 'Training', 'Project', 'Rework & WIP Activity'];
+		//    var ctxData1 = [10, 80, 30, 0, 20, 0, 10, 10];
+		//    var ctxData2 = [0, 10, 0, 0, 0, 0, 0, 0];
+
+		//    // Bar chart
+		//    var ctx1 = document.getElementById('chartBar1').getContext('2d');
+		//    new Chart(ctx1, {
+		//        type: 'horizontalBar',
+		//        data: {
+		//            labels: ctxLabel,
+		//            datasets: [{
+		//                data: ctxData1,
+		//                backgroundColor: '#69b2f8'
+		//            }, {
+		//                data: ctxData2,
+		//                backgroundColor: '#d1e6fa'
+		//            }]
+		//        },
+		//        options: {
+		//            maintainAspectRatio: false,
+		//            responsive: true,
+		//            legend: {
+		//                display: false,
+		//                labels: {
+		//                    display: false
+		//                }
+		//            },
+		//            scales: {
+		//                yAxes: [{
+		//                    gridLines: {
+		//                        display: false
+		//                    },
+		//                    ticks: {
+		//                        display: false,
+		//                        beginAtZero: true,
+		//                        fontSize: 10,
+		//                        fontColor: '#182b49'
+		//                    }
+		//                }],
+		//                xAxes: [{
+		//                    gridLines: {
+		//                        display: true,
+		//                        color: '#eceef4'
+		//                    },
+		//                    barPercentage: 0.6,
+		//                    ticks: {
+		//                        beginAtZero: true,
+		//                        fontSize: 10,
+		//                        fontColor: '#8392a5',
+		//                        max: 100
+		//                    }
+		//                }]
+		//            }
+		//        }
+		//    });
+
+		//})
+	</script>
+
+	<!------------------------CHART ------------------------------------>
+	<script>
+		var colors = ['#0066ff', '#ff6600', '#808080', '#ffff66', '#cc00ff', '#4dd2ff', '#009933', '#262626', '#990000', '#beff33'];
+
+		var barChartData = {
+			labels: ['January', 'February', 'March'],
+			datasets: [{
+				label: 'Blank',
+				backgroundColor: colors[0],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Backup Leave',
+				backgroundColor: colors[1],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Daily',
+				backgroundColor: colors[2],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Emergency',
+				backgroundColor: colors[3],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Leave',
+				backgroundColor: colors[4],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Maintenance',
+				backgroundColor: colors[5],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Other',
+				backgroundColor: colors[6],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Project',
+				backgroundColor: colors[7],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Rework',
+				backgroundColor: colors[8],
+				data: [0.60, 0.74, 0.83]
+			}, {
+				label: 'Training',
+				backgroundColor: colors[9],
+				data: [0.60, 0.74, 0.83]
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+		}
+
+		var ctx = document.getElementById('canvasRE').getContext('2d');
+
+		var overtimeChart = new Chart(ctx, {
+			type: 'bar',
+			data: barChartData,
+			options: {
+				tooltips: {
+					mode: 'index',
+					intersect: false
+				},
+				responsive: true,
+				scales: {
+					xAxes: [{
+						stacked: true,
+						barPercentage: 0.8,
+						categoryPercentage: 0.5,
+						ticks: {
+							min: 0,
+							max: 100,
+						},
+					}],
+					yAxes: [{
+						stacked: true
+					}]
+				}, legend: {
+					display: true,
+					position: 'right',
+					labels: {
+						boxWidth: 20,
+						fontSize: 10
+					}
+				}
+			}
+		});
+	</script> @*CHART Overtime Section*@
+
+	<script>
+		var datapie = {
+			labels: ['Half Assigned', 'Fully Assigned', 'Unallocated', 'No WPP'],
+			datasets: [{
+				data: [225, 575, 200, 100],
+				backgroundColor: ['#d9534f', '#5cb85c', '#292b2c', '#7f7f7f']
+			}]
+		};
+
+		var optionpie = {
+			maintainAspectRatio: false,
+			responsive: true,
+			legend: {
+				display: false,
+			},
+			animation: {
+				animateScale: true,
+				animateRotate: true
+			},
+			tooltips: {
+				enabled: true,
+				callbacks: {
+					label: function (tooltipItems, data) {
+						return data.datasets[0].data[tooltipItems.index];
+					}
+				}
+			},
+			plugins: {
+				labels: {
+					fontSize: '10',
+					fontColor: '#000',
+					display: true,
+				}
+			},
+		};
+
+
+		var ctx2 = document.getElementById('chartDonut');
+		var myMppDonutChart = new Chart(ctx2, {
+			type: 'doughnut',
+			data: datapie,
+			options: optionpie
+		});
+	</script> @*CHART MPP Machine*@
+
+	<script>
+		var datapie = {
+			labels: ['Available', 'Half Assigned', 'Fully Assigned', 'Overload'],
+			datasets: [{
+				data: [100, 100, 225, 575,],
+				backgroundColor: ['#feff99', '#fe9900', '#33cc33', '#cd3301']
+			}]
+		};
+
+		var optionpie = {
+			maintainAspectRatio: false,
+			responsive: true,
+			legend: {
+				display: false,
+			},
+			animation: {
+				animateScale: true,
+				animateRotate: true
+			},
+			tooltips: {
+				enabled: true,
+				callbacks: {
+					label: function (tooltipItems, data) {
+						return data.datasets[0].data[tooltipItems.index];
+					}
+				}
+			},
+			plugins: {
+				labels: {
+					fontSize: '10',
+					fontColor: '#000',
+					display: true,
+				}
+			},
+		};
+
+		var ctx2 = document.getElementById('chartDonutPeople');
+		var myPeopleDonutChart = new Chart(ctx2, {
+			type: 'doughnut',
+			data: datapie,
+			options: optionpie
+		});
+	</script> @*CHART MPP People*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#349CFB', '#FD7E14', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+        var chclad = null;
+		var chcladElement = document.getElementById("chclad");
+
+        $.ajax({
+			type: "POST",
+			url: "@Url.Action("DashboardDaily", "Checklist")",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (data) {
+		        var chcladData = {
+			        labels: data.Header,
+			        datasets: [
+				        {
+					        data: data.Submitted,
+					        backgroundColor: "#fe9900"
+				        },
+				        {
+					        data: data.Approved,
+					        backgroundColor: "#349CFB"
+				        }
+			        ]
+		        };
+
+		        if (chcladElement) {
+			        chclad = new Chart(chcladElement, {
+				        type: 'horizontalBar',
+				        data: chcladData,
+				        options: {
+					        scales: {
+						        xAxes: [{
+							        barPercentage: 0.2,
+							        categoryPercentage: 0.5,
+							        ticks: {
+								        min: 0,
+								        max: 100,
+							        },
+						        }],
+						        yAxes: [{
+							        ticks: {
+								        beginAtZero: false
+							        }
+						        }]
+					        },
+					        legend: {
+						        display: false
+					        },
+				        }
+			        });
+		        }
+
+
+			},
+		});
+
+	</script> @*chekclist adherence*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#349CFB', '#FD7E14', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+        var chbandrol = null;
+		var chbandrolx = document.getElementById("chbandrol");
+
+        $.ajax({
+			type: "POST",
+			url: "@Url.Action("GetBandrolDaily", "ReportPemakaianBandrol")",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+            success: function (data) {
+                console.log(data);
+		        var chbandrolData = {
+			        labels: data.Header,
+			        datasets: [
+				        {
+					        data: data.Submitted,
+					        backgroundColor: "#007bff"
+				        },
+				        {
+					        data: data.Approved,
+					        backgroundColor: "#5bd276"
+				        }
+			        ]
+		        };
+
+		        if (chbandrolx) {
+			        chbandrol = new Chart(chbandrolx, {
+				        type: 'bar',
+				        data: chbandrolData,
+				        options: {
+					        scales: {
+						        xAxes: [{
+							        barPercentage: 0.2,
+							        categoryPercentage: 0.5,
+						        }],
+						        yAxes: [{
+							        ticks: {
+								        beginAtZero: false
+							        }
+						        }]
+					        },
+					        legend: {
+						        display: false
+					        },
+				        }
+			        });
+		        }
+
+
+			},
+		});
+
+	</script> @*bandrol*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+		var chlphpp = null;
+		var chlphppElement = document.getElementById("chlphpp");
+		var chlphppData = {
+			labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+			datasets: [
+				{
+					data: [60, 50, 70, 80, 90, 85, 92],
+					backgroundColor: colors[0]
+				},
+				{
+					data: [99, 91, 88, 95, 70, 70, 40],
+					backgroundColor: colors[1]
+				}
+			],
+		};
+
+		if (chlphppElement) {
+			chlphpp = new Chart(chlphppElement, {
+				type: 'bar',
+				data: chlphppData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+				}
+			});
+		}
+	</script> @*chlphpp*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+		var chlphsp = null;
+		var chlphspElement = document.getElementById("chlphsp");
+		var chlphspData = {
+			labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+			datasets: [
+				{
+					data: [60, 50, 70, 80, 90, 85, 92],
+					backgroundColor: colors[0]
+				},
+				{
+					data: [99, 91, 88, 95, 70, 70, 40],
+					backgroundColor: colors[1]
+				}]
+		};
+		if (chlphspElement) {
+			chlphsp = new Chart(chlphspElement, {
+				type: 'bar',
+				data: chlphspData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+				}
+			});
+		}
+	</script> @*chlphpp*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#f65c78', '#28a745', '#333333', '#c3e6cb', '#dc3545', '#6c757d', 'rgba(40, 167, 69, 0.12)'];
+
+		/* large line chart */
+		var chsisallpvolume = null;
+		var chsisallpvolumeElement = document.getElementById("chsisallpvolume");
+		var chsisallpvolumeData = {
+			labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+			datasets: [{
+				data: [72.2, 77.6, 70, 51.2],
+				backgroundColor: colors[6],
+				borderColor: colors[1],
+				borderWidth: 2,
+				pointBackgroundColor: colors[1],
+				additionalData: {
+					date: ""
+				},
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chsisallpvolumeElement) {
+			chsisallpvolume = new Chart(chsisallpvolumeElement, {
+				type: 'line',
+				data: chsisallpvolumeData,
+				options: {
+					tooltips: {
+						callbacks: {
+							title: function (tooltipItem, data) {
+								return [
+									(tooltipItem[0].xLabel || '') + "  " + data.datasets[tooltipItem[0].datasetIndex].additionalData.date,
+								];
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+					annotation: {
+						annotations: [{
+							type: 'line',
+							mode: 'horizontal',
+							scaleID: 'y-axis-0',
+							value: 70,
+							borderColor: 'rgb(75, 192, 192)',
+							borderWidth: 1,
+							label: {
+								enabled: true,
+								content: 'Target : 70'
+							}
+						}]
+					}
+				}
+			});
+		}
+	</script> @*chsisallpvolume - Prod Volume*@
+
+	<script>
+
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#f65c78', '#28a745', '#333333', '#c3e6cb', '#dc3545', '#6c757d', 'rgba(40, 167, 69, 0.12)'];
+
+		/* large line chart */
+		var chsisallup = null;
+		var chsisallupElement = document.getElementById("chsisallup");
+		var chsisallupData = {
+			labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+			datasets: [{
+				data: [39, 45, 77.6, 66.1],
+				backgroundColor: colors[6],
+				borderColor: colors[1],
+				borderWidth: 2,
+				pointBackgroundColor: colors[1],
+				additionalData: {
+					date: ""
+				},
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chsisallupElement) {
+			chsisallup = new Chart(chsisallupElement, {
+				type: 'line',
+				data: chsisallupData,
+				options: {
+					tooltips: {
+						callbacks: {
+							title: function (tooltipItem, data) {
+								return [
+									(tooltipItem[0].xLabel || '') + " " + data.datasets[tooltipItem[0].datasetIndex].additionalData.date,
+								];
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+					annotation: {
+						annotations: [{
+							type: 'line',
+							mode: 'horizontal',
+							scaleID: 'y-axis-0',
+							value: 70,
+							borderColor: 'rgb(75, 192, 192)',
+							borderWidth: 1,
+							label: {
+								enabled: true,
+								content: 'Target : 70'
+							}
+						}]
+					}
+				}
+			});
+		}
+	</script> @*chsisallup - Uptime*@
+
+	<script>
+
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#f65c78', '#28a745', '#333333', '#c3e6cb', '#dc3545', '#6c757d', 'rgba(40, 167, 69, 0.12)'];
+
+		/* large line chart */
+		var chsisallmtrf = null;
+		var chsisallmtrfElement = document.getElementById("chsisallmtrf");
+		var chsisallmtrfData = {
+			labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+			datasets: [{
+				data: [6.31, 0, 45, 77.6],
+				backgroundColor: colors[6],
+				borderColor: colors[1],
+				borderWidth: 2,
+				pointBackgroundColor: colors[1],
+				additionalData: {
+					date: ""
+				},
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chsisallmtrfElement) {
+			chsisallmtrf = new Chart(chsisallmtrfElement, {
+				type: 'line',
+				data: chsisallmtrfData,
+				options: {
+					tooltips: {
+						callbacks: {
+							title: function (tooltipItem, data) {
+								return [
+									(tooltipItem[0].xLabel || '') + " " + data.datasets[tooltipItem[0].datasetIndex].additionalData.date,
+								];
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+					annotation: {
+						annotations: [{
+							type: 'line',
+							mode: 'horizontal',
+							scaleID: 'y-axis-0',
+							value: 70,
+							borderColor: 'rgb(75, 192, 192)',
+							borderWidth: 1,
+							label: {
+								enabled: true,
+								content: 'Target : 70'
+							}
+						}]
+					}
+				}
+			});
+		}
+	</script> @*chsisallmtrf - MTBF*@
+
+	<script>
+
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#f65c78', '#28a745', '#333333', '#c3e6cb', '#dc3545', '#6c757d', 'rgba(40, 167, 69, 0.12)'];
+
+		/* large line chart */
+		var chsisallcrr = null;
+		var chsisallcrrElement = document.getElementById("chsisallcrr");
+		var chsisallcrrData = {
+			labels: ["10 Des 20", "11 Des 20", "12 Des 20", "13 Des 20"],
+			datasets: [{
+				data: [33, 0, 80, 34],
+				backgroundColor: colors[6],
+				borderColor: colors[1],
+				borderWidth: 2,
+				pointBackgroundColor: colors[1],
+				additionalData: {
+					date: ""
+				},
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chsisallcrrElement) {
+			chsisallcrr = new Chart(chsisallcrrElement, {
+				type: 'line',
+				data: chsisallcrrData,
+				options: {
+					tooltips: {
+						callbacks: {
+							title: function (tooltipItem, data) {
+								return [
+									(tooltipItem[0].xLabel || '') + " " + data.datasets[tooltipItem[0].datasetIndex].additionalData.date,
+								];
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+					annotation: {
+						annotations: [{
+							type: 'line',
+							mode: 'horizontal',
+							scaleID: 'y-axis-0',
+							value: 70,
+							borderColor: 'rgb(75, 192, 192)',
+							borderWidth: 1,
+							label: {
+								enabled: true,
+								content: 'Target : 70'
+							}
+						}]
+					}
+				}
+			});
+		}
+	</script> @*chsisallcrr - CRR*@
+
+	<script>
+
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#f65c78', '#28a745', '#333333', '#c3e6cb', '#dc3545', '#6c757d', 'rgba(40, 167, 69, 0.12)'];
+
+		/* large line chart */
+		var chLine = document.getElementById("chsisallvqi");
+		var chartData = {
+			labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+			datasets: [{
+				data: [72.2, 77.6, 45.6, 65.4],
+				backgroundColor: colors[6],
+				borderColor: colors[1],
+				borderWidth: 2,
+				pointBackgroundColor: colors[1],
+				additionalData: {
+					date: ""
+				},
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chLine) {
+			new Chart(chLine, {
+				type: 'line',
+				data: chartData,
+				options: {
+					tooltips: {
+						callbacks: {
+							title: function (tooltipItem, data) {
+								return [
+									(tooltipItem[0].xLabel || '') + " " + data.datasets[tooltipItem[0].datasetIndex].additionalData.date,
+								];
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+					annotation: {
+						annotations: [{
+							type: 'line',
+							mode: 'horizontal',
+							scaleID: 'y-axis-0',
+							value: 70,
+							borderColor: 'rgb(75, 192, 192)',
+							borderWidth: 1,
+							label: {
+								enabled: true,
+								content: 'Target : 70'
+							}
+						}]
+					}
+				}
+			});
+		}
+	</script> @*chsisallvqi - yield*@
+
+	<script>
+
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#f65c78', '#28a745', '#333333', '#c3e6cb', '#dc3545', '#6c757d', 'rgba(40, 167, 69, 0.12)'];
+
+		/* large line chart */
+		var chLine = document.getElementById("chsisallstrs");
+		var chartData = {
+			labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+			datasets: [{
+				data: [72.2, 77.6, 60.2, 59, 1],
+				backgroundColor: colors[6],
+				borderColor: colors[1],
+				borderWidth: 2,
+				pointBackgroundColor: colors[1],
+				additionalData: {
+					date: ""
+				},
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chLine) {
+			new Chart(chLine, {
+				type: 'line',
+				data: chartData,
+				options: {
+					tooltips: {
+						callbacks: {
+							title: function (tooltipItem, data) {
+								return [
+									(tooltipItem[0].xLabel || '') + " - " + data.datasets[tooltipItem[0].datasetIndex].additionalData.date,
+								];
+							}
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+					annotation: {
+						annotations: [{
+							type: 'line',
+							mode: 'horizontal',
+							scaleID: 'y-axis-0',
+							value: 70,
+							borderColor: 'rgb(75, 192, 192)',
+							borderWidth: 1,
+							label: {
+								enabled: true,
+								content: 'Target : 70'
+							}
+						}]
+					}
+				}
+			});
+		}
+	</script> @*chsisallstrs - dim*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#f67575', '#ffa34d', '#1eb2a6', '#6c757d'];
+
+		var chwaste = null;
+		var chwasteElement = document.getElementById("chwaste");
+		var chwasteData = {
+			labels: ["Int", "Krt", "Wht", "Wht OTP"],
+			datasets: [{
+				data: [14, 44, 22, 43],
+				backgroundColor: colors[2]
+			},
+			{
+				data: [65, 77, 34, 22],
+				backgroundColor: colors[3]
+			},
+			{
+				data: [67, 34, 23, 54],
+				backgroundColor: colors[4]
+			},
+			{
+				data: [0, 0, 0, 76],
+				backgroundColor: colors[5]
+			}]
+		};
+
+		function updateAnnotation(val) {
+			chart51.options.annotation.annotations[0].label.enabled = val;
+			//chart51.update();
+		}
+
+		if (chwasteElement) {
+			chwaste = new Chart(chwasteElement, {
+				type: 'bar',
+				data: chwasteData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+				}
+			});
+		}
+	</script> @*chwaste*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#f67575', '#ffa34d', '#1eb2a6', '#6c757d'];
+
+		var chyieldgov = null;
+		var chyieldgovElement = document.getElementById("chyieldgov");
+		var chyieldgovData = {
+			labels: ["Clv", "Krt", "Wht", "DIET"],
+			datasets: [{
+				data: [33, 42, 16, 25],
+				backgroundColor: colors[2]
+			},
+			{
+				data: [65, 64, 68, 73],
+				backgroundColor: colors[3]
+			}]
+		};
+
+		if (chyieldgovElement) {
+			chyieldgov = new Chart(chyieldgovElement, {
+				type: 'bar',
+				data: chyieldgovData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					},
+				}
+			});
+		}
+	</script> @*chwaste*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+		var chBar = document.getElementById("chrph1");
+		var chartData = {
+			labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+			datasets: [{
+				data: [847, 854, 822, 557, 777, 873, 871],
+				backgroundColor: colors[0]
+			},
+			{
+				data: [53.77, 53.77, 53.77, 53.77, 53.77, 53.77, 53.77],
+				backgroundColor: colors[1]
+			}]
+		};
+
+		if (chBar) {
+			new Chart(chBar, {
+				type: 'bar',
+				data: chartData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					}
+				}
+			});
+		}
+	</script> @*chrph1*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+		var chBar = document.getElementById("chrph");
+		var chartData = {
+			labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+			datasets: [{
+				data: [1695.00, 1688.00, 1618.00, 1082.00, 1525.00, 1721.00, 17003.00],
+				backgroundColor: colors[0]
+			},
+			{
+				data: [105907.20, 105907.20, 105907.20, 105907.20, 105907.20, 105907.20, 105907.20],
+				backgroundColor: colors[1]
+			}]
+		};
+
+		if (chBar) {
+			new Chart(chBar, {
+				type: 'bar',
+				data: chartData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					}
+				}
+			});
+		}
+	</script> @*chrph*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+		var chBar = document.getElementById("chlph");
+		var chartData = {
+			labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+			datasets: [{
+				data: [22064.0, 22064.0, 22064.0, 22064.0, 22064.0, 22064.0, 22064.0],
+				backgroundColor: colors[0]
+			},
+			{
+				data: [0, 0, 0, 0, 0, 0, 0],
+				backgroundColor: colors[1]
+			}]
+		};
+
+		if (chBar) {
+			new Chart(chBar, {
+				type: 'bar',
+				data: chartData,
+				options: {
+					scales: {
+						xAxes: [{
+							barPercentage: 0.4,
+							categoryPercentage: 0.5
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false
+					}
+				}
+			});
+		}
+	</script> @*chlph*@
+
+	<script>
+		/* chart.js chart examples */
+
+		// chart colors
+		var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+        var chbaroverallsis = null;
+		var chbaroverallsisx = document.getElementById("chbaroverallsis");
+
+        $.ajax({
+			type: "POST",
+			url: "@Url.Action("GetClaimableDaily", "ReportPemakaianBandrol")",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+            success: function (data) {
+                console.log(data);
+		        var chbaroverallsisData = {
+			        labels: data.Header,
+			        datasets: [
+				        {
+					        data: data.Submitted,
+					        backgroundColor: "#007bff"
+				        },
+				        {
+					        data: data.Approved,
+					        backgroundColor: "#5bd276"
+				        }
+			        ]
+		        };
+
+		        if (chbaroverallsisx) {
+			        chbaroverallsis = new Chart(chbaroverallsisx, {
+				        type: 'bar',
+				        data: chbaroverallsisData,
+				        options: {
+					        scales: {
+						        xAxes: [{
+							        barPercentage: 0.2,
+							        categoryPercentage: 0.5,
+						        }],
+						        yAxes: [{
+							        ticks: {
+								        beginAtZero: false
+							        }
+						        }]
+					        },
+					        legend: {
+						        display: false
+					        },
+				        }
+			        });
+		        }
+
+
+			},
+		});
+
+
+	</script> @*Claimable*@
+
+	<script>
+		$("#btnShowHideIDPP").click(function () {
+			var x = document.getElementById("collapseExampleIDPP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button ID PP *@
+
+	<script>
+		$("#btnShowHideIDSP").click(function () {
+			var x = document.getElementById("collapseExampleIDSP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button ID SP *@
+
+	<script>
+		$("#btnShowHidePJPP").click(function () {
+			var x = document.getElementById("collapseExamplePJPP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button pj PP *@
+
+	<script>
+		$("#btnShowHidePJSP").click(function () {
+			var x = document.getElementById("collapseExamplePJSP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button pj SP *@
+
+	<script>
+		$("#btnShowHidePKPP").click(function () {
+			var x = document.getElementById("collapseExamplePKPP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button PK PP *@
+
+	<script>
+		$("#btnShowHidePKSP").click(function () {
+			var x = document.getElementById("collapseExamplePKSP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button PK SP *@
+
+	<script>
+		$("#btnShowHidePIPP").click(function () {
+			var x = document.getElementById("collapseExamplePIPP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button PI PP *@
+
+	<script>
+		$("#btnShowHidePISP").click(function () {
+			var x = document.getElementById("collapseExamplePISP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button PI SP *@
+
+	<script>
+		$("#btnShowHidePBPP").click(function () {
+			var x = document.getElementById("collapseExamplePBPP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button PB PP *@
+
+	<script>
+		$("#btnShowHidePBSP").click(function () {
+			var x = document.getElementById("collapseExamplePBSP");
+			if (x.style.display === 'none') {
+				x.style.display = '';
+				$(this).data("text", $(this).text());
+				$(this).text("Hide");
+			} else {
+				x.style.display = 'none';
+				$(this).text($(this).data("text"));
+			}
+		});
+	</script> @*hide button PB SP *@
+}
+
+

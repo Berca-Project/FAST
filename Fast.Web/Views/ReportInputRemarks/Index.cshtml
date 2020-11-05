@@ -1,0 +1,235 @@
+﻿@model Fast.Web.Models.Report.ReportRemarksModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+
+}
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Remarks</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Remarks</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <a href="@(Url.Action("Create","ReportInputRemarks"))" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnRemarks"><i data-feather="plus-circle" class="wd-10 mg-r-5"></i> New Remarks</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Remarks
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 350px">
+                            <table class="table table-bordered table-hover table-striped" id="remarksList">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="min-width:105px;">ID</th>
+                                        <th style="min-width:105px;">Remark Date</th>
+                                        <th style="min-width:105px;">KPI </th>
+                                        <th style="min-width:105px;">Shift</th>
+                                        <th style="min-width:105px;">Focus</th>
+                                        <th style="min-width:105px;">Action Plan</th>
+                                        <th style="min-width:40px;">Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--Laporan Process Packing White Box-->
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+        <div class="modal-content">
+            <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+                <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+                <div class="media align-items-center">
+                    <span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+                    <div class="media-body mg-sm-l-20">
+                        <h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+                    </div>
+                </div><!-- media -->
+            </div><!-- modal-header -->
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+                </div>
+            </div><!-- modal-body -->
+            <div class="modal-footer pd-x-20 pd-y-15">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+                <button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+            </div>
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+               var table = $('#remarksList').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/ReportInputRemarks/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+                      "searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+                        },
+                    	{
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+                        }
+
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+                    },
+                    { "data": "RSA", "name": "RSA", "autoWidth": true },
+                    { "data": "Shift", "name": "Shift", "autoWidth": true },
+                    { "data": "Focus", "name": "Focus", "autoWidth": true },
+                    { "data": "ActionPlan", "name": "ActionPlan","autoWidth": true },
+				    {
+						"render": function (data, type, full, meta) {
+								return '<button class="btn-menu btn-default" onclick="Edit(\'' + full['ID'] + '\')"  title="Edit"><i class="fa fa-edit"></i></button>'+
+									   '<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] +  '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					}
+				]
+			});
+        });
+        var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+       var Edit = function (ID) {
+          window.location.href = fastApp.BaseUrl  + '/ReportInputRemarks/Edit?id=' + ID;
+        }
+
+		var Delete = function (ID, Name) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteRemarks(ID);
+			});
+		}
+
+		function DeleteRemarks(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/ReportInputRemarks/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						location.reload();
+					}, 1000);
+				}
+			});
+		}
+    </script>
+
+
+}
+
+
+

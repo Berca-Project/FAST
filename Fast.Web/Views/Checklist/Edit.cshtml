@@ -1,0 +1,1021 @@
+﻿@model Fast.Web.Models.ChecklistEditModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+
+@{
+    List<SelectListItem> HeaderComponentType = new List<SelectListItem>()
+{
+        new SelectListItem() {Text="Input Text",          Value="input_text"},
+        new SelectListItem() {Text="Input Number",        Value="input_number"},
+        new SelectListItem() {Text="Input Date",          Value="input_date"},
+        new SelectListItem() {Text="Input Time",          Value="input_time"},
+        new SelectListItem() {Text="Input Checkbox",      Value="input_checkbox"},
+        new SelectListItem() {Text="Input Image Upload",  Value="input_file"},
+        new SelectListItem() {Text="Input Option",        Value="input_option"},
+        new SelectListItem() {Text="Input User",          Value="input_user"},
+        new SelectListItem() {Text="Input Location",      Value="input_location"},
+        new SelectListItem() {Text="Input Reference",     Value="input_reference"},
+        new SelectListItem() {Text="Image",               Value="image"},
+        new SelectListItem() {Text="Blank",               Value="blank"}
+    };
+
+    List<SelectListItem> ContentComponentType = new List<SelectListItem>()
+{
+        new SelectListItem() {Text="Input Text",          Value="input_text"},
+        new SelectListItem() {Text="Input Number",        Value="input_number"},
+        new SelectListItem() {Text="Input Date",          Value="input_date"},
+        new SelectListItem() {Text="Input Checkbox",      Value="input_checkbox"},
+        new SelectListItem() {Text="Input Barcode",       Value="input_barcode"},
+        new SelectListItem() {Text="Input Option",        Value="input_option"},
+        new SelectListItem() {Text="Input Radio Button",  Value="input_radio"},
+        new SelectListItem() {Text="Input Reference",     Value="input_reference"},
+        new SelectListItem() {Text="Input Webcam",        Value="input_webcam"},
+        new SelectListItem() {Text="Label",               Value="label"},
+        new SelectListItem() {Text="Image",               Value="image"},
+        new SelectListItem() {Text="Blank",               Value="blank"},
+    };
+
+
+    List<SelectListItem> IsRequired = new List<SelectListItem>()
+{
+        new SelectListItem() {Text="Required", Value=true.ToString() },
+        new SelectListItem() {Text="Optional", Value=false.ToString() },
+    };
+
+    List<SelectListItem> FrequencyUnit = new List<SelectListItem>()
+{
+        new SelectListItem() {Text="Minute", Value="Minute" },
+        new SelectListItem() {Text="Hour", Value="Hour" },
+        new SelectListItem() {Text="Shift", Value="Shift" },
+        new SelectListItem() {Text="Day", Value="Day" },
+        new SelectListItem() {Text="Week", Value="Week" },
+        new SelectListItem() {Text="Month", Value="Month" },
+    };
+
+    int index = 0;
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+        .table th, .table td {
+            /*vertical-align: middle;*/
+        }
+
+        .add-sub, .remove-sub {
+            padding: 2px 5px;
+            font-size: 11px;
+            margin-top: 7px;
+        }
+
+        .bootstrap-tagsinput {
+            margin-top: 5px;
+        }
+
+            .bootstrap-tagsinput .tag {
+                margin-bottom: 2px;
+            }
+
+        .select2-results__option[aria-selected=true] {
+            display: none;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item"><a href="#">Generated</a></li>
+                        <li class="breadcrumb-item"><a href="#">@(Model.Checklist.Header)</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Edit Checklist (@(Model.Checklist.Header))</h4>
+            </div>
+            <div class="d-none" id="print_barcode">
+                <a id="print_all" class="btn btn-sm pd-x-15 btn-primary btn-uppercase" href="#"><i class="fas fa-print"></i> Print Barcode</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+
+                <!--
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h5 class="alert-heading">Warning!</h5>
+                    <hr>
+                    <p class="mb-0">Some input type can be converted to another type, for example input number to input text, input date to input text, etc. Some input type cannot be converted at all, such as input image, input location, input user, input reference. If the conversion is done, it will potentially cause errors in view history, edit, & report.</p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                -->
+
+                @using (Html.BeginForm("Edit", "Checklist", FormMethod.Post, new { @class = "preventDoubleSubmission", @autocomplete = "false", encType = "multipart/form-data" }))
+                {
+                    int header_counter = 1;
+                    var random = new Random();
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(x => x.Checklist.ID)
+
+                    <div class="card mg-b-20">
+                        <div class="card-header">
+                            <b>Checklist Information Segment</b>
+                        </div>
+                        <div class="card-body">
+                            <p>The form below contains basic information of this checklist. You can change Menu Title, Header, and Detail Frequency</p>
+                        </div>
+                        <div class="card-footer pd-15">
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Menu Title</label>
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.Checklist.MenuTitle, null, new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Header</label>
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.Checklist.Header, null, new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-2">Icon</div>
+                                <div class="col-sm-9">
+                                    <div class="custom-file">
+                                        @Html.TextBoxFor(x => x.Checklist.IconFile, null, new { type = "file", @class = "custom-file-input" })
+                                        <label class="custom-file-label" for="IconFile">@UIResources.Ch_EditIcon</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 text-right">
+                                    <img src="~/Uploads/checklist/icon/@((Model.Checklist.Icon == "" || Model.Checklist.Icon == null)?"_no_image.jpg":Model.Checklist.Icon)" alt="" style="min-height: 38px;max-height: 38px;">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-2 mg-b-10">Locations</div>
+                                <div class="col-sm-10">
+                                    <div class="row mg-l-0 mg-r-0">
+                                        <div class="col-4 mg-b-10 p-0">@Html.DropDownListFor(x=>x.Checklist.Location1, Enumerable.Empty<SelectListItem>(), new { @class = "form-control selection-location", multiple = "multiple" })</div>
+                                        <div class="col-4 mg-b-10 p-0">@Html.DropDownListFor(x => x.Checklist.Location2, Enumerable.Empty<SelectListItem>(), new { @class = "form-control selection-department", multiple = "multiple" })</div>
+                                        <div class="col-4 mg-b-10 p-0">@Html.DropDownListFor(x => x.Checklist.Location3, Enumerable.Empty<SelectListItem>(), new { @class = "form-control selection-subdepartment", multiple = "multiple" })</div>
+                                        <!-- <button type="button" class="col-1 offset-2 btn btn-xs btn-info selection-add"><i class="fas fa-plus"></i></button> -->
+                                    </div>
+                                    <div class="form-text text-muted">If location is empty, checklist will be visible in all locations.</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-3">This Checklist should be submitted </div>
+                                <div class="col-sm-1">
+                                    @Html.TextBoxFor(x => x.Checklist.FrequencyAmount, new { @class = "form-control", @type = "number", @required = "required", @onkeypress = "validateNumber(event)" })
+                                </div>
+                                <div class="col-form-label col-sm-2">times every </div>
+                                <div class="col-sm-1">
+                                    @Html.TextBoxFor(p => p.Checklist.FrequencyDivider, new { @class = "form-control", @type = "number", @onkeypress = "validateNumber(event)" })
+                                </div>
+                                <div class="col-sm-1">
+                                    @Html.DropDownListFor(p => p.Checklist.FrequencyUnit, new SelectList(FrequencyUnit, "Value", "Text", "Day"), new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mg-b-20">
+                        <div class="card-header">
+                            <b>Header Segment</b>
+                        </div>
+                        <div class="card-body">
+                            <p>The form below contains the component configuration for the checklist header. You can change the display order, text label, input type, whether it needs to be filled in, or you can delete it.</p>
+                        </div>
+                        <div class="card-footer pd-15">
+                            <div class="row pd-t-20">
+                                @for (var i = 0; i < Model.Components.Count(); i++)
+                                {
+                                    if (Model.Components[i].Segment.Trim() == "header" && Model.Components[i].ComponentType.Trim() == "label")
+                                    {
+                                        <div class="form-group col-@(12 / (Model.Checklist.ColumnHeader < 1?1:Model.Checklist.ColumnHeader)) bd-x">
+                                            <div class="row">
+                                                <div class="col-sm-2 pd-r-5">
+                                                    @{
+                                                        Model.Components[i].OrderNum = header_counter++;
+                                                    }
+                                                    @Html.TextBoxFor(x => x.Components[i].OrderNum, new { @class = "form-control header-order" })
+                                                </div>
+                                                <div class="col-sm-3 pd-x-5">
+                                                    @Html.HiddenFor(x => x.Components[i].ID)
+                                                    @Html.HiddenFor(x => x.Components[i].IsDeleted)
+                                                    @Html.HiddenFor(x => x.Components[i].ComponentType)
+                                                    @Html.TextBoxFor(x => x.Components[i].ComponentName, new { @class = "form-control", @placeholder = "Label" })
+                                                </div>
+                                                <div class="col-sm-4 pd-x-5">
+                                                    @Html.HiddenFor(x => x.Components[i + 1].ID)
+                                                    @Html.HiddenFor(x => x.Components[i + 1].IsDeleted)
+
+                                                    @Html.DropDownListFor(x => x.Components[i + 1].ComponentType, new SelectList(HeaderComponentType, "Value", "Text", Model.Components[i + 1].ComponentType), new { @class = "form-control header-selection" })
+
+                                                    @if (Model.Components[i + 1].ComponentType.Trim() == "input_option")
+                                                    {
+                                                        @Html.TextBoxFor(x => x.Components[i + 1].ComponentName, new { @class = "form-control tags-input mg-t-5 subchild", @data_role = "tagsinput", @placeholder = "Comma separated" })
+                                                    }
+                                                    else if (Model.Components[i + 1].ComponentType.Trim() == "input_reference")
+                                                    {
+                                                        @Html.DropDownListFor(x => x.Components[i + 1].ComponentName, new SelectList((IEnumerable<SelectListItem>)ViewBag.ReferenceList, "Value", "Text", Model.Components[i + 1].ComponentName), new { @class = "form-control subchild", @required = "required", @id = "" })
+                                                    }
+                                                    else if (Model.Components[i + 1].ComponentType.Trim() == "image")
+                                                    {
+                                                        var identifier = random.Next(0, 1000);
+
+                                                        <div class="custom-file subchild">
+                                                            @Html.TextBoxFor(x => x.Components[i + 1].ComponentName, new { @id = "image" + identifier, @class = "custom-file-input", @type = "file", @placeholder = "Label", @accept = "image/*" })
+                                                            <label class="custom-file-label" for="image@(identifier)">@(Model.Components[i + 1].ComponentName == "" ? "Upload your images here" : Model.Components[i + 1].ComponentName)</label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div class="col-sm-2 pd-x-5">
+                                                    @Html.DropDownListFor(x => x.Components[i + 1].IsRequired, new SelectList(IsRequired, "Value", "Text", Model.Components[i + 1].IsRequired), new { @class = "form-control" })
+                                                </div>
+                                                <div class="col-sm-1 pd-l-5">
+                                                    <button type='button' class='pd-y-2 pd-x-5 mg-t-7 btn btn-xs btn-danger remove-header'><i class='fas fa-minus'></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div class="form-group col-@(12 / (Model.Checklist.ColumnHeader < 1?1:Model.Checklist.ColumnHeader)) bd-x">
+                                    <div class="row">
+                                        <div class="col-sm-12 pd-x-10">
+                                            <button type='button' class='btn btn-block btn-info add-header'><i class='fas fa-plus'></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table id='table_content' class="table table-bordered table-primary">
+                        <thead>
+                            <tr>
+                                <th colspan="@(Model.Checklist.ColumnContent + 1)">
+                                    <div class="mg-y-10">Content Segment</div>
+                                </th>
+                            </tr>
+                            <tr>
+                                @for (var i = 0; i < Model.Components.Count(); i++)
+                                {
+                                    if (Model.Components[i].Segment.Trim() == "content" && Model.Components[i].ComponentType.Trim() == "header")
+                                    {
+                                        <td>
+                                            <div class='row mg-r-0 mg-l-0'>
+                                                @Html.HiddenFor(x => x.Components[i].ID)
+                                                @Html.HiddenFor(x => x.Components[i].ComponentType)
+                                                @Html.TextBoxFor(x => x.Components[i].ComponentName, new { @class = "form-control col-8", @placeholder = "Header Label & Width", @autocomplete = "off" })
+                                                <div class="input-group col-4 pd-l-0 pd-r-0">
+                                                    @Html.TextBoxFor(x => x.Components[i].AdditionalValue, new { @class = "form-control text-right input-width", @autocomplete = "off", @type = "number" })
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text pd-l-5 pd-r-5">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    }
+                                }
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var counter = 0;
+                                var temp_cell = -1;
+                            }
+
+                            <tr>
+                                @for (var i = 0; i < Model.Components.Count(); i++)
+                                {
+                                    if (Model.Components[i].Segment.Trim() == "content" && Model.Components[i].ComponentType.Trim() != "header")
+                                    {
+                                        if (temp_cell != Model.Components[i].ColumnNum)
+                                        {
+                                            if (counter % Model.Checklist.ColumnContent == 0 && temp_cell != -1)
+                                            {
+                                                @Html.Raw("<td class='wd-100 text-center'><button type='button' class='btn btn-xs btn-danger remove-content'><i class='fas fa-minus'></i></button></td></tr><tr>");
+                                            }
+
+                                            temp_cell = Model.Components[i].ColumnNum;
+                                            counter++;
+
+                                            @Html.Raw("<td>");
+                                        }
+
+                                        var additional_class = "";
+                                        if (Model.Components[i].ComponentType.Trim() == "label" || Model.Components[i].ComponentType.Trim() == "image" || Model.Components[i].ComponentType.Trim() == "blank")
+                                        {
+                                            additional_class = "d-none";
+                                        }
+
+                                        @Html.Raw("<div class='row'>");
+
+                                        @Html.Raw("<div class='col-" + ((additional_class == "") ? "9 pd-r-0" : "12") + "'>");
+                                        @Html.HiddenFor(x => x.Components[i].ColumnNum, new { @class = "column-num" })
+                                        @Html.HiddenFor(x => x.Components[i].ID, new { @class = "component-id" })
+
+                                        @Html.DropDownListFor(x => x.Components[i].ComponentType, new SelectList(ContentComponentType, "Value", "Text", Model.Components[i].ComponentType), new { @class = "form-control content-selection" })
+
+                                        if (Model.Components[i].ComponentType.Trim() == "label")
+                                        {
+                                            @Html.TextBoxFor(x => x.Components[i].ComponentName, new { @class = "form-control subchild", @placeholder = "Label" })
+                                        }
+                                        else if (Model.Components[i].ComponentType.Trim() == "input_radio" || Model.Components[i].ComponentType.Trim() == "input_option")
+                                        {
+                                            @Html.TextBoxFor(x => x.Components[i].ComponentName, new { @class = "form-control subchild tags-input", @data_role = "tagsinput", @placeholder = "Comma separated" })
+                                        }
+                                        else if (Model.Components[i].ComponentType.Trim() == "input_reference")
+                                        {
+                                            @Html.DropDownListFor(x => x.Components[i].ComponentName, new SelectList((IEnumerable<SelectListItem>)ViewBag.ReferenceList, "Value", "Text", Model.Components[i].ComponentName), new { @class = "form-control subchild", @required = "required", @id = "" })
+                                        }
+                                        else if (Model.Components[i].ComponentType.Trim() == "input_barcode")
+                                        {
+                                            <div class="subchild">
+                                                @Html.TextBoxFor(x => x.Components[i].ComponentName, new { @class = "form-control barcode", @placeholder = "Input Barcode" })
+                                                <div class="barcodeImage mg-t-3 ht-40 bd-b bd-x bd-gray-500 rounded overflow-hidden text-center">
+                                                    <img class="wd-100p" src='@Url.Action("RenderBarcode", "Barcode")?sample=@(Model.Components[i].ComponentName)' />
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (Model.Components[i].ComponentType.Trim() == "image")
+                                        {
+                                            var identifier = random.Next(0, 1000);
+                                            <div class="subchild">
+                                                <div class="custom-file">
+                                                    @Html.TextBoxFor(x => x.Components[i].ComponentFile, new { @id = "image" + identifier, @class = "custom-file-input", @type = "file", @placeholder = "Label", @accept = "image/*" })
+                                                    <label class="custom-file-label" for="image@(identifier)">@(Model.Components[i].ComponentName == "" ? "Upload your images here" : Model.Components[i].ComponentName)</label>
+                                                </div>
+                                                <small class="form-text text-muted">Recommended image size: 600x600 pixels</small>
+                                            </div>
+                                        }
+
+                                        @Html.Raw("</div><div class='col-3 pd-l-5 " + additional_class + "'>");
+                                        @Html.DropDownListFor(x => x.Components[i].IsRequired, new SelectList(IsRequired, "Value", "Text", Model.Components[i].IsRequired), new { @class = "form-control isrequired pd-l-5 pd-r-2" })
+                                        @Html.Raw("</div><div class='col-2 d-none'>");
+
+
+                                        if ((i + 1) == Model.Components.Count() || ((i + 1) < Model.Components.Count() && temp_cell != Model.Components[i + 1].ColumnNum))
+                                        {
+                                            @Html.Raw("<button type='button' class='btn btn-xs btn-success add-sub'><i class='fas fa-plus'></i></button>");
+                                            @Html.Raw("</div></div>");
+
+                                            @Html.Raw("</td>");
+                                        }
+                                        else
+                                        {
+                                            @Html.Raw("<button type='button' class='btn btn-xs remove-sub btn-warning'><i class='fas fa-minus'></i></button>");
+                                            @Html.Raw("</div></div>");
+                                        }
+                                    }
+                                }
+                                <td class='wd-100 text-center'><button type='button' class='btn btn-xs btn-info add-content'><i class='fas fa-plus'></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <input type="hidden" id="removed_content" name="removed_content" value="" />
+
+                    <button type="submit" class="btn btn-primary mg-t-10 float-right"><i data-feather="save" class="wd-10 mg-l-5"></i> Submit</button>
+                }
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div id="temp_tr" class="d-none"></div>
+<div id="temp_td" class="d-none"></div>
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+<div id="jsonLocationSelected" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.ChecklistLocations))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /******************* FUNGSI UMUM *******************/
+
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+            });
+            $("form").on("change", "input[type='file']", function () {
+                $(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+            });
+
+
+            /******************* MANIPULASI HEADER **********************/
+
+            $(document).on("click", "button.remove-header", function () {
+                /*
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).removeClass('remove-header').removeClass('btn-danger');
+                $(this).addClass('restore-header').addClass('btn-success');
+
+                $(this).closest('.row').find('input, select').each(function () {
+                    $(this).prop('disabled', true);
+                    if ($(this).attr('name').includes('IsDeleted')) {
+                        $(this).val('1');
+                    }
+                })
+                */
+
+                $(this).closest('.row').find('input').each(function () {
+                    console.log($(this).attr('name'));
+                    if ($(this).attr('name').includes('IsDeleted')) {
+                        $(this).val('True');
+                        //return false;
+                    }
+                })
+
+                $(this).closest('.form-group').hide();
+
+                if ($(this).closest('.row').find('input, select').first().attr('name') == 'Headers[]') {
+                    $(this).closest('.form-group').remove();
+                }
+            });
+
+            $(document).on("click", "button.add-header", function () {
+                var lastOrder = $(this).closest('.form-group').prev().find('input').first().val();
+                if (typeof lastOrder === "undefined")
+                    lastOrder = 0;
+                lastOrder++;
+
+                $(this).closest('.form-group').before(`
+                    <div class="form-group col-@(12 / (Model.Checklist.ColumnHeader < 1?1:Model.Checklist.ColumnHeader)) bd-x">
+                        <div class="row">
+                            <div class="col-sm-2 pd-r-5">
+                                <input class="form-control header-order" type="text" name="Headers[]" value="`+ lastOrder +`">
+                            </div>
+                            <div class="col-sm-3 pd-x-5">
+                                <input class="form-control" name="Headers[]" placeholder="Label" type="text">
+                            </div>
+                            <div class="col-sm-4 pd-x-5">
+                                <select class="form-control header-selection" name="Headers[]">
+                                    <option value="input_text">Input Text</option>
+                                    <option value="input_number">Input Number</option>
+                                    <option value="input_date">Input Date</option>
+                                    <option value="input_time">Input Time</option>
+                                    <option value="input_checkbox">Input Checkbox</option>
+                                    <option value="input_file">Input Image Upload</option>
+                                    <option value="input_option">Input Option</option>
+                                    <option value="input_user">Input User</option>
+                                    <option value="input_location">Input Location</option>
+                                    <option value="input_reference">Input Reference</option>
+                                    <option value="image">Image</option>
+                                    <option value="blank">Blank</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2 pd-x-5">
+                                <select class="form-control" name="Headers[]">
+                                    <option value="True">Required</option>
+                                    <option value="False">Optional</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-1 pd-l-5">
+                                <button type="button" class="pd-y-2 pd-x-5 mg-t-7 btn btn-xs btn-danger remove-header"><i class="fas fa-minus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `)
+            });
+
+            $(document).on('change', 'select.header-selection', function () {
+                thisName = $(this).attr('name');
+                if (thisName != 'Headers[]') {
+                    thisName = thisName.replace("ComponentType", "ComponentName");
+                }
+
+                $(this).next(".subchild").remove();
+                $(this).next(".bootstrap-tagsinput").next('input').remove();
+                $(this).next(".bootstrap-tagsinput").next('.bootstrap-tagsinput').remove();
+                $(this).next(".bootstrap-tagsinput").remove();
+
+                if ($(this).find(":selected").val() == 'input_option') {
+                    $(this).after('<input type="text" name="'+thisName+'" class="form-control tags-input subchild" data-role="tagsinput" placeholder="Comma separated" />');
+                    $('.tags-input').tagsinput();
+                } else if ($(this).find(":selected").val() == 'input_reference') {
+                    $(this).after(`@(Html.DropDownList("`+thisName+`", (IEnumerable<SelectListItem>)ViewBag.ReferenceList, new { @class = "form-control subchild", @required="required", @id="" }))`);
+                } else if ($(this).find(":selected").val() == 'image') {
+                    var unique = Math.floor(Math.random() * 100);
+
+                    $(this).after(`<div class="custom-file subchild">
+                        <input type="file" class="custom-file-input" name="upload`+ unique + `" id="upload`+ unique + `" accept="image/*">
+                        <label class="custom-file-label" for="upload`+ unique + `">Upload your images here</label>
+                    </div>`);
+                }
+            });
+
+            $(document).on('change', 'input.header-order', function () {
+                $this = $(this);
+                $('.card-footer').find('input.header-order').not($this).each(function () {
+                    if ($(this).val() >= $this.val()) {
+                        $(this).not($this).val(parseInt($(this).val()) + 1);
+                    }
+
+                    /*
+                    $this = $(this);
+                    var ho_counter = $this.val();
+                    $('.card-footer').find('input.header-order').not($this).each(function () {
+                        ho_counter++;
+                        if ($(this).val() >= $this.val()) {
+                            $(this).val(ho_counter);
+                        }
+                    */
+                })
+            });
+
+            /******************* MANIPULASI CONTENT **********************/
+
+            $(document).on("click", "button.add-content", function () {
+                $('.tags-input').tagsinput('destroy');
+
+                var tr = $(this).closest('tr');
+                var clone = tr.clone();
+                tr.after(clone);
+
+                var trIndex = tr.index()+1;
+                var cellIndex = (trIndex * @(Model.Checklist.ColumnContent)) + 1;
+
+                console.log("trIndex " + trIndex);
+                console.log("cellIndex " + cellIndex);;
+
+
+                $('#table_content tr:last').find('.component-id, .column-num').remove();
+                $('#table_content tr:last').find('td').each(function (i) {
+                    $(this).find('select.content-selection').each(function () {
+                        $(this).before('<input type="hidden" class="column-num" name="Content[]" value="'+(cellIndex+i)+'">');
+                        $(this).attr('name', 'Content[]');
+                    });
+                    $(this).find('select.isrequired, select.subchild').each(function () {
+                        $(this).attr('name', 'Content[]');
+                    });
+                    $(this).find('input').each(function () {
+                        $(this).attr('name', 'Content[]');
+                        if ($(this).attr('type') == "file")
+                            $(this).attr('name', ((Math.round((new Date()).getTime() / 100)+Math.floor(Math.random()*9)).toString()).substr(-9));
+                    });
+                });
+
+                $('#table_content tr:last').find('input.barcode').each(function () {
+                    var barcode_val = '@(Model.Checklist.ID)' + '@(Model.Checklist.ModifiedBy.Substring(0,1))' + Math.floor(Math.random() * 90 + 10) + '_' + ((Math.round((new Date()).getTime() / 100)+Math.floor(Math.random()*9)).toString()).substr(-9);;
+
+                    $(this).attr('value', barcode_val);
+                    var link = '@Url.Action("RenderBarcode", "Barcode")?sample=' + barcode_val;
+                    $(this).siblings('div.barcodeImage').html('<img class="wd-100p" src=' + link + ' />');
+                })
+
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).addClass('remove-content').addClass('btn-danger');
+                $(this).removeClass('add-content').removeClass('btn-info');
+
+                $('.tags-input').tagsinput();
+                $('.tags-input').tagsinput('refresh');
+            });
+
+            $(document).on("click", "button.remove-content", function () {
+                var flag = 0;
+                var deleted = "";
+                $(this).closest('tr').find('td').each(function () {
+                    $(this).find('.component-id').each(function () {
+                        deleted += $(this).val() + ',';
+                        flag = 1;
+                    })
+                })
+
+                console.log(flag);
+
+                deleted = $('#removed_content').val() + deleted;
+                $('#removed_content').val(deleted);
+
+                if (flag)
+                    $(this).closest('tr').hide();
+                else
+                    $(this).closest('tr').remove();
+
+                var cellIndex = 1;
+                $('#table_content tbody').find('td').not(':last').each(function () {
+                    $(this).find('input.column-num').each(function () {
+                        $(this).val(cellIndex);
+                        cellIndex++;
+                        //karena add-sub & remove sub sudah tidak ada, ini cara paling mudah
+                        return false;
+                    });
+                })
+
+                if ($('input.barcode').length) {
+                }else{
+                    $('#print_barcode').addClass('d-none');
+                }
+            });
+            if ($('input.barcode').length) {
+                $('#print_barcode').removeClass('d-none');
+            }else{
+                $('#print_barcode').addClass('d-none');
+            }
+
+            $(document).on("click", "button.add-sub", function () {
+                $('.tags-input').tagsinput('destroy');
+
+                var tr = $(this).closest('div.row');
+                var clone = tr.clone();
+                $('#temp_td').html(clone);
+
+                $('#temp_td').find('.component-id').remove();
+                $('#temp_td').find('input, select').attr('name', 'Content[]');
+                tr.after($('#temp_td').html());
+
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).addClass('remove-sub').addClass('btn-warning');
+                $(this).removeClass('add-sub').removeClass('btn-success');
+
+                $('.tags-input').tagsinput();
+                $('.tags-input').tagsinput('refresh');
+            });
+
+            $(document).on("click", "button.remove-sub", function () {
+                var deleted = "";
+                $(this).closest('.row').find('.component-id').each(function () {
+                    deleted += $(this).val() + ',';
+                })
+
+                deleted = $('#removed_content').val() + deleted;
+                $('#removed_content').val(deleted);
+
+                $(this).closest('div.row').hide();
+            });
+
+            $(document).on('change', 'select.content-selection', function () {
+                $(this).next(".subchild").remove();
+                $(this).next(".bootstrap-tagsinput").next('input').remove();
+                $(this).next(".bootstrap-tagsinput").next('.bootstrap-tagsinput').remove();
+                $(this).next(".bootstrap-tagsinput").remove();
+
+                var name = $(this).attr('name');
+                var val = $(this).val();
+                //$(this).find('option[value="' + val + '"]').attr('selected', 'selected');
+                $(this).find('option').each(function () {
+                    if ($(this).attr('value') == val)
+                        $(this).attr('selected', 'selected');
+                    else
+                        $(this).removeAttr('selected');
+                })
+
+                var unique = Math.floor(Math.random() * 100);
+                var compoName = name.replace("ComponentType", "ComponentName");
+                var compoFile = name.replace("ComponentType", "ComponentFile");
+
+                if (!compoName.includes("ComponentName")) {
+                    compoName = "Content[]";
+                    compoFile = "image_"+unique;
+                }
+
+                if (val == 'input_option' || val == 'input_radio') {
+                    $(this).after('<input type="text" name="' + compoName + '" class="form-control subchild tags-input" data-role="tagsinput" placeholder="Comma separated" />');
+                    $('.tags-input').tagsinput();
+                } else if (val == 'image') {
+                    $(this).after(`<div class="subchild"><div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="upload`+ unique + `" name="` + compoFile + `" accept="image/*">
+                                    <label class="custom-file-label" for="upload`+ unique + `">Upload your images here</label>
+                                </div>
+								<small class="form-text text-muted">Recommended image size: 600x600 pixels</small></div>`);
+                } else if (val == 'label') {
+                    $(this).after('<input name="' + compoName + '" type="text" class="form-control subchild" placeholder="Label" />');
+                } else if (val == 'input_barcode') {
+                    $('#print_barcode').removeClass('d-none');
+                    var barcode_val = '@(Model.Checklist.ID)' + '@(Model.Checklist.ModifiedBy.Substring(0,1))' + Math.floor(Math.random() * 90 + 10) + '_' + (Math.round((new Date()).getTime() / 100).toString()).substr(-9);;
+
+                    $(this).after(`<div class="subchild">
+                        <input type="text" name="`+name+`" class="form-control barcode" placeholder="Input Barcode" aria-describedby="button-addon`+unique+`" value="`+barcode_val+`" required />
+                        <div class="barcodeImage mg-t-3 ht-40 bd-b bd-x bd-gray-500 rounded overflow-hidden text-center"><img class="wd-100p" src='@(Url.Action("RenderBarcode", "Barcode"))?sample=`+barcode_val+`' /></div>
+                    </div>`);
+                } else if (val == 'input_reference') {
+                    $(this).after(`<select class="form-control subchild" name="` + name + `" required="required">
+                        @foreach(SelectListItem reference in ViewBag.ReferenceList)
+                        {
+                            <option value="@reference.Value">@reference.Text</option>
+                        }
+                        </select>`);
+                }
+
+                if (val == 'image' || val == 'label' || val == 'blank') {
+                    $(this).parent().addClass('col-12').removeClass('col-9').removeClass('pd-r-0');
+                    $(this).parent().next().addClass('d-none');
+                } else {
+                    $(this).parent().removeClass('col-12').addClass('col-9').addClass('pd-r-0');
+                    $(this).parent().next().removeClass('d-none');
+                }
+            });
+
+            $(document).on('change', 'select.isrequired', function () {
+                var val = $(this).val();
+
+                $(this).find('option').each(function () {
+                    if ($(this).attr('value') == val)
+                        $(this).attr('selected', 'selected');
+                    else
+                        $(this).removeAttr('selected');
+                })
+            });
+
+            $("form").on("change", "input[type='file']", function () {
+                $(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+            });
+
+            $("form").on("change", 'input.input-width', function () {
+                var total_width = 0.0;
+                $('table .row.mg-r-0.mg-l-0').find('input.input-width').each(function () {
+                    if(isNaN($(this).val())){
+                        alert("Width must be a number");
+                    }else{
+                        total_width = total_width + parseFloat($(this).val());
+                    }
+                })
+
+                console.log('total width : '+total_width);
+
+                if (total_width > 101 || total_width < 99) {
+                    alert("Total table width = " + total_width + "%, it should be around 100%");
+                }
+            });
+
+            $("form").on("change paste keyup", "input.barcode", function () {
+                if ($(this).val().trim() != '') {
+                    var link = '@Url.Action("RenderBarcode", "Barcode")?sample=' + $(this).val();
+                    $(this).siblings('div.barcodeImage').html('<img class="wd-100p" src=' + link + ' />');
+                }
+            });
+
+            $(document).on("click", "#print_barcode", function () {
+                // A4 2480 pixels x 3508 pixels
+                var mywindow = window.open('', 'PRINT');
+
+                mywindow.document.write('<html><head><title>FAST - Checklist - Barcode - @(Model.Checklist.Header)</title>');
+                mywindow.document.write('</head><body style="padding:20px 30px 40px 40px;transform: scale(1);">');
+                mywindow.document.write('<div style="width=2000px">');
+                mywindow.document.write('<h2 style="text-align: center;margin-bottom:50px;">List Barcode in @(Model.Checklist.Header)</h2>');
+
+                mywindow.document.write('<div style="display: flex;flex-wrap: wrap;">');
+                $('form').find('input.barcode').each(function () {
+                    var barcode_label = "No Label Found";
+                    var tr = $(this).closest('tr');
+                    tr.find('select').each(function () {
+                        if ($(this).val() == "label") {
+                            var temp = $(this).siblings('input').val();
+                            if (temp.length > 2) {
+                                barcode_label = temp;
+                                return false;
+                            }
+                        }
+                    })
+
+                    mywindow.document.write('<div style="flex-basis: 0;flex-grow: 1;margin-bottom: 30px;position: relative;">');
+                    mywindow.document.write(`
+                        <table style="border-collapse: collapse;border: 1px solid black;page-break-inside: avoid;">
+                            <tr style="border-collapse: collapse;border: 1px solid black;">
+                                <th style="padding: 15px 0;font-size: 23px;">`+barcode_label+`</th>
+                            </tr>
+                            <tr style="border-collapse: collapse;border: 1px solid black;">
+                                <td style="padding:5px;"><img style="" src="@(Url.Action("RenderBarcodeBig","Barcode"))?sample=`+$(this).val()+`"></td>
+                            </tr>
+                        </table>
+                    `);
+
+                    mywindow.document.write('</div>');
+                })
+                mywindow.document.write('</div>');
+
+                mywindow.document.write('</div>');
+                mywindow.document.write('</body></html>');
+
+                mywindow.focus(); // necessary for IE >= 10*/
+
+                mywindow.print();
+
+                mywindow.document.close(); // necessary for IE >= 10
+                setTimeout(
+                function()
+                {
+                    mywindow.close();
+                }, 5000);
+            });
+
+
+            // disable beberapa fungsi ketika ada submission, demi menjaga konsistensi data
+            if (@(ViewBag.hasSubmitted) == 1) {
+                $('select.header-selection, select.content-selection').attr('readonly', true);
+                $('button.remove-header, button.add-header, button.remove-content, button.add-content').hide();
+                $('select.header-selection').find('option').each(function () {
+                    $(this).not(':selected').attr("disabled", true); 
+                })
+                $('select.content-selection').find('option').each(function () {
+                    $(this).not(':selected').attr("disabled", true); 
+                })
+            }
+
+
+            // prefill lokasi
+
+            $('.select2').select2({
+                placeholder: 'Choose locations',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+            var LocationSelected = JSON.parse($("#jsonLocationSelected").attr("data-json"));
+
+            console.log(LocationTree);
+            console.log(LocationSelected);
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose "></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value='+LocationTree.ProductionCenters[i].LocationID+'>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            $('.selection-location').select2({
+              placeholder: 'All Locations',
+              searchInputPlaceholder: 'Search options'
+            });
+            $('.selection-department, .selection-subdepartment').select2();
+
+            var locat_selected;
+            $(document).on("change",".selection-location",function(){
+                locat_selected = $(this).select2("val");
+                console.log(locat_selected);
+
+                $('.selection-department').select2('destroy');
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        select_depart.append('<optgroup label="'+LocationTree.ProductionCenters[i].Description+'">')
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                        select_depart.append('</optgroup>')
+                    }
+                }
+
+                $('.selection-department').select2({
+                  placeholder: 'All Departments',
+                  searchInputPlaceholder: 'Search options'
+                });
+                $('.selection-subdepartment').select2();
+            });
+
+            $(document).on("change",".selection-department",function(){
+                var department_selected = $(this).select2("val");
+                console.log(department_selected);
+
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                select_subdepart.append('<optgroup label="' + LocationTree.ProductionCenters[i].Description+ " - " + LocationTree.ProductionCenters[i].Departments[j].Description + '">')
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                                select_subdepart.append('</optgroup>')
+                            }
+                        }
+                    }
+                }
+
+                $('.selection-subdepartment').select2({
+                  placeholder: 'All Sub Departments',
+                  searchInputPlaceholder: 'Search options'
+                });
+            });
+
+
+            var arrayLocat = [];
+            var arrayDepartment = [];
+            var arraySubdepartment = [];
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                arrayLocat.push(LocationTree.ProductionCenters[i].LocationID);
+                for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                    arrayDepartment.push(LocationTree.ProductionCenters[i].Departments[j].LocationID);
+                    for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                        arraySubdepartment.push(LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID);
+                    }
+                }
+            }
+
+            console.log(arraySubdepartment);
+            console.log(arrayDepartment);
+            console.log(arrayLocat);
+
+            if (LocationSelected.length == (arraySubdepartment.length+arrayDepartment.length+arrayLocat.length)) {
+                // do nothing; = select all
+                console.log("semua lokasi dipilih");
+            } else {
+                // Production Center
+                var LocatSelected = [];
+                for (var i = 0; i < arrayLocat.length; i++) {
+                    if (LocationSelected.includes(arrayLocat[i]))
+                        LocatSelected.push(arrayLocat[i]);
+                }
+                $('.selection-location').val(LocatSelected).change();
+
+                // Department & Subnya
+                var AllDepartSelected = [];
+                var AllSubDepartSelected = [];
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if (LocatSelected.includes(LocationTree.ProductionCenters[i].LocationID)) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            AllDepartSelected.push(LocationTree.ProductionCenters[i].Departments[j].LocationID);
+                            for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                AllSubDepartSelected.push(LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID);
+                            }
+                        }
+                    }
+                }
+
+                // cek apakah department dipilih semua
+                var flagBolong = 1;
+                var DepartSelected = [];
+
+                for (var i = 0; i < arrayDepartment.length; i++) {
+                    if (LocationSelected.includes(arrayDepartment[i]))
+                        DepartSelected.push(arrayDepartment[i]);
+                }
+
+                // jika sumlah subdepart sama, berarti dipilih semua, uda gak usah dipikirin
+                if ((LocationSelected.length - LocatSelected.length - DepartSelected.length) == AllSubDepartSelected.length) {
+                    flagBolong = 0;
+                }
+
+                // berarti ada yang bolong; tidak dipilih
+                if (flagBolong == 1) {
+                    // isi department
+                    $('.selection-department').val(DepartSelected).change();
+
+
+                    // Get All Sub Department
+                    AllSubDepartSelected = [];
+                    for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                        if (LocatSelected.includes(LocationTree.ProductionCenters[i].LocationID)) {
+                            for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                                if (DepartSelected.includes(LocationTree.ProductionCenters[i].Departments[j].LocationID)) {
+                                    for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                        AllSubDepartSelected.push(LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // cek apakah subdepartment dipilih semua
+                    flagBolong = 1;
+                    var SubdepartSelected = [];
+
+                    for (var i = 0; i < arraySubdepartment.length; i++) {
+                        if (LocationSelected.includes(arraySubdepartment[i]))
+                            SubdepartSelected.push(arraySubdepartment[i]);
+                    }
+
+                    // jika sumlah subdepart sama, berarti dipilih semua, uda gak usah dipikirin
+                    console.log(SubdepartSelected);
+                    console.log(AllSubDepartSelected);
+                    if (SubdepartSelected.length == AllSubDepartSelected.length) {
+                        flagBolong = 0;
+                    }
+
+                    // berarti ada yang bolong; tidak dipilih
+                    if (flagBolong == 1) {
+                        $('.selection-subdepartment').val(SubdepartSelected).change();
+                    } else {
+                        console.log("semua subdepartment yang muncul, terpilih");
+                    }
+
+                } else {
+                    console.log("semua department yang muncul, terpilih");
+                }
+            }
+        });
+
+    </script>
+}

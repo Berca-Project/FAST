@@ -1,0 +1,2304 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow:hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Clove</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH Clove</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                @if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+                {
+                    @: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+                }
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Fri / 26-Jul-19">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Shift</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control" disabled value="1">
+                                </div>
+                                <label class="col-3 col-form-label tx-right">Week</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" disabled value="42">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Prodtech</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Sunandar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Dodi herdiyanto">
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Batch No.</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" value="929102601">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">SAP Batch</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="sapBatch">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Blend</label>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" id="blend">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Formula Rev.</label>
+                                    <div class="col-4">
+                                        <div class="input-group">
+                                            <input id="formulaRev" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Infeed</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Batch No.</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" value="919101806">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label"></label>
+                                <div class="col-6 mg-b-10">
+                                    <button class="btn btn-sm pd-x-15 btn-primary" id="get-pss-data-infeed" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Blend</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedBlend">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">SAP Batch</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedSapbatch">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Formula Rev</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedFormularev">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Start</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedStart">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Stop</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedStop">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">No TPC</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedTpc">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">SILO Destination</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedSiloDestination">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Quantity Weighter</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="infeedQuantityWeighter">
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <center>
+                                <button class="btn btn-lg pd-x-15 btn-primary" id="add-to-table" onclick="javascript:addRow(this)" data-target="infeed" style=" padding: 0.391rem 0.5rem;">Add to table</button>
+                            </center>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex">
+                        <div class="tableWrapper col-12" style="max-height: 200px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width: 120px;"> Batch No.</th>
+                                        <th rowspan="2" style="min-width: 100px;">Blend</th>
+                                        <th rowspan="2" style="min-width: 120px;">SAP Batch</th>
+                                        <th rowspan="2" style="min-width: 150px;">Formula Rev.</th>
+                                        <th colspan="3">Waktu</th>
+                                        <th rowspan="2">No TPC</th>
+                                        <th rowspan="2">Silo Destination</th>
+                                        <td rowspan="2">Quantity Weigher</td>
+                                        <td rowspan="2">Action</td>
+                                    </tr>
+                                    <tr>
+
+                                        <th style="min-width: 70px;">Start</th>
+                                        <th style="min-width: 70px;">Stop</th>
+                                        <th style="min-width: 100px;">Duration</th>
+
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>123 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="infeed"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div> <!--INFEED-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Conditioning</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Batch No.</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" value="919101806">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label"></label>
+                                <div class="col-6 mg-b-10">
+                                    <button class="btn btn-sm pd-x-15 btn-primary" id="get-pss-data-conditioning" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Blend</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningBlend">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">SAP Batch</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningSapbatch">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Formula Rev</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningFormularev">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Start</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningStart">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Stop</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningStop">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+
+                        <div class="flex-1">
+                            <center>
+                                <button class="btn btn-lg pd-x-15 btn-primary" id="add-to-table" onclick="javascript:addRow(this)" data-target="conditioning" style="padding: 0.391rem 0.5rem;">Add to table</button>
+                            </center>
+                        </div>
+                    </div>
+
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Silo Destination</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningSd">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Flow Rate Input</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningFri">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Quantity WeighCon 1</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningQw1">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Quantity WeighCon 2</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningQw2">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Casing Clove Screw 1</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningCcs1">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Casing Clove Screw 2</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningCcs2">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Totalizer Water App 1</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningTwp1">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Totalizer Water App 2</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="conditioningTwp2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex">
+                        <div class="tableWrapper col-12" style="max-height: 200px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width: 90px;">Batch No.</th>
+                                        <th rowspan="2" style="min-width: 90px;">Blend</th>
+                                        <th rowspan="2" style="min-width: 90px;">SAP Batch</th>
+                                        <th rowspan="2" style="min-width: 110px;">Formula Rev.</th>
+                                        <th colspan="3">Waktu</th>
+                                        <th rowspan="2" style="min-width: 130px;">Silo Destination</th>
+                                        <th rowspan="2" style="min-width: 130px;">Flow Rate Input</th>
+                                        <td rowspan="2" style="min-width: 170px;">Quantity WeighCon 1</td>
+                                        <th rowspan="2" style="min-width: 170px;">Quantity WeighCon 2</th>
+                                        <th rowspan="2" style="min-width: 170px;">Casing Clove Screw 1</th>
+                                        <th rowspan="2" style="min-width: 170px;">Casing Clove Screw 2</th>
+                                        <th rowspan="2" style="min-width: 170px;">Totalizer Water App 1</th>
+                                        <th rowspan="2" style="min-width: 170px;">Totalizer Water App 2</th>
+                                        <td rowspan="2">Action</td>
+                                    </tr>
+                                    <tr>
+
+                                        <th style="min-width: 70px;">Start</th>
+                                        <th style="min-width: 70px;">Stop</th>
+                                        <th style="min-width: 100px;">Duration</th>
+
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>123 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="conditioning"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div> <!--CONDITIONING-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Cutting Drying + Packing</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Batch No.</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" value="919101806">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label"></label>
+                                <div class="col-6 mg-b-10">
+                                    <button class="btn btn-sm pd-x-15 btn-primary" id="get-pss-data-cutting" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Blend</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="cuttingBlend">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">SAP Batch</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="cuttingSapbatch">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Start</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="cuttingStart">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Stop</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="cuttingStop">
+                                </div>
+                            </div>
+                            @*<div class="form-group row">
+                                    <label class="col-5 col-form-label">Duration</label>
+                                    <div class="col-6">
+                                        <input type="text" disabled class="form-control" id="cuttingDuration">
+                                    </div>
+                                </div>*@
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Asal Silo</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="cuttingSiloOrigin">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Tujuan Silo</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="cuttingSiloDestination">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <center>
+                                <button class="btn btn-lg pd-x-15 btn-primary" id="add-to-table" onclick="javascript:addRow(this)" data-target="cutting" style="padding: 0.391rem 0.5rem;">Add to table</button>
+                            </center>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex">
+                        <div class="col-5">
+                            <div class="form-group row">
+                                <div class="col-4"></div>
+                                <div class="col-4">Dryer 4650</div>
+                                <div class="col-4">Dryer 4651</div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Row Rate Input Dryer</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingRrid4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingRrid4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Air Temp Dryer</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingAtd4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingAtd4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Hood Pressure</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingHp4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingHp4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Residence Time In Dryer</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingRtid4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingRtid4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Total Weighcon Infeed</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingTwi4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingTwi4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Temp Exit Dryer</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingTed4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingTed4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Moisture Exit Dryer</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingMed4650"></div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingMed4651"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Total Weighcon Master</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingTwm4650"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">Addback Angkup</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingAa4650"></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-4 col-form-label">MC Final</div>
+                                <div class="col-4"><input type="text" class="form-control" id="cuttingMf4650"></div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="col-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label class="col-form-label" style="font-weight:bold; margin-left:-15px;">Cutting</label>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">Cutter No</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingCn">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">Clove Flow Rate Input</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingCfri">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">Total Weighcon Before Cutter</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingTwbc">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="col-form-label" style="font-weight:bold; margin-left:-15px;">Clove Oil</label>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">No Tangki</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingNt2">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">Kg</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingKg2">
+                                        </div>
+                                    </div>
+                                    <div class="divider-text"></div>
+                                    <div class="form-group row mg-t-15">
+                                        <label class="col-7 col-form-label">Cleve</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingCleve">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="col-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label class="col-form-label" style="font-weight:bold; margin-left:-15px;">Condensate</label>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">Ops Batch</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingOb">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">No Tangki</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingNt">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-7 col-form-label">Kg</label>
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" id="cuttingKg">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="col-form-label" style="font-weight:bold;">WOC Cutter</label>
+                                    <div class="d-flex">
+                                        <div class="flex-1">
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">1</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting1">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">2</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting2">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">3</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting3">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">4</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting4">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">5</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting5">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="divider-vertical"></div>
+                                        <div class="flex-1">
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">6</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting6">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">7</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting7">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-3 col-form-label">8</label>
+                                                <div class="col-9">
+                                                    <input type="text" class="form-control" id="cutting8">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-4 col-form-label">9</label>
+                                                <div class="col-8">
+                                                    <input type="text" class="form-control" id="cutting9">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-4 col-form-label">10</label>
+                                                <div class="col-8">
+                                                    <input type="text" class="form-control" id="cutting10">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body d-flex">
+                        <div class="tableWrapper col-12" style="max-height: 200px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width: 120px;"> Batch No.</th>
+                                        <th rowspan="2" style="min-width: 100px;">Blend</th>
+                                        <th rowspan="2" style="min-width: 120px;">SAP Batch</th>
+                                        <th colspan="3">Waktu</th>
+                                        <th rowspan="2" style="min-width: 90px;">Asal Silo</th>
+                                        <th rowspan="2" style="min-width: 120px;">Tujuan Silo</th>
+                                        <th rowspan="2" style="min-width: 90px;">Cutter No</th>
+                                        <th rowspan="2" style="min-width: 190px;">Clove Flow Rate Input</th>
+                                        <th rowspan="2" style="min-width: 220px;">Total Weighcon Before Cutter</th>
+
+
+                                        <th colspan="2">Flow Rate Input Dryer</th>
+                                        <th colspan="2">Air Temp Dryer</th>
+                                        <th colspan="2">Hood Pressure</th>
+                                        <th colspan="2">Residence Time In Dryer</th>
+                                        <th colspan="2">Total Weighcon Infeed</th>
+                                        <th colspan="2">Moisture Input Dryer</th>
+                                        <th colspan="2">Temp Exit Dryer</th>
+                                        <th colspan="2">Moisture Exit Dryer</th>
+
+
+                                        <th>Total Weighcon Master</th>
+                                        <th>Addback Angkup</th>
+                                        <th>MC Final</th>
+
+                                        <td colspan="3">Condensate</td>
+                                        <td colspan="2">Clove Oil</td>
+                                        <td rowspan="2">Cleve</td>
+
+                                        <td colspan="10">WOC Cutter</td>
+
+                                        <td rowspan="2">Action</td>
+                                    </tr>
+                                    <tr>
+
+                                        <th style="min-width: 70px;">Start</th>
+                                        <th style="min-width: 70px;">Stop</th>
+                                        <th style="min-width: 100px;">Duration</th>
+
+
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4651</th>
+
+                                        <th style="min-width: 200px;">Dryer 4650</th>
+                                        <th style="min-width: 180px;">Dryer 4650</th>
+                                        <th style="min-width: 100px;">Dryer 4650</th>
+
+                                        <th style="min-width: 100px;">Ops Batch</th>
+                                        <th style="min-width: 100px;">No Tangki</th>
+                                        <th style="min-width: 60px;">Kg</th>
+
+                                        <th style="min-width: 100px;">No Tangki</th>
+                                        <th style="min-width: 60px;">Kg</th>
+
+                                        <th style="min-width: 60px;">1</th>
+                                        <th style="min-width: 60px;">2</th>
+                                        <th style="min-width: 60px;">3</th>
+                                        <th style="min-width: 60px;">4</th>
+                                        <th style="min-width: 60px;">5</th>
+                                        <th style="min-width: 60px;">6</th>
+                                        <th style="min-width: 60px;">7</th>
+                                        <th style="min-width: 60px;">8</th>
+                                        <th style="min-width: 60px;">9</th>
+                                        <th style="min-width: 60px;">10</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>123 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="cutting"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div> <!--CUTTING DRYING + PACKING-->
+
+            <br><br>
+            <br><br>
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Lot
+                    </div>
+                    <div class="card-body" style="padding:15px">
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th>Number</th>
+                                        <th>Qty</th>
+                                        <th width="70px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>7847.8470</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="lot">
+                                    <tr>
+                                        <td>lo8482</td>
+                                        <td>5207.2900</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>lo6324</td>
+                                        <td>1319.7070</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>lo6325</td>
+                                        <td>1320.8500</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="lot" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--LOT-->
+
+            <div class="col-9 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        &nbsp;
+                    </div>
+                    <div class="card-body" style="padding:20px 10px">
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <table cellspacing="5" style="border-collapse: unset;">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Target</th>
+                                            <th>Pencapaian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="min-width:150px;">Steam Preasure (Bar) </td>
+                                            <td><input type="text" class="form-control" id="cTB"></td>
+                                            <td><input type="text" class="form-control" id="cTFC"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="min-width:150px;">Steam Preasure (Bar)</td>
+                                            <td><input type="text" class="form-control" id="aRAB"></td>
+                                            <td><input type="text" class="form-control" id="aRAFC"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="divider-text divider-vertical" style="margin:2px"></div>
+                            <div class="flex-1">
+                                <table cellspacing="5" style="width: 100%;border-collapse: unset;">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width:100px;"></th>
+                                            <th style="min-width:50px;">Target</th>
+                                            <th style="min-width:50px;">Pencapaian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="min-width:150px;">Clove Temp Exi (&deg;C)</td>
+                                            <td><input type="text" class="form-control" id="cTB"></td>
+                                            <td><input type="text" class="form-control" id="cTFC"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="min-width:150px;">Clove Temp Exi (&deg;C)</td>
+                                            <td><input type="text" class="form-control" id="aRAB"></td>
+                                            <td><input type="text" class="form-control" id="aRAFC"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="divider-text divider-vertical" style="margin:2px"></div>
+                            <div class="flex-1">
+                                <table cellspacing="5" style="width: 100%;border-collapse: unset;">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width:100px;"></th>
+                                            <th style="min-width:50px;">Target</th>
+                                            <th style="min-width:50px;">Pencapaian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="min-width:150px;">Residence Time (detik) </td>
+                                            <td><input type="text" class="form-control" id="cTB"></td>
+                                            <td><input type="text" class="form-control" id="cTFC"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="min-width:150px;">Add Back Mate (Kg)</td>
+                                            <td><input type="text" class="form-control" id="aRAB"></td>
+                                            <td><input type="text" class="form-control" id="aRAFC"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <br />
+                    </div>
+                </div>
+            </div> <!--RESULT-->
+
+            <div class="col-5 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        &nbsp;
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col-6"></div>
+                            <div class="col-3"><b>Target</b></div>
+                            <div class="col-3"><b>Result</b></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Top band pressure (Bar)</div>
+                            <div class="col-3">0.6</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Mouth Height (mm)</div>
+                            <div class="col-3">110-1130</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Width of cut (mm)</div>
+                            <div class="col-3">0.3907</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Detected metal (times)</div>
+                            <div class="col-3">0</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Cutter stop (times)</div>
+                            <div class="col-3"></div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Sharp knives (OK/Not OK)</div>
+                            <div class="col-3">Shiny/Not Shiny</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Counter traverse ... (Impulse)</div>
+                            <div class="col-3">1.8</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Counter traverse ... (Impulse)</div>
+                            <div class="col-3">2.5</div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Addback material ... (kg)</div>
+                            <div class="col-3"></div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6">Addback angkup (kg)</div>
+                            <div class="col-3"></div>
+                            <div class="col-3"><input type="text" class="form-control"></div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--RESULT-->
+
+            <div class="col-7 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Packing Clove
+                    </div>
+                    <div class="card-body" style="padding:15px">
+                        <div class="tableWrapper" style="min-height:320px; max-height: 310px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th rowspan="2">Shift</th>
+                                        <th rowspan="2">Prodtech</th>
+                                        <th rowspan="2">No Ops</th>
+                                        <th rowspan="2">Blend</th>
+                                        <th colspan="2"><center>Silo</center></th>
+                                        <th rowspan="2">Box</th>
+                                        <th rowspan="2">Kg</th>
+                                        <th rowspan="2">Total</th>
+                                        <th rowspan="2"></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Origin</th>
+                                        <th>Qty</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>132</td>
+                                        <td></td>
+                                        <td>19800</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="packing-clove">
+                                    <tr>
+                                        <td>I</td>
+                                        <td>Bayu</td>
+                                        <td>1019040101</td>
+                                        <td>AA18C</td>
+                                        <td>4125</td>
+                                        <td>12513</td>
+                                        <td>68</td>
+                                        <td>150</td>
+                                        <td>10200</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="packing-clove" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>II</td>
+                                        <td>M Nur Suud</td>
+                                        <td>1019040101</td>
+                                        <td>AA18C</td>
+                                        <td>4125</td>
+                                        <td>12513</td>
+                                        <td>14</td>
+                                        <td>150</td>
+                                        <td>2100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="packing-clove" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>II</td>
+                                        <td>M Nur Suud</td>
+                                        <td>1019033003</td>
+                                        <td>AA18C</td>
+                                        <td>4121</td>
+                                        <td>12631</td>
+                                        <td>50</td>
+                                        <td>150</td>
+                                        <td>7500</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="packing-clove" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="packing-clove" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--PACKING CLOVE-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+                    <div class="card-body" style="padding:10px">
+                        <div class="row" style="margin:0">
+                            <div class="col-2" style="padding: 0 10px 0 0">
+                                <table class="table table-bordered table-hover table-striped" style="min-height:150px;">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th class="tx-center"><label class="tx-center" style="margin:0px;"> Weight</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin-left: 0; margin-right: 0">
+                                                    <div class="col-12 tx-center" style="margin-right:0px;">
+                                                        <label class="tx-center font-weight-bold" style="font-size:32px;margin-right:0px;">19.55 Kg</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-3 tx-center">
+                                                        <label class="tx-center">&nbsp;</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <button type="button" class="phase-show btn btn-lg btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-waste-modal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-10">
+                                <table class="table table-bordered table-hover table-striped ">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Waste</th>
+                                            <th>Kind</th>
+                                            <th>Type</th>
+                                            <th>Reused/Disposed</th>
+                                            <th>Weight</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>35</td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="waste"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- WASTE -->
+
+            <br><br>
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Downtime</th>
+                                        <th>Problem</th>
+                                        <th>Description</th>
+                                        <th style="width:60px;">Start</th>
+                                        <th style="width:60px;">End</th>
+                                        <th style="width:80px;">Duration</th>
+                                        <th>PIC</th>
+                                        <th>Status</th>
+                                        <th>Action Plan</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>180 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="machine-problem">
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">301 Minor Stop</option>
+                                                <option value="302">302 Proces Adjustment</option>
+                                                <option value="401">401 Breakdown</option>
+                                                <option value="501">501 Distruption of Material Flow</option>
+                                                <option value="601">601 Cleaning</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Done</option>
+                                                <option value="2">On Progres</option>
+                                                <option value="3">Pending</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">SLAC</option>
+                                                <option value="302">CBM</option>
+                                                <option value="303">PM</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bagas</td>
+                                    <td>Requester</td>
+                                    <td>Submit to Supervisor</td>
+                                    <td>05-Sep-19 13:15</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagus</td>
+                                    <td>Supervisor</td>
+                                    <td>Confirmed</td>
+                                    <td>05-Sep-19 13:25</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!--APPROVAL SEGMENT-->
+
+        </div>
+    </div>
+</div>
+      </div>
+
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+
+
+<div class="modal fade wizard-modal" id="phase-waste-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div class="stepper row">
+                    <div class="stepper-step col active">
+                        <a class="btn stepper-btn">1</a>
+                        <p><small>Waste</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">2</a>
+                        <p><small>Kind</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">3</a>
+                        <p><small>Type</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">4</a>
+                        <p><small>Reused</small></p>
+                    </div>
+                </div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Machine</h5>
+                            <hr />
+                            <center class="waste">
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Machine Number</h5>
+                            <hr />
+                            <center class="kind">
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Machine Number</h5>
+                            <hr />
+                            <center class="type">
+                                <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Dry</button>
+                                <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Wet</button>
+                                <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Dust</button>
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Machine Number</h5>
+                            <hr />
+                            <center class="reused">
+                                <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Reused</button>
+                                <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Disposed</button>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>$(function () {
+$('.select2').select2({
+		allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+        })</script>
+    <script>const machineProblemRow = `<td>301 Minor Stop</td><td>Bobbin Putus</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+        const machineProblemEditRow = `<td><select class="form-control select2"><option label="Choose one"></option><option value="301">301 Minor Stop</option><option value="302">302 Proces Adjustment</option><option value="401">401 Breakdown</option><option value="501">501 Distruption of Material Flow</option><option value="601">601 Cleaning</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem" class="fa fa-trash"></i></td>`;
+        const lotRow = `
+                    <td>lo8482</td>
+                    <td>5207.2900</td>
+                  <td class="tx-center">
+                  <div class="btn-group">
+                  <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                  </div>
+                  </td>`;
+        const lotEditRow = `
+                  <td><input type="text" class="form-control" value="lo8482"></td>
+                  <td><input type="text" class="form-control" value="5207.2900"></td>
+                  <td class="tx-center">
+                  <div class="btn-group">
+                  <i data-target="lot" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                  </div>
+                  </td>`;
+
+        const infeedRow = `
+                <td>839102501</td>
+                <td>AA30D</td>
+                <td>1323692</td>
+                <td>33</td>
+                <td>09:15</td>
+                <td>11:18</td>
+                <td>123 Min</td>
+                <td>2598.2597</td>
+                <td>40237.00</td>
+                <td>11855.66</td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i onclick="javascript:toEdit(this)" data-target="infeed" class="fa fa-edit"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+        const infeedEditRow = `
+                <td><input type="text" class="form-control" value="839102501"></td>
+                <td><input type="text" class="form-control" value="AA30D"></td>
+                <td><input type="text" class="form-control" value="1323692"></td>
+                <td><input type="text" class="form-control" value="33"></td>
+                <td><input type="text" class="form-control" value="16:01"></td>
+                <td><input type="text" class="form-control" value="17:48"></td>
+                <td><input type="text" class="form-control" value="107 Min"></td>
+                <td><input type="text" class="form-control" value="2598.2597"></td>
+                <td><input type="text" class="form-control" value="40237.00"></td>
+                <td><input type="text" class="form-control" value="11855.66"></td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i data-target="infeed" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+
+        const conditioningRow = `
+                <td>839102501</td>
+                <td>AA30D</td>
+                <td>1323692</td>
+                <td>33</td>
+                <td>06:30</td>
+                <td>08:30</td>
+                <td>120 Min</td>
+                <td>46007.00</td>
+                <td>6000.00</td>
+                <td>5832.31</td>
+                <td>5918.74</td>
+                <td>71.73</td>
+                <td>72.47</td>
+                <td>1713.48</td>
+                <td>1409.23</td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i onclick="javascript:toEdit(this)" data-target="conditioning" class="fa fa-edit"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+        const conditioningEditRow = `
+                <td><input type="text" class="form-control" value="839102501"></td>
+                <td><input type="text" class="form-control" value="AA30D"></td>
+                <td><input type="text" class="form-control" value="1323692"></td>
+                <td><input type="text" class="form-control" value="33"></td>
+                <td><input type="text" class="form-control" value="06:30"></td>
+                <td><input type="text" class="form-control" value="08:30"></td>
+                <td><input type="text" class="form-control" value="120 Min"></td>
+                <td><input type="text" class="form-control" value="46007.00"></td>
+                <td><input type="text" class="form-control" value="6000.00"></td>
+                <td><input type="text" class="form-control" value="5832.31"></td>
+                <td><input type="text" class="form-control" value="5918.74"></td>
+                <td><input type="text" class="form-control" value="71.73"></td>
+                <td><input type="text" class="form-control" value="72.47"></td>
+                <td><input type="text" class="form-control" value="1713.48"></td>
+                <td><input type="text" class="form-control" value="1409.23"></td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i data-target="conditioning" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+
+        const cuttingRow = `
+                    <td>839102302</td>
+                    <td>AA305</td>
+                    <td>1323689</td>
+                    <td>07:31</td>
+                    <td>09:40</td>
+                    <td>129 Min</td>
+                    <td>46008</td>
+                    <td>46407</td>
+                    <td>023</td>
+                    <td>7900.00</td>
+                    <td>15377.94</td>
+                    <td>3900.00</td>
+                    <td>3900.00</td>
+                    <td>118.24</td>
+                    <td>118.24</td>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                    <td>10.00</td>
+                    <td>10.00</td>
+                    <td>7386.10</td>
+                    <td>7594.51</td>
+                    <td>29.61</td>
+                    <td>29.27</td>
+                    <td>56.74</td>
+                    <td>53.92</td>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                    <td>12393.32</td>
+                    <td>2.00</td>
+                    <td>13.37</td>
+                    <td>839102302</td>
+                    <td>2</td>
+                    <td>900.00</td>
+                    <td>0</td>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                    <td>0.39</td>
+                    <td>0.41</td>
+                    <td>0.44</td>
+                    <td>0.36</td>
+                    <td>0.39</td>
+                    <td>0.39</td>
+                    <td>0.37</td>
+                    <td>0.40</td>
+                    <td>0.41</td>
+                    <td>0.41</td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i onclick="javascript:toEdit(this)" data-target="cutting" class="fa fa-edit"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+        const cuttingEditRow = `
+                <td><input type="text" class="form-control" value="839102302"></td>
+                    <td><input type="text" class="form-control" value="AA305"></td>
+                    <td><input type="text" class="form-control" value="1323689"></td>
+                    <td><input type="text" class="form-control" value="07:31"></td>
+                    <td><input type="text" class="form-control" value="09:40"></td>
+                    <td><input type="text" class="form-control" value="129 Min"></td>
+                    <td><input type="text" class="form-control" value="46008"></td>
+                    <td><input type="text" class="form-control" value="46407"></td>
+                    <td><input type="text" class="form-control" value="023"></td>
+                    <td><input type="text" class="form-control" value="7900.00"></td>
+                    <td><input type="text" class="form-control" value="15377.94"></td>
+                    <td><input type="text" class="form-control" value="3900.00"></td>
+                    <td><input type="text" class="form-control" value="3900.00"></td>
+                    <td><input type="text" class="form-control" value="118.24"></td>
+                    <td><input type="text" class="form-control" value="118.24"></td>
+                    <td><input type="text" class="form-control" value="0.00"></td>
+                    <td><input type="text" class="form-control" value="0.00"></td>
+                    <td><input type="text" class="form-control" value="10.00"></td>
+                    <td><input type="text" class="form-control" value="10.00"></td>
+                    <td><input type="text" class="form-control" value="7386.10"></td>
+                    <td><input type="text" class="form-control" value="7594.51"></td>
+                    <td><input type="text" class="form-control" value="29.61"></td>
+                    <td><input type="text" class="form-control" value="29.27"></td>
+                    <td><input type="text" class="form-control" value="56.74"></td>
+                    <td><input type="text" class="form-control" value="53.92"></td>
+                    <td><input type="text" class="form-control" value="0.00"></td>
+                    <td><input type="text" class="form-control" value="0.00"></td>
+                    <td><input type="text" class="form-control" value="12393.32"></td>
+                    <td><input type="text" class="form-control" value="2.00"></td>
+                    <td><input type="text" class="form-control" value="13.37"></td>
+                    <td><input type="text" class="form-control" value="839102302"></td>
+                    <td><input type="text" class="form-control" value="2"></td>
+                    <td><input type="text" class="form-control" value="900.00"></td>
+                    <td><input type="text" class="form-control" value="0"></td>
+                    <td><input type="text" class="form-control" value="0.00"></td>
+                    <td><input type="text" class="form-control" value="0.00"></td>
+                    <td><input type="text" class="form-control" value="0.39"></td>
+                    <td><input type="text" class="form-control" value="0.41"></td>
+                    <td><input type="text" class="form-control" value="0.44"></td>
+                    <td><input type="text" class="form-control" value="0.36"></td>
+                    <td><input type="text" class="form-control" value="0.39"></td>
+                    <td><input type="text" class="form-control" value="0.39"></td>
+                    <td><input type="text" class="form-control" value="0.37"></td>
+                    <td><input type="text" class="form-control" value="0.40"></td>
+                    <td><input type="text" class="form-control" value="0.41"></td>
+                    <td><input type="text" class="form-control" value="0.41"></td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i data-target="cutting" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+        function toEdit(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $(button).parents("tr").html(machineProblemEditRow);
+                    break;
+                case "lot":
+                    $(button).parents("tr").html(lotEditRow);
+                    break;
+                case "infeed":
+                    $(button).parents("tr").html(infeedEditRow);
+                    break;
+                case "conditioning":
+                    $(button).parents("tr").html(conditioningEditRow);
+                    break;
+                case "cutting":
+                    $(button).parents("tr").html(cuttingEditRow);
+                    break;
+            }
+        }
+        function toNormal(button) {
+            if (confirm("Are you sure?")) {
+                const target = $(button).data("target");
+                switch (target) {
+                    case "machine-problem":
+                        $(button).parents("tr").html(machineProblemRow);
+                        break;
+                    case "lot":
+                        $(button).parents("tr").html(lotRow);
+                        break;
+                    case "infeed":
+                        $(button).parents("tr").html(infeedRow);
+                        break;
+                    case "conditioning":
+                        $(button).parents("tr").html(conditioningRow);
+                        break;
+                    case "cutting":
+                        $(button).parents("tr").html(cuttingRow);
+                        break;
+                }
+            }
+        }
+        function addRow(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $("#" + target).append($(`<tr>${machineProblemRow}</tr>`));
+                    break;
+                case "lot":
+                    $("#" + target).append($(`<tr>${lotRow}</tr>`));
+                    break;
+                case "infeed":
+                    $("#" + target).append($(`<tr>${infeedRow}</tr>`));
+                    break;
+                case "conditioning":
+                    $("#" + target).append($(`<tr>${conditioningRow}</tr>`));
+                    break;
+                case "cutting":
+                    $("#" + target).append($(`<tr>${cuttingRow}</tr>`));
+                    break;
+            }
+        }
+        function removeRow(button) {
+            if (confirm("Are you sure?")) {
+                $(button).parents("tr").remove();
+            }
+        }
+        const infeedPssData = {
+            infeedBlend: "AA30S",
+            infeedSapbatch: "1323692",
+            infeedFormularev: "33",
+            infeedStart: "09:15",
+            infeedStop: "11:18",
+            infeedDuration: "123 Mnt",
+            infeedTpc: "2598.2597",
+            infeedSiloDestination: "40237.00",
+            infeedQuantityWeighter: "11855.66",
+        };
+        const conditioningPssData = {
+            conditioningBlend: "AA30S",
+            conditioningSapbatch: "1323684",
+            conditioningFormularev: "33",
+            conditioningStart: "06:30",
+            conditioningStop: "08:30",
+            conditioningDuration: "120 Mnt",
+            conditioningSd: "46007.00",
+            conditioningMcInput: "",
+            conditioningFri: "6000.00",
+            conditioningQw1: "5832.31",
+            conditioningQw2: "5918.74",
+            conditioningCcs1: "71.73",
+            conditioningCcs2: "72.47",
+            conditioningTwp1: "1713.48",
+            conditioningTwp2: "1409.23",
+        };
+        const cuttingPssData = {
+            cuttingBlend: "AA30S",
+            cuttingSapbatch: "1323689",
+            cuttingStart: "07:31",
+            cuttingStop: "09:40",
+            cuttingDuration: "129 Mnt",
+            cuttingSiloOrigin: "460008.00",
+            cuttingSiloDestination: "46407.00",
+            cuttingRrid4650: "3900.00",
+            cuttingRrid4651: "3900.00",
+            cuttingAtd4650: "118.24",
+            cuttingAtd4651: "118.24",
+            cuttingHp4650: "0.00",
+            cuttingHp4651: "0.00",
+            cuttingRtid4650: "10.00",
+            cuttingRtid4651: "10.00",
+            cuttingTwi4650: "7386.10",
+            cuttingTwi4651: "7594.51",
+            cuttingMid4650: "29.61",
+            cuttingMid4651: "29.27",
+            cuttingTed4650: "56.74",
+            cuttingTed4651: "53.92",
+            cuttingMed4650: "0.00",
+            cuttingMed4651: "0.00",
+            cuttingTwm4650: "12393.32",
+            cuttingAa4650: "2.00",
+            cuttingMf4650: "13.37",
+            cuttingCfri: "7900.00",
+            cuttingTwbc: "15377.94",
+            cuttingOb: "839102302",
+            cuttingNt: "2",
+            cuttingKg: "900.00",
+            cuttingNt2: "0",
+            cuttingKg2: "0.00",
+            cutting1: "0.39",
+            cutting2: "0.41",
+            cutting3: "0.44",
+            cutting4: "0.36",
+            cutting5: "0.39",
+            cutting6: "0.39",
+            cutting7: "0.37",
+            cutting8: "0.40",
+            cutting9: "0.41",
+            cutting10: "0.41",
+            cuttingCleve: "0.00",
+        };
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $('#get-pss-data-infeed').click(function () {
+                for (var prop in infeedPssData) {
+                    if (Object.prototype.hasOwnProperty.call(infeedPssData, prop)) {
+                        $("#" + prop).val(infeedPssData[prop]);
+                    }
+                }
+            });
+            $('#get-pss-data-conditioning').click(function () {
+                for (var prop in conditioningPssData) {
+                    if (Object.prototype.hasOwnProperty.call(conditioningPssData, prop)) {
+                        $("#" + prop).val(conditioningPssData[prop]);
+                    }
+                }
+            });
+            $('#get-pss-data-cutting').click(function () {
+                for (var prop in cuttingPssData) {
+                    if (Object.prototype.hasOwnProperty.call(cuttingPssData, prop)) {
+                        $("#" + prop).val(cuttingPssData[prop]);
+                    }
+                }
+            });
+        });
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            for (var prop in data) {
+                if (Object.prototype.hasOwnProperty.call(data, prop)) {
+                    if (prop == "id") continue;
+                    r += `<td data-name="${prop}">${data[prop]}</td>`;
+                }
+            }
+            r += `<td class="tx-center">`;
+            r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                var tableBody = "";
+                switch (targetTable) {
+                    case "#waste":
+                        crrData = deleteFromArray(id, wasteData);
+                        tableBody = generateTable(wasteData, targetTable);
+                        break;
+                }
+                $(targetTable).html(tableBody);
+            }
+        }
+        function editData(button) {
+            const tds = $(button).parents("tr").children('td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                if (i != tdsCount - 1) {
+                    const html = $(e).html();
+                    $(e).html(`<input type="text" class="form-control" value="${html}">`);
+                } else {
+                    const edit = $(e).find(".edit");
+                    $(edit).attr("onclick", "javascript:normalData(this)");
+                    $(edit).removeClass("fa-edit");
+                    $(edit).addClass("fa-save");
+                }
+            });
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                let row = "";
+                switch (targetTable) {
+                    case "#waste":
+                        const index = findInArray(id, wasteData);
+                        $(tds).each(function (i, e) {
+                            if (i != tdsCount - 1) {
+                                wasteData[index][$(e).data("name")] = $(e).find("input").val();
+                            } else {
+                                const edit = $(e).find(".edit");
+                                $(edit).attr("onclick", "javascript:editData(this)");
+                                $(edit).removeClass("fa-save");
+                                $(edit).addClass("fa-edit");
+                            }
+                        });
+                        row = generateRow(wasteData[index], targetTable)
+                        console.log(wasteData);
+                        break;
+                }
+                $(button).parents("tr").html(row);
+            }
+        }
+        const wasteOpt = [
+            {
+                category: "Line 400, hopper-silo LU",
+                child: [
+                    "Dust Cyclone & Screen Dryer",
+                    "Vibro infeed DRYR-0006/0027",
+                    "Exit Dryer/CBAN0804/0806/Wcon097",
+                    "Addback Angkup bersih",
+                    "Sisa di Silo Packing/ shuttle /blending / CBAN-0807/0809/0810/0813/0814",
+                ]
+            },
+            {
+                category: "Line 150, Unload silo - Scrwe Conditioning",
+                child: [
+                    "Vibro CVIB 015 (Screen & Spillage)",
+                    "Bottom Tray Weycon BF Cond",
+                    "Scrubber",
+                ]
+            },
+            {
+                category: "Line 200, Unload silo - Cutter",
+                child: [
+                    "Dust Bag Cutter/CBAN 0661",
+                    "Vibro Sieving Cutter CVIB 0196",
+                    "Sisa di Silo Bulking/ shuttle /blending/ CBAN-033/034/035/036",
+                ]
+            },
+            {
+                category: "Line 100, Feeding- silo Bulking String Removel / MPS",
+                child: [
+                    "Feeding/ Hopper/ Boardes",
+                    "Angkup kotor",
+                    "Sampah Cyclone (CVIB - 0204)",
+                    "Sampah Angkup (CVIB - 0204)",
+                    "Sampah Vibro (CVIB - 0201)",
+                    "Dust Seiving Vibro (CVIB - 0201)",
+                    "Dust Angkup halus (DUST - 0049)",
+                    "Dust Colector Clasif (CSFR - 0004)",
+                    "Heaviest / batu (CSFR - 0004)",
+                    "Dust0052 (New Dustbag)",
+                    "Karung Goni (satuan lembar)",
+                    "Penggantian Velcro (CROL - 0228)",
+                    "Bottom Tray CBAN 0811 - 0812",
+                ]
+            },
+        ];
+        var wasteNewData = {};
+        var wasteData = [
+            {
+                id: uuidv4(),
+                category: "Line 100, Feeding-silo Bulking String Removel / MPS",
+                kind: "Sampah Angkup",
+                type: "Dry",
+                reused: "Reused",
+                weight: "34",
+            },
+            {
+                id: uuidv4(),
+                category: "Line 100, Feeding-silo Bulking String Removel / MPS",
+                kind: "Dust Collector Clasif",
+                type: "Dust",
+                reused: "Reused",
+                weight: "3",
+            },
+            {
+                id: uuidv4(),
+                category: "Line 400, hopper-silo LU",
+                kind: "Dust Cyclone Dryer",
+                type: "Wet",
+                reused: "Disposed",
+                weight: "91",
+            },
+        ];
+
+
+        var selected;
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item').siblings('.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $("#waste").html(generateTable(wasteData, "#waste"));
+
+            $(".wizard-modal .next").click(function () {
+                wizardButtonNext(this);
+            });
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item').siblings('.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+            $('#phase-waste-modal').on('show.bs.modal', function (e) {
+                let opts = [];
+                for (var i = 0; i < wasteOpt.length; i++) {
+                    opts.push(wasteOpt[i].category);
+                }
+                $(this).find(".waste").html(generateWizardButton(opts));
+            });
+            $('#phase-waste-modal').on('next', function (e, i, info) {
+                if (!selected) {
+                    info.shouldReturn = true;
+                    return;
+                }
+                console.log(i);
+                switch (i) {
+                    case 0:
+                        wasteNewData.category = selected;
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            if (wasteOpt[i].category == selected) {
+                                $(this).find(".kind").html(generateWizardButton(wasteOpt[i].child));
+                            }
+                        }
+                        selected = null;
+                        break;
+                    case 1:
+                        wasteNewData.kind = selected;
+                        selected = null;
+                        break;
+                    case 2:
+                        wasteNewData.type = selected;
+                        selected = null;
+                        break;
+                    case 3:
+                        info.shouldHide = true;
+                        wasteNewData.id = uuidv4();
+                        wasteNewData.reused = selected;
+                        wasteNewData.weight = "19.55";
+                        wasteData.push(wasteNewData);
+                        tableBody = generateTable(wasteData, '#waste');
+                        $('#waste').html(tableBody);
+                        break;
+                }
+            });
+            $('#phase-waste-modal').on('hide', function (e) {
+                wasteNewData = {};
+                selected = null;
+            });
+        });</script>
+}
+
+
+

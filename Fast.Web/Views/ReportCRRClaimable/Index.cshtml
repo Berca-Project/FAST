@@ -1,0 +1,1676 @@
+﻿@model Fast.Web.Models.Report.ReportModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+            .tableWrapper .summary-body2 td, .tableWrapper .summary-body2 th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body2.hidden td, .tableWrapper .summary-body2.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        .anu {
+            /*width: 500px;*/
+            overflow-x: scroll;
+            margin-left: 20em;
+            overflow-y: visible;
+            padding: 0;
+        }
+
+        .headcol {
+            position: absolute;
+            width: 20em;
+            left: 0;
+            top: auto;
+            border-top-width: 1px;
+            /*only relevant for first row*/
+            margin-top: -1px;
+            /*compensate for top border*/
+        }
+    </style>
+}
+
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">CRR and Claimable</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">CRR and Claimable</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="btnExportExcel" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i>Export Excel</button>
+                @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                    <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                    <button id="btnSave" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group col-12" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group col-12">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Lph Status</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" name="status">
+                                        <option value="Submitted">Submitted</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Submitted-Approved">Submitted and Approved</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Prod. Center</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" data-mock-width="150px" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        @*<option value="pi">PI - PMID Karawang</option>
+                                            <option value="pk">PK - SKM Karawang</option>
+                                            <option value="pb">PB - SIS Sukorejo</option>
+                                            <option value="pj">PJ - SKM Sukorejo</option>*@
+                                        @foreach (SelectListItem i in ViewBag.ProductionCenterList)
+                                        {
+                                            <option value="@(i.Value)">@i.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <!--div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand :</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="brand">
+
+                                    <option label="Select Brand"></option>
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div-->
+
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Machine</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="machine">
+                                        <option label="Select Machine"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <ul id="line-tabs" class="nav nav-tabs">
+                        <li class="nav-item machine-tab luPB51" data-target-carousel="Overall" id="Overall">
+                            <a class="nav-link overall">OVERALL</a>
+                        </li>
+                        <li class="nav-item machine-tab luPB51" data-target-carousel="Chart" id="Chart">
+                            <a class="nav-link">Chart</a>
+                        </li>
+                    </ul>
+
+                    <div id="lines" class="carousel" data-pause="true">
+                        <div class="carousel-inner">
+                            <div class="carousel-item" data-carousel-id="Overall">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                       
+                                    </div> <!--Mesin M50-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">Maker</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:350px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:120px;">Date</th>
+                                                                <th style="min-width:90px;">Shift</th>
+                                                                <th style="min-width:90px;">Machine</th>
+                                                                <th style="min-width:180px;">Brand</th>
+                                                                <th style="min-width:120px;">Output (Stick)</th>
+                                                                <th style="min-width:120px;">Cig Rod Reject (Kg)</th>
+                                                                <th style="min-width:120px;">Tob Rod Reject (Kg)</th>
+                                                                <th style="min-width:120px;">Total</th>
+                                                                <th style="min-width:120px;">SAP Mat Doc.</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="maker-overall">
+                                                        </tbody>
+                                                        <tfoot>
+
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Mesin M-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">Packer</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:350px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:120px;">Date</th>
+                                                                <th style="min-width:90px;">Shift</th>
+                                                                <th style="min-width:90px;">Machine</th>
+                                                                <th style="min-width:180px;">Brand</th>
+                                                                <th style="min-width:120px;">Output (Box)</th>
+                                                                <th style="min-width:120px;">Cig Rod Reject (Kg)</th>
+                                                                <th style="min-width:120px;">SAP Mat Doc.</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="packer-overall">
+                                                        </tbody>
+                                                        <tfoot>
+
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Mesin P-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">GI</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:300px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th colspan="8" style="min-width:100px;" id="headGI">Stock CIgarette Reject Reguler</th>
+                                                            </tr>
+                                                            <tr id="headerGI">
+                                                                <th style="min-width:120px;">Date</th>
+                                                                <th style="min-width:100px;">Shift</th>
+                                                                <th style="min-width:100px;">Brand</th>
+                                                                <th style="min-width:100px;">Stock Awal</th>
+                                                                <th style="min-width:100px;">In</th>
+                                                                @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.CRRType)
+                                                                {
+                                                                    <th style="min-width:100px;">@(detail.Code)</th>
+                                                                }
+                                                                @*<th style="min-width:100px;">Cig Reject</th>
+                                                                    <th style="min-width:100px;">CTF</th>
+                                                                    <th style="min-width:100px;">NTM</th>
+                                                                    <th style="min-width:100px;">Debu Kasar</th>*@
+                                                                <th style="min-width:100px;">Total</th>
+                                                                <th style="min-width:100px;">SAP</th>
+                                                                <th style="min-width:100px;">Stock</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="GITableBody" class="tx-center">
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--GI-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">GR</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:300px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th colspan="6" style="min-width:100px;" id="headGR">Output Ripper Short</th>
+                                                            </tr>
+                                                            <tr id="headerGR">
+                                                                @*<th style="min-width:100px;">Reclaim</th>
+                                                                    <th style="min-width:100px;">Debu/Middle</th>
+                                                                    <th style="min-width:100px;">Debu/Final</th>
+                                                                    <th style="min-width:100px;">Sapon</th>
+                                                                    <th style="min-width:100px;">KF</th>*@
+                                                                <th style="min-width:120px;">Date</th>
+                                                                <th style="min-width:100px;">Shift</th>
+                                                                <th style="min-width:100px;">Brand</th>
+                                                                @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.RIOutput)
+                                                                {
+                                                                    <th style="min-width:100px;">@(detail.Code)</th>
+                                                                }
+                                                                <th style="min-width:100px;">Yield</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="GRTableBody" class="tx-center">
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--GR-->
+                                </div>
+                            </div> <!-- OVERALL -->
+                            
+                            <div class="carousel-item" data-carousel-id="Chart">
+                                <div class="row" style="margin-top:20px;" >
+
+                                    <div class="col-12 tx-center">
+                                        <label class="font-weight-bold mg-b-15 mg-t-20" style="font-size:1.5em;">Monitoring CRR</label>
+                                    </div>
+                                    <div class="col-12 pd-t-10">
+                                        <center>
+                                            <div class="card" style="width:25%;padding-top:10px;">
+                                                <label style="font-weight:bold;width:100%;" class="tx-center">Legend</label>
+                                                <div class="mg-l-10 mg-b-10">
+                                                    <center>
+                                                        <span class="wd-15 ht-15" style="background-color:#007bff;display:inline-block;"></span>
+                                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Maker</span>
+                                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; &nbsp; &nbsp; </span>
+                                                        <span class="wd-15 ht-15" style="background-color:#5bd276;display:inline-block;"></span>
+                                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Packer</span>
+                                                    </center>
+                                                </div>
+                                            </div>
+                                        </center>
+                                    </div>
+                                    @*<div class="content col-4">
+                                        <label style="font-weight:bold;">LU 51</label>
+                                        <hr style="margin:0 0 10px 0;" />
+                                        <canvas id="chbarlu51" height="160"></canvas>
+                                    </div>
+                                    <div class="content col-4">
+                                        <label style="font-weight:bold;">LU 57</label>
+                                        <hr style="margin:0 0 10px 0;" />
+                                        <canvas id="chbarlu57" height="160"></canvas>
+                                    </div>
+                                    <div class="content col-4">
+                                        <label style="font-weight:bold;">LU 59</label>
+                                        <hr style="margin:0 0 10px 0;" />
+                                        <canvas id="chbarlu59" height="160"></canvas>
+                                    </div>*@
+                                    <div class="content col-6" id="chartoveral">
+                                        <label style="font-weight:bold;">Overall</label>
+                                        <hr style="margin:0 0 10px 0;" />
+                                        <canvas id="chbaroverallsis" height="160"></canvas>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top:20px;" id="containerChart"></div>
+                            </div> <!-- Prod -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/exportaction.js"></script>
+
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    $(".machine-tab").hide();
+        //    $("[name=prodCenter]").on("change", function () {
+        //        let opt = '<option label="Select Machine"></option>';
+        //        const val = $(this).val();
+        //        if (val != "") for (let i = 0; i < loc[val].length; i++)
+        //            opt += `<option value="${loc[val][i].machine}">${loc[val][i].machine}</option>`;
+        //        $("[name=machine]").html(opt);
+        //    })
+        //    $("[name=machine]").on("input", function () {
+        //        const val = $(this).val();
+        //        $("#machine").html(mac[val]);
+        //    })
+        //});
+        $(document).ready(function () {
+            //$(".machine-tab").hide();
+            var colCount = 0;
+            $('#headerGI > th').each(function () {
+
+                    colCount++;
+
+            });
+            $('#headGI').attr('colspan', colCount);
+
+            var colCount = 0;
+            $('#headerGR > th').each(function () {
+
+                    colCount++;
+
+            });
+            $('#headGR').attr('colspan', colCount);
+            $(".machine-tab").hide();
+        });
+
+
+        let kolomGR = [];
+        let thisProdCenterMachine = null;
+        $("[name=prodCenter]").on("change", function () {
+            $('[name="machine"]').html('');
+            const prodCenterID = $("[name=prodCenter]").val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetMachine", "ReportCRRClaimable")",
+                data: JSON.stringify({
+				    prodCenterID: prodCenterID,
+                }),
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    console.log(result);
+                    $('[name="machine"]').append('<option label="Select machine"></option>');
+                    $('[name="machine"]').append('<option value="All">All</option>');
+                    let machineList = [];
+                    if (result.Status == true) {
+                        for (let i = 0; i < result.machine.length; i++) {
+                            let machine = result.machine[i].Code;
+                            let countMacchinePackerMaker = 0; //count mesin packer dan maker yang nomornya sama
+                            for (let j = 0; j < result.machine.length; j++) {
+                                let machinecode = result.machine[j].Code;
+                                machinecode = machinecode.substring(2);
+                                if (machine.includes(machinecode)) {
+                                    countMacchinePackerMaker++;
+                                }
+                            }
+                            let machinecode = result.machine[i].Code;
+                            machinecode = machinecode.substring(2);
+                            if (countMacchinePackerMaker > 1) {
+                                machineList.push('LU' + machinecode);
+                            } else {
+                                machineList.push(machine);
+                            }
+
+                        }
+                        console.log(machineList);
+                        var uniquemachineList = [];
+                        $.each(machineList, function (i, el) {
+                            if($.inArray(el, uniquemachineList) === -1) uniquemachineList.push(el);
+                        });
+                        for (let i = 0; i < uniquemachineList.length; i++) {
+                            if(uniquemachineList[i] != "Mentholator")
+                            $('[name="machine"]').append('<option value="'+uniquemachineList[i]+'">'+uniquemachineList[i]+'</option>');
+                        }
+                    } else {
+                        $('[name="machine"]').append('<option label="Select machine"></option>');
+                        $('[name="machine"]').append('<option value="All">All</option>');
+                        for (let i = 0; i < result.machine.length; i++) {
+                            $('[name="machine"]').append('<option value="'+result.machine[i]+'">'+result.machine[i]+'</option>');
+                        }
+                    }
+
+                }
+            });
+        });
+
+        var ListBarisTabelPacker = [];
+        var ListBarisTabelMaker = [];
+        var ListBarisTabelGI = [];
+        var ListBarisTabelGR = [];
+        
+        var TotalPerhariMesinMaker = [];
+        var TotalPerhariMesinPacker = [];
+        var TotalOverAllPacker = [];
+        var TotalOverAllMaker = [];
+        var AllBrand = [];
+        var TotalPerhariBrandPacker = [];
+        var TotalPerhariBrandMaker = [];
+
+        $('#btnSearch').on('click', function () {
+            var ALLMachine = [];
+            var allDate = [];
+            TotalOverAllPacker = [];
+            TotalOverAllMaker = [];
+            const startDate = $("[name=start]").val();
+            const endDate = $("[name=end]").val();
+            const prodCenter = $("[name=prodCenter]").val();
+            const machine = $("[name=machine]").val();
+            const status = $("[name=status]").val();
+            if (startDate == "") {
+                showError("Date can't be empty");
+                return;
+            }
+            if (endDate == "") {
+                showError("Date can't be empty");
+                return;
+            }
+            if (status == null || status == "") {
+                showError("Lph Status can't be empty");
+                return;
+            }
+            if (prodCenter == "" || prodCenter == null) {
+                showError("Prod. Center can't be empty");
+                return;
+            }
+
+            console.log(prodCenter);
+            console.log(machine);
+            console.log(startDate);
+            console.log(endDate);
+            $('#loading_overlay').removeClass('d-none');
+             $.ajax({
+                type: "post",
+                url: fastApp.BaseUrl + "/ReportCRRClaimable/GetReportWithParam",
+                 data: {
+                     startDate: startDate,
+                     endDate: endDate,
+                     prodCenter: prodCenter,
+                     machine: machine,
+                     status: status,
+                 },
+                datatype: "json",
+                 success: function (result) {
+                     $('.tableWrapper thead tr').each(function () {
+                            const top = $(this).position().top;
+                            $(this).children().css({ "top": top });
+                     });
+                     if (result.Status == "False") {
+                         showError(result.data);
+                         $('#loading_overlay').addClass('d-none');
+                     } else {
+                         TotalPerhariMesinMaker = [];
+                         TotalPerhariMesinPacker = [];
+                         allDate = [];
+                         ALLMachine = [];
+                         ListBarisTabelPacker = [["Date", "Shift", "Machine", "Brand", "Output (Box)", "Cig Rod Reject", "SAP Mat Doc"]];
+                         ListBarisTabelMaker = [["Date", "Shift", "Machine", "Brand", "Output (Stick)", "Cig Rod Reject", "Tob Rod Reject", "Total", "SAP Mat Doc."]];
+                         ListBarisTabelGI = [["Date", "Shift", "Brand", "Stock Awal", "In"]];
+
+                         for (let i = 0; i < result.headerGI.length; i++) {
+                             ListBarisTabelGI[0].push(result.headerGI[i].Code);
+                         }
+                         ListBarisTabelGI[0].push("Total");
+                         ListBarisTabelGI[0].push("SAP");
+                         ListBarisTabelGI[0].push("Stock");
+
+                         ListBarisTabelGR = [["Date", "Shift", "Brand"]];
+                     
+                         for (let i = 0; i < result.headerGR.length; i++) {
+                             ListBarisTabelGR[0].push(result.headerGR[i].Code);
+                         }
+                         ListBarisTabelGR[0].push("Yield");
+
+                         console.log(result.ResultPacker);
+                         console.log(result);
+                         var table = "";//untuk tabel Packer
+                         var tableMaker = "";//untuk tabel Maker
+                         var tableGI = "";//untuk tabel GI
+                         var tableGR = "";//untuk tabel GR
+                         let countMesinDalamShift = 0;
+                         let countBrandDalamMesin = 0;
+                         let countShiftDalamDate = 0;
+
+                     
+                         //untuk Packer
+                         let WTDOutputPacker = 0;
+                         let WTDCigRodRejectPakcer = 0;
+                         let AdaMesin = false;
+                         let tabelDatePacker = "";
+                         Object.keys(result.ResultPacker).forEach(Date => {
+                             AdaMesin = false;
+                             tabelDatePacker  = '<tr><td>' + Date + '</td>';
+                             countShiftDalamDate = 0;
+                             countBrandDalamMesin = 0;
+                             countMesinDalamShift = 0;
+                             let arrayIsiBrandPerHari = [];
+                             let arrayBrandPerHari = [];
+                             let arrayIsiMesinPerHari = [];
+                             let arrayMesinPerHari = [];
+                             allDate.push(Date);
+                             let shiftFound = false; 
+                             let shiftHtml = "";
+                             Object.keys(result.ResultPacker[Date]).forEach(shift => {
+                                 shiftFound = false;
+                                 shiftHtml = "";
+                                 if (countShiftDalamDate == 0 || !AdaMesin) {
+                                     shiftHtml += '<td>' + shift + '</td>';
+                                 } else {
+                                     shiftHtml += '<tr><td></td><td>' + shift + '</td>';
+                                     countMesinDalamShift = 0;
+                                     countBrandDalamMesin = 0;
+                                 }
+                                 let arrayBrandPerShift = [];
+                                 let arrayIsiBrandPerShift = [];
+                                 Object.keys(result.ResultPacker[Date][shift]).forEach(mesin => {
+                                    if ($.inArray(mesin, arrayMesinPerHari) === -1) {
+                                        arrayMesinPerHari.push(mesin);
+                                     }
+                                     if ($.inArray(mesin, ALLMachine) === -1) {
+                                         ALLMachine.push(mesin);
+                                     }
+                                 });
+                                 Object.keys(result.ResultPacker[Date][shift]).forEach(mesin => {
+                                     //console.log("log u"+result.ResultPacker[Date][shift]);
+                                     AdaMesin = true;
+                                     shiftFound = true; 
+                                     let Pmesin = mesin.substring(2);
+                                     if (countMesinDalamShift == 0) {
+
+                                         shiftHtml += '<td>P' + Pmesin + '</td>';
+                                     }
+                                     else {
+                                         shiftHtml += '<tr><td></td><td></td>'
+                                         shiftHtml += '<td>P' + Pmesin + '</td>';
+                                         countBrandDalamMesin = 0;
+                                     }
+                                     Object.keys(result.ResultPacker[Date][shift][mesin]).forEach(brand => {
+                                         if ($.inArray(brand, arrayBrandPerShift) === -1) {
+                                             arrayBrandPerShift.push(brand);
+                                         }
+                                         if ($.inArray(brand, arrayBrandPerHari) === -1) {
+                                             arrayBrandPerHari.push(brand);
+                                         }
+                                         if ($.inArray(brand, AllBrand) === -1) {
+                                             AllBrand.push(brand);
+                                         }
+                                     });
+                                     Object.keys(result.ResultPacker[Date][shift][mesin]).forEach(brand => {
+                                         //get value
+                                         let Output = result.ResultPacker[Date][shift][mesin][brand]['Output'];
+                                         let CigRodReject = result.ResultPacker[Date][shift][mesin][brand]['CigRodReject'];
+
+                                         //hitung wtd atau summary semua val
+                                         WTDOutputPacker += result.ResultPacker[Date][shift][mesin][brand]['Output'];
+                                         WTDCigRodRejectPakcer += result.ResultPacker[Date][shift][mesin][brand]['CigRodReject'];
+
+                                         if (countBrandDalamMesin == 0) {
+                                             shiftHtml += '<td>' + brand + '</td>';
+                                             shiftHtml += '<td>' + Output + '</td>';
+                                             shiftHtml += '<td>' + CigRodReject + '</td>';
+                                             shiftHtml += '<td></td></tr>';
+                                         } else {
+                                             shiftHtml += '<tr><td></td><td></td><td></td>';
+                                             shiftHtml += '<td>' + brand + '</td>';
+                                             shiftHtml += '<td>' + Output + '</td>';
+                                             shiftHtml += '<td>' + CigRodReject.toFixed(2) + '</td>';
+                                             shiftHtml += '<td></td></tr>';
+                                         }
+                                         arrayIsiBrandPerShift.push([brand, Output, CigRodReject]);
+                                         arrayIsiBrandPerHari.push([brand, Output, CigRodReject]);
+                                         arrayIsiMesinPerHari.push([mesin, Output, CigRodReject]);
+                                         countBrandDalamMesin++;
+                                     });
+                                     countMesinDalamShift++;
+                                 });
+                                 countShiftDalamDate++;
+                                 for (let i = 0; i < arrayBrandPerShift.length; i++) {
+                                    let Output = 0;
+                                    let CigRodReject = 0;
+                                    for (let j = 0; j < arrayIsiBrandPerShift.length; j++) {
+                                        if (arrayIsiBrandPerShift[j][0] == arrayBrandPerShift[i]) {
+                                            Output += arrayIsiBrandPerShift[j][1];
+                                            CigRodReject += arrayIsiBrandPerShift[j][2];
+                                        }
+                                    }
+                                    shiftHtml += '<tr><td></td><td></td><td colspan="2"><center>Total per shift ' + arrayBrandPerShift[i] + '</center></td><td>' + Output + '</td><td>' + CigRodReject.toFixed(2) + '</td><td></td></tr>';
+                                
+                                 }
+                                 if (shiftFound)
+                                     tabelDatePacker += shiftHtml;
+                             });
+                             let TotalOutput = 0;
+                             let TotalCigRodReject = 0;
+                             for (let i = 0; i < arrayIsiMesinPerHari.length; i++) {
+                                 TotalOutput += arrayIsiMesinPerHari[i][1];;
+                                 TotalCigRodReject += arrayIsiMesinPerHari[i][2];
+                             }
+                             TotalOverAllPacker.push(TotalCigRodReject.toFixed(2));
+                             tabelDatePacker += '<tr class="summary-body"><td></td><td colspan="3"><center>Total per hari </center></td><td>' + TotalOutput + '</td><td>' + TotalCigRodReject.toFixed(2) + '</td><td></td></tr>';
+                             for (let j = 0; j < arrayMesinPerHari.length; j++) {
+                                let TotalCigRodReject = 0;
+                                 for (let i = 0; i < arrayIsiMesinPerHari.length; i++) {
+                                    if (arrayIsiMesinPerHari[i][0] == arrayMesinPerHari[j]) {   
+                                        TotalCigRodReject += arrayIsiMesinPerHari[i][2];
+                                    }
+
+                                 }
+                                 TotalPerhariMesinPacker.push([Date, arrayMesinPerHari[j], TotalCigRodReject]);
+                             }
+                             for (let j = 0; j < arrayBrandPerHari.length; j++) {
+                                let TotalCigRodReject = 0;
+                                 for (let i = 0; i < arrayIsiBrandPerHari.length; i++) {
+                                    if (arrayIsiBrandPerHari[i][0] == arrayBrandPerHari[j]) {   
+                                        TotalCigRodReject += arrayIsiBrandPerHari[i][2];
+                                    }
+
+                                 }
+                                 TotalPerhariBrandPacker.push([Date, arrayBrandPerHari[j], TotalCigRodReject]);
+                             }
+                             if (AdaMesin)
+                                 table += tabelDatePacker;
+                         });
+                         console.log(TotalPerhariMesinPacker);
+                         console.log(TotalPerhariBrandPacker);
+                         table += '<tr class="summary-body"><td colspan="4"><center>WTD </center></td><td>' + WTDOutputPacker + '</td><td>' + WTDCigRodRejectPakcer.toFixed(2) + '</td><td></td></tr>';
+
+                         countMesinDalamShift = 0;
+                         countBrandDalamMesin = 0;
+                         countShiftDalamDate = 0;
+                         //untuk Maker
+                         let WTDOutput = 0;
+                         let WTDCigRodReject = 0;
+                         let WTDTobRodReject = 0;
+                         let WTDtotalMakerPershift = 0;
+                         AdaMesin = false;
+                         let tabelDateMaker = "";
+                         Object.keys(result.ResultMaker).forEach(Date => {
+                             AdaMesin = false;
+                             tabelDateMaker = '<tr><td>' + Date + '</td>';
+                             countShiftDalamDate = 0;
+                             countBrandDalamMesin = 0;
+                             countMesinDalamShift = 0;
+                             let arrayIsiMesinPerHari = [];
+                             let arrayMesinPerHari = [];
+                             let arrayBrandPerHari = [];
+                             let arrayIsiBrandPerHari = [];
+                             let shiftFound = false;
+                             let shiftHtml = "";
+                             Object.keys(result.ResultMaker[Date]).forEach(shift => {
+                                 shiftFound = false;
+                                 shiftHtml = "";
+                                 if (countShiftDalamDate == 0 || !AdaMesin) {
+                                     shiftHtml += '<td>' + shift + '</td>';
+                                 } else {
+                                     shiftHtml += '<tr><td></td><td>' + shift + '</td>';
+                                     countMesinDalamShift = 0;
+                                     countBrandDalamMesin = 0;
+                                 }
+                                 let arrayBrandPerShift = [];
+                                 let arrayIsiBrandPerShift = [];
+                                 Object.keys(result.ResultMaker[Date][shift]).forEach(mesin => {
+                                     if ($.inArray(mesin, arrayMesinPerHari) === -1) {
+                                         arrayMesinPerHari.push(mesin);
+                                     }
+                                     if ($.inArray(mesin, ALLMachine) === -1) {
+                                         ALLMachine.push(mesin);
+                                     }
+                                 });
+                                 Object.keys(result.ResultMaker[Date][shift]).forEach(mesin => {
+                                     AdaMesin = true;
+                                     shiftFound = true;
+                                     let Pmesin = mesin.substring(2);
+                                     if (countMesinDalamShift == 0) {
+                                         shiftHtml += '<td>M' + Pmesin + '</td>';
+                                     }
+                                     else {
+                                         shiftHtml += '<tr><td></td><td></td>'
+                                         shiftHtml += '<td>M' + Pmesin + '</td>';
+                                         countBrandDalamMesin = 0;
+                                     }
+                                     Object.keys(result.ResultMaker[Date][shift][mesin]).forEach(brand => {
+                                         if ($.inArray(brand, arrayBrandPerShift) === -1) {
+                                             arrayBrandPerShift.push(brand);
+                                         }
+                                         if ($.inArray(brand, arrayBrandPerHari) === -1) {
+                                             arrayBrandPerHari.push(brand);
+                                         }
+                                         if ($.inArray(brand, AllBrand) === -1) {
+                                             AllBrand.push(brand);
+                                         }
+                                     });
+                                     Object.keys(result.ResultMaker[Date][shift][mesin]).forEach(brand => {
+                                         //get value
+                                         let Output = result.ResultMaker[Date][shift][mesin][brand]['Output'];
+                                         let CigRodReject = result.ResultMaker[Date][shift][mesin][brand]['CigRodReject'];
+                                         let TobRodReject = result.ResultMaker[Date][shift][mesin][brand]['TobRodReject'];
+
+                                         let BeratCigarette = result.ResultMaker[Date][shift][mesin][brand]['BeratCigarette'];
+                                         let CTF = result.ResultMaker[Date][shift][mesin][brand]['CTF'];
+                                         let totalMakerPershift = ((CigRodReject / BeratCigarette) + (TobRodReject / CTF)) * BeratCigarette;
+                                         if (totalMakerPershift === Infinity || isNaN(totalMakerPershift) == true) {
+                                            totalMakerPershift = 0;
+                                         }
+                                         //hitung wtd atau summary semua value
+                                         WTDOutput += Output;
+                                         WTDCigRodReject += CigRodReject;
+                                         WTDTobRodReject += TobRodReject;
+                                         WTDtotalMakerPershift += totalMakerPershift;
+
+                                         if (countBrandDalamMesin == 0) {
+                                             shiftHtml += '<td>' + brand + '</td>';
+                                             shiftHtml += '<td>' + Output + '</td>';
+                                             shiftHtml += '<td>' + CigRodReject.toFixed(2) + '</td>';
+                                             shiftHtml += '<td>' + TobRodReject.toFixed(2) + '</td>';
+                                             shiftHtml += '<td>' + totalMakerPershift.toFixed(2) + '</td>';
+                                             shiftHtml += '<td></td></tr>';
+                                         } else {
+                                             shiftHtml += '<tr><td></td><td></td><td></td>';
+                                             shiftHtml += '<td>' + brand + '</td>';
+                                             shiftHtml += '<td>' + Output + '</td>';
+                                             shiftHtml += '<td>' + CigRodReject.toFixed(2) + '</td>';
+                                             shiftHtml += '<td>' + TobRodReject.toFixed(2) + '</td>';
+                                             shiftHtml += '<td>' + totalMakerPershift.toFixed(2) + '</td>';
+                                             shiftHtml += '<td></td></tr>';
+                                         }
+                                         arrayIsiBrandPerShift.push([brand, Output, CigRodReject, TobRodReject, totalMakerPershift]);
+                                         arrayIsiMesinPerHari.push([mesin, Output, CigRodReject, TobRodReject, totalMakerPershift]);
+                                         arrayIsiBrandPerHari.push([brand, Output, CigRodReject, TobRodReject, totalMakerPershift]);
+                                         countBrandDalamMesin++;
+                                     });
+                                     countMesinDalamShift++;
+                                 });
+                                 countShiftDalamDate++;
+
+                                 for (let i = 0; i < arrayBrandPerShift.length; i++) {
+                                     let Output = 0;
+                                     let CigRodReject = 0;
+                                     let TobRodReject = 0;
+                                     let totalMakerPershift = 0;
+                                     for (let j = 0; j < arrayIsiBrandPerShift.length; j++) {
+                                         if (arrayIsiBrandPerShift[j][0] == arrayBrandPerShift[i]) {
+                                             Output += arrayIsiBrandPerShift[j][1];
+                                             CigRodReject += arrayIsiBrandPerShift[j][2];
+                                             TobRodReject += arrayIsiBrandPerShift[j][3];
+                                             totalMakerPershift += arrayIsiBrandPerShift[j][4];
+                                         }
+                                     }
+                                     shiftHtml += '<tr><td></td><td></td><td colspan="2"><center>Total per shift ' + arrayBrandPerShift[i] + '</center></td><td>' + Output + '</td><td>' + CigRodReject.toFixed(2) + '</td><td>' + TobRodReject.toFixed(2) + '</td><td>' + totalMakerPershift.toFixed(2) + '</td><td></td></tr>';
+                                 
+                                 }
+                                 if (shiftFound)
+                                     tabelDateMaker += shiftHtml;
+                             });
+                             let TotalOutput = 0;
+                             let TotalCigRodReject = 0;
+                             let TotalTobRodReject = 0;
+                             let TotaltotalMakerPershift = 0;
+                             for (let i = 0; i < arrayIsiMesinPerHari.length; i++) {
+
+                                 TotalOutput += arrayIsiMesinPerHari[i][1];;
+                                 TotalCigRodReject += arrayIsiMesinPerHari[i][2];
+                                 TotalTobRodReject += arrayIsiMesinPerHari[i][3];
+                                 TotaltotalMakerPershift += arrayIsiMesinPerHari[i][4];
+                             }
+
+                             //untuk data char maker
+                             for (let j = 0; j < arrayMesinPerHari.length; j++) {
+                                 let totalMakerPershift = 0;
+                                 for (let i = 0; i < arrayIsiMesinPerHari.length; i++) {
+                                     if (arrayIsiMesinPerHari[i][0] == arrayMesinPerHari[j]) {
+                                         totalMakerPershift += arrayIsiMesinPerHari[i][4];
+                                     }
+                                 }
+                                 TotalPerhariMesinMaker.push([Date, arrayMesinPerHari[j], totalMakerPershift]);
+                             }
+                             TotalOverAllMaker.push(TotaltotalMakerPershift.toFixed(2));
+                             for (let j = 0; j < arrayBrandPerHari.length; j++) {
+                                let totalMakerPershift = 0;
+                                 for (let i = 0; i < arrayIsiBrandPerHari.length; i++) {
+                                    if (arrayIsiBrandPerHari[i][0] == arrayBrandPerHari[j]) {   
+                                        totalMakerPershift += arrayIsiBrandPerHari[i][4];
+                                    }
+
+                                 }
+                                 TotalPerhariBrandMaker.push([Date, arrayBrandPerHari[j], totalMakerPershift]);
+                             }
+                         
+                             tabelDateMaker += '<tr class="summary-body"><td></td><td colspan="3"><center>Total per hari </center></td><td>' + TotalOutput + '</td><td>' + TotalCigRodReject.toFixed(2) + '</td><td>' + TotalTobRodReject.toFixed(2) + '</td><td>' + TotaltotalMakerPershift.toFixed(2) + '</td><td></td></tr>';
+                             if (AdaMesin)
+                                 tableMaker += tabelDateMaker;
+                         });
+                     
+                         tableMaker += '<tr class="summary-body"><td colspan="4"><center>WTD </center></td><td>' + WTDOutput + '</td><td>' + WTDCigRodReject.toFixed(2) + '</td><td>' + WTDTobRodReject.toFixed(2) + '</td><td>' + WTDtotalMakerPershift.toFixed(2) + '</td><td></td></tr>';
+
+                         //untuk chart
+                         $("#containerChart").html('');
+                         var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+                         for (let i = 0; i < ALLMachine.length; i++) {
+                             let machine = ALLMachine[i].substring(2);
+                             $("#containerChart").append('<div class="content col-4"><label style="font-weight:bold;">LU' + machine + '</label><hr style="margin:0 0 10px 0;" /><canvas id="'+machine+'" height="160"></canvas></div>');
+                             var chBar = document.getElementById(machine);
+                             let totalPacker = [];
+                             let totalMaker = [];
+                             let WTDPacker = 0;
+                             let WTDMaker = 0;
+                             let TempAllDate = [];
+                             let foundPacker = false;
+                             for (let j = 0; j < allDate.length; j++) {
+                                 TempAllDate.push(allDate[j]);
+                                 foundPacker = false;
+                                 for (let l = 0; l < TotalPerhariMesinPacker.length; l++) {
+                                     if (TotalPerhariMesinPacker[l][0] == allDate[j] && TotalPerhariMesinPacker[l][1] == ALLMachine[i]) {
+                                         let total = TotalPerhariMesinPacker[l][2];
+                                         WTDPacker += parseFloat(total);
+                                         totalPacker.push(total.toFixed(2));
+                                         foundPacker = true;
+                                     }
+                                 }
+                                 if (!foundPacker)
+                                     totalPacker.push(0);
+                             }
+                             totalPacker.push(WTDPacker.toFixed(2));
+                             TempAllDate.push("WTD");
+                             let foundMaker = false;
+                             for (let j = 0; j < allDate.length; j++) {
+                                 foundMaker = false;
+                                 for (let l = 0; l < TotalPerhariMesinMaker.length; l++) {
+                                     if (TotalPerhariMesinMaker[l][0] == allDate[j] && TotalPerhariMesinMaker[l][1] == ALLMachine[i]) {
+                                         let total = TotalPerhariMesinMaker[l][2];
+                                         WTDMaker += parseFloat(total);
+                                         totalMaker.push(total.toFixed(2));
+                                         foundMaker = true;
+                                     }
+                                 }
+                                 if (!foundMaker)
+                                     totalMaker.push(0);
+                             }
+                             totalMaker.push(WTDMaker.toFixed(2));
+                             var chartData = {
+                                labels: TempAllDate,
+                                datasets: [{
+                                    data: totalMaker,
+                                    backgroundColor: colors[0]
+                                },
+                                {
+                                    data: totalPacker,
+                                    backgroundColor: colors[1]
+                                }]
+                             };
+                             if (chBar) {
+                                new Chart(chBar, {
+                                    type: 'bar',
+                                    data: chartData,
+                                    options: {
+                                        scales: {
+                                            xAxes: [{
+                                                barPercentage: 0.4,
+                                                categoryPercentage: 0.5
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    beginAtZero: true
+                                                }
+                                            }]
+                                        },
+                                        legend: {
+                                            display: false
+                                        }
+                                    }
+                                });
+                             }
+                         }
+
+                         for (let i = 0; i < AllBrand.length; i++) {
+                             let brand = AllBrand[i];
+                             $("#containerChart").append('<div class="content col-4"><label style="font-weight:bold;">' + brand + '</label><hr style="margin:0 0 10px 0;" /><canvas id="'+brand+'" height="160"></canvas></div>');
+                             var chBar = document.getElementById(brand);
+                             let totalPacker = [];
+                             let totalMaker = [];
+                             let WTDPacker = 0;
+                             let WTDMaker = 0;
+                             let TempAllDate = [];
+                             let foundPacker = false;
+                             for (let j = 0; j < allDate.length; j++) {
+                                 TempAllDate.push(allDate[j]);
+                                 foundPacker = false;
+                                 for (let l = 0; l < TotalPerhariBrandPacker.length; l++) {
+                                     if (TotalPerhariBrandPacker[l][0] == allDate[j] && TotalPerhariBrandPacker[l][1] == AllBrand[i]) {
+                                         let total = TotalPerhariBrandPacker[l][2];
+                                         WTDPacker += parseFloat(total);
+                                         totalPacker.push(total.toFixed(2));
+                                         foundPacker = true;
+                                     }
+                                 }
+                                 if (!foundPacker)
+                                     totalPacker.push(0);
+                             }
+                             totalPacker.push(WTDPacker.toFixed(2));
+                             TempAllDate.push("WTD");
+                             let foundMaker = false;
+                             for (let j = 0; j < allDate.length; j++) {
+                                 foundMaker = false;
+                                 for (let l = 0; l < TotalPerhariBrandMaker.length; l++) {
+                                     if (TotalPerhariBrandMaker[l][0] == allDate[j] && TotalPerhariBrandMaker[l][1] == AllBrand[i]) {
+                                         let total = TotalPerhariBrandMaker[l][2];
+                                         WTDMaker += parseFloat(total);
+                                         totalMaker.push(total.toFixed(2));
+                                         foundMaker = true;
+                                     }
+                                 }
+                                 if (!foundMaker)
+                                     totalMaker.push(0);
+                             }
+                             totalMaker.push(WTDMaker.toFixed(2));
+                             console.log(totalPacker);
+                             var chartData = {
+                                labels: TempAllDate,
+                                datasets: [{
+                                    data: totalMaker,
+                                    backgroundColor: colors[0]
+                                },
+                                {
+                                    data: totalPacker,
+                                    backgroundColor: colors[1]
+                                }]
+                             };
+                             if (chBar) {
+                                new Chart(chBar, {
+                                    type: 'bar',
+                                    data: chartData,
+                                    options: {
+                                        scales: {
+                                            xAxes: [{
+                                                barPercentage: 0.4,
+                                                categoryPercentage: 0.5
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    beginAtZero: true
+                                                }
+                                            }]
+                                        },
+                                        legend: {
+                                            display: false
+                                        }
+                                    }
+                                });
+                             }
+                         }
+                         if (machine == "" || machine == "All") {
+                             $('#chbaroverallsis').replaceWith($('<canvas id="chbaroverallsis" height="160"></canvas>'));
+                             $(".overall").text("OVERALL");
+                             $("#chartoveral").removeClass('d-none');
+                             allDate.push("WTD");
+                             let totalMakerWTD = 0;
+                             for (let i = 0; i < TotalOverAllMaker.length; i++) {
+                                 totalMakerWTD += parseFloat(TotalOverAllMaker[i]);
+                             }
+                             TotalOverAllMaker.push(totalMakerWTD.toFixed(2));
+
+                             let totalPackerWTD = 0;
+                             for (let i = 0; i < TotalOverAllPacker.length; i++) {
+                                 totalPackerWTD += parseFloat(TotalOverAllPacker[i]);
+                             }
+                             TotalOverAllPacker.push(totalPackerWTD.toFixed(2));
+
+                             var chBar = document.getElementById("chbaroverallsis");
+
+                             var chartData = {
+                                 labels: allDate,
+                                 datasets: [{
+                                     data: TotalOverAllMaker,
+                                     backgroundColor: colors[0]
+                                 },
+                                 {
+                                     data: TotalOverAllPacker,
+                                     backgroundColor: colors[1]
+                                 }]
+                             };
+
+                             if (chBar) {
+                                 new Chart(chBar, {
+                                     type: 'bar',
+                                     data: chartData,
+                                     options: {
+                                         scales: {
+                                             xAxes: [{
+                                                 barPercentage: 0.4,
+                                                 categoryPercentage: 0.5
+                                             }],
+                                             yAxes: [{
+                                                 ticks: {
+                                                     beginAtZero: true
+                                                 }
+                                             }]
+                                         },
+                                         legend: {
+                                             display: false
+                                         }
+                                     }
+                                 });
+                             }
+                         } else {
+                             $("#chartoveral").addClass('d-none');
+                             $(".overall").text(machine)
+                         }
+
+
+                         countBrandDalamShift = 0;
+                         countShiftDalamDate = 0;
+                         var stokAwalperBrand = [];
+                         //untuk GI
+                         let AdaBrand = false;
+                         let tabelDateGI = "";
+                         Object.keys(result.ResultGI).forEach(Date => {
+                             AdaBrand = false;
+                             tabelDateGI = '<tr><td>' + Date + '</td>';
+                             countShiftDalamDate = 0;
+                             countBrandDalamShift = 0;
+                             countMesinDalamShift = 0;
+                         
+                             let shiftFound = false; 
+                             let shiftHtml = "";
+                             Object.keys(result.ResultGI[Date]).forEach(shift => {
+                                 shiftFound = false;
+                                 shiftHtml = "";
+                                 if (countShiftDalamDate == 0 || !AdaBrand) {
+                                     shiftHtml += '<td>' + shift + '</td>';
+                                 } else {
+                                     shiftHtml += '<tr><td></td><td>' + shift + '</td>';
+                                     countBrandDalamShift = 0;
+                                 }
+                                 Object.keys(result.ResultGI[Date][shift]).forEach(brand => {
+                                    AdaBrand = true;
+                                    shiftFound = true;
+                                    let ctw = result.ResultGI[Date][shift][brand]["CTW"];
+                                    let beratcig = result.ResultGI[Date][shift][brand]["BeratCigarette"];
+                                    let ctfbrand = result.ResultGI[Date][shift][brand]["BrandCTF"];
+                                    let cigreject = result.ResultGI[Date][shift][brand]["Cig Reject"];
+                                    let DustKasar = result.ResultGI[Date][shift][brand]["Dust Kasar"];
+                                    let CTF = result.ResultGI[Date][shift][brand]["CTF"];
+                                    //let SAP = ((cigreject / beratcig) + (CTF / ctfbrand) + (DustKasar / ctw)) * beratcig;
+                                    let SAP = result.ResultGI[Date][shift][brand]["SAP"];
+                                     let stokawal = result.ResultGI[Date][shift][brand]["StockAwal"];
+                                     let stokAkhir = result.ResultGI[Date][shift][brand]["StockAkhir"];
+                                    let In = result.ResultGI[Date][shift][brand]["In"];
+                                
+                                    let stok = 0 + In + SAP;
+                                
+                                     if (countBrandDalamShift == 0) {
+                                         let totalGI = 0;
+                                         shiftHtml += '<td>' + brand + '</td>';
+                                         shiftHtml += '<td>' + stokawal.toFixed(2) + '</td>';
+                                         shiftHtml += '<td>' + In.toFixed(2) + '</td>';
+                                     
+                                         for (let i = 0; i < result.headerGI.length; i++) {
+                                             //shiftHtml += result.ResultGI[Date][shift][brand][result.headerGI[i].Code];
+                                             shiftHtml += '<td>' + result.ResultGI[Date][shift][brand][result.headerGI[i].Code].toFixed(2) + '</td>';
+                                             totalGI += result.ResultGI[Date][shift][brand][result.headerGI[i].Code];
+                                         
+                                         }
+                                         shiftHtml += '<td>' + totalGI.toFixed(2) + '</td>';
+                                         shiftHtml += '<td>' + SAP.toFixed(2) + '</td>';
+                                         shiftHtml += '<td>' + stokAkhir.toFixed(2) + '</td></tr>';
+                                     
+                                     
+                                     } else {
+                                        shiftHtml += '<tr><td></td><td></td>';
+                                        let totalGI = 0;
+                                         shiftHtml += '<td>' + brand + '</td>';
+                                         shiftHtml += '<td>' + stokawal.toFixed(2) + '</td>';
+                                         shiftHtml += '<td>' + result.ResultGI[Date][shift][brand]["In"].toFixed(2) + '</td>';
+                                        for (let i = 0; i < result.headerGI.length; i++) {
+                                            //shiftHtml += result.ResultGI[Date][shift][brand][result.headerGI[i].Code];
+                                            shiftHtml += '<td>' + result.ResultGI[Date][shift][brand][result.headerGI[i].Code].toFixed(2) + '</td>';
+                                            totalGI += result.ResultGI[Date][shift][brand][result.headerGI[i].Code];
+                                         }
+                                         shiftHtml += '<td>' + totalGI.toFixed(2) + '</td>';
+                                         shiftHtml += '<td>' + SAP.toFixed(2) + '</td>';
+                                         shiftHtml += '<td>' + stokAkhir.toFixed(2) + '</td></tr>';
+                                     
+                                     }                                
+                                     //stokAwal += stok;
+                                     countBrandDalamShift++;
+                                 });
+                                 if (shiftFound)
+                                     tabelDateGI += shiftHtml;
+                                countShiftDalamDate++;
+                             });
+                             if (AdaBrand)
+                                 tableGI += tabelDateGI;
+
+                         });
+
+
+                         countBrandDalamShift = 0;
+                         countShiftDalamDate = 0;
+                         //untuk GR
+                         AdaBrand = false;
+                         let tabelDateGR = "";
+                         Object.keys(result.ResultGR).forEach(Date => {
+                         AdaBrand = false;
+                             tabelDateGR = '<tr><td>' + Date + '</td>';
+                             countShiftDalamDate = 0;
+                             countBrandDalamShift = 0;
+                         
+                             let shiftFound = false; 
+                             let shiftHtml = "";
+                             Object.keys(result.ResultGR[Date]).forEach(shift => {
+                                 shiftFound = false;
+                                 shiftHtml = "";
+                                 if (countShiftDalamDate == 0 || !AdaBrand) {
+                                     shiftHtml += '<td>' + shift + '</td>';
+                                 } else {
+                                     shiftHtml += '<tr><td></td><td>' + shift + '</td>';
+                                     countBrandDalamShift = 0;
+                                 }
+                                 Object.keys(result.ResultGR[Date][shift]).forEach(brand => {
+                                     AdaBrand = true;
+                                     shiftFound = true;
+                                     let Reclaim = result.ResultGR[Date][shift][brand]["Reclaim"];
+                                     let ctw = result.ResultGR[Date][shift][brand]["CTW"];
+                                     let beratcig = result.ResultGR[Date][shift][brand]["BeratCigarette"];
+                                     let ctfbrand = result.ResultGR[Date][shift][brand]["CTF"];
+                                     let cigreject = 0;
+                                     let DustKasar = 0;
+                                     let CTF = 0;
+                                     if (result.ResultGI[Date][shift][brand] != null) {
+                                         cigreject = result.ResultGI[Date][shift][brand]["Cig Reject"];
+                                         DustKasar = result.ResultGI[Date][shift][brand]["Dust Kasar"];
+                                         CTF = result.ResultGI[Date][shift][brand]["CTF"];
+                                     }
+                                     //let Yield = (Reclaim / ctw) / ((cigreject / beratcig) + (CTF / ctfbrand) + (DustKasar / ctw));
+                                     let Yield = result.ResultGR[Date][shift][brand]["yield"];
+                                     if (Yield === Infinity || isNaN(Yield) == true) {
+                                         Yield = 0;
+                                     }
+                                 
+
+                                     if (countBrandDalamShift == 0) {
+                                         shiftHtml += '<td>' + brand + '</td>';
+                                         for (let i = 0; i < result.headerGR.length; i++) {
+                                             shiftHtml += '<td>' + result.ResultGR[Date][shift][brand][result.headerGR[i].Code].toFixed(2)+ '</td>';
+                                         
+                                         }
+                                         if (Reclaim <= 0) {
+                                             shiftHtml += '<td>' + 0 + '</td></tr>';
+                                         
+                                         } else {
+                                             shiftHtml += '<td>' + Yield.toFixed(2) + '</td></tr>';
+                                         
+                                         }
+                                    } else {
+                                         shiftHtml += '<tr><td></td><td></td>';
+                                         shiftHtml += '<td>' + brand + '</td>';
+                                         for (let i = 0; i < result.headerGR.length; i++) {
+                                            shiftHtml += '<td>' + result.ResultGR[Date][shift][brand][result.headerGR[i].Code].toFixed(2) + '</td>';
+                                     
+                                         }
+                                         if (Reclaim <= 0) {
+                                             shiftHtml += '<td>' + 0 + '</td></tr>';
+                                         } else {
+                                             shiftHtml += '<td>' + Yield.toFixed(2) + '</td></tr>';
+                                         
+                                         }
+
+                                    }
+
+                                    countBrandDalamShift++;
+                                 });
+                                 if (shiftFound)
+                                     tabelDateGR += shiftHtml;
+                                countShiftDalamDate++;
+                             });
+                             if (AdaBrand)
+                                 tableGR += tabelDateGR;
+                         });
+
+
+                         
+                     
+
+                         $('#packer-overall').html(table);
+                         $('#maker-overall').html(tableMaker);
+                         $('#GITableBody').html(tableGI);
+                         $('#GRTableBody').html(tableGR);
+                         $(".machine-tab").show();
+                         $("#Overall").click();
+                         $('#loading_overlay').addClass('d-none');
+
+                         
+                         // emptyField();
+                         // displayBySearch(result, dateFilter);
+                     }
+                     
+                 },
+                 error: function (jqXHR, message, error) {
+                     $('#loading_overlay').addClass('d-none');
+                     console.log(jqXHR);
+                     console.log(message);
+                     console.log(error);
+                 }
+			 });
+        });
+
+        
+        $("#btnExportExcel").on("click", function () {
+            $('#loading_overlay').removeClass('d-none');
+                //if (searchResult == null) {
+                //    showError("Do search first!");
+                //    return;
+                //} else if (!checkSearchResult()) {
+                //    showError("Empty data!");
+                //    return;
+                //}
+                $('#maker-overall tr').each(function () {
+                    let row = [];
+                    $(this).find('td').each(function () {
+                        if ($(this).attr('colspan') == 4) {
+                            row.push("");
+                            row.push("");
+                            row.push("");
+                        }
+                        if ($(this).attr('colspan') == 3) {
+                            row.push("");
+                            row.push("");
+                        }
+                        if ($(this).attr('colspan') == 2) {
+                            row.push("");
+                        }
+                        row.push($(this).text());
+                    });
+                    ListBarisTabelMaker.push(row);
+                });
+                $('#packer-overall tr').each(function () {
+                    let row = [];
+                    $(this).find('td').each(function () {
+                        if ($(this).attr('colspan') == 4) {
+                            row.push("");
+                            row.push("");
+                            row.push("");
+                        }
+                        if ($(this).attr('colspan') == 3) {
+                            row.push("");
+                            row.push("");
+                        }
+                        if ($(this).attr('colspan') == 2) {
+                            row.push("");
+                        }
+                        row.push($(this).text());
+                    });
+                    ListBarisTabelPacker.push(row);
+                });
+                $('#GITableBody tr').each(function () {
+                    let row = [];
+                    $(this).find('td').each(function () {
+                        row.push($(this).text());
+                    });
+                    ListBarisTabelGI.push(row);
+                });
+                $('#GRTableBody tr').each(function () {
+                    let row = [];
+                    $(this).find('td').each(function () {
+                        row.push($(this).text());
+                    });
+                    ListBarisTabelGR.push(row);
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ExtractExcel", "ReportCRRClaimable")",
+                    data: JSON.stringify({
+                        maker: JSON.stringify(ListBarisTabelMaker), packer: JSON.stringify(ListBarisTabelPacker), GI: JSON.stringify(ListBarisTabelGI), GR: JSON.stringify(ListBarisTabelGR)
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        window.location = "@Url.Action("DownloadExcel", "ReportCRRClaimable")";
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+        });
+        $("[name='end']").on('focusout', function () {
+            let dateEnd = new Date($("[name='end']").val()); 
+            if ($("[name='end']").val() != "" && $("[name='start']").val() != "") {
+                let dateStar = new Date($("[name='start']").val()); 
+                
+                let Difference_In_Time = dateEnd.getTime() - dateStar.getTime(); 
+                let Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
+                if (Difference_In_Days >= 7) {
+                    $("[name='end']").val('');
+                    showError("can't filter more than 7 days");
+                }
+            }
+            let today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (dateEnd > today) {
+                $("[name='end']").val('');
+                showError("can't filter more than today date");
+            }
+        });
+        $("[name='start']").on('focusout', function () {
+            let dateStar = new Date($("[name='start']").val());
+            if ($("[name='end']").val() != "" && $("[name='start']").val() != "") {
+                let dateStar = new Date($("[name='start']").val());
+                let dateEnd = new Date($("[name='end']").val());
+                let Difference_In_Time = dateEnd.getTime() - dateStar.getTime();
+                let Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+                if (Difference_In_Days >= 7) {
+                    $("[name='end']").val('');
+                    showError("can't filter more than 7 days");
+                }
+                let today = new Date();
+                today.setHours(0,0,0,0);
+
+            }
+            let today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (dateStar > today) {
+                $("[name='start']").val('');
+                showError("can't filter more than today date");
+            }
+        });
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+            setTimeout(function(){
+                notice.remove();
+            }, 3000);
+        }
+    </script>
+    <!------------------------ STICKY ------------------------------------>
+    @*<script>
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        });
+    </script>*@
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+
+    <!------------------------ JS TAB ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().addClass("active");
+                $("#lines .carousel-item.active").removeClass("active");
+                $(`#lines .carousel-item[data-carousel-id="${$(this).data("target-carousel")}"]`).addClass("active");
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+            });
+        });
+    </script>
+
+    <!------------------------ SELECT 2 ---------------------------------->
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options',
+                allowClear: true,
+            });
+            $('.select2[data-mock-width]').on("select2:open", function () {
+                $(".select2-dropdown.select2-dropdown--below").css("min-width", $(this).data("mock-width"));
+            });
+        });
+    </script>
+}

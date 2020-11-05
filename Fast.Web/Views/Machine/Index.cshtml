@@ -1,0 +1,897 @@
+﻿@model Fast.Web.Models.MachineModel
+@using Fast.Web.Resources;
+@using Fast.Web.Utils;
+
+@section CSS_lib{
+    <!-- Specific Page Vendor CSS -->
+    <link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+
+}
+
+@section Styles{
+    <style>
+        .dataTables_scrollHead table, .dataTables_scrollBody table {
+            width: 2000px !important;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed bd-b">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="mg-b-5">@UIResources.MachineList</h4>
+                <p class="mg-b-0 tx-color-03">@UIResources.MachineManagement</p>
+            </div>
+            <div class="mg-t-20 mg-sm-t-0">
+                <div class="row">
+                    <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+                        <i data-feather="repeat" class="mg-r-5"></i> Load All
+                    </button>
+                    @*<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "MachineType")'">
+                            <i data-feather="layers" class="mg-r-5"></i> @UIResources.MachineTypeGroup
+                        </button>*@
+                    <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "MachineAllocation")'">
+                        <i data-feather="layers" class="mg-r-5"></i> @UIResources.MachineAllocationList
+                    </button>
+                    @if (Model.Access.hasPrint)
+                    {
+                        <button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+                            <span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+                        </button>
+                        <div id="buttonprint" class="dtButton"></div>
+                    }
+                    @if (Model.Access.hasWrite)
+                    {
+                        <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddMachine">
+                            <i data-feather="plus" class="mg-r-5"></i> @UIResources.NEW
+                        </button>
+                    }
+                </div>
+            </div>
+        </div><!-- End content header -->
+        <div data-label="Example" class="df-example demo-table dtMarginTop">
+            <table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="machineTable" style="overflow-x:scroll">
+                <thead>
+                    <tr>
+                        <th>@UIResources.ID</th>
+                        <th>@UIResources.Location</th>
+                        <th>@UIResources.Code</th>
+                        <th>@UIResources.LegalEntity</th>
+                        <th>@UIResources.Brand</th>
+                        <th>@UIResources.MachineType</th>
+                        <th>@UIResources.MachineSN</th>
+                        <th>@UIResources.SamID</th>
+                        <th>@UIResources.Area</th>
+                        <th>@UIResources.Cluster</th>
+                        <th>@UIResources.LinkUp</th>
+                        <th>@UIResources.OrderNumber</th>
+                        <th>@UIResources.DesignSpeed</th>
+                        <th>@UIResources.CellophanerSpeed</th>
+                        <th>@UIResources.ModifiedDate</th>
+                        <th>@UIResources.ModifiedBy</th>
+                        <th>@UIResources.Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditMachine" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+        <div class="modal-content" id="OpenDialog">
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddMachine" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+        <div class="modal-content">
+            @using (Html.BeginForm("Create", "Machine", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="truck" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewMachine</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Country</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry1" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ProductionCenter</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Department</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment1" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.SubDepartment</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment1" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Code</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.Code, null, new { @class = "form-control", @id = "Code", @required = "required", @onkeypress = "return checkForComma(event);" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-sm-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Items</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.Items, null, new { @class = "form-control", @id = "Items" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.LegalEntity</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.LegalEntity, (IEnumerable<SelectListItem>)ViewBag.LegalEntityList, new { @class = "form-control", @id = "ddlLegalEntity" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-sm-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Brand</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.MachineBrand, (IEnumerable<SelectListItem>)ViewBag.MachineBrandList, new { @class = "form-control", @id = "ddlBrand" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.MachineType</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.MachineTypeID, (IEnumerable<SelectListItem>)ViewBag.MachineTypeList, new { @class = "form-control", @id = "ddlMachineType" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-sm-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.MachineSN</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.MachineSN, null, new { @class = "form-control", @id = "MachineNo" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.AssetID</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.SamID, null, new { @class = "form-control", @id = "SamID" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-sm-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Area</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.Notes, (IEnumerable<SelectListItem>)ViewBag.AreaList, new { @class = "form-control", @id = "ddlArea" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Cluster</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.Cluster, (IEnumerable<SelectListItem>)ViewBag.ClusterList, new { @class = "form-control", @id = "ddlCluster" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-sm-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.OrderNumber</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.OrderNumber, null, new { @class = "form-control", @id = "tbOrderNumber", @type = "number" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.CellophanerSpeed</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.CellophanerSpeed, null, new { @class = "form-control", @id = "tbCellophanerSpeed" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-sm-5">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.DesignSpeed/label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.DesignSpeed, null, new { @class = "form-control", @id = "tbDesignSpeed" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-4">
+                                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.LinkUp</label>
+                            </div>
+                            <div class="col-7">
+                                @Html.TextBoxFor(x => x.LinkUp, null, new { @class = "form-control", @id = "tbLinkUp" })
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                        </div>
+                    </div>
+                    <div class="row row-sm mg-b-10">
+                        <div class="flex-1 row">
+                            <div class="col-12">
+                            </div>
+                        </div>
+                        <div class="flex-1 row">
+                            <div class="col-12">
+                                <p id="error-message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- modal-body -->
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="Validate()">@UIResources.Save</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+        <div class="modal-content">
+            <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+                <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+                <div class="media align-items-center">
+                    <span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+                    <div class="media-body mg-sm-l-20">
+                        <h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+                    </div>
+                </div><!-- media -->
+            </div><!-- modal-header -->
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+                </div>
+            </div><!-- modal-body -->
+            <div class="modal-footer pd-x-20 pd-y-15">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+                <button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+            </div>
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+    <!-- Specific Page Vendor -->
+    <script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+    <script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+    <style>
+        .dataTables_scrollBody thead tr {
+            visibility: collapse
+        }
+    </style>
+
+    <script type="text/javascript">
+		$(document).ready(function () {
+			var table = $('#machineTable').dataTable({
+				"scrollX": true,
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"destroy": true,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Machine/GetAllByLocation",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"visible": false,
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+                    },
+                    {
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+                    {
+						"targets": [9],
+						"searchable": false,
+						"orderable": false
+					},
+                    {
+						"targets": [10],
+						"searchable": false,
+						"orderable": false
+					},
+                    {
+						"targets": [11],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [13],
+                        "searchable": false,
+                        "orderable": false
+					},
+                    {
+						"targets": [14],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [15],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [16],
+                        "searchable": false,
+                        "orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{ "data": "Code", "name": "Code", "autoWidth": true },
+					{ "data": "LegalEntity", "name": "LegalEntity", "autoWidth": true },
+					{ "data": "MachineBrand", "name": "MachineBrand", "autoWidth": true },
+					{ "data": "MachineType", "name": "MachineType", "autoWidth": true },
+					{ "data": "MachineSN", "name": "MachineSN", "autoWidth": true },
+					{ "data": "SamID", "name": "SamID", "autoWidth": true },
+					{ "data": "Notes", "name": "Notes", "autoWidth": true },
+                    { "data": "Cluster", "name": "Cluster", "autoWidth": true },
+					{ "data": "LinkUp", "name": "LinkUp", "autoWidth": true },
+					{ "data": "OrderNumber", "name": "OrderNumber", "autoWidth": true },
+					{ "data": "DesignSpeed", "name": "DesignSpeed", "autoWidth": true },
+					{ "data": "CellophanerSpeed", "name": "CellophanerSpeed", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "ModifiedBy", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							if (@Model.Access.hasWriteStr) {
+								return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditMachine" title="Edit"><i class="fa fa-edit"></i></button>'+
+										'<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] + '\',\'' + full['Code'] + '\')" title="Delete"><i class="fa fa-trash"></i></button>';
+							} else
+								return '-';
+						}
+					}
+				]
+			});
+
+			var buttons2 = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-print"></i> Print',
+						"extend": 'print',
+						"title": 'Master Machine List',
+						"className": 'btn btn-sm pd-x-15 btn-white btn-uppercase',
+						"exportOptions": {
+							columns: [0, 1, 2, 3, 4, 5, 6]
+						}
+					}
+				]
+			}).container().appendTo($('#buttonprint'));
+
+			$('#ddlCountry1').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Machine/GetProductionCenterByCountryID",
+					data: { id: $('#ddlCountry1').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlProdCenter1'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlProdCenter1').html(ddlTemp);
+						$('#ddlDepartment1').html("<select id='ddlDepartment1'><option value='0'>- Please Select -</option></select>");
+						$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlProdCenter1').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Machine/GetDepartmentByProdCenterID",
+					data: { id: $('#ddlProdCenter1').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartment1'>";
+						var ddlMT = "<select id='ddlMachineType'>";
+						var isMT = false;
+						for (var i = 0; i < data.length; i++) {
+							if (data[i].Value.indexOf("#") >= 0) {
+								isMT = true;
+								ddlMT = ddlMT + '<option value=' + data[i].Value.replace("#", "") + '>' + data[i].Text + '</option>';
+							} else {
+								ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+							}
+						}
+
+						if (isMT) {
+							ddlMT = ddlMT + '</select>';
+							$('#ddlMachineType').html(ddlMT);
+						} else {
+							$('#ddlMachineType').html("<select id='ddlMachineType'><option value='0'>- Please Select -</option></select>");
+						}
+
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartment1').html(ddlTemp);
+						$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlDepartment1').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Machine/GetSubDepartmentByDepartmentID",
+					data: { id: $('#ddlDepartment1').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartment1'>";
+						var ddlMT = "<select id='ddlMachineType'>";
+						var isMT = false;
+						for (var i = 0; i < data.length; i++) {
+							if (data[i].Value.indexOf("#") >= 0) {
+								isMT = true;
+								ddlMT = ddlMT + '<option value=' + data[i].Value.replace("#", "") + '>' + data[i].Text + '</option>';
+							} else {
+								ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+							}
+						}
+
+						if (isMT) {
+							ddlMT = ddlMT + '</select>';
+							$('#ddlMachineType').html(ddlMT);
+						} else {
+							$('#ddlMachineType').html("<select id='ddlMachineType'><option value='0'>- Please Select -</option></select>");
+						}
+
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartment1').html(ddlTemp);
+					}
+				});
+			});
+
+			$('#ddlSubDepartment1').change(function () {
+				$("#error-message").text("");
+				//$.ajax({
+				//	type: "post",
+				//	url: fastApp.BaseUrl + "/Machine/GetMachineTypeBySubDepartmentID",
+				//	data: { id: $('#ddlSubDepartment1').val() },
+				//	datatype: "json",
+				//	traditional: true,
+				//	success: function (data) {
+				//		if (data.length == 0) {
+				//			$('#ddlMachineType').html("<select id='ddlMachineType'><option value='0'>- Please Select -</option></select>");
+				//		} else {
+				//			var ddlMT = "<select id='ddlMachineType'>";
+				//			for (var i = 0; i < data.length; i++) {
+				//				ddlMT = ddlMT + '<option value=' + data[i].Value.replace("#", "") + '>' + data[i].Text + '</option>';
+				//			}
+
+				//			ddlMT = ddlMT + '</select>';
+				//			$('#ddlMachineType').html(ddlMT);
+				//		}
+				//	}
+				//});
+			});
+		});
+
+        $('#loadAll').on('click', function () {
+            var table1 = $('#machineTable').dataTable({
+				"scrollX": true,
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"destroy": true,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Machine/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"visible": false,
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+                    },
+                    {
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+                    {
+						"targets": [9],
+						"searchable": false,
+						"orderable": false
+					},
+                    {
+						"targets": [10],
+						"searchable": false,
+						"orderable": false
+					},
+                    {
+						"targets": [11],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [13],
+                        "searchable": false,
+                        "orderable": false
+					},
+                    {
+						"targets": [14],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [15],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [16],
+                        "searchable": false,
+                        "orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{ "data": "Code", "name": "Code", "autoWidth": true },
+					{ "data": "LegalEntity", "name": "LegalEntity", "autoWidth": true },
+					{ "data": "MachineBrand", "name": "MachineBrand", "autoWidth": true },
+					{ "data": "MachineType", "name": "MachineType", "autoWidth": true },
+					{ "data": "MachineSN", "name": "MachineSN", "autoWidth": true },
+					{ "data": "SamID", "name": "SamID", "autoWidth": true },
+					{ "data": "Notes", "name": "Notes", "autoWidth": true },
+					{ "data": "Cluster", "name": "Cluster", "autoWidth": true },
+					{ "data": "LinkUp", "name": "LinkUp", "autoWidth": true },
+                    { "data": "OrderNumber", "name": "OrderNumber", "autoWidth": true },
+					{ "data": "DesignSpeed", "name": "DesignSpeed", "autoWidth": true },
+					{ "data": "CellophanerSpeed", "name": "CellophanerSpeed", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "ModifiedBy", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							if (@Model.Access.hasWriteStr) {
+								return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditMachine" title="Edit"><i class="fa fa-edit"></i></button>'+
+										'<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] + '\',\'' + full['Code'] + '\')" title="Delete"><i class="fa fa-trash"></i></button>';
+							} else
+								return '-';
+						}
+					}
+				]
+			});
+
+		});
+
+		function checkForComma(event) {
+			if (event.charCode == 44) {
+				alert('Comma is not allowed');
+				return false;
+			}else{
+				return true;
+			}
+		}
+
+		function RenderActions(id) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/Machine/Edit/" + id);
+		};
+
+		var Delete = function (ID, Name) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteMachine(ID);
+			});
+		}
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function DeleteMachine(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Machine/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/Machine/Index';
+					}, 1000);
+				}
+			});
+		}
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "Machine")';
+		};
+
+		function Validate() {
+			if ($('#ddlSubDepartment1').is(":visible") && $('#ddlSubDepartment1').val() == "0") {
+				$("#error-message").css('color', 'red');
+				$("#error-message").text("No sub department is selected");
+				return (false);
+			}
+
+            if ($('#Code').val() == "0" || $('#Code').val() == "") {
+				$("#error-message").css('color', 'red');
+				$("#error-message").text("Code cannot be empty");
+				return (false);
+			}
+
+			document.getElementById('ModalForm').submit();
+			return (true);
+		}
+
+		var result = "@ViewBag.Result";
+		if (result != "") {
+			if (result == "True") {
+				var message = "@ViewBag.Message";
+
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: message,
+					width: "400px",
+					type: 'success',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright,
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+			else {
+				var error = "@ViewBag.ErrorMessage";
+
+				var notice = new PNotify({
+					title: "@UIResources.ErrorMessage",
+					text: error,
+					width: "400px",
+					type: 'error',
+					addclass: 'stack-bottomright',
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+		}
+    </script>
+}
+

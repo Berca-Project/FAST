@@ -1,0 +1,296 @@
+﻿@model Fast.Web.Models.Report.ExtractDataModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = "Filter";
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@using (Html.BeginForm("GenerateRawData", "ExtractDataSP", FormMethod.Post, new { encType = "multipart/form-data" }))
+{
+    <div class="content content-fixed">
+        <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+            <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                            <li class="breadcrumb-item"><a href="#">Extract Data</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Extract Data SP</li>
+                        </ol>
+                    </nav>
+                    <h4 class="mg-b-0 tx-spacing--1">Extract Data SP</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mg-b-20">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-2">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">LPH Type</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.DropDownListFor(x => x.LPHType, (IEnumerable<SelectListItem>)ViewBag.TypeList, new { @class = "form-control", @id = "ddlType" })
+                                </div>
+                                <div class="col-2 offset-1">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProductionCenter</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.DropDownListFor(x => x.location1, Enumerable.Empty<SelectListItem>(), new { @class = "form-control selection-location" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-2">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Start Date</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.TextBoxFor(x => x.StartDate, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDateStart", autocomplete = "off", required = "required" })
+                                </div>
+                                <div class="col-2 offset-1">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Status</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.DropDownListFor(x => x.Status, (IEnumerable<SelectListItem>)ViewBag.StatusList, new { @class = "form-control", @id = "ddlType", required = "required" })
+                                </div>
+                                @*<div class="col-2 offset-1">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Department</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.DropDownListFor(x => x.location2, Enumerable.Empty<SelectListItem>(), new { @class = "form-control selection-department" })
+                                </div>*@
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-2">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">End Date</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.TextBoxFor(x => x.EndDate, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDateEnd", autocomplete = "off", required = "required" })
+                                </div>
+                                
+                            </div>
+
+                            <button type="submit" class="d-none" id="submit"></button>
+
+                            @*<div class="form-group row">
+                                <div class="col-2">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">End Date</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.TextBoxFor(x => x.EndDate, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDateEnd", autocomplete = "off", required = "required" })
+                                </div>
+                                <div class="col-2 offset-1">
+                                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.SubDepartment</label>
+                                </div>
+                                <div class="col-3">
+                                    @Html.DropDownListFor(x => x.location3, Enumerable.Empty<SelectListItem>(), new { @class = "form-control selection-subdepartment" })
+                                </div>
+                            </div>*@
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-block btn-primary" id="export">Download Raw Data as Excel File</button>
+                                </div>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-block btn-primary" id="exportSAP">Download Raw Data for SAP</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- row -->
+        </div><!-- container -->
+    </div><!-- content -->
+}
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#export').click(function () {
+                //$('#loading_overlay').removeClass('d-none');
+                $('form').attr('action', '@(Url.Action("GenerateRawDataCategorized","ExtractDataSP"))');
+                $('#submit').trigger('click');
+            });
+
+            $('#exportSAP').click(function () {
+                //$('#loading_overlay').removeClass('d-none');
+                $('form').attr('action', '@(Url.Action("GenerateRawDataSAP","ExtractDataSP"))');
+                $('#submit').trigger('click');
+            });
+
+            $("form").bind('ajax:complete', function() {
+                alert("done");
+            });
+
+            $('#tbDateStart').datepicker({
+                format: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true
+            });
+            $('#tbDateEnd').datepicker({
+                format: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true
+            });
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+
+            console.log(LocationTree);
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose "></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value='+LocationTree.ProductionCenters[i].LocationID+'>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            $('.selection-location').select2({
+                width: "100%",
+              placeholder: 'All Production Center',
+              searchInputPlaceholder: 'Search options'
+            });
+
+            $('.selection-department, .selection-subdepartment').select2({width: "100%"});
+
+            var locat_selected;
+            $(document).on("change",".selection-location",function(){
+                locat_selected = $(this).select2("val");
+                console.log(locat_selected);
+
+                $('.selection-department').select2('destroy');
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        select_depart.append('<optgroup label="'+LocationTree.ProductionCenters[i].Description+'">')
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                        select_depart.append('</optgroup>')
+                    }
+                }
+
+                $('.selection-department').select2({
+                    width: "100%",
+                  placeholder: 'All Department',
+                  searchInputPlaceholder: 'Search options'
+                });
+                $('.selection-subdepartment').select2();
+            });
+
+            $(document).on("change",".selection-department",function(){
+                var department_selected = $(this).select2("val");
+                console.log(department_selected);
+
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                select_subdepart.append('<optgroup label="' + LocationTree.ProductionCenters[i].Description+ " - " + LocationTree.ProductionCenters[i].Departments[j].Description + '">')
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                                select_subdepart.append('</optgroup>')
+                            }
+                        }
+                    }
+                }
+
+                $('.selection-subdepartment').select2({
+                    width: "100%",
+                  placeholder: 'All Sub Department',
+                  searchInputPlaceholder: 'Search options'
+                });
+            });
+
+        });
+          var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			var error = "@ViewBag.ErrorMessage";
+			var message = "@ViewBag.Message";
+
+			if (result != "") {
+				if (result == "True") {
+					if (message == "") {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.ExtractSuccess",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: message,
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+				else {
+					if (error == "") {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DataNotFound",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: error,
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			}
+
+    </script>
+}

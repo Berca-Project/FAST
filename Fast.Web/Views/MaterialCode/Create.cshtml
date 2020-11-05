@@ -1,0 +1,105 @@
+﻿@model Fast.Web.Models.MaterialCodeModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Create", "MaterialCode", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()	
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewMaterialCode</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Code</label>
+			</div>
+			<div class="col-8">
+				@Html.TextBoxFor(x => x.Code, null, new { @class = "form-control", @id = "tbCode" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Description</label>
+			</div>
+			<div class="col-8">
+				@Html.TextBoxFor(x => x.Description, null, new { @class = "form-control", @id = "tbDescription" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Country</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.ProductionCenter</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.PcID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Department</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.DeptID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.SubDepartment</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.LocationID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#ddlProdCenter').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/MaterialCode/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenter').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartment'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartment').html(ddlTemp);
+					$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlDepartment').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/MaterialCode/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartment').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartment'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartment').html(ddlTemp);
+				}
+			});
+		});
+	});
+
+</script>

@@ -1,0 +1,1968 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow:hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+  <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+    <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+            <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Combine</li>
+          </ol>
+        </nav>
+        <h4 class="mg-b-0 tx-spacing--1">LPH Combine</h4>
+      </div>
+      <div class="d-none d-md-block">
+          <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+          <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+          @if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+          {
+              @: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+          }
+          <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+          <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+          <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 mg-b-20">
+        <div class="card">
+          <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+          <div class="card-body d-flex">
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Date</label>
+                <div class="col-5">
+                  <input type="text" class="form-control" disabled value="Thu / 05-Sep-19">
+                </div>
+                <label class="col-2 col-form-label tx-right">Week</label>
+                <div class="col-2">
+                  <input type="text" class="form-control" disabled value="22">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Machine</label>
+                <div class="col-4">
+                  <input type="text" class="form-control" disabled value="F52">
+                </div>
+              </div>
+            </div>
+            <div class="divider-text divider-vertical"></div>
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Prodtech</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled value="80404805 - Agung Dwi Prasetyo">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Foreman</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Mekanik</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled value="80011429 - Jono">
+                </div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Electric</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Supervisor</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled value="80011827 - Djasmadi">
+                </div>
+              </div>
+            </div>
+            <div class="divider-text divider-vertical"></div>
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Shift / Group</label>
+                <div class="col-3">
+                  <input type="text" class="form-control" disabled value="3">
+                </div>
+                <label class="col-1 col-form-label tx-center">/</label>
+                <div class="col-3">
+                  <input type="text" class="form-control" disabled value="C">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Start / Stop</label>
+                <div class="col-3">
+                  <div class="input-group">
+                    <input id="inputTimeStart" class="form-control" value="22:00">
+                  </div>
+                </div>
+                <label class="col-1 col-form-label">/</label>
+                <div class="col-3">
+                  <div class="input-group">
+                    <input id="inputTimeStop" class="form-control" value="06:00">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!--INFORMATION-->
+
+      <div class="col-12 mg-b-20">
+        <div class="card">
+          <ul id="line-tabs" class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Drying Line</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Cutting Line</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Addback Line</a>
+            </li>
+          </ul>
+
+          <div id="lines" class="carousel" data-pause="true">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <div class="row">
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Machine Problems (Drying Line)
+                      </div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                              <tr>
+                                <th>Downtime</th>
+                                <th>Problem</th>
+                                <th>Description</th>
+                                <th style="width:6%;">Start</th>
+                                <th style="width:6%;">End</th>
+                                <th style="width:6%;">Duration</th>
+                                <th>PIC</th>
+                                <th>Status</th>
+                                <th>Action Plan</th>
+                                <th></th>
+                              </tr>
+                              <tr class="summary-body">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>180 Min</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </thead>
+                            <tbody id="machine-problem-1">
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+
+                            <tfoot>
+                              <tr class="input">
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">301 Minor Stop</option>
+                                    <option value="302">302 Proces Adjustment</option>
+                                    <option value="401">401 Breakdown</option>
+                                    <option value="501">501 Distruption of Material Flow</option>
+                                    <option value="601">601 Cleaning</option>
+                                  </select>
+                                </td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="1">Done</option>
+                                    <option value="2">On Progres</option>
+                                    <option value="3">Pending</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">SLAC</option>
+                                    <option value="302">CBM</option>
+                                    <option value="303">PM</option>
+                                  </select>
+                                </td>
+                                <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem-1" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!-- PROBLEM MESIN -->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance (Drying Line)</div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 300px">
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info tx-center">
+                              <tr>
+                                <th rowspan="2" style="width:60px;">No</th>
+                                <th rowspan="2" style="width:100px;">Blend</th>
+                                <th rowspan="2" style="width:140px;">No. Ops</th>
+                                <th colspan="2">Silo</th>
+                                <th colspan="3">Drying</th>
+                                <th colspan="2">Flowrate Dryer</th>
+                                <th colspan="4">Total Weigher</th>
+                                <th rowspan="2" style="width:80px;">Final OV</th>
+                                <th rowspan="2">Analisis Result</th>
+                                <th rowspan="2">Action</th>
+                              </tr>
+                              <tr>
+                                <th style="width:80px;">Asal</th>
+                                <th style="width:80px;">Tujuan</th>
+
+                                <th style="width:60px;">Start</th>
+                                <th style="width:60px;">Stop</th>
+                                <th style="width:60px;">Total</th>
+
+                                <th style="width:60px;">FTD</th>
+                                <th style="width:60px;">HTD</th>
+
+                                <th style="width:60px;">FTD</th>
+                                <th style="width:60px;">HTD</th>
+                                <th style="width:60px;">Master1</th>
+                                <th style="width:60px;">Totalizer</th>
+                              </tr>
+                              <tr class="summary-body">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>80</td>
+                                <td></td>
+                                <td></td>
+                                <td>1200</td>
+                                <td>1400</td>
+                                <td>1400</td>
+                                <td>4000</td>
+                                <td>2000</td>
+                                <td></td>
+                                <td class="tx-center">
+                                </td>
+                              </tr>
+                            </thead>
+                            <tbody id="machine-performance-drying-line">
+                              <tr>
+                                <td>1</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-drying-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>2</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-drying-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>3</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-drying-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>4</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-drying-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                            <tfoot>
+                              <tr class="input">
+                                <td><input type="text" class="form-control" value="5" disabled></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" disabled value="0 Min"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                <td><input type="text" class="form-control" placeholder="Pts"></td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="1">Good</option>
+                                    <option value="2">Avg</option>
+                                    <option value="3">Bad</option>
+                                  </select>
+                                </td>
+                                <td class="tx-center"><i  onclick="javascript:addRow(this)" data-target="machine-performance-drying-line" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!--Machine Performance (Drying Line)-->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval </div>
+                      <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                          <thead class="thead-info">
+                            <tr>
+                              <th>Name</th>
+                              <th>Role</th>
+                              <th>Actions</th>
+                              <th style="width:15%;">Date &amp; Time</th>
+                              <th style="width:40%;">Comment</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Bagas</td>
+                              <td>Requester</td>
+                              <td>Submit to Supervisor</td>
+                              <td>05-Sep-19 13:15</td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>Bagus</td>
+                              <td>Supervisor</td>
+                              <td>Confirmed</td>
+                              <td>05-Sep-19 13:25</td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div> <!--APPROVAL SEGMENT-->
+                </div>
+              </div>
+
+
+              <div class="carousel-item">
+                <div class="row">
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Machine Problems (Cutting Line)
+                      </div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                              <tr>
+                                <th>Downtime</th>
+                                <th>Problem</th>
+                                <th>Description</th>
+                                <th style="width:6%;">Start</th>
+                                <th style="width:6%;">End</th>
+                                <th style="width:6%;">Duration</th>
+                                <th>PIC</th>
+                                <th>Status</th>
+                                <th>Action Plan</th>
+                                <th></th>
+                              </tr>
+                              <tr class="summary-body">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>180 Min</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </thead>
+                            <tbody id="machine-problem-2">
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-2" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+
+                            <tfoot>
+                              <tr class="input">
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">301 Minor Stop</option>
+                                    <option value="302">302 Proces Adjustment</option>
+                                    <option value="401">401 Breakdown</option>
+                                    <option value="501">501 Distruption of Material Flow</option>
+                                    <option value="601">601 Cleaning</option>
+                                  </select>
+                                </td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="1">Done</option>
+                                    <option value="2">On Progres</option>
+                                    <option value="3">Pending</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">SLAC</option>
+                                    <option value="302">CBM</option>
+                                    <option value="303">PM</option>
+                                  </select>
+                                </td>
+                                <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem-2" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!-- PROBLEM MESIN -->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance (Cutting Line)</div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 300px">
+
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info tx-center">
+                              <tr>
+                                <th rowspan="2" style="width:60px;">No</th>
+                                <th rowspan="2" style="width:70px;">Blend</th>
+                                <th rowspan="2" style="width:130px;">No. Ops</th>
+                                <th colspan="2">Silo</th>
+                                <th colspan="3">Cutting</th>
+                                <th rowspan="2" style="width:20px;">Deviasi</th>
+                                <th rowspan="2" style="width:20px;">Material</th>
+                                <th colspan="2">Height</th>
+                                <th rowspan="2">Width</th>
+                                <th rowspan="2">Pressure</th>
+                                <th rowspan="2">Number</th>
+                                <th rowspan="2">Total</th>
+                                <th colspan="3">Detected Material</th>
+                                <th rowspan="2">Action</th>
+                              </tr>
+                              <tr>
+                                <th style="width:80px;">Asal</th>
+                                <th style="width:80px;">Tujuan</th>
+
+                                <th style="width:20px;">Start</th>
+                                <th style="width:20px;">Stop</th>
+                                <th style="width:20px;">Total</th>
+
+                                <th style="width:20px;">Mouth</th>
+                                <th style="width:20px;">tobacco</th>
+
+                                <th style="width:60px;">2400</th>
+                                <th style="width:60px;">2430</th>
+                                <th style="width:60px;">Actual</th>
+                              </tr>
+                              <tr class="summary-body">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>80</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>1400</td>
+                                <td>4000</td>
+                                <td></td>
+                                <td></td>
+                                <td class="tx-center">
+                                </td>
+                              </tr>
+                            </thead>
+                            <tbody id="machine-performance-cutting-line">
+                              <tr>
+                                <td>1</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-cutting-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>2</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-cutting-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>3</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-cutting-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>4</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>1252</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>14.20</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>250</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>350</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Avg</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-cutting-line" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                            <tfoot>
+                              <tr class="input">
+                                <td><input type="text" class="form-control" value="5" disabled></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" disabled value="0 Min"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" placeholder="Avg(mm)"></td>
+                                <td><input type="text" class="form-control" placeholder="Avg(Bar)"></td>
+                                <td><input type="text" class="form-control" ></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td class="tx-center"><i  onclick="javascript:addRow(this)" data-target="machine-performance-cutting-line" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!--Machine Performance (Cutting Line)-->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval </div>
+                      <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                          <thead class="thead-info">
+                            <tr>
+                              <th>Name</th>
+                              <th>Role</th>
+                              <th>Actions</th>
+                              <th style="width:15%;">Date &amp; Time</th>
+                              <th style="width:40%;">Comment</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Bagas</td>
+                              <td>Requester</td>
+                              <td>Submit to Supervisor</td>
+                              <td>05-Sep-19 13:15</td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>Bagus</td>
+                              <td>Supervisor</td>
+                              <td>Confirmed</td>
+                              <td>05-Sep-19 13:25</td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div> <!--APPROVAL SEGMENT-->
+                </div>
+              </div>
+
+              <div class="carousel-item">
+                <div class="row">
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Machine Problems (Addback Line)
+                      </div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                              <tr>
+                                <th>Downtime</th>
+                                <th>Problem</th>
+                                <th>Description</th>
+                                <th style="width:6%;">Start</th>
+                                <th style="width:6%;">End</th>
+                                <th style="width:6%;">Duration</th>
+                                <th>PIC</th>
+                                <th>Status</th>
+                                <th>Action Plan</th>
+                                <th></th>
+                              </tr>
+                              <tr class="summary-body">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>180 Min</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </thead>
+                            <tbody id="machine-problem-3">
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-3" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>301 Minor Stop</td>
+                                <td>Bobbin Putus</td>
+                                <td>Mesin AUS</td>
+                                <td>12:00</td>
+                                <td>13:00</td>
+                                <td>60 Min</td>
+                                <td>Hengki</td>
+                                <td>Done</td>
+                                <td>CBM</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-problem-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+
+                            <tfoot>
+                              <tr class="input">
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">301 Minor Stop</option>
+                                    <option value="302">302 Proces Adjustment</option>
+                                    <option value="401">401 Breakdown</option>
+                                    <option value="501">501 Distruption of Material Flow</option>
+                                    <option value="601">601 Cleaning</option>
+                                  </select>
+                                </td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="1">Done</option>
+                                    <option value="2">On Progres</option>
+                                    <option value="3">Pending</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">SLAC</option>
+                                    <option value="302">CBM</option>
+                                    <option value="303">PM</option>
+                                  </select>
+                                </td>
+                                <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem-3" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!-- PROBLEM MESIN -->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance (Addback Line)</div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px; overflow-x: hidden">
+
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info tx-center" style="font-size:12px;">
+                              <tr>
+                                <th rowspan="2">No</th>
+                                <th rowspan="2">Blend</th>
+                                <th rowspan="2">No. Ops</th>
+                                <th colspan="3">Clove</th>
+                                <th colspan="3">Diet</th>
+                                <th colspan="3">Cres</th>
+                                <th colspan="3">RTC</th>
+                                <th colspan="3">Flavor</th>
+                                <th colspan="3">Addback Outspec</th>
+                                <th colspan="3">Addback Short</th>
+                                <th colspan="3">CSF</th>
+                                <th rowspan="2"></th>
+                              </tr>
+                              <tr>
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+
+                                <th style="width:50px;">N</th>
+                                <th style="width:50px;">B</th>
+                                <th style="width:50px;">W</th>
+                              </tr>
+                            </thead>
+                            <tbody style="font-size:12px;" id="machine-performance-addback-line-1">
+                              <tr>
+                                <td>1</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>2</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>3</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>4</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-1" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                            <tfoot>
+                              <tr class="input">
+                                <td><input type="text" class="form-control" value="5" disabled></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td class="tx-center"><i  onclick="javascript:addRow(this)" data-target="machine-performance-addback-line-1" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!--Machine Performance (Adding Line)-->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance (Addback Line)</div>
+                      <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px;">
+                          <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info tx-center">
+                              <tr>
+                                <th rowspan="2" style="width:4%;">No</th>
+                                <th rowspan="2" style="width:6%;">Blend</th>
+                                <th rowspan="2" style="width:12%;">No. Ops</th>
+                                <th colspan="3">Clove</th>
+                                <th colspan="3">Diet</th>
+                                <th colspan="3">Cres</th>
+                                <th colspan="3">RTC</th>
+                                <th colspan="3">Flavor</th>
+                                <th colspan="3">Addback Outspec</th>
+                                <th colspan="3">Addback Short</th>
+                                <th colspan="3">CSF</th>
+                                <th rowspan="2">Action</th>
+                              </tr>
+                              <tr>
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+
+                                <th style="width:50px;">Nama</th>
+                                <th style="width:50px;">Batch</th>
+                                <th style="width:50px;">Weighcon</th>
+                              </tr>
+                            </thead>
+                            <tbody id="machine-performance-addback-line-2">
+                              <tr>
+                                <td>1</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-2" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>2</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-2" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>3</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-2" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>4</td>
+                                <td>Liquid</td>
+                                <td>0124</td>
+                                <td>Ale</td>
+                                <td>1555</td>
+                                <td>14.00</td>
+                                <td>Ale</td>
+                                <td>20</td>
+                                <td>200</td>
+                                <td>Ale</td>
+                                <td>300</td>
+                                <td>350</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td>Ale</td>
+                                <td>1000</td>
+                                <td>500</td>
+                                <td class="tx-center">
+                                  <div class="btn-group">
+                                    <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-2" class="fa fa-edit"></i>
+                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                            <tfoot>
+                              <tr class="input">
+                                <td><input type="text" class="form-control" value="5" disabled></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td class="tx-center"><i  onclick="javascript:addRow(this)" data-target="machine-performance-addback-line-2" class="fa fa-plus-circle"></i></td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!--Machine Performance (Adding Line)-->
+
+                  <div class="col-12 mg-b-20">
+                    <div class="card">
+                      <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval </div>
+                      <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                          <thead class="thead-info">
+                            <tr>
+                              <th>Name</th>
+                              <th>Role</th>
+                              <th>Actions</th>
+                              <th style="width:15%;">Date &amp; Time</th>
+                              <th style="width:40%;">Comment</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Bagas</td>
+                              <td>Requester</td>
+                              <td>Submit to Supervisor</td>
+                              <td>05-Sep-19 13:15</td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>Bagus</td>
+                              <td>Supervisor</td>
+                              <td>Confirmed</td>
+                              <td>05-Sep-19 13:25</td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div> <!--APPROVAL SEGMENT-->
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- content -->
+
+
+@section Scripts{
+<script>
+  $(function () {
+
+    $('.select2').select2({
+      placeholder: 'Choose one',
+      searchInputPlaceholder: 'Search options'
+    });
+  })
+</script>
+<script>
+  const machineProblemRow = i => `<td>301 Minor Stop</td><td>Bobbin Putus</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem-${i}" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+  const machineProblemEditRow = i => `<td><select class="form-control select2">
+                        <option label="Choose one"></option>
+                        <option value="301">301 Minor Stop</option>
+                        <option value="302">302 Proces Adjustment</option>
+                        <option value="401">401 Breakdown</option>
+                        <option value="501">501 Distruption of Material Flow</option>
+                        <option value="601">601 Cleaning</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem-${i}" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem-${i}" class="fa fa-trash"></i></td>`;
+  const machinePerformanceAddbackLineRow = i => `
+  <td>1</td>
+  <td>Liquid</td>
+  <td>0124</td>
+  <td>Ale</td>
+  <td>1555</td>
+  <td>14.00</td>
+  <td>Ale</td>
+  <td>20</td>
+  <td>200</td>
+  <td>Ale</td>
+  <td>300</td>
+  <td>350</td>
+  <td>Ale</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>Ale</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>Ale</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>Ale</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>Ale</td>
+  <td>1000</td>
+  <td>500</td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i onclick="javascript:toEdit(this)" data-target="machine-performance-addback-line-${i}" class="fa fa-edit"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+  const machinePerformanceAddbackLineEditRow = i => `
+  <td><input type="text" class="form-control" value="1" disabled></td>
+  <td><input type="text" class="form-control" value="Liquid"></td>
+  <td><input type="text" class="form-control" value="0124"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="1555"></td>
+  <td><input type="text" class="form-control" value="14.00"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="20"></td>
+  <td><input type="text" class="form-control" value="200"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="300"></td>
+  <td><input type="text" class="form-control" value="350"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td><input type="text" class="form-control" value="Ale"></td>
+  <td><input type="text" class="form-control" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i data-target="machine-performance-addback-line-${i}" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+  const machinePerformanceDryingLineRow = `
+  <td>1</td>
+  <td>Liquid</td>
+  <td>0124</td>
+  <td>1252</td>
+  <td>1555</td>
+  <td>14.00</td>
+  <td>14.20</td>
+  <td>20</td>
+  <td>200</td>
+  <td>250</td>
+  <td>300</td>
+  <td>350</td>
+  <td>350</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>Avg</td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i onclick="javascript:toEdit(this)" data-target="machine-performance-drying-line" class="fa fa-edit"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+  const machinePerformanceDryingLineEditRow = `
+  <td><input type="text" class="form-control" value="1" disabled></td>
+  <td><input type="text" class="form-control" value="Liquid"></td>
+  <td><input type="text" class="form-control" value="0124"></td>
+  <td><input type="text" class="form-control" value="1252"></td>
+  <td><input type="text" class="form-control" value="1555"></td>
+  <td><input type="text" class="form-control" value="14.00"></td>
+  <td><input type="text" class="form-control" value="14.20"></td>
+  <td><input type="text" class="form-control" disabled value="20 Min"></td>
+  <td><input type="text" class="form-control" value="200"></td>
+  <td><input type="text" class="form-control" value="250"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="300"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="350"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="350"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="1000"></td>
+  <td><input type="text" class="form-control" placeholder="Pts" value="500"></td>
+  <td>
+  <select class="form-control select2">
+  <option label="Choose one"></option>
+  <option value="1">Good</option>
+  <option value="2" selected>Avg</option>
+  <option value="3">Bad</option>
+  </select>
+  </td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i data-target="machine-performance-drying-line" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+  const machinePerformanceCuttingLineRow = `
+  <td>1</td>
+  <td>Liquid</td>
+  <td>0124</td>
+  <td>1252</td>
+  <td>1555</td>
+  <td>14.00</td>
+  <td>14.20</td>
+  <td>20</td>
+  <td>200</td>
+  <td>250</td>
+  <td>300</td>
+  <td>350</td>
+  <td>350</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>350</td>
+  <td>1000</td>
+  <td>500</td>
+  <td>Avg</td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i onclick="javascript:toEdit(this)" data-target="machine-performance-cutting-line" class="fa fa-edit"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+  const machinePerformanceCuttingLineEditRow = `
+  <td><input type="text" class="form-control" value="1" disabled></td>
+  <td><input type="text" class="form-control" value="Liquid"></td>
+  <td><input type="text" class="form-control" value="0124"></td>
+  <td><input type="text" class="form-control" value="1252"></td>
+  <td><input type="text" class="form-control" value="1555"></td>
+  <td><input type="text" class="form-control" value="14.00"></td>
+  <td><input type="text" class="form-control" value="14.20"></td>
+  <td><input type="text" class="form-control" disabled value="20 Min"></td>
+  <td><input type="text" class="form-control" value="200"></td>
+  <td><input type="text" class="form-control" value="250"></td>
+  <td><input type="text" class="form-control" value="300"></td>
+  <td><input type="text" class="form-control" value="350"></td>
+  <td><input type="text" class="form-control" value="350"></td>
+  <td><input type="text" class="form-control" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td><input type="text" class="form-control" placeholder="Avg(mm)" value="350"></td>
+  <td><input type="text" class="form-control" placeholder="Avg(Bar)" value="1000"></td>
+  <td><input type="text" class="form-control" value="500"></td>
+  <td><input type="text" class="form-control" value="Avg"></td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i data-target="machine-performance-cutting-line" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+  function toEdit(button) {
+    const target = $(button).data("target");
+    switch (target) {
+      case "machine-problem-1":
+      $(button).parents("tr").html(machineProblemEditRow("1"));
+      break;
+      case "machine-problem-2":
+      $(button).parents("tr").html(machineProblemEditRow("2"));
+      break;
+      case "machine-problem-3":
+      $(button).parents("tr").html(machineProblemEditRow("3"));
+      break;
+      case "machine-performance-addback-line-1":
+      $(button).parents("tr").html(machinePerformanceAddbackLineEditRow("1"));
+      break;
+      case "machine-performance-addback-line-2":
+      $(button).parents("tr").html(machinePerformanceAddbackLineEditRow("2"));
+      break;
+      case "machine-performance-drying-line":
+      $(button).parents("tr").html(machinePerformanceDryingLineEditRow);
+      break;
+      case "machine-performance-cutting-line":
+      $(button).parents("tr").html(machinePerformanceCuttingLineEditRow);
+      break;
+    }
+  }
+  function toNormal(button) {
+    const target = $(button).data("target");
+    switch (target) {
+      case "machine-problem-1":
+      $(button).parents("tr").html(machineProblemRow("1"));
+      break;
+      case "machine-problem-2":
+      $(button).parents("tr").html(machineProblemRow("2"));
+      break;
+      case "machine-problem-3":
+      $(button).parents("tr").html(machineProblemRow("3"));
+      break;
+      case "machine-performance-addback-line-1":
+      $(button).parents("tr").html(machinePerformanceAddbackLineRow("1"));
+      break;
+      case "machine-performance-addback-line-2":
+      $(button).parents("tr").html(machinePerformanceAddbackLineRow("2"));
+      break;
+      case "machine-performance-drying-line":
+      $(button).parents("tr").html(machinePerformanceDryingLineRow);
+      break;
+      case "machine-performance-cutting-line":
+      $(button).parents("tr").html(machinePerformanceCuttingLineRow);
+      break;
+    }
+  }
+  function addRow(button) {
+    const target = $(button).data("target");
+    switch (target) {
+      case "machine-problem-1":
+      $("#" + target).append($(`<tr>${machineProblemRow("1")}</tr>`));
+      break;
+      case "machine-problem-2":
+      $("#" + target).append($(`<tr>${machineProblemRow("2")}</tr>`));
+      break;
+      case "machine-problem-3":
+      $("#" + target).append($(`<tr>${machineProblemRow("3")}</tr>`));
+      break;
+      case "machine-performance-addback-line-1":
+      $("#" + target).append($(`<tr>${machinePerformanceAddbackLineRow("1")}</tr>`));
+      break;
+      case "machine-performance-addback-line-2":
+      $("#" + target).append($(`<tr>${machinePerformanceAddbackLineRow("2")}</tr>`));
+      break;
+      case "machine-performance-drying-line":
+      $("#" + target).append($(`<tr>${machinePerformanceDryingLineRow}</tr>`));
+      break;
+      case "machine-performance-cutting-line":
+      $("#" + target).append($(`<tr>${machinePerformanceCuttingLineRow}</tr>`));
+      break;
+    }
+  }
+  function removeRow(button) {
+    $(button).parents("tr").remove();
+  }
+  $(document).ready(function () {
+    $('.tableWrapper thead tr').each(function(){
+      const top = $(this).position().top;
+      $(this).children().css({"top": top});
+    });
+    $("#line-tabs li").click(function () {
+      $(this).siblings().children().removeClass("active");
+      $(this).children().toggleClass("active");
+      const index = $(this).index() + 1;
+      $("#lines .carousel-item.active").removeClass("active");
+      const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+      $(carouselItem).toggleClass("active");
+      $(carouselItem).find('.tableWrapper thead tr').each(function(){
+        const top = $(this).position().top;
+        $(this).children().css({"top": top});
+      });
+    });
+  });
+</script>
+}

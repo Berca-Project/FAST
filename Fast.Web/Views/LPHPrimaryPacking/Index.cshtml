@@ -1,0 +1,1592 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow:hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Packing</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH Packing</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                @if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+                {
+                    @: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+                }
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" class="form-control" disabled value="Thu / 05-Sep-19">
+                                </div>
+                                <label class="col-2 col-form-label tx-right">Week</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" disabled value="22">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Machine</label>
+                                <div class="col-4">
+                                    <input type="text" class="form-control" disabled value="F52">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Prodtech</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="80404805 - Agung Dwi Prasetyo">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Foreman</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Mekanik</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="80011429 - Jono">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Electric</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="80011827 - Djasmadi">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Shift / Group</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control" disabled value="3">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control" disabled value="C">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Start / Stop</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStart" class="form-control" value="22:00">
+                                    </div>
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStop" class="form-control" value="06:00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Machine Problems
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Downtime</th>
+                                        <th>Problem</th>
+                                        <th>Description</th>
+                                        <th style="width:6%;">Start</th>
+                                        <th style="width:6%;">End</th>
+                                        <th style="width:6%;">Duration</th>
+                                        <th>PIC</th>
+                                        <th>Status</th>
+                                        <th>Action Plan</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>180 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="machine-problem">
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">301 Minor Stop</option>
+                                                <option value="302">302 xxxxx xxxx</option>
+                                                <option value="303">400 xxxxx xxxx</option>
+                                                <option value="304">500 xxxxx xxxx</option>
+                                                <option value="305">600 xxxxx xxxx</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Done</option>
+                                                <option value="2">On Progres</option>
+                                                <option value="3">Pending</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">SLAC</option>
+                                                <option value="302">CBM</option>
+                                                <option value="303">PM</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="width: 10px;">No.</th>
+                                        <th style="width: 120px;">Blend</th>
+                                        <th style="width: 140px;">No. Ops</th>
+                                        <th style="width: 90px;">Silo Asal</th>
+                                        <th style="width: 90px;">Box C48</th>
+                                        <th style="width: 70px;">Start</th>
+                                        <th style="width: 70px;">Stop</th>
+                                        <th style="width: 80px;">Total</th>
+                                        <th style="width: 50px;">Hasil</th>
+                                        <th style="width: 50px;">Sisa</th>
+                                        <th style="width: 80px;">Qty/Box</th>
+                                        <th style="width: 80px;">Total Qty</th>
+                                        <th width="70px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>150 Min</td>
+                                        <td>1290</td>
+                                        <td>60</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="machine-performance">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>VOCGI</td>
+                                        <td>119092406</td>
+                                        <td>2406</td>
+                                        <td></td>
+                                        <td>06:10</td>
+                                        <td>07:00</td>
+                                        <td>50 Min</td>
+                                        <td>430</td>
+                                        <td>20</td>
+                                        <td>20</td>
+                                        <td>8600</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>VOCGI</td>
+                                        <td>119092406</td>
+                                        <td>2406</td>
+                                        <td></td>
+                                        <td>06:10</td>
+                                        <td>07:00</td>
+                                        <td>50 Min</td>
+                                        <td>430</td>
+                                        <td>20</td>
+                                        <td>20</td>
+                                        <td>8600</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>VOCGI</td>
+                                        <td>119092406</td>
+                                        <td>2406</td>
+                                        <td></td>
+                                        <td>06:10</td>
+                                        <td>07:00</td>
+                                        <td>50 Min</td>
+                                        <td>430</td>
+                                        <td>20</td>
+                                        <td>20</td>
+                                        <td>8600</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" value="4" disabled></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" value="0 Min" disabled></td>
+                                        <td><input type="text" class="form-control" placeholder="Box"></td>
+                                        <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                        <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                        <td><input type="text" class="form-control" placeholder="Kg"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-performance" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Sampling Timbang ulang Line 700</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 10px;">No</th>
+                                        <th style="width: 120px;">No Box</th>
+                                        <th style="width: 140px;">Label</th>
+                                        <th style="width: 90px;">Tbg Ulang</th>
+                                        <th style="width: 90px;">Error</th>
+                                        <th style="width: 70px;">Average</th>
+                                        <th width="70px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>150</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="sampling-timbang-700">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>35</td>
+                                        <td>Box 700</td>
+                                        <td>50</td>
+                                        <td>0.2</td>
+                                        <td>0.3</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-700" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>35</td>
+                                        <td>Box 700</td>
+                                        <td>50</td>
+                                        <td>0.2</td>
+                                        <td>0.3</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-700" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>35</td>
+                                        <td>Box 700</td>
+                                        <td>50</td>
+                                        <td>0.2</td>
+                                        <td>0.3</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-700" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" value="4" disabled></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" value="0" disabled></td>
+                                        <td><input type="text" class="form-control" value="0" disabled></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="sampling-timbang-700" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Sampling Timbang ulang Line 710</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 10px;">No</th>
+                                        <th style="width: 120px;">No Box</th>
+                                        <th style="width: 140px;">Label</th>
+                                        <th style="width: 90px;">Tbg Ulang</th>
+                                        <th style="width: 90px;">Error</th>
+                                        <th style="width: 70px;">Average</th>
+                                        <th width="70px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>150</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="sampling-timbang-710">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>35</td>
+                                        <td>Box 710</td>
+                                        <td>50</td>
+                                        <td>0.2</td>
+                                        <td>0.3</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-710" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>35</td>
+                                        <td>Box 710</td>
+                                        <td>50</td>
+                                        <td>0.2</td>
+                                        <td>0.3</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-710" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>35</td>
+                                        <td>Box 710</td>
+                                        <td>50</td>
+                                        <td>0.2</td>
+                                        <td>0.3</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-710" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" value="4" disabled></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" value="0" disabled></td>
+                                        <td><input type="text" class="form-control" value="0" disabled></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="sampling-timbang-710" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Addback</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 10px;">No</th>
+                                        <th style="width: 120px;">Blend</th>
+                                        <th style="width: 140px;">No. Ops</th>
+                                        <th width="80px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="addback">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>AA18C</td>
+                                        <td>119092406</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="addback" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>AA18C</td>
+                                        <td>119092101</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="addback" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>AA18C</td>
+                                        <td>119092406</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="addback" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" value="4" disabled></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="addback" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Clove</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 120px;">No. Ops</th>
+                                        <th style="width: 80;">Wighcon</th>
+                                        <th width="80px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>300</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="clove">
+                                    <tr>
+                                        <td>119092406</td>
+                                        <td>100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="clove" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>119092101</td>
+                                        <td>100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="clove" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>119092406</td>
+                                        <td>100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="clove" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="clove" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Flavor Solution</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 120px;">No. Ops</th>
+                                        <th style="width: 80;">Wighcon</th>
+                                        <th width="80px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>300</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="flavor-solution">
+                                    <tr>
+                                        <td>119092101</td>
+                                        <td>100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="flavor-solution" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>119092101</td>
+                                        <td>100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="flavor-solution" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>119092101</td>
+                                        <td>100</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="flavor-solution" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="flavor-solution" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Small Lamina</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 120px;">Code </th>
+                                        <th style="width: 80;">Qty</th>
+                                        <th width="80px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>90</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="small-lamina">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>30</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="small-lamina" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>30</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="small-lamina" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>30</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="small-lamina" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="small-lamina" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col">
+                                    <center>
+                                        <img data-toggle="modal" data-target="#single-photo-modal" src="~/Content/dashforge/assets/img/upload-img-mini.png" class="rounded mx-auto d-block" alt="insert image" width="auto">
+                                        <label class="col-12 col-form-label"><i>Label Flavor </i></label>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-9 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Addback Out Of Spec/Reclaim</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 100px;">No Ops/PJ </th>
+                                        <th style="width: 60px;">Code</th>
+                                        <th style="width: 40px;">Weighcon</th>
+                                        <th style="width: 80px;">No Box</th>
+                                        <th style="width: 100px;">Tanggal</th>
+                                        <th>WPP Addback</th>
+                                        <th style="width: 110px;">Tot. Addback</th>
+                                        <th>Kondisi Addback</th>
+                                        <th width="80px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td>600</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>72</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="addback-reclaim">
+                                    <tr>
+                                        <td>119092406</td>
+                                        <td>2406</td>
+                                        <td>200</td>
+                                        <td>24</td>
+                                        <td>02-Oct-19</td>
+                                        <td>-</td>
+                                        <td>24</td>
+                                        <td>-</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="addback-reclaim" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>119092406</td>
+                                        <td>2406</td>
+                                        <td>200</td>
+                                        <td>24</td>
+                                        <td>02-Oct-19</td>
+                                        <td>-</td>
+                                        <td>24</td>
+                                        <td>-</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="addback-reclaim" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>119092406</td>
+                                        <td>2406</td>
+                                        <td>200</td>
+                                        <td>24</td>
+                                        <td>02-Oct-19</td>
+                                        <td>-</td>
+                                        <td>24</td>
+                                        <td>-</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="addback-reclaim" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Yes</option>
+                                                <option value="2">No</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Ok</option>
+                                                <option value="2">Not Ok</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="addback-reclaim" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bagas</td>
+                                    <td>Requester</td>
+                                    <td>Submit to Supervisor</td>
+                                    <td>05-Sep-19 13:15</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagus</td>
+                                    <td>Supervisor</td>
+                                    <td>Confirmed</td>
+                                    <td>05-Sep-19 13:25</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!--APPROVAL SEGMENT-->
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+
+<div class="modal fade" id="single-photo-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5>Input Image</h5>
+                <hr>
+                <center>
+                    <img src="~/Content/dashforge/assets/img/upload-img-mini.png" class="rounded mx-auto d-block" alt="insert image" width="auto">
+                    <textarea style="border:1px solid lightgray;border-radius: 5px;width:80%; margin:20px"></textarea>
+                </center>
+
+                <hr>
+                <div>
+                    <button type="button" class="btn btn-xs btn-primary next" style="float:right">Next</button>
+                    <button type="button" class="btn btn-xs btn-white cancel" data-dismiss="modal" style="float:right;margin-right:10px">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <div class="stepper row">
+                    <div class="stepper-step col active">
+                        <a class="btn stepper-btn">1</a>
+                        <p><small>Take For</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">2</a>
+                        <p><small>Take Picture</small></p>
+                    </div>
+                </div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Take For</h5>
+                            <hr />
+                            <center>
+                                <button type="button" class="wizard-button btn btn-primary">Label Flavor</button>
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Take Picture</h5>
+                            <hr />
+                            <center>
+                                <img src="~/Content/dashforge/assets/img/upload-img-mini.png" class="rounded mx-auto d-block" alt="insert image" width="auto">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button type="button" class="btn btn-xs btn-primary next" style="float:right">Next</button>
+                    <button type="button" class="btn btn-xs btn-white cancel" data-dismiss="modal" style="float:right;margin-right:10px">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    
+  <script>
+    $(function(){
+      'use strict'
+
+      var inputTime1 = new Cleave('#inputTime1', {
+        time: true,
+        timePattern: ['h', 'm']
+      });
+      var inputTime2 = new Cleave('#inputTime2', {
+        time: true,
+        timePattern: ['h', 'm']
+      });
+      var inputTime3 = new Cleave('#inputTime3', {
+        time: true,
+        timePattern: ['h', 'm']
+      });
+
+      $('.select2').select2({
+        placeholder: 'Choose one',
+        searchInputPlaceholder: 'Search options'
+      });
+    })
+  </script>
+  <script>const machineProblemRow = `<td>301 Minor Stop</td><td>Bobbin Putus</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+      const machineProblemEditRow = `<td><select class="form-control select2"><option label="Choose one"></option><option value="301" selected>301 Minor Stop</option><option value="302">302 xxxxx xxxx</option><option value="303">400 xxxxx xxxx</option><option value="304">500 xxxxx xxxx</option><option value="305">600 xxxxx xxxx</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem" class="fa fa-trash"></i></td>`;
+      const machinePerformanceRow = `
+                    <td>1</td>
+                    <td>VOCGI</td>
+                    <td>119092406</td>
+                    <td>2406</td>
+                    <td></td>
+                    <td>06:10</td>
+                    <td>07:00</td>
+                    <td>50 Min</td>
+                    <td>430</td>
+                    <td>20</td>
+                    <td>20</td>
+                    <td>8600</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const machinePerformanceEditRow = `
+                    <td><input type="text" class="form-control" value="1" disabled></td>
+                    <td><input type="text" class="form-control" value="VOCGI"></td>
+                    <td><input type="text" class="form-control" value="119092406"></td>
+                    <td><input type="text" class="form-control" value="2406"></td>
+                    <td><input type="text" class="form-control" value=""></td>
+                    <td><input type="text" class="form-control" value="06:10"></td>
+                    <td><input type="text" class="form-control" value="07:00"></td>
+                    <td><input type="text" class="form-control" value="50 Min" disabled></td>
+                    <td><input type="text" class="form-control" placeholder="Box" value="430"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg" value="20"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg" value="20"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg" value="8600"></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="machine-performance" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const samplingTimbang700Row = `
+                    <td>1</td>
+                    <td>35</td>
+                    <td>Box 700</td>
+                    <td>50</td>
+                    <td>0.2</td>
+                    <td>0.3</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-700" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const samplingTimbang700EditRow = `
+                    <td><input type="text" class="form-control" value="1" disabled></td>
+                    <td><input type="text" class="form-control" value="35"></td>
+                    <td><input type="text" class="form-control" value="Box 700"></td>
+                    <td><input type="text" class="form-control" value="50"></td>
+                    <td><input type="text" class="form-control" value="0.2" disabled></td>
+                    <td><input type="text" class="form-control" value="0.3" disabled></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="sampling-timbang-700" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const samplingTimbang710Row = `
+                    <td>1</td>
+                    <td>35</td>
+                    <td>Box 710</td>
+                    <td>50</td>
+                    <td>0.2</td>
+                    <td>0.3</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="sampling-timbang-710" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const samplingTimbang710EditRow = `
+                    <td><input type="text" class="form-control" value="1" disabled></td>
+                    <td><input type="text" class="form-control" value="35"></td>
+                    <td><input type="text" class="form-control" value="Box 710"></td>
+                    <td><input type="text" class="form-control" value="50"></td>
+                    <td><input type="text" class="form-control" value="0.2" disabled></td>
+                    <td><input type="text" class="form-control" value="0.3" disabled></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="sampling-timbang-710" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const addbackRow = `
+                    <td>4</td>
+                    <td>AA18C</td>
+                    <td>119092101</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="addback" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const addbackEditRow = `
+                    <td><input type="text" class="form-control" value="4" disabled></td>
+                    <td><input type="text" class="form-control" value="AA18C"></td>
+                    <td><input type="text" class="form-control" value="119092101"></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="addback" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const cloveRow = `
+                    <td>119092101</td>
+                    <td>100</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="clove" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const cloveEditRow = `
+                    <td><input type="text" class="form-control" value="119092101"></td>
+                    <td><input type="text" class="form-control" value="100"></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="clove" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const flavorSolutionRow = `
+                    <td>119092101</td>
+                    <td>100</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="flavor-solution" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const flavorSolutionEditRow = `
+                    <td><input type="text" class="form-control" value="119092101"></td>
+                    <td><input type="text" class="form-control" value="100"></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="flavor-solution" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const smallLaminaRow = `
+                    <td>4</td>
+                    <td>35</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="small-lamina" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const smallLaminaEditRow = `
+                    <td><input type="text" class="form-control" value="4"></td>
+                    <td><input type="text" class="form-control" value="35"></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="small-lamina" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const addbackReclaimRow = `
+                    <td>119092406</td>
+                    <td>2406</td>
+                    <td>200</td>
+                    <td>24</td>
+                    <td>02-Oct-19</td>
+                    <td>-</td>
+                    <td>24</td>
+                    <td>-</td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i onclick="javascript:toEdit(this)" data-target="addback-reclaim" class="fa fa-edit"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+      const addbackReclaimEditRow = `
+                    <td><input type="text" class="form-control" value="119092406"></td>
+                    <td><input type="text" class="form-control" value="2406"></td>
+                    <td><input type="text" class="form-control" value="200"></td>
+                    <td><input type="text" class="form-control" value="24"></td>
+                    <td><input type="text" class="form-control" value="02-Oct-19"></td>
+                    <td><select class="form-control select2">
+                    <option label="Choose one"></option>
+                    <option value="301">301 Minor Stop</option>
+                    <option value="302">302 xxxxx xxxx</option>
+                    <option value="303">400 xxxxx xxxx</option>
+                    <option value="304">500 xxxxx xxxx</option>
+                    <option value="305">600 xxxxx xxxx</option>
+                    </select></td>
+                    <td><input type="text" class="form-control" value="24"></td>
+                    <td><select class="form-control select2">
+                    <option label="Choose one"></option>
+                    <option value="301">301 Minor Stop</option>
+                    <option value="302">302 xxxxx xxxx</option>
+                    <option value="303">400 xxxxx xxxx</option>
+                    <option value="304">500 xxxxx xxxx</option>
+                    <option value="305">600 xxxxx xxxx</option>
+                    </select></td>
+                    <td class="tx-center">
+                    <div class="btn-group">
+                    <i data-target="addback-reclaim" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                    </div>
+                    </td>`;
+
+      function toEdit(button) {
+          const target = $(button).data("target");
+          switch (target) {
+              case "machine-problem":
+                  $(button).parents("tr").html(machineProblemEditRow);
+                  break;
+              case "machine-performance":
+                  $(button).parents("tr").html(machinePerformanceEditRow);
+                  break;
+              case "sampling-timbang-700":
+                  $(button).parents("tr").html(samplingTimbang700EditRow);
+                  break;
+              case "sampling-timbang-710":
+                  $(button).parents("tr").html(samplingTimbang710EditRow);
+                  break;
+              case "addback":
+                  $(button).parents("tr").html(addbackEditRow);
+                  break;
+              case "clove":
+                  $(button).parents("tr").html(cloveEditRow);
+                  break;
+              case "flavor-solution":
+                  $(button).parents("tr").html(flavorSolutionEditRow);
+                  break;
+              case "small-lamina":
+                  $(button).parents("tr").html(smallLaminaEditRow);
+                  break;
+              case "addback-reclaim":
+                  $(button).parents("tr").html(addbackReclaimEditRow);
+                  break;
+          }
+      }
+      function toNormal(button) {
+          const target = $(button).data("target");
+          switch (target) {
+              case "machine-problem":
+                  $(button).parents("tr").html(machineProblemRow);
+                  break;
+              case "machine-performance":
+                  $(button).parents("tr").html(machinePerformanceRow);
+                  break;
+              case "sampling-timbang-700":
+                  $(button).parents("tr").html(samplingTimbang700Row);
+                  break;
+              case "sampling-timbang-710":
+                  $(button).parents("tr").html(samplingTimbang710Row);
+                  break;
+              case "addback":
+                  $(button).parents("tr").html(addbackRow);
+                  break;
+              case "clove":
+                  $(button).parents("tr").html(cloveRow);
+                  break;
+              case "flavor-solution":
+                  $(button).parents("tr").html(flavorSolutionRow);
+                  break;
+              case "small-lamina":
+                  $(button).parents("tr").html(smallLaminaRow);
+                  break;
+              case "addback-reclaim":
+                  $(button).parents("tr").html(addbackReclaimRow);
+                  break;
+          }
+      }
+      function addRow(button) {
+          const target = $(button).data("target");
+          switch (target) {
+              case "machine-problem":
+                  $("#" + target).append($(`<tr>${machineProblemRow}</tr>`));
+                  break;
+              case "machine-performance":
+                  $("#" + target).append($(`<tr>${machinePerformanceRow}</tr>`));
+                  break;
+              case "sampling-timbang-700":
+                  $("#" + target).append($(`<tr>${samplingTimbang700Row}</tr>`));
+                  break;
+              case "sampling-timbang-710":
+                  $("#" + target).append($(`<tr>${samplingTimbang710Row}</tr>`));
+                  break;
+              case "addback":
+                  $("#" + target).append($(`<tr>${addbackRow}</tr>`));
+                  break;
+              case "clove":
+                  $("#" + target).append($(`<tr>${cloveRow}</tr>`));
+                  break;
+              case "flavor-solution":
+                  $("#" + target).append($(`<tr>${flavorSolutionRow}</tr>`));
+                  break;
+              case "small-lamina":
+                  $("#" + target).append($(`<tr>${smallLaminaRow}</tr>`));
+                  break;
+              case "addback-reclaim":
+                  $("#" + target).append($(`<tr>${addbackReclaimRow}</tr>`));
+                  break;
+          }
+      }
+      function removeRow(button) {
+          $(button).parents("tr").remove();
+      }
+      $(document).ready(function () {
+          $('.tableWrapper thead tr').each(function () {
+              const top = $(this).position().top;
+              $(this).children().css({ "top": top });
+          });
+          $(".wizard-button").click(function () {
+              $(".wizard-button").removeClass("active");
+              $(this).toggleClass("active");
+              selected = $(this).html();
+          });
+          $(".wizard-modal .next").click(function () {
+              const modal = $(this).parents(".modal");
+              const carousel = $(modal).find('.carousel');
+              const stepper = $(modal).find('.stepper');
+              $(carousel).carousel('next');
+              const index = $(carousel).find('.carousel-item').siblings('.active').index();
+              $(stepper).children('.active').removeClass("active");
+              $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+          });
+          $('.wizard-modal').on('hidden.bs.modal', function (e) {
+              const carousel = $(this).find('.carousel');
+              const stepper = $(this).find('.stepper');
+              $(this).modal('hide');
+              $(this).find('.active').removeClass("active");
+              $(stepper).children(".stepper-step:first-child").toggleClass("active");
+              $(carousel).find(".carousel-item:first-child").toggleClass("active");
+              $(this).children('.next').html("Next");
+          });
+          $("#photo-modal .next").click(function () {
+              if (!selected) return;
+              const index = $(carousel).find('.carousel-item').siblings('.active').index();
+              switch (index) {
+                  case 0:
+                      $(this).html("Add");
+                      selectedPhotoCategory = selected;
+                      break;
+                  case 1:
+                      $(modal).modal('hide');
+                      break;
+              }
+          });
+          $('#photo-modal').on('hidden.bs.modal', function (e) {
+              selectedPhotoCategory = null;
+              selected = null;
+          });
+      });</script>
+}
+
+
+

@@ -1,0 +1,240 @@
+﻿@model Fast.Web.Models.ChecklistModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: inherit;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">CMS Checklist</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">CMS Checklist</h4>
+            </div>
+            <div class="d-none d-md-block tx-right">
+                <div>
+                    <a class="btn pd-x-15 btn-primary btn-uppercase mg-l-20px" href="@Url.Action("Create","Checklist")"><i data-feather="plus" class="wd-10 mg-r-5"></i> @UIResources.Create</a>
+                    <select id="select_source" class="form-control wd-300-f d-inline">
+                        <option value="">Show Checklists on My Location</option>
+                        <option value="GetAll" @(ViewBag.FilterMode == 1 ? "selected" : "")>Show All Checklists</option>
+                        <option value="Location" @(ViewBag.FilterMode == 2 ? "selected" : "")>Show by Filter Location</option>
+                    </select>
+                </div>
+                <div id="location_detail" class="mg-t-10 wd-700" style="display:none">
+                    <div class="row">
+                        <div class="col-3 p-0"><select name="Location1" class="form-control selection-location"></select></div>
+                        <div class="col-3 p-0"><select name="Location2" class="form-control selection-department"></select></div>
+                        <div class="col-3 p-0"><select name="Location3" class="form-control selection-subdepartment"></select></div>
+                        <div class="col-3 pd-t-0 pd-m-0"><button class="btn btn-primary w-100" id="search_by_location"><i data-feather="search" class="wd-10 mg-r-5"></i> SEARCH</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="df-example demo-table">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered" id="do_datatable">
+                                <thead class="thead-primary font-weight-bold">
+                                    <tr>
+                                        <th width="120px">ID</th>
+                                        <th>Menu Title</th>
+                                        <th>Header</th>
+                                        <th>Creator</th>
+                                        <th width="180px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Checklists != null)
+                                    {
+                                        foreach (Fast.Web.Models.ChecklistModel checklist in ViewBag.Checklists)
+                                        {
+                                            Int32 unixTimestamp = (Int32)(Convert.ToDateTime(checklist.ModifiedDate).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+                                            <tr>
+                                                <td><a href="@Url.Action("Generated/"+checklist.ID,"Checklist")">@unixTimestamp</a></td>
+                                                <td>@checklist.MenuTitle</td>
+                                                <td>@checklist.Header</td>
+                                                <td>@(checklist.Creator == null?"-":checklist.Creator.FullName)</td>
+                                                <td class="text-center">
+                                                    <a class="btn-default tx-black mg-r-10" title="Go to Generated Checklist" href="@Url.Action("Generated/"+checklist.ID,"Checklist")"><i class="fa fa-eye"></i></a>
+                                                    <a class="btn-default tx-black mg-r-10" title="Submit History" href="@Url.Action("History/"+checklist.ID,"Checklist")"><i class="fa fa-history"></i></a>
+                                                    <a class="btn-default tx-black mg-r-10" title="Report" href="@Url.Action("Report/"+checklist.ID,"Checklist")"><i class="fa fa-chart-bar"></i></a>
+                                                    @if (ViewBag.isAdmin == true || checklist.CreatorEmployeeID == ViewBag.MyEmpolyeeID)
+                                                    {
+                                                        <a class="btn-default tx-black mg-r-10" title="Edit Checklist" href="@Url.Action("Edit/"+checklist.ID,"Checklist")"><i class="fa fa-edit"></i></a>
+                                                        <a class="btn-default tx-black" title="Remove Checklist" href="@Url.Action("Delete/"+checklist.ID,"Checklist")" onclick="return confirm('Do you really want to delete this item?')"><i class="fa fa-trash"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#select_source').change(function () {
+                var url = "@(Url.Action("Index","Checklist"))";
+                if ($(this).val() == "GetAll") {
+                    url += "?data=GetAll";
+                    window.location = url;
+                } else if ($(this).val() == "Location") {
+                    $('#location_detail').show();
+                } else {
+                    window.location = url;
+                }
+            })
+
+            $('#search_by_location').click(function () {
+                var url = "@(Url.Action("Index","Checklist"))?data=Location&location1="+$('.selection-location').val()+"&location2="+$('.selection-department').val()+"&location3="+$('.selection-subdepartment').val();
+                window.location = url;
+            })
+
+            $('#do_datatable').DataTable({
+                //responsive: true,
+                language: {
+                    searchPlaceholder: 'Search...',
+                    sSearch: '',
+                    lengthMenu: '_MENU_ items/page',
+                }
+            });
+            $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+
+            console.log(LocationTree);
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose "></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value='+LocationTree.ProductionCenters[i].LocationID+'>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            $('.selection-location').select2({
+                width: "100%",
+              placeholder: 'Select Location',
+              searchInputPlaceholder: 'Search options'
+            });
+
+            $('.selection-department, .selection-subdepartment').select2({width: "100%"});
+
+            var locat_selected;
+            $(document).on("change",".selection-location",function(){
+                locat_selected = $(this).select2("val");
+                console.log(locat_selected);
+
+                $('.selection-department').select2('destroy');
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        select_depart.append('<optgroup label="'+LocationTree.ProductionCenters[i].Description+'">')
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                        select_depart.append('</optgroup>')
+                    }
+                }
+
+                $('.selection-department').select2({
+                    width: "100%",
+                  placeholder: 'Select Department',
+                  searchInputPlaceholder: 'Search options'
+                });
+                $('.selection-subdepartment').select2();
+            });
+
+            $(document).on("change",".selection-department",function(){
+                var department_selected = $(this).select2("val");
+                console.log(department_selected);
+
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                select_subdepart.append('<optgroup label="' + LocationTree.ProductionCenters[i].Description+ " - " + LocationTree.ProductionCenters[i].Departments[j].Description + '">')
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                                select_subdepart.append('</optgroup>')
+                            }
+                        }
+                    }
+                }
+
+                $('.selection-subdepartment').select2({
+                    width: "100%",
+                  placeholder: 'Select Sub Department',
+                  searchInputPlaceholder: 'Search options'
+                });
+            });
+
+
+            var location1 = getUrlParameter('location1');
+            if (typeof location1 !== "undefined") {
+                $('#location_detail').show();
+                $('.selection-location').val(location1).change();
+
+                var location2 = getUrlParameter('location2');
+                if (typeof location2 !== "undefined") {
+                    $('.selection-department').val(location2).change();
+
+                    var location3 = getUrlParameter('location3');
+                    if (typeof location3 !== "undefined") {
+                        $('.selection-subdepartment').val(location3).change();
+                    }
+                }
+            }
+        });
+    </script>
+}

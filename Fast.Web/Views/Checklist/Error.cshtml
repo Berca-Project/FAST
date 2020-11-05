@@ -1,0 +1,36 @@
+﻿@using Fast.Web.Resources;
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Error</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Error</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="df-example demo-table">
+                    <div class="card">
+                        <div class="card-body">
+                            @if (ViewBag.Code == 1)
+                            {
+                                <b>Your Employee ID not recorded in FAST Application, please contact Support Team</b>
+                            }
+                            else
+                            {
+                                <b>Your Supervisor1 or Supervisor2 is empty, please contact Support Team</b>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->

@@ -1,0 +1,838 @@
+﻿@model Fast.Web.Models.ReferenceTreeModel
+@using Fast.Web.Resources;
+@section CSS_lib{
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/styles.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/jquery.treegrid.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/default.min.css" />
+}
+@section Styles{
+	<style>
+		.tableWrapper thead th {
+			position: sticky;
+			top: 0;
+		}
+
+		.tableWrapper {
+			overflow-y: auto;
+			max-height: 150px;
+		}
+
+		.tableWrapper table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		.tableWrapper thead th, .tableWrapper thead td {
+			position: sticky;
+			background: #066fcb;
+			z-index: 100;
+			border: none;
+		}
+
+		.tableWrapper table tfoot td {
+			position: sticky;
+			bottom: 0;
+			z-index: 100;
+		}
+
+		.tableWrapper .input td {
+			background: white;
+		}
+
+		.tableWrapper .summary-body td {
+			font-weight: bold;
+			background-color: #d8eafe;
+			color: #000;
+		}
+
+		.fa {
+			padding: 5px;
+			cursor: pointer;
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.ReferenceList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.ReferenceManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					@if (Model.Access.hasPrint)
+					{
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+						<div id="buttonprint" class="dtButton"></div>
+					}
+					@if (Model.Access.hasWrite)
+					{
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="AddActions()" data-toggle="modal" data-target="#modalAddReference">
+							<i data-feather="plus" class="mg-r-5"></i> @UIResources.NEW
+						</button>
+					}
+				</div>
+			</div>
+		</div>
+		<div data-label="Example" class="df-example demo-table dtMarginTop">
+			<table class="tree table-bordered">
+				<thead>
+					<tr class="headerTree">
+						<th>@UIResources.Name</th>
+						<th>@UIResources.Purpose</th>
+						<th>@UIResources.Code</th>
+						<th>@UIResources.Description</th>
+						@if (Model.Access.hasWrite)
+						{
+							<th>@UIResources.Action</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var parent in Model.Parents)
+					{
+						<tr class="treegrid-@parent.Name" title="parent">
+							<td>@parent.Name</td>
+							<td>@parent.Purpose</td>
+							@if (parent.ReferenceDetails.Count > 0)
+							{
+								if (parent.Name == "HT")
+								{
+									<td bgcolor="@parent.ReferenceDetails[0].Code">@parent.ReferenceDetails[0].Code</td>
+								}
+								else
+								{
+									<td>@parent.ReferenceDetails[0].Code</td>
+								}
+								<td>@parent.ReferenceDetails[0].Description</td>
+								if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditActions(@parent.ID, '@parent.Name', '@parent.Purpose')" data-toggle="modal" data-target="#modalAddReference" title="Edit"><i class="fa fa-edit"></i></button>
+										<button class="btn-menu btn-default" onclick="DeleteActions(@parent.ReferenceDetails[0].ID, '@parent.ReferenceDetails[0].Description')" data-toggle="modal" data-target="#modalDeleteReference" title="Delete"><i class="fa fa-trash-alt"></i></button>
+									</td>
+								}
+							}
+							else
+							{
+								<td>-</td>
+								<td>-</td>
+								if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditActions(@parent.ID, '@parent.Name', '@parent.Purpose')" data-toggle="modal" data-target="#modalAddReference" title="Edit"><i class="fa fa-edit"></i></button>
+										<button class="btn-menu btn-default" onclick="DeleteReferenceActions(@parent.ID, '@parent.Purpose')" data-toggle="modal" data-target="#modalDeleteReference" title="Delete"><i class="fa fa-trash-alt"></i></button>
+									</td>
+								}
+							}
+						</tr>
+						int x = 0;
+						foreach (var child in parent.ReferenceDetails)
+						{
+							if (x == 0) { x++; continue; }
+
+							<tr class="treegrid-@child.ID treegrid-parent-@parent.Name">
+								<td></td>
+								<td></td>
+								@if (parent.Name == "HT")
+								{
+									<td bgcolor="@child.Code">@child.Code</td>
+								}
+								else
+								{
+									<td>@child.Code</td>
+								}
+								<td>@child.Description</td>
+								@if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditActions(@parent.ID, '@parent.Name', '@parent.Purpose')" data-toggle="modal" data-target="#modalAddReference" title="Edit"><i class="fa fa-edit"></i></button>
+										<button class="btn-menu btn-default" onclick="DeleteActions(@child.ID, '@child.Description')" data-toggle="modal" data-target="#modalDeleteReference" title="Delete"><i class="fa fa-trash-alt"></i></button>
+									</td>
+								}
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalAddReference" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="archive" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddEditReference</h4>
+						<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+				<div class="row row-sm mg-b-10" id="divrefList">
+					<div class="col-2">
+						<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ReferenceType</label>
+					</div>
+					<div class="col-3">
+						@Html.DropDownListFor(p => p.ReferenceID, (IEnumerable<SelectListItem>)ViewBag.ReferenceList, new { @class = "form-control", @id = "ddlReference" })
+					</div>
+				</div>
+				<div id="divReference">
+					<div class="row row-sm mg-b-10">
+						<div class="col-2" id="divName">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Name</label>
+						</div>
+						<div class="col-3">
+							@Html.TextBoxFor(x => x.Name, null, new { @class = "form-control", @id = "tbName" })
+						</div>
+						<div class="col-2" id="divPurpose">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Purpose</label>
+						</div>
+						<div class="col-5">
+							@Html.TextBoxFor(x => x.Purpose, null, new { @class = "form-control", @id = "tbPurpose" })
+						</div>
+					</div>
+				</div>
+				<div class="row row-sm mg-b-10">
+					<div class="col-sm-12">
+						<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Reference Detail</label>
+						<div class="tableWrapper" style="max-height: 300px">
+							<table class="table table-bordered table-hover table-striped" id="addNewTable">
+								<thead class="thead-info">
+									<tr>
+										<th style="width:120px;">@UIResources.Code</th>
+										<th style="width:200px;">@UIResources.Description</th>
+										<th style="width:80px;">@UIResources.Action</th>
+									</tr>
+								</thead>
+								<tbody id="reference">
+								</tbody>
+								<tfoot>
+									<tr class="input">
+										<td id="tdCode"><input type="text" class="form-control" id="tbCode"></td>
+										<td><input type="text" class="form-control" id="tbDesc"></td>
+										<td class="tx-center"><i onclick="javascript:addRow(this)" data-target="reference" class="fa fa-plus-circle"></i></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+				<button type="button" class="btn btn-primary" id="btnCreate">@UIResources.Save</button>
+			</div>
+		</div>
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<script src="~/Content/theme/lib/jquery-treegrid/js/jquery.treegrid.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+
+			$('#divReferenceDetail').hide();
+			$('.tree').treegrid();
+
+			var result = "@ViewBag.Result";
+			var error = "@ViewBag.ErrorMessage";
+
+			if (result != "") {
+				if (result == "True") {
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: "@UIResources.CreateSucceed",
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					if (error == "") {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.CreateFailed",
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: error,
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			}
+		});
+
+		function toEdit(button) {
+			var $row = $(button).parents("tr");
+			var $tds = $row.find("td");
+
+			var code = $tds[0].innerText;
+			var desc = $tds[1].innerText;
+
+			if (code.indexOf("#") >= 0) {
+				const editRow = `
+				  <td id="${$tds[0].id}" bgcolor="${code}">
+					<select id="tbCode" class="form-control">
+					  <option value="#c0c0c0" style="background-color:#c0c0c0">#c0c0c0</option>
+					  <option value="#808080" style="background-color:#808080">#808080</option>
+					  <option value="#800000" style="background-color:#800000">#800000</option>
+				   	  <option value="#ff0000" style="background-color:#ff0000">#ff0000</option>
+					  <option value="#ff9224" style="background-color:#ff9224">#ff9224</option>
+					  <option value="#800080" style="background-color:#800080">#800080</option>
+					  <option value="#ff00ff" style="background-color:#ff00ff">#ff00ff</option>
+					  <option value="#ff90ff" style="background-color:#ff90ff">#ff90ff</option>
+					  <option value="#008000" style="background-color:#008000">#008000</option>
+					  <option value="#00ff00" style="background-color:#00ff00">#00ff00</option>
+					  <option value="#a4ff48" style="background-color:#a4ff48">#a4ff48</option>
+					  <option value="#808000" style="background-color:#808000">#808000</option>
+					  <option value="#ffff00" style="background-color:#ffff00">#ffff00</option>
+					  <option value="#ffff90" style="background-color:#ffff90">#ffff90</option>
+					  <option value="#000080" style="background-color:#000080">#000080</option>
+					  <option value="#0000ff" style="background-color:#0000ff">#0000ff</option>
+					  <option value="#008080" style="background-color:#008080">#008080</option>
+				      <option value="#00ffff" style="background-color:#00ffff">#00ffff</option>
+				      <option value="#833c0c" style="background-color:#833c0c">#833c0c</option>
+				      <option value="#c00000" style="background-color:#c00000">#c00000</option>
+				      <option value="#5b9bd5" style="background-color:#5b9bd5">#5b9bd5</option>
+					</select>
+				  </td>
+				  <td><input type="text" class="form-control" value="${desc}"></td>
+				  <td class="tx-center">
+				  <div class="btn-group">
+				  <i onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+				  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+				  </div>
+				  </td>`;
+
+				$(button).parents("tr").html(editRow);
+			} else {
+				const editRow = `
+				  <td id="${$tds[0].id}"><input type="text" class="form-control" value="${code}"></td>
+				  <td><input type="text" class="form-control" value="${desc}"></td>
+				  <td class="tx-center">
+				  <div class="btn-group">
+				  <i onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+				  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+				  </div>
+				  </td>`;
+
+				$(button).parents("tr").html(editRow);
+			}
+		}
+
+		function toNormal(button) {
+			var $row = $(button).parents("tr");
+			var $tds = $row.find("td");
+			var $inputs = $row.find("td input");
+			var code = {};
+			var desc = {};
+			if ($inputs.length > 1) {
+				code = $inputs[0].value;
+				desc = $inputs[1].value;
+			} else {
+				var $inputcolor = $row.find("td select");
+				code = $inputcolor[0].value;
+				desc = $inputs[0].value;
+			}
+
+			if (code.indexOf("#") >= 0) {
+				const updatedRow = `
+				  <td id="${$tds[0].id}" bgcolor="${code}">${code}</td>
+				  <td>${desc}</td>
+				  <td class="tx-center">
+				  <div class="btn-group">
+				  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+				  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+				  </div>
+				  </td>`;
+				$(button).parents("tr").html(updatedRow);
+			} else {
+				const updatedRow = `
+				  <td id="${$tds[0].id}">${code}</td>
+				  <td>${desc}</td>
+				  <td class="tx-center">
+				  <div class="btn-group">
+				  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+				  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+				  </div>
+				  </td>`;
+				$(button).parents("tr").html(updatedRow);
+			}
+		}
+
+		function addRow(button) {
+			if ($('#tbCode').val() == '' && $('#tbDesc').val() == '') {
+				alert('Please fill in the code and description fields');
+			} else {
+				if ($('#tbCode').val().indexOf("#") >= 0) {
+					const newRow = `
+					  <td id="0" bgcolor="${$('#tbCode').val()}">${$('#tbCode').val()}</td>
+					  <td>${$('#tbDesc').val()}</td>
+					  <td class="tx-center">
+					  <div class="btn-group">
+					  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+					  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+					  </div>
+					  </td>`;
+					const target = $(button).data("target");
+					$("#" + target).append($(`<tr>${newRow}</tr>`));
+				} else {
+					const newRow = `
+					  <td id="0">${$('#tbCode').val()}</td>
+					  <td>${$('#tbDesc').val()}</td>
+					  <td class="tx-center">
+					  <div class="btn-group">
+					  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+					  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+					  </div>
+					  </td>`;
+					const target = $(button).data("target");
+					$("#" + target).append($(`<tr>${newRow}</tr>`));
+				}
+				$('#tbCode').val('');
+				$('#tbDesc').val('');
+			}
+		}
+
+		function removeRow(button) {
+			$(button).parents("tr").remove();
+		}
+
+        $('#btnCreate').on('click', function () {
+             var referenceDetails = new Array();
+			 $("#addNewTable TBODY TR").each(function () {
+				 var $tds = $(this).find("td");
+
+				 var code = $tds[0].innerText;
+				 var desc = $tds[1].innerText;
+
+				 var detail = {};
+				 detail.ID = $tds[0].id;
+				 detail.Code = code;
+				 detail.Description = desc;
+
+				 referenceDetails.push(detail);
+             });
+
+             var name = $('#tbName').val();
+			 var purpose = $('#tbPurpose').val();
+			 var typeId = $('#ddlReference').val();
+
+             //Send the JSON array to Controller using AJAX.
+             $.ajax({
+                 type: "POST",
+                 url: fastApp.BaseUrl + '/Reference/Create?' + $.param({ name: name, purpose: purpose, typeId: typeId }),
+                 data: JSON.stringify(referenceDetails),
+                 contentType: "application/json; charset=utf-8",
+                 dataType: "json",
+                 success: function (result) {
+	   			 if (result.Status == 'True') {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.CreateOrEditSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+					}
+					else {
+						if (result.ErrorMessage) {
+							var notice = new PNotify({
+								title: "@UIResources.ErrorMessage",
+								text: result.ErrorMessage,
+								width: "400px",
+								type: 'error',
+								addclass: 'stack-bottomright',
+								delay: 2000
+							});
+
+							notice.get().click(function () {
+									notice.remove();
+							});
+						}
+						else {
+							var notice = new PNotify({
+								title: "@UIResources.ErrorMessage",
+								text: "@UIResources.CreateOrEditFailed",
+								width: "400px",
+								type: 'error',
+								addclass: 'stack-bottomright',
+								delay: 2000
+							});
+
+							notice.get().click(function () {
+									notice.remove();
+								});
+							}
+						}
+                    }
+			 });
+		});
+
+		$('#ddlReference').change(function () {
+			if ($('#ddlReference').val() == "0") {
+				$('#reference').html('');
+				$('#divReference').show();
+			} else {
+				$('#divReference').hide();
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Reference/GetReferenceDetail",
+					data: { referenceID: $('#ddlReference').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var refdetail = '';
+						var isColor = false;
+						for (var i = 0; i < data.length; i++) {
+							if (data[i].Code.indexOf("#") >= 0) {
+								isColor = true;
+								refdetail = refdetail + `<tr>
+								  <td id="${data[i].ID}" bgcolor="${data[i].Code}">${data[i].Code}</td>
+								  <td>${data[i].Description}</td>
+								  <td class="tx-center">
+								  <div class="btn-group">
+								  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+								  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+								  </div>
+								  </td></tr>`;
+							} else {
+								isColor = false;
+								refdetail = refdetail + `<tr>
+								  <td id="${data[i].ID}">${data[i].Code}</td>
+								  <td>${data[i].Description}</td>
+								  <td class="tx-center">
+								  <div class="btn-group">
+								  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+								  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+								  </div>
+								  </td></tr>`;
+							}
+						}
+
+						if (isColor) {
+							var cbColor = `<td id="tdCode"><select id="tbCode" class="form-control">
+							<option value="#c0c0c0" style="background-color:#c0c0c0">#c0c0c0</option>
+							<option value="#808080" style="background-color:#808080">#808080</option>
+							<option value="#800000" style="background-color:#800000">#800000</option>
+							<option value="#ff0000" style="background-color:#ff0000">#ff0000</option>
+							<option value="#ff9224" style="background-color:#ff9224">#ff9224</option>
+							<option value="#800080" style="background-color:#800080">#800080</option>
+							<option value="#ff00ff" style="background-color:#ff00ff">#ff00ff</option>
+							<option value="#ff90ff" style="background-color:#ff90ff">#ff90ff</option>
+							<option value="#008000" style="background-color:#008000">#008000</option>
+							<option value="#00ff00" style="background-color:#00ff00">#00ff00</option>
+							<option value="#a4ff48" style="background-color:#a4ff48">#a4ff48</option>
+							<option value="#808000" style="background-color:#808000">#808000</option>
+							<option value="#ffff00" style="background-color:#ffff00">#ffff00</option>
+							<option value="#ffff90" style="background-color:#ffff90">#ffff90</option>
+							<option value="#000080" style="background-color:#000080">#000080</option>
+							<option value="#0000ff" style="background-color:#0000ff">#0000ff</option>
+							<option value="#008080" style="background-color:#008080">#008080</option>
+							<option value="#00ffff" style="background-color:#00ffff">#00ffff</option>
+							</select></td>`;
+
+							$('#tdCode').replaceWith(cbColor);
+						} else {
+							var defaultInput = `<td id="tdCode"><input type="text" class="form-control" id="tbCode"></td>`;
+
+							$('#tdCode').replaceWith(defaultInput);
+						}
+
+						$('#reference').html(refdetail);
+					}
+				});
+			}
+		});
+
+		function AddActions() {
+			$('#ddlReference').val('0');
+			$('#divrefList').show();
+			$('#tbName').val('');
+			$('#tbPurpose').val('');
+			$('#tbName').show();
+			$('#tbPurpose').show();
+			$('#reference').html('');
+		}
+
+		function EditActions(id, name, purpose) {
+			$('#ddlReference').val(id);
+			$('#divrefList').hide();
+			$('#divReference').show();
+			$('#tbName').val(name);
+			$('#tbPurpose').val(purpose);
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Reference/GetReferenceDetail",
+				data: { referenceID: id },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var refdetail = '';
+					var isColor = false;
+					for (var i = 0; i < data.length; i++) {
+						if (data[i].Code.indexOf("#") >= 0) {
+							isColor = true;
+							refdetail = refdetail + `<tr>
+							  <td id="${data[i].ID}" bgcolor="${data[i].Code}">${data[i].Code}</td>
+							  <td>${data[i].Description}</td>
+							  <td class="tx-center">
+							  <div class="btn-group">
+							  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+							  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+							  </div>
+							  </td></tr>`;
+						} else {
+							refdetail = refdetail + `<tr>
+							  <td id="${data[i].ID}">${data[i].Code}</td>
+							  <td>${data[i].Description}</td>
+							  <td class="tx-center">
+							  <div class="btn-group">
+							  <i onclick="javascript:toEdit(this)" class="fa fa-edit"></i>
+							  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+							  </div>
+							  </td></tr>`;
+						}
+					}
+
+					$('#reference').html(refdetail);
+
+					if (isColor) {
+							var cbColor = `<td id="tdCode"><select id="tbCode" class="form-control">
+							<option value="#c0c0c0" style="background-color:#c0c0c0">#c0c0c0</option>
+							<option value="#808080" style="background-color:#808080">#808080</option>
+							<option value="#800000" style="background-color:#800000">#800000</option>
+							<option value="#ff0000" style="background-color:#ff0000">#ff0000</option>
+							<option value="#ff9224" style="background-color:#ff9224">#ff9224</option>
+							<option value="#800080" style="background-color:#800080">#800080</option>
+							<option value="#ff00ff" style="background-color:#ff00ff">#ff00ff</option>
+							<option value="#ff90ff" style="background-color:#ff90ff">#ff90ff</option>
+							<option value="#008000" style="background-color:#008000">#008000</option>
+							<option value="#00ff00" style="background-color:#00ff00">#00ff00</option>
+							<option value="#a4ff48" style="background-color:#a4ff48">#a4ff48</option>
+							<option value="#808000" style="background-color:#808000">#808000</option>
+							<option value="#ffff00" style="background-color:#ffff00">#ffff00</option>
+							<option value="#ffff90" style="background-color:#ffff90">#ffff90</option>
+							<option value="#000080" style="background-color:#000080">#000080</option>
+							<option value="#0000ff" style="background-color:#0000ff">#0000ff</option>
+							<option value="#008080" style="background-color:#008080">#008080</option>
+							<option value="#00ffff" style="background-color:#00ffff">#00ffff</option>
+							</select></td>`;
+
+							$('#tdCode').replaceWith(cbColor);
+						} else {
+							var defaultInput = `<td id="tdCode"><input type="text" class="form-control" id="tbCode"></td>`;
+
+							$('#tdCode').replaceWith(defaultInput);
+						}
+				}
+			});
+		};
+
+		function DeleteActions(ID, Name) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteDetail(ID);
+			});
+		}
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function DeleteDetail(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Reference/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/Reference/Index';
+					}, 1000);
+				}
+			});
+		}
+
+		function DeleteReferenceActions(ID, Name) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteReference(ID);
+			});
+		}
+
+		function DeleteReference(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Reference/DeleteReference?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/Reference/Index';
+					}, 1000);
+				}
+			});
+		}
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "Reference")';
+		};
+	</script>
+}
+

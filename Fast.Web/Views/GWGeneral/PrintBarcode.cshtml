@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "PrintBarcode";
+}
+@{
+    Layout = null;
+}
+    
+<html>
+<head>
+    <title>FAST - GW General - Barcode - @ViewBag.barcode</title>
+    <link href="/qa/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="/qa/Content/dashforge/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+    <link href="/qa/Content/theme/lib/pnotify/pnotify.custom.css" rel="stylesheet" />
+    <link href="/qa/Content/theme/lib/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet" />
+    <link href="/qa/Content/theme/css/jquery-ui-1.9.2.css" rel="stylesheet" />
+
+
+    <link href="/qa/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+
+
+    <!-- DashForge CSS -->
+    <link href="/qa/Content/dashforge/assets/css/dashforge.css" rel="stylesheet">
+    <link href="/qa/Content/dashforge/assets/css/dashforge.dashboard.css" rel="stylesheet">
+    <link href="/qa/Content/fast.css" rel="stylesheet" />
+
+</head>
+<body style="padding: 10px; transform: scale(1);">
+    <img width="100%" style="" src="@(Url.Action("RenderBarcodeBig","Barcode"))?sample=@ViewBag.barcode">
+    <br />
+    <center><img width="70%" src="@(Url.Action("DrawString","Barcode"))?text=@ViewBag.desc"></center>
+    <center><img width="70%" src="@(Url.Action("DrawString","Barcode"))?text=@ViewBag.Info"></center>
+    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" id="print" style="float:right"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+    <script src="/qa/Content/theme/js/jquery-1.10.0.min.js"></script>
+    <script src="/qa/Content/dashforge/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/qa/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="/qa/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="/qa/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+    <script src="/qa/Content/dashforge/assets/js/dashforge.js"></script>
+    <script>
+        $('#print').on('click', function (e) {
+            $('#print').hide();
+            window.print();
+        });
+    </script>
+</body>
+</html>

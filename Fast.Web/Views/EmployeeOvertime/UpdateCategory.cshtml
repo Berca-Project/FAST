@@ -1,0 +1,189 @@
+﻿@model Fast.Web.Models.EmployeeOvertimeModel
+@using Fast.Web.Resources;
+
+<!-- Specific Page Vendor CSS -->
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link href="~/Content/theme/css/jquery-ui-1.9.2.css" rel="stylesheet" />
+<style>
+	.fixedHeight {
+		font-size: 14px;
+		max-height: 300px;
+		margin-bottom: 10px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.ui-helper-hidden-accessible {
+		display: none;
+	}
+</style>
+
+@using (Html.BeginForm("UpdateCategory", "EmployeeOvertime", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm", @encType = "multipart/form-data" }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-random fa-3x"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.UpdateOvertimeCategory</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.UpdateOvertimeCategoryViaExcel</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.StartDate</label>
+			</div>
+			<div class="col-8"><input class="form-control hasDatepicker mg-b-5" id="startDateFilter" type="text" placeholder="dd-MMM-yy" autocomplete="off" /></div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.EndDate</label>
+			</div>
+			<div class="col-8"><input class="form-control hasDatepicker mg-b-5" id="endDateFilter" type="text" placeholder="dd-MMM-yy" autocomplete="off" /></div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Supervisor</label>
+			</div>
+			<div class="col-8">
+				@Html.TextBoxFor(x => x.FullName, null, new { @class = "form-control mg-b-5", @id = "tbFullName", @placeholder = "Type SPV name or ID here...", @onkeypress = "return blockSpecialChar(event)" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.DownloadTemplate</label>
+			</div>
+			<div class="col-8">
+				<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton btn-block" data-dismiss="modal" id="btnGenerate">
+					<i data-feather="download" class="mg-r-5"></i> @UIResources.Download
+				</button>
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">Upload Template</label>
+			</div>
+			<div class="col-12 dtMarginTop">
+				<div class="form-control-static">
+					<span class="btn btn-success fileinput-button btn-block">
+						@Html.TextBoxFor(x => x.PostedFilename, null, new { @type = "file", @accept = ".xls, .xlsx", @id = "customFile" })
+					</span>
+				</div>
+			</div>
+			<div class="progress col-12" id="loadingbar" style="height: 30px;">
+				<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Please wait a few seconds...</div>
+			</div>
+			<div class="col-4" style="display:none">
+				@Html.TextBoxFor(x => x.EmployeeID, null, new { @class = "form-control", @id = "tbEmployeeID" })
+			</div>
+			<div class="col-8">
+				<p id="empty-message"></p>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal" onclick="OnCancel()" id="btnCancel">@UIResources.Cancel</button>
+		<button type="button" class="btn btn-primary" onclick="Validate()" id="btnSubmit">@UIResources.Upload</button>
+	</div>
+}
+
+<script src="~/Content/theme/js/jquery-1.10.0.min.js"></script>
+<script src="~/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+<script src="~/Content/theme/lib/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#loadingbar').hide();
+
+		$('#tbFullName').keyup(function () {
+			if ($("#tbFullName").val() == '') {
+				$("#empty-message").text("");
+			}
+		});
+
+		$('.hasDatepicker').datepicker({
+			format: 'd-M-yy'
+		});
+
+		$("#tbFullName").autocomplete({
+			delay: 500,
+			source: function (request, response) {
+				$.ajax({
+					url: fastApp.BaseUrl + '/EmployeeOvertime/AutoCompleteSpv/',
+					data: "{ 'prefix': '" + request.term + "'}",
+					dataType: "json",
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.length == 0) {
+							$("#empty-message").css('color', 'red');
+							$("#empty-message").text("Data does not exist in Employee List");
+						} else {
+							$("#empty-message").text("");
+							response($.map(data, function (item) {
+								return $.trim(item.EmployeeID) + " - " + item.FullName;
+							}))
+						}
+					},
+					error: function (response) {
+						alert(response.responseText);
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					}
+				});
+			},
+			select: function (e, i) {
+				var res = i.item.label.split(" - ");
+				if (res[0]) {
+					$("#tbEmployeeID").val(res[0]);
+				}
+			},
+			minLength: 1
+		});
+
+		$("#tbFullName").autocomplete("widget").addClass("fixedHeight");
+	});
+
+	$('#btnGenerate').on('click', function (e) {
+		if ($('#startDateFilter').val() == '') {
+			alert('Please select the start date first');
+		} else if ($('#endDateFilter').val() == '') {
+			alert('Please select the end date first');
+		} else {
+			e.preventDefault();
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			var spvID = $('#tbEmployeeID').val();
+			var startDateFilters = $('#startDateFilter').val();
+			var endDateFilters = $('#endDateFilter').val();
+
+			var url = fastApp.BaseUrl + '/EmployeeOvertime/DownloadTemplate?supervisorID=' + spvID + '&startDate=' + startDateFilters + '&endDate=' + endDateFilters;
+
+			window.location.href = url;
+		}
+	});
+
+	function OnCancel() {
+		window.location.href = fastApp.BaseUrl + '/EmployeeOvertime/Index';
+	};
+
+	function Validate() {
+		if ($('#customFile').is(":visible") && $('#customFile').val() == "") {
+			$("#error-message").css('color', 'red');
+			$("#error-message").text("No file is selected");
+			return (false);
+		}
+
+		$('#loadingbar').show();
+		$("#btnSubmit").attr("disabled", true);
+		$("#btnCancel").attr("disabled", true);
+
+		document.getElementById('AddModalForm').submit();
+		return (true);
+	}
+</script>

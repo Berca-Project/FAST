@@ -1,0 +1,214 @@
+﻿@model Fast.Web.Models.WppStpModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Edit", "Wpp", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.IsDeleted, new { @Id = "IsDeleted" })
+	@Html.HiddenFor(x => x.Location, new { @Id = "Location" })
+	@Html.HiddenFor(x => x.Description, new { @Id = "Description" })
+	@Html.HiddenFor(x => x.Packer, new { @Id = "Packer" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.EditWPP</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+		<div class="form-row">
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Country</label>
+			</div>
+			<div class="form-group col-md-2">
+				@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountryEdit" })
+			</div>
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.ProdCenter</label>
+			</div>
+			<div class="form-group col-md-2">
+				@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenterEdit" })
+			</div>
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Department</label>
+			</div>
+			<div class="form-group col-md-2">
+				@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartmentEdit" })
+			</div>
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.SubDepart</label>
+			</div>
+			<div class="form-group col-md-2">
+				@Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartmentEdit" })
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Brand</label>
+			</div>
+			<div class="form-group col-md-3">
+				@Html.DropDownListFor(p => p.BrandID, (IEnumerable<SelectListItem>)ViewBag.BrandList, new { @class = "form-control", @id = "ddlBrandEdit" })
+			</div>
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.LinkUp</label>
+			</div>
+			<div class="form-group col-md-3">
+				@Html.DropDownListFor(p => p.LinkUpID, (IEnumerable<SelectListItem>)ViewBag.LinkUpList, new { @class = "form-control", @id = "ddlLinkUpEdit" })
+			</div>
+			<div class="col-md-1 mg-t-10" id="labelIdMachineEdit">
+				<label style="font-size:smaller">@UIResources.Machine</label>
+			</div>
+			<div class="form-group col-md-3" id="idMachineEdit">
+				@Html.DropDownListFor(p => p.Maker, (IEnumerable<SelectListItem>)ViewBag.MachineList, Model.Maker, new { @class = "form-control", @id = "ddlMachineEdit" })
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Date</label>
+			</div>
+			<div class="form-group col-md-3">
+				@Html.TextBoxFor(x => x.Date, "{0:dd-MMM-yy}", new { @class = "form-control", @id = "wppdateedit" })
+			</div>
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Type</label>
+			</div>
+			<div class="form-group col-md-3">
+				@Html.DropDownListFor(p => p.ActivityID, (IEnumerable<SelectListItem>)ViewBag.WppTypeList, new { @class = "form-control", @id = "ddlActivityEdit" })
+			</div>
+			<div class="col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.PONumber</label>
+			</div>
+			<div class="form-group col-md-3">
+				@Html.TextBoxFor(x => x.PONumber, null, new { @class = "form-control", @id = "tbPONumberEdit" })
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.OPSNumber</label>
+			</div>
+			<div class="col-md-3">
+				@Html.TextBoxFor(x => x.OPSNumber, null, new { @class = "form-control", @id = "tbOPSNumberEdit" })
+			</div>
+			<div class="form-group col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.BatchSAP</label>
+			</div>
+			<div class="col-md-3">
+				@Html.TextBoxFor(x => x.BatchSAP, null, new { @class = "form-control", @id = "tbBatchSAPEdit" })
+			</div>
+			<div class="form-group col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Others</label>
+			</div>
+			<div class="col-md-3">
+				@Html.TextBoxFor(x => x.Others, null, new { @class = "form-control", @id = "tbOthersEdit" })
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Shift1</label>
+			</div>
+			<div class="col-md-3">
+				@Html.TextBoxFor(x => x.Shift1, null, new { @class = "form-control", @id = "tbShift1Edit" })
+			</div>
+			<div class="form-group col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Shift2</label>
+			</div>
+			<div class="col-md-3">
+				@Html.TextBoxFor(x => x.Shift2, null, new { @class = "form-control", @id = "tbShift2Edit" })
+			</div>
+			<div class="form-group col-md-1 mg-t-10">
+				<label style="font-size:smaller">@UIResources.Shift3</label>
+			</div>
+			<div class="col-md-3">
+				@Html.TextBoxFor(x => x.Shift3, null, new { @class = "form-control", @id = "tbShift3Edit" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+
+		$('#ddlLinkUpEdit').change(function () {
+			if ($('#ddlLinkUpEdit').val() == "0") {
+				$("#idMachineEdit").show();
+				$("#labelIdMachineEdit").show();
+			} else {
+				$("#idMachineEdit").hide();
+				$("#labelIdMachineEdit").hide();
+			}
+		});
+
+		$('#wppdateedit').datepicker({
+			format: 'd-M-yy',
+			changeMonth: true,
+			changeYear: true
+		});
+
+		$('#ddlCountryEdit').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Wpp/GetProductionCenterByCountryID",
+				data: { id: $('#ddlCountryEdit').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlProdCenterEdit'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlProdCenterEdit').html(ddlTemp);
+					$('#ddlDepartmentEdit').html("<select id='ddlDepartmentEdit'><option value='0'>- Please Select -</option></select>");
+					$('#ddlSubDepartmentEdit').html("<select id='ddlSubDepartmentEdit'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlProdCenterEdit').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Wpp/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenterEdit').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartmentEdit'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartmentEdit').html(ddlTemp);
+					$('#ddlSubDepartmentEdit').html("<select id='ddlSubDepartmentEdit'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlDepartmentEdit').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Wpp/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartmentEdit').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartmentEdit'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartmentEdit').html(ddlTemp);
+				}
+			});
+		});
+	});
+</script>
+

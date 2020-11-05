@@ -1,0 +1,1152 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow:hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">KRETEK LINE</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH Krosok Drying</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                @if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+                {
+                    @: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+                }
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Fri / 26-Jul-19">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Shift</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control" disabled value="1">
+                                </div>
+                                <label class="col-3 col-form-label tx-right">Week</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control" disabled value="42">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Prodtech</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Sunandar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Supervisor</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" disabled value="Dodi herdiyanto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Cutter in use </label>
+                                <div class="col-5">
+                                    <select class="form-control select2">
+                                        @*<option label="Choose one"></option>*@
+                                        <option value="019">019</option>
+                                        <option value="010">010</option>
+                                        <option value="011">011</option>
+                                        <option value="019">019</option>
+                                        <option value="020">020</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Drying
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Batch No.</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" value="919101806">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label"></label>
+                                    <div class="col-6 mg-b-10">
+                                        <button class="btn btn-sm pd-x-15 btn-primary" id="get-pss-data-drying" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Blend</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingblend">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">SAP Batch</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingsapbatch">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Silo Asal Total Blend</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingsiloatb">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Silo Tujuan CF</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingsilotcf">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <center>
+                                    <button class="btn btn-lg pd-x-15 btn-primary" id="add-to-table-drying" onclick="javascript:addRow(this)" data-target="drying">Add to table</button>
+                                </center>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-form-label" style="font-weight:bold;">FTD</label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Start</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingstart">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Stop</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingstop">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Duration</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingduration">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-form-label" style="font-weight:bold;">&nbsp;</label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Tob Weigher</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingtobweigher">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">MC Inlet</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingmcinlet">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">PG Temperature</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingpgt">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-form-label" style="font-weight:bold;">&nbsp;</label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">PG Speed</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingpgspeed">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Cooling Conv Fan Speed</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingccfs">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">MC Exit Dryer</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="dryingmced">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="tableWrapper" style="max-height:240px">
+                            <table class="table table-bordered table-hover table-striped ">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:90px">Batch No</th>
+                                        <th rowspan="2" style="min-width:90px">SAP Batch</th>
+                                        <th rowspan="2">Blend</th>
+                                        <th rowspan="2" style="min-width:160px">Silo Asal Total Blend</th>
+                                        <th rowspan="2" style="min-width:150px">Silo Tujuan CF</th>
+                                        <th colspan="3" style="min-width:90px" class="tx-center">Waktu</th>
+                                        <th rowspan="2" style="min-width:100px" class="tx-center">Tob Weigher</th>
+                                        <th rowspan="2" style="min-width:90px" class="tx-center">MC Inlet</th>
+                                        <th rowspan="2" style="min-width:130px" class="tx-center">PG Temperature</th>
+                                        <th rowspan="2" style="min-width:90px" class="tx-center">PG Speed</th>
+                                        <th rowspan="2" style="min-width:180px" class="tx-center">Cooling Conv Fan Speed</th>
+                                        <th rowspan="2" style="min-width:140px" class="tx-center">MC Exit Dryer</th>
+                                        <th rowspan="2">Action</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Start</th>
+                                        <th>Stop</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drying"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>  <!--DRYING-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+                    <div class="card-body" style="padding:10px">
+                        <div class="row" style="margin:0">
+                            <div class="col-3" style="padding: 0 10px 0 0">
+                                <table class="table table-bordered table-hover table-striped" style="min-height:150px;">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th class="tx-center"><label class="tx-center" style="margin:0px;"> Weight</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin-left: 0; margin-right: 0">
+                                                    <div class="col-12 tx-center" style="margin-right:0px;">
+                                                        <label class="tx-center font-weight-bold" style="font-size:30px;margin-right:0px;">19.55 Kg</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-3 tx-center">
+                                                        <label class="tx-center">&nbsp;</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <button type="button" class="phase-show btn btn-lg btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-waste-modal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-9">
+                                <table class="table table-bordered table-hover table-striped ">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Area</th>
+                                            <th>Waste</th>
+                                            <th>Waste Type</th>
+                                            <th>Weight</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>35</td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="waste">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- WASTE -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Downtime</th>
+                                        <th>Problem</th>
+                                        <th>Description</th>
+                                        <th style="width:60px;">Start</th>
+                                        <th style="width:60px;">End</th>
+                                        <th style="width:80px;">Duration</th>
+                                        <th>PIC</th>
+                                        <th>Status</th>
+                                        <th style="min-width:120px;">Action Plan</th>
+                                        <th style="min-width:70px;"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>180 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="machine-problem">
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">301 Minor Stop</option>
+                                                <option value="302">302 Proces Adjustment</option>
+                                                <option value="401">401 Breakdown</option>
+                                                <option value="501">501 Distruption of Material Flow</option>
+                                                <option value="601">601 Cleaning</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Done</option>
+                                                <option value="2">On Progres</option>
+                                                <option value="3">Pending</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">SLAC</option>
+                                                <option value="302">CBM</option>
+                                                <option value="303">PM</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- HANDOVER LOGBOOK -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bagas</td>
+                                    <td>Requester</td>
+                                    <td>Submit to Supervisor</td>
+                                    <td>05-Sep-19 13:15</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagus</td>
+                                    <td>Supervisor</td>
+                                    <td>Confirmed</td>
+                                    <td>05-Sep-19 13:25</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!--APPROVAL SEGMENT-->
+
+        </div>
+    </div>
+</div>
+      </div>
+
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- content -->
+
+
+<div class="modal fade wizard-modal" id="phase-waste-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div class="stepper row">
+                    <div class="stepper-step col active">
+                        <a class="btn stepper-btn">1</a>
+                        <p><small>Area</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">2</a>
+                        <p><small>Waste</small></p>
+                    </div>
+                </div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Area</h5>
+                            <hr />
+                            <center class="waste">
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Waste</h5>
+                            <hr />
+                            <center class="kind">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+
+    <script>
+        $(function () {
+
+            $('.select2').click({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+        })
+    </script>
+    <script>
+        const machineProblemRow = `<td>301 Minor Stop</td><td>Text yang sangat panjang, contoh nya rubah meloncaat atau lorem ipsum</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+        const machineProblemEditRow = `<td><select class="form-control select2"><option label="Choose one"></option><option value="301">301 Minor Stop</option><option value="302">302 Proces Adjustment</option><option value="401">401 Breakdown</option><option value="501">501 Distruption of Material Flow</option><option value="601">601 Cleaning</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem" class="fa fa-trash"></i></td>`;
+        
+        const dryingRow = `
+
+
+                <td>919101806</td>
+                <td>V0N5A</td>
+                <td>819103108</td>
+                <td>No HPS</td>
+                <td>300025</td>
+
+                <td>06:10</td>
+                <td>07:27</td>
+                <td>77 Mnt</td>
+                <td>4717.00</td>
+                <td>4116.86</td>
+
+                <td>64.83</td>
+                <td>0.00</td>
+                <td>66.00</td>
+                <td>66.00</td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i onclick="javascript:toEdit(this)" data-target="drying" class="fa fa-edit"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+        const dryingEditRow = `
+              <td><input type="text" class="form-control" value="919101806"></td>
+              <td><input type="text" class="form-control" value="V0N5A"></td>
+              <td><input type="text" class="form-control" value="819103108"></td>
+              <td><input type="text" class="form-control" value="No HPS"></td>
+              <td><input type="text" class="form-control" value="300025"></td>
+
+              <td><input type="text" class="form-control" value="06:10"></td>
+              <td><input type="text" class="form-control" value="07:27"></td>
+              <td><input type="text" class="form-control" value="77 Mnt"></td>
+              <td><input type="text" class="form-control" value="4717.00"></td>
+              <td><input type="text" class="form-control" value="4116.86"></td>
+
+              <td><input type="text" class="form-control" value="64.83"></td>
+              <td><input type="text" class="form-control" value="0.00"></td>
+              <td><input type="text" class="form-control" value="66.00"></td>
+              <td><input type="text" class="form-control" value="66.00"></td>
+              <td class="tx-center">
+              <div class="btn-group">
+              <i data-target="drying" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+              <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+              </div>
+              </td>`;
+        function toEdit(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $(button).parents("tr").html(machineProblemEditRow);
+                    break;
+                case "drying":
+                    $(button).parents("tr").html(dryingEditRow);
+                    break;
+            }
+            ieFix();
+        }
+        function toNormal(button) {
+            if (confirm("Are you sure?")) {
+                const target = $(button).data("target");
+                switch (target) {
+                    case "machine-problem":
+                        $(button).parents("tr").html(machineProblemRow);
+                        break;
+                    case "drying":
+                        $(button).parents("tr").html(dryingRow);
+                        break;
+                }
+                ieFix();
+            }
+        }
+        function addRow(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $("#" + target).append($(`<tr>${machineProblemRow}</tr>`));
+                    break;
+                case "drying":
+                    $("#" + target).append($(`<tr>${dryingRow}</tr>`));
+                    break;
+            }
+            ieFix();
+        }
+        function removeRow(button) {
+            if (confirm("Are you sure?")) {
+                $(button).parents("tr").remove();
+                ieFix();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+        const DryingPssData = {
+            dryingblend: "V0N5A",
+            dryingsapbatch: "819103108",
+            dryingsiloatb: "No HPS",
+            dryingsilotcf: "300025",
+            dryingstart: "06:10",
+            dryingstop: "07:27",
+            dryingduration: "77 Mnt",
+            dryingtobweigher: "4717.00",
+            dryingmcinlet: "4116.86",
+            dryingpgt: "64.83",
+            dryingpgspeed: "0.00",
+            dryingccfs: "66.00",
+            dryingmced: "66.00",
+        };
+
+
+
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        const buttonDelete = ``;
+        function generateRow(data, targetTable) {
+            let r = "";
+            for (var prop in data) {
+                if (Object.prototype.hasOwnProperty.call(data, prop)) {
+                    if (prop == "id") continue;
+                    r += `<td data-name="${prop}">${data[prop]}</td>`;
+                }
+            }
+            r += `<td class="tx-center">`;
+            r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                var tableBody = "";
+                switch (targetTable) {
+                    case "#waste":
+                        crrData = deleteFromArray(id, wasteData);
+                        tableBody = generateTable(wasteData, targetTable);
+                        break;
+                }
+                $(targetTable).html(tableBody);
+            }
+        }
+        function editData(button) {
+            const tds = $(button).parents("tr").children('td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                if (i != tdsCount - 1) {
+                    const html = $(e).html();
+                    $(e).html(`<input type="text" class="form-control" value="${html}">`);
+                } else {
+                    const edit = $(e).find(".edit");
+                    $(edit).attr("onclick", "javascript:normalData(this)");
+                    $(edit).removeClass("fa-edit");
+                    $(edit).addClass("fa-save");
+                }
+            });
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                let row = "";
+                switch (targetTable) {
+                    case "#waste":
+                        const index = findInArray(id, wasteData);
+                        $(tds).each(function (i, e) {
+                            if (i != tdsCount - 1) {
+                                wasteData[index][$(e).data("name")] = $(e).find("input").val();
+                            } else {
+                                const edit = $(e).find(".edit");
+                                $(edit).attr("onclick", "javascript:editData(this)");
+                                $(edit).removeClass("fa-save");
+                                $(edit).addClass("fa-edit");
+                            }
+                        });
+                        row = generateRow(wasteData[index], targetTable)
+                        console.log(wasteData);
+                        break;
+                }
+                $(button).parents("tr").html(row);
+            }
+        }
+        const wasteOpt = [
+            {
+                category: "Cutter",
+                child: [
+                    {
+                        waste: "Sapon",
+                        type: "Dry Waste",
+                    },
+                    {
+                        waste: "Vacuum",
+                        type: "Dust",
+                    },
+                ]
+            },
+            {
+                category: "FTD",
+                child: [
+                    {
+                        waste: "Cookies",
+                        type: "Wet Waste",
+                    },
+                    {
+                        waste: "Auto leaning FTD",
+                        type: "Dry Waste",
+                    },
+                    {
+                        waste: "Sapon",
+                        type: "Dry Waste",
+                    },
+                    {
+                        waste: "Vacuum",
+                        type: "Dust",
+                    },
+                ]
+            },
+            {
+                category: "Dust Collector",
+                child: [
+                    {
+                        waste: "FTD Dust",
+                        type: "Dust",
+                    },
+                ]
+            },
+        ];
+        var wasteNewData = {};
+        var wasteData = [
+            {
+                id: uuidv4(),
+                category: "Cutter",
+                kind: "Sapon",
+                type: "Dry Waste",
+                weight: "36.50",
+            },
+            {
+                id: uuidv4(),
+                category: "FTD",
+                kind: "Auto Cleaning FTD",
+                type: "Wet Waste",
+                weight: "36.50",
+            },
+            {
+                id: uuidv4(),
+                category: "Dust Collector",
+                kind: "FTD Dust",
+                type: "Dust",
+                weight: "36.50",
+            },
+        ];
+
+
+        var selected;
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item').siblings('.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+
+        function ieFix() {
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").each(function () {
+                    $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+                    $(this).find("table").css({ "margin-bottom": "32px" });
+                    $(this).css({ "overflow-y":"scroll" });
+                    const ths = $(this).find("thead tr:first-child th");
+                    $(this).find("tfoot td").each(function (i) {
+                        console.log($($(ths)[i]).width() + 20);
+                        $(this).css({ "min-width":$($(ths)[i]).width()+20, "position": "static" });
+                    });
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            ieFix();
+
+
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $("#waste").html(generateTable(wasteData, "#waste"));
+
+            $(".wizard-modal .next").click(function () {
+                wizardButtonNext(this);
+            });
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item').siblings('.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+            $('#phase-waste-modal').on('show.bs.modal', function (e) {
+                let opts = [];
+                for (var i = 0; i < wasteOpt.length; i++) {
+                    opts.push(wasteOpt[i].category);
+                }
+                $(this).find(".waste").html(generateWizardButton(opts));
+            });
+            $('#phase-waste-modal').on('next', function (e, i, info) {
+                if (!selected) {
+                    info.shouldReturn = true;
+                    return;
+                }
+                switch (i) {
+                    case 0:
+                        wasteNewData.category = selected;
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            if (wasteOpt[i].category == selected) {
+                                let opts = [];
+                                for (var j = 0; j < wasteOpt[i].child.length; j++) {
+                                    opts.push(wasteOpt[i].child[j].waste);
+                                }
+                                $(this).find(".kind").html(generateWizardButton(opts));
+                            }
+                        }
+                        selected = null;
+                        break;
+                    case 1:
+                        wasteNewData.id = uuidv4();
+                        info.shouldHide = true;
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            for (var j = 0; j < wasteOpt[i].child.length; j++) {
+                                if (wasteOpt[i].child[j].waste == selected) {
+                                    wasteNewData.kind = wasteOpt[i].child[j].waste;
+                                    wasteNewData.type = wasteOpt[i].child[j].type;
+                                }
+                            }
+                        }
+                        wasteNewData.weight = "19.55";
+                        wasteData.push(wasteNewData);
+                        tableBody = generateTable(wasteData, '#waste');
+                        $('#waste').html(tableBody);
+                        break;
+                }
+            });
+            $('#phase-waste-modal').on('hide', function (e) {
+                wasteNewData = {};
+                selected = null;
+            });
+        });
+
+
+
+
+    $(document).ready(function () {
+        $('.tableWrapper thead tr').each(function () {
+            const top = $(this).position().top;
+            $(this).children().css({ "top": top });
+        });
+        $('#get-pss-data-drying').click(function () {
+            for (var prop in DryingPssData) {
+                if (Object.prototype.hasOwnProperty.call(DryingPssData, prop)) {
+                    $("#" + prop).val(DryingPssData[prop]);
+                }
+            }
+        });
+    });
+
+
+    </script>
+}

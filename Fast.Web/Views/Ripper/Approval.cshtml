@@ -1,0 +1,2603 @@
+﻿@model Fast.Web.Models.LPH.LPHEditModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Edit Ripper";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+        /* chanif: tolong tambahkan css dari sini sampai bawah untuk memperbaiki tampilan select2 */
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            display: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            font-size: 13px;
+            padding: 0 0 0 5px;
+        }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .select2-results__option[aria-selected=true] {
+            display: none;
+        }
+    </style>
+}
+
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Ripper</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH Ripper</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#scan-modal"><i data-feather="file-text" class="wd-10 mg-r-5"></i> Scan</button>*@
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#photo-modal"><i data-feather="camera" class="wd-10 mg-r-5"></i> Photo</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card" id="generalinfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" id="txtDateInfo" class="form-control information-datepicker mandatory" value="">
+                                </div>
+                                <label class="col-2 col-form-label tx-right pd-r-0-f">Week</label>
+                                <div class="col-2">
+                                    <input type="text" id="txtWeekNumber" class="form-control" disabled value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Machine *</label>
+                                <div class="col-4">
+                                    <select class="form-control select2 mandatory" id="machInfo">
+                                        <option value="">Select Machine</option>
+                                        @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                        {
+                                            <option value="@(machine.Code)">@(machine.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand *</label>
+                                <div class="col-9">
+                                    <select class="form-control select2 mandatory" id="brandInfo">
+                                        <option value="">Select Brand</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCodeFA)
+                                        {
+                                            <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Prodtech*</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" id="prodTech" multiple disabled>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Mechanic</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" id="mekanik" disabled>
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Mechanics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Gw Name*</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="GwGeneral" id="gwGeneral" disabled>
+                                        <option value="">Select GW</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.GeneralWorker)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Electrician</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" id="elektrik" disabled>
+                                        <option value="">Select Electrician</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Electrics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" id="teamLeader" disabled>
+                                        <option value="">Select Team Leader</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">PO Number</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="PONumber" id="PONumber">
+                                        <option value="">Select PO Number</option>
+                                        @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                        {
+                                            <option value="@(wpp.PONumber)">@(wpp.PONumber)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Shift / Group *</label>
+                                <div class="col-3">
+                                    <input type="text" id="shift" class="form-control mandatory" value="">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    @*<input type="text" id="group" class="form-control mandatory" value="">*@
+                                    <select class="form-control select2 mandatory" name="Group" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.referenceGroup)
+                                        {
+                                            <option value="@(detail.Code)">@(detail.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Start / Stop *</label>
+                                <div class="col-3">
+                                    <input id="inputTimeStart" class="form-control date mandatory" value="">
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <input id="inputTimeStop" class="form-control date mandatory" value="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Ripper Short Problem</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th style="width:100px">Sample</th>
+                                    <th style="width:150px">Time</th>
+                                    <th>Blend Name</th>
+                                    <th>NTRM Type</th>
+                                    <th>Remark</th>
+                                    <th style="width: 10%"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="ripper">
+                            </tbody>
+                            <tfoot>
+                                <tr class="input">
+                                    <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="SampleRipper"></td>
+                                    <td><input type="text" class="form-control date" name="TimeRipper"></td>
+                                    <td><input type="text" class="form-control" name="BlendRipper"></td>
+                                    <td><input type="text" class="form-control" name="NTRMRipper"></td>
+                                    <td><input type="text" class="form-control" name="RemarkRipper"></td>
+                                    <td class="tx-center"><i data-target="ripper" class="fa fa-plus-circle add-to-table"></i></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Input</div>
+                    <div class="card-body">
+                        <div class="row" style="margin:0">
+                            <div class="col-2" style="padding-right: 10px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Input</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin:0">
+                                                    <input id="scanner-inputTable" onkeypress="inputBarcode(event)" class="form-control col-9" style="margin-bottom:10px;" data-table="inputTable" value="" />
+                                                    <div class="col-2" style="padding-top: 3px">
+                                                        <i class="fa fa-plus-circle" onclick="getvaluebarcode()" id="input_plus"></i>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-10" style="min-height:260px;">
+                                <table class="table table-bordered table-hover table-striped ">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th style="min-width:110px;">PO Number</th>
+                                            <th style="min-width:150px;">FA Code</th>
+                                            <th>LU Origin</th>
+                                            <th>Machine</th>
+                                            <th>Machine Number</th>
+                                            <th>CR Code</th>
+                                            <th>Resource Cigarette</th>
+                                            <th style="min-width:100px;">Item</th>
+                                            <th style="min-width:100px;">Type CF</th>
+                                            <th style="min-width:70px;">Weight (Kg)</th>
+                                            <th style="min-width:70px;display:none"></th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>0</td>
+                                            <td style="display:none"></td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inputTable">
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td>
+                                                <input type="text" class="form-control " name="PONumberInput">
+                                            </td>
+                                            <td>@*<input type="text" class="form-control " name="FACodeInput">*@
+                                                <select class="form-control select2" name="FACodeInput">
+                                                    <option value="">Select Brand</option>
+                                                    @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCodeFA)
+                                                    {
+                                                        <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                                    }
+                                                    @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                                    {
+                                                        <option value="@(wpp.Brand)">@(wpp.Brand)</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td><input type="text" class="form-control " name="AsalLUInput"></td>
+                                            <td><input type="text" class="form-control " name="MachineInput"></td>
+                                            <td><input type="text" class="form-control " name="MachineNumValInput"></td>
+                                            <td><input type="text" class="form-control " name="CRCodeInput"></td>
+                                            <td><input type="text" class="form-control " name="ResourceCigaretteInput"></td>
+                                            <td>
+                                                <select class="form-control select2" name="TypeInput">
+                                                    @*<option value="">Select Item</option>
+        <option value="CGI REJECT">CGI REJECT</option>
+        <option value="CTF">CTF</option>
+        <option value="DUST KASAR">DUST KASAR</option>
+        <option value="DUST VACUUM">DUST VACUUM</option>
+        <option value="NTM">NTM</option>
+        <option value="OTHER">OTHER</option>*@
+                                                    @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.CRRType)
+                                                    {
+                                                        <option value="@(detail.Code)">@(detail.Code)</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control select2" name="TypeCFInput">
+                                                    @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.CFType)
+                                                    {
+                                                        <option value="@(detail.Code)">@(detail.Code)</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="WeightInput"></td>
+                                            <td style="display:none"><input type="text" class="form-control" name="datetime"></td>
+                                            <td class="tx-center"><i data-target="inputTable" class="add-to-table fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Input -->
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_1_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_1" class="input-img rounded mx-auto d-block" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" width="auto">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_1_show">
+                                </div>
+                                <div class="col-12">
+                                    <center>
+                                        <label class="col-12 col-form-label"></label>
+                                        <i onclick="printImage('image_1_show','image_1')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+
+                </div>
+            </div> <!-- CAPTURE BY WEBCAM -->
+            <div class="col-9 mg-b-20">
+                <div class="card" id="output-div">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Output *</div>
+                    <div class="card-body" style="padding:10px">
+                        <div class="row" style="margin:0">
+                            <div class="col-3" style="padding: 0 10px 0 0">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th class="tx-center">Input</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin-left: 0; margin-right: 0">
+                                                    <div class="col-9 tx-center">
+                                                        <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control tx-center" style="font-size:24px;height:35px;" id="weightOutput">
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <label class="tx-center font-weight-bold" style="font-size:24px;margin-left:-10px;">Kg</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-3 tx-center">
+                                                        <label class="tx-center">&nbsp;</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <button type="button" class="phase-show btn btn-sm btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-modal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-9">
+                                <table class="table table-bordered table-hover table-striped " id="dtOutput">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Weight (Kg)</th>
+                                            <th>Remarks</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td>0</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="output"></tbody>
+                                    <tfoot>
+                                        <tr class="input" style="display:none">
+                                            <td><input type="text" class="form-control disabled" disabled name="TypeOutput"></td>
+                                            <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="WeightOutput"></td>
+                                            <td><input type="text" class="form-control" name="RemarkOutput"></td>
+                                            <td class="tx-center"><i data-target="output" class="add-to-table fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Output -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Ripping Processing</div>
+                    <div class="card-body">
+
+                        <div class="form-group row">
+                            <label class="col-1 col-form-label mg-l-20">Summary</label>
+                            <div class="col-1">
+                                <input type="text" class="form-control" disabled value="0">
+                            </div>
+                        </div>
+                        <div class="tableWrapper" style="min-height:190px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th colspan="2" class="tx-center">MC Incoming</th>
+                                        <th colspan="2" class="tx-center">Parameter Setting</th>
+                                        <th colspan="4" class="tx-center">RS Output</th>
+                                        <th rowspan="2" style="min-width:70px"></th>
+                                    </tr>
+                                    <tr>
+                                        <th style="top:29px">Incoming</th>
+                                        <th style="top:29px">Recheck</th>
+                                        <th style="top:29px">Speed</th>
+                                        <th style="top:29px">Steam</th>
+                                        <th style="top:29px">MC</th>
+                                        <th style="top:29px">On Pan</th>
+                                        <th style="top:29px">NTRM</th>
+                                        <th style="top:29px;width:200px;">Remark</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px">0</td>
+                                        <td style="top:29px;width:200px;"></td>
+                                        <td rowspan="2" style="min-width:70px"></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="ripping">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="IncomingProcess" placeholder="%"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="RecheckProcess" placeholder="Hz"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="SpeedProcess" placeholder="bar"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="SteamProcess" placeholder="%"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="MCProcess" placeholder="%"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="OnPanProcess"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="NTRMProcess"></td>
+                                        <td><input type="text" class="form-control" name="RemarkProcess"></td>
+                                        <td class="tx-center"><i data-target="ripping" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Ripping Processing -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval Segment</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped" id="dtApproval">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    @*<th>Approver</th>*@
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+                </div>
+            </div><!-- APPROVAL SEGMENT-->
+            <div class="col-12 mg-b-20 ">
+                <div class="d-none d-md-block float-right">
+                    <button id="btnApprove" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="check" class="wd-10 mg-r-5"></i> Approve</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" data-toggle="modal" data-target="#comment-modal"><i data-feather="slash" class="wd-10 mg-r-5"></i> Revise</button>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="comment-modal" role="dialog">
+    <div class="modal-dialog" style="max-width:50%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="detail-header" style="font-size:1rem;font-weight:bold;">Comment</div>
+                <hr>
+                <textarea type="text" id="comment_value" class="form-control" style="height:75px"></textarea>
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-primary mg-l-5" style="float:right" id="btnReject">Revise</button>
+                    <button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade wizard-modal" id="scan-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <h5>Scan</h5>
+                            <hr />
+                            <center>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="focus here to add scan"><br>
+                                    <table class="table table-bordered table-hover table-striped">
+                                        <thead class="thead-info">
+                                            <tr>
+                                                <th>Scan Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>DOA1VC WLS PJ 129314300038130819130014481398</td>
+                                            </tr>
+                                            <tr>
+                                                <td>DOA1VC WLS PJ 129311300028140819130014481398</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button type="button" class="btn btn-xs btn-primary next" style="float:right">Add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade wizard-modal" id="phase-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Type</h5>
+                            <hr />
+                            <center>
+                                @*<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Reclaim</button>
+        <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Mid. Dust</button>
+        <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Final Dust</button>
+        <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Filter Paper</button>
+        <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Sapon</button>
+        <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">Rough Dust</button>
+        <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">NTM</button>*@
+                                @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.RIOutput)
+                                {
+                                    <button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">@(detail.Code)</button>
+                                }
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Remark</h5>
+                            <hr />
+                            <center class="machine-list">
+                                <input type="text" class="form-control" id="outputRemark">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="btn btn-xs btn-primary next" style="float:right;display:none;">Add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog" style="min-width:90%;height:auto;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <h5><label id="next-1">Take Picture </label></h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <video autoplay="true" width="500" height="300" id="videoElement"> </video><br />
+                                        <button id="snapHat">Capture Image </button><br />
+                                    </center>
+                                </div>
+                                <div class="col-md-6">
+                                    <center>
+                                        <canvas id="snapshot" style="max-width: 500px;max-height: 300px !important"></canvas><br />
+                                        <p id="demo"></p>
+
+                                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                                    </center>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right">Add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Scripts/webcam_help/main.js"></script>
+    <script src="~/Scripts/webcam_help/MRZ_417_230119.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script type="text/javascript">
+
+        $("#txtDateInfo").val(moment().format("ddd, DD-MMM-YY"));
+        //$("#txtWeekNumber").val(moment().week());
+        //$('.datepicker').datepicker({
+        //        format: 'dd-M-yy',
+        //        language: 'id-ID'
+        //    });
+        $(document).find('.date').each(function () {
+            var cleave = new Cleave($(this), {
+                time: true,
+                timePattern: ['h', 'm']
+            });
+        })
+        $('.information-datepicker').toArray().forEach(function (field) {
+            $(field).datepicker({
+                todayHighlight: true,
+                format: 'D, dd-M-yy',
+                startDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+                //maxDate: 2,
+                //minDate: -2,
+            });
+        });
+    </script>
+    <script>
+        function ieFix() {
+            /*
+                    if (navigator.userAgent.search("Edge") >= 0) {
+                        $(".tableWrapper:has(tfoot)").each(function () {
+                            $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+                            $(this).find("table").css({ "margin-bottom": "32px" });
+                            $(this).css({ "overflow-y": "scroll" });
+                            const ths = $(this).find("thead tr:first-child th");
+                            $(this).find("tfoot td").each(function (i) {
+                                $(this).css({ "min-width": $($(ths)[i]).width() + 20, "position": "static" });
+                            });
+                        });
+                    }
+                    */
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            $(`#${targetTable} ~ tfoot tr.input td`).children("input, select").each(function () {
+                const name = $(this).prop("name");
+                //r += `<td data-name="${name}">${data[name]}</td>`;
+
+                if (targetTable == "inputTable" && name == "datetime") {
+                    r += `<td style='display:none' data-name="${name}">${data[name]}</td>`;
+                } else {
+                    r += `<td data-name="${name}">${data[name]}</td>`;
+                }
+            });
+
+            let useEdit = true;
+            let useDelete = true;
+            let additionalButtons = "";
+            if (configAle[targetTable].rowConfig !== undefined) {
+                if (configAle[targetTable].rowConfig.withEdit !== undefined)
+                    useEdit = configAle[targetTable].rowConfig.withEdit;
+                if (configAle[targetTable].rowConfig.withDelete !== undefined)
+                    useDelete = configAle[targetTable].rowConfig.withDelete;
+                if (configAle[targetTable].rowConfig.additionalButtons != undefined)
+                    additionalButtons = configAle[targetTable].rowConfig.additionalButtons(data);
+            }
+            r += `<td class="tx-center">`;
+            r += additionalButtons;
+            if (useEdit) r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            if (useDelete) r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const table = $(button).parents("table");
+            if (!$(table).data("edited")) {
+                $(table).data("edited", true);
+
+                const tds = $(button).parents("tr").children('td');
+                const inputTr = $(table).find('tr.input');
+                const inputTds = $(inputTr).children('td');
+                const tdsCount = $(tds).length;
+
+                $(tds).each(function (i, e) {
+                    const el = $(inputTds[i]).children()[0];
+                    if (i != tdsCount - 1) {
+                        const html = $(e).html();
+                        const newInput = $(el).clone();
+                        if ($(el).hasClass('select2'))
+                            $(el).val(null).trigger("change");
+                        else
+                            $(el).val("");
+                        if (!$(el).hasClass("disabled"))
+                            $(newInput).prop("disabled", false);
+
+                        $(el).prop("disabled", true);
+                        $(newInput).val(html);
+                        $(e).html(newInput);
+                        if ($(el).hasClass('select2')) {
+                            $(newInput).select2('destroy');
+                            $(newInput).removeAttr('data-select2-id');
+                            $(newInput).select2({
+                                allowClear: true,
+                                placeholder: 'Choose one',
+                                searchInputPlaceholder: 'Search options'
+                            });
+                        }
+                    } else {
+                        $(el).off("click");
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:normalData(this)");
+                        $(edit).removeClass("fa-edit");
+                        $(edit).addClass("fa-save");
+                    }
+                });
+            }
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            basicFunction();
+            ieFix();
+        }
+        function basicFunction() {
+
+            /*  chanif: $('.select2').start diganti jadi $('.select2').select2 */
+            $('.select2').select2({
+                allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+                placeholder: 'Choose one or more',
+                searchInputPlaceholder: 'Search options'
+            });
+
+
+            $(document).find('.input-time').each(function () {
+                var cleave = new Cleave($(this), {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            })
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    var ev = $._data(el, 'events');
+                    if (!(ev && ev.click))
+                        $(el).on("click", addToTable);
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target, data) {
+            $(target).html(generateTable(data, target));
+            countSummary(target);
+        }
+        function getTimbangan() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+
+            $.ajax({
+                url: url,
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: "callback",
+                success: function (data) {
+                    $('#weightOutput').val(data.Weight);
+                },
+                error: function (httpReq, status, exception) {
+                    console.log("timbangan not found");
+                }
+            });
+        }
+
+        var podata = [];
+        $(document).ready(function () {
+            setInterval(getTimbangan, 1000);
+
+
+            $('.phase-show').click(function () {
+                getTimbangan();
+            })
+
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $(".add-to-table").on("click", addToTable);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        function addToTable(button) {
+            const targetTable = $(this).data("target");
+            const tds = $(this).parents("tr").children("td");
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(tds).each(function (tdIndex, td) {
+                const input = $(td).children();
+                if (input.attr("name") != undefined) {
+                    const name = input.attr("name");
+                    const val = input.val();
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            if ((input[0].nodeName.toLowerCase() === 'select')) {
+                                $(input[0]).siblings(".select2-container").css('border', '1px solid red');
+                                $(input[0]).siblings(".select2-container").css('border-radius', '0.25rem');
+                                $(input[0]).on('select2:select', function (e) {
+                                    $(input[0]).siblings(".select2-container").css('border', 'none');
+                                    $(input[0]).siblings(".select2-container").css('border-radius', '0');
+                                });
+                            } else if (input[0].value === "") {
+                                input[0].style.borderColor = "red";
+                                $(input[0]).on('click', function (e) {
+                                    input[0].style.borderColor = "rgb(192, 204, 218)";
+                                });
+                            }
+                            return false;
+                        }
+                    }
+                    if (input[0].type.toLowerCase() == "number") {
+                        var myRegexp = /^00+$/g;
+                        var match = myRegexp.exec(val);
+                        if (match != null) {
+                            alert("Please input a valid number");
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+            $(tds).each(function (i, td) {
+                const node = $(td).children();
+                $(node).val("");
+                if ($(node).hasClass("select2"))
+                    $(node).trigger('change');
+            });
+
+            if (configAle[targetTable].onAdd != undefined) {
+                if (configAle[targetTable].onAdd(newdata)) {
+                    return;
+                }
+            }
+            configAle[targetTable].data.push(newdata);
+            $("#" + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+            countSummary(targetTable);
+            ieFix();
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const summaryTds = $('#' + targetTable).parents('table').find('.summary-body').children();
+                $('#' + targetTable).parents('table').find('.input td').each(function (i, td) {
+                    const name = $(td).children().attr("name");
+                    if (rowData.hasOwnProperty(name))
+                        $(summaryTds[i]).html(rowData[name]);
+                });
+            }
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const table = $(button).parents("table");
+                releaseDisabledInput(table);
+                if (configAle[targetTable].onDelete != undefined) {
+                    if (configAle[targetTable].onDelete(id)) {
+                        return;
+                    }
+                }
+                deleteFromArray(id, configAle[targetTable].data);
+                $('#' + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                const table = $(button).parents("table");
+
+                if (configAle[targetTable].onSave != undefined) {
+                    if (configAle[targetTable].onSave(id)) {
+                        return;
+                    }
+                }
+                const index = findInArray(id, configAle[targetTable].data);
+                let shouldReturn = false;
+                var newdata = {
+                    id: uuidv4()
+                };
+                $(tds).each(function (tdIndex, e) {
+                    if (tdIndex != tdsCount - 1) {
+                        const name = $(e).data("name");
+                        const val = $($(e).children()[0]).val();
+                        if (configAle[targetTable].onValidate != undefined) {
+                            if (configAle[targetTable].onValidate(name, val)) {
+                                shouldReturn = true;
+                                return false;
+                            }
+                        }
+                        newdata[name] = val;
+                    } else {
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:editData(this)");
+                        $(edit).removeClass("fa-save");
+                        $(edit).addClass("fa-edit");
+                    }
+                });
+                if (shouldReturn) return;
+
+                configAle[targetTable].data[index] = newdata;
+                const row = generateRow(configAle[targetTable].data[index], targetTable);
+                $(button).parents("tr").html(row);
+
+                releaseDisabledInput(table);
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+
+        function collectAllData() {
+            let collectorArray = [];
+            for (var tableId in configAle) {
+                let tableColumnType = {};
+                $(`#${tableId} ~ tfoot tr.input td input`).each(function () {
+                    tableColumnType[$(this).prop("name")] = $(this).prop("type");
+                });
+                const data = configAle[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let val = data[i][prop];
+                            if (configAle[tableId].onCollectData != undefined) {
+                                val = configAle[tableId].onCollectData(prop, val);
+                            }
+                            console.log(prop, val);
+                            collectorArray.push({
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: tableColumnType[prop] == "number" ? parseInt(val).toFixed(2) : val,
+                                ValueType: tableColumnType[prop] == "number" ? "Numeric" : "NonNumeric",
+                                RowNumber: i
+                            });
+                            console.log(collectorArray);
+                        }
+                    }
+                }
+            }
+            return collectorArray;
+        }
+        function countDuration(start, end, duration) {
+            var end = $('#' + end).val();
+            var start = $('#' + start).val();
+
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                $('#' + duration).val(diffMinutes + " Min");
+            }
+        };</script>
+    <script>
+        /*
+                    * data = array untuk menyimpan data;
+                    * countSummary = dipanggil saat menghitung summary, return object dengan property sesuai dengan name pada `tfoot tr.input`;
+                    * onAdd(newData) = dipanggil sebelum menambah data, return boolean apakah harus ditambahkan atau tidak;
+                    * onDelete(idOfDeletedObject) = dipanggil sebelum menghapus data, return boolean apakah harus dihapus atau tidak;
+                    * onSave(idOfUpdatedObject) = dipanggil sebelum mengubah data, return boolean apakah harus diubah atau tidak;
+                    * onValidate(nameOfInput, valueOfInput) = validasi nilai saat tambah dan save, return boolean apakah harus diterus atau tidak;
+                    *
+                    * rowConfig = config untuk generate baris tabel;
+                    * - withEdit = menampilkan edit, default true;
+                    * - withDelete = menampilkan delete, default true;
+                    * - additionalButtons(data) = fungsi untuk yang akan mengembalikan button tambahan untuk tiap baris, return element html dalam string;
+                    */</script>
+    <script>
+        var ripperData = [];
+        var inputData = [];
+        var outputData = [];
+        var rippingData = [];
+        const configAle = {
+            ripping: {
+                data: rippingData,
+                countSummary: function () {
+                    let rowData = {
+                        IncomingProcess: 0.00,
+                        RecheckProcess: 0.00,
+                        SpeedProcess: 0.00,
+                        SteamProcess: 0.00,
+                        MCProcess: 0.00,
+                        OnPanProcess: 0.00,
+                        NTRMProcess: 0.00,
+                    };
+                    var count = 0;
+                    for (var i = 0; i < rippingData.length; i++) {
+                        rowData.IncomingProcess += Number.parseFloat(rippingData[i].IncomingProcess);
+                        rowData.RecheckProcess += Number.parseFloat(rippingData[i].RecheckProcess);
+                        rowData.SpeedProcess += Number.parseFloat(rippingData[i].SpeedProcess);
+                        rowData.SteamProcess += Number.parseFloat(rippingData[i].SteamProcess);
+                        rowData.MCProcess += Number.parseFloat(rippingData[i].MCProcess);
+                        rowData.OnPanProcess += Number.parseFloat(rippingData[i].OnPanProcess);
+                        rowData.NTRMProcess += Number.parseFloat(rippingData[i].NTRMProcess);
+                        count = i + 1;
+                    }
+                    rowData.IncomingProcess = Math.floor((rowData.IncomingProcess / count) * 100) / 100;
+                    rowData.RecheckProcess = Math.floor((rowData.RecheckProcess / count) * 100) / 100;
+                    rowData.SpeedProcess = Math.floor((rowData.SpeedProcess / count) * 100) / 100;
+                    rowData.SteamProcess = Math.floor((rowData.SteamProcess / count) * 100) / 100;
+                    rowData.MCProcess = Math.floor((rowData.MCProcess / count) * 100) / 100;
+                    rowData.OnPanProcess = Math.floor((rowData.OnPanProcess / count) * 100) / 100;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            ripper: {
+                data: ripperData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            inputTable: {
+                data: inputData,
+                countSummary: function () {
+                    let rowData = {
+                        WeightInput: 0.00,
+                    };
+                    for (var i = 0; i < inputData.length; i++) {
+                        rowData.WeightInput += Number.parseFloat(inputData[i].WeightInput);
+                    }
+                    rowData.WeightInput = Math.floor(rowData.WeightInput * 100) / 100;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        if (name == "datetime") return false;
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            output: {
+                data: outputData,
+                countSummary: function () {
+                    let rowData = {
+                        WeightOutput: 0.00,
+                    };
+                    for (var i = 0; i < outputData.length; i++) {
+                        rowData.WeightOutput += Number.parseFloat(outputData[i].WeightOutput);
+                    }
+                    rowData.WeightOutput = Math.floor(rowData.WeightOutput * 100) / 100;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+        }
+    </script>
+    <script>
+        var dataNonNumericComponent = [
+            //"hlsafetytrigger",
+            //"hlsafetycomment",
+            //"hlquality",
+            //"hlqualitycomment",
+            //"hlqualityflags",
+            //"hlqualityflagsaction",
+            //"hlqualityincidents",
+            //"hlqualityincidentsaction",
+            //"hlqualitycompletitionofvqi",
+            //"hlqualitycompletitionofvqiaction",
+            //"hlqualityspc",
+            //"hlqualityspcaction",
+            //"hlqualityincompletedoc",
+            //"hlqualityincompletedocaction",
+            //"hlqualityhigherrr",
+            //"hlqualityhigherrraction"
+        ];
+        var dataNumericComponent = [
+            //"hlnoofstops",
+            //"hlmtbf",
+            //"hlcenterlineschecked",
+            //"hlcenterlinesofl",
+            //"hlensurecldeviation",
+            //"hlcilcompletion",
+            //"hlplannedduration",
+            //"hlactualduration",
+            //"hlnumofdefectsfound",
+            //"hlnumofdefectsfixed",
+            //"hlensurereporteddhl",
+            //"hlnumofbreakdown",
+            //"hltotbreakdown",
+            //"hlensurepmcard"
+        ];
+        var datanonnumericvalue = [
+            //"hlsafetytrigger",
+            //"hlsafetycomment",
+            //"hlquality",
+            //"hlqualitycomment",
+            //"hlqualityflags",
+            //"hlqualityflagsaction",
+            //"hlqualityincidents",
+            //"hlqualityincidentsaction",
+            //"hlqualitycompletitionofvqi",
+            //"hlqualitycompletitionofvqiaction",
+            //"hlqualityspc",
+            //"hlqualityspcaction",
+            //"hlqualityincompletedoc",
+            //"hlqualityincompletedocaction",
+            //"hlqualityhigherrr",
+            //"hlqualityhigherrraction"
+        ];
+        var datanumericvalue = [
+            //"hlnoofstops",
+            //"hlmtbf",
+            //"hlcenterlineschecked",
+            //"hlcenterlinesofl",
+            //"hlensurecldeviation",
+            //"hlcilcompletion",
+            //"hlplannedduration",
+            //"hlactualduration",
+            //"hlnumofdefectsfound",
+            //"hlnumofdefectsfixed",
+            //"hlensurereporteddhl",
+            //"hlnumofbreakdown",
+            //"hltotbreakdown",
+            //"hlensurepmcard"
+        ];
+        $(function () {
+            'use strict'
+            /******************** PREFILLED ******************/
+            var model = JSON.parse($("#jsonModel").attr("data-json"));
+            console.log(model);
+            var counter = 0;
+            $('#generalinfo').find('input,select').each(function () {
+                var val = model.CompoVal[counter++].Value.Value;
+                val = decodeURIComponent(val == null ? "" : val);
+
+                if (val.indexOf('___') !== -1) {
+                    val = val.split('___');
+                }
+                console.log(val);
+                console.log(this);
+                $(this).val(val);
+                if ($(this).data('datepicker')) {
+					var date = val.substr(5, 9).split("-");
+					var months = moment.monthsShort();
+					date[1]=months.indexOf(date[1])+1;
+					if(date[1]<10){
+						date[1]='0'+date[1];
+					}                        
+					val = '20'+date[2]+'-'+date[1]+'-'+date[0];
+                    $(this).datepicker('setDate', new Date(val)).datepicker('fill');
+                }
+            });
+
+            for (var i = counter; i < model.CompoVal.length; i++) {
+                for (var j = 0; j < dataNonNumericComponent.length; j++) {
+                    if (model.CompoVal[i].Component.ComponentName == dataNonNumericComponent[j]) {
+                        var val = model.CompoVal[i].Value.Value;
+                        val = decodeURIComponent(val == null ? "" : val);
+
+                        if (val.indexOf('___') !== -1) {
+                            val = val.split('___');
+                        }
+                        console.log(dataNonNumericComponent[j]);
+                        console.log(val);
+                        $('#' + dataNonNumericComponent[j]).val(val);
+                    }
+                }
+
+                for (var j = 0; j < dataNumericComponent.length; j++) {
+                    if (model.CompoVal[i].Component.ComponentName == dataNumericComponent[j]) {
+                        const val = model.CompoVal[i].Value.Value;
+                        $('#' + dataNumericComponent[j]).val(decodeURIComponent(val == null ? "" : val));
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Image1") {
+                    document.getElementById("image_1_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" src="' + fastApp.BaseUrl + '/Uploads/lph/ripper/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" width=160px; id="image_1" data-toggle="modal" data-target="#photo-modal" />';
+                }
+                counter = i;
+
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        data[model.Extras[i].FieldName] = decodeURIComponent(model.Extras[i].Value);
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                        console.log(model.Extras.length);
+                    }
+                }
+                configAle[table].data.push(data);
+            }
+            for (let prop in configAle) {
+                configAle[prop].data.reverse();
+                $("#" + prop).html(generateTable(configAle[prop].data, prop));
+                countSummary(prop);
+                ieFix();
+            }
+            $('.select2').select2({
+                allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+                placeholder: 'Choose one or more',
+                searchInputPlaceholder: 'Search options'
+            });
+            /****************** END PREFILLED ****************/
+
+
+        })
+    </script>
+
+    <script type="text/javascript">
+          $('#btnHistory').on('click', function (e) {
+		    location.href = '@Url.Action("Index", "History")';
+          });
+
+		  $('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "Ripper")",
+                  data: JSON.stringify({
+                      LPHID: @(Model.LPH.ID),
+                      machine: $('#machInfo').val()
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "Ripper"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No previous submissions found",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+          })
+        function checkTableMandatory() {
+            const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+            if (outputData != null && outputData.length != null && outputData.length > 0) {
+                return true;
+            } else {
+                if (statusScroll == true) {
+                    window.scrollTo(0, Math.max(0, $('#output').closest(".card").offset().top - headerHeight - 100));
+                    statusScroll = false;
+                }
+                $('#table-error-submit').remove();
+                $('#output-div').append($('<div>', {
+                    style: "color:red; display:block; float:left; text-align:center;",
+                    id: "table-error-submit",
+                    html: 'Please insert at least one output',
+                    class: 'row card-body'
+                }));
+                return false;
+            }
+        }
+        var statusScroll = true;
+        function checkMandatory() {
+                var mandatory = $(".mandatory");
+                const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        if (statusScroll == true) {
+                            window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                            statusScroll = false;
+                        }
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                            $(e.target).siblings(".select2-container").css('border', 'none');
+                            $(e.target).siblings(".select2-container").css('border-radius', '0');
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    } else if ($(mandatory[i])[0].value === "") {
+                        if (statusScroll == true) {
+                            window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                            statusScroll = false;
+                        }
+                        $(mandatory[i])[0].style.borderColor = "red";
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('click', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        $(mandatory[i]).on('focus', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    }
+                }
+                return status;
+            }
+        $('#btnApprove').click(function (e) {
+            statusScroll = true;
+            var checkM = checkMandatory();
+            var checkT = checkTableMandatory();
+            if (checkM && checkT) {
+                $('#loading_overlay').removeClass('d-none');
+
+                console.log("save");
+                var timeStart = $('#inputTimeStart').val();
+                var timeStop = $('#inputTimeStop').val();
+                var comment = $('#comment_value').val();
+
+                var collectorArray = collectAllData(); // for LPH Extras
+
+                var detailSubmission = {};
+                detailSubmission.StartTime = timeStart;
+                detailSubmission.EndTime = timeStop;
+                detailSubmission.Shift = $('#shift').val();
+
+                collectInformationComponent();
+                collectImageComponent();
+
+                collectInformationValue();
+                collectImageValue();
+                console.log("Panggil :: Okey");
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Approval", "Ripper")",
+                    data: JSON.stringify({
+                        id: @(Model.LPH.ID),
+                        comment: comment,
+                        detailExtras: collectorArray, detailSubmission: detailSubmission, detailComponent: collectorComponent,
+                        detailValue: collectorValue
+
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        $('#loading_overlay').removeClass('d-none');
+                        console.log(result.Status);
+                        console.log(result);
+                        if (result.Status == 'True') {
+                            var notice = new PNotify({
+                                title: "@UIResources.Confirmation",
+                                text: "@UIResources.ApproveSucceed",
+                                width: "400px",
+                                type: 'success',
+                                addclass: 'stack-bottomright'
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+
+                            setTimeout(function () { window.location.href = "@(Url.Action("Index", "Approval"))"; }, 3000);
+                        }
+                        else {
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "@UIResources.ApprovalFailed",
+                                width: "400px",
+                                type: 'error',
+                                addclass: 'stack-bottomright',
+                                hide: false,
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#btnReject').click(function (e) {
+            $('#loading_overlay').removeClass('d-none');
+
+            var comment = $('#comment_value').val();
+            console.log(@(Model.LPH.ID));
+               $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("Rejected", "Ripper")",
+                  data: JSON.stringify({
+                      id: @(Model.LPH.ID),
+                      comment: comment
+
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+                      console.log(result.Status);
+					if (result.Status == 'True') {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.RejectSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright'
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+
+                        setTimeout(function () { window.location.href = "@(Url.Action("Index", "Approval"))"; }, 3000);
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.ApprovalFailed",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+        });
+
+
+    </script>
+    <script>
+        var collectorComponent = [];
+        var collectorValue = [];
+        function collectInformationComponent() {
+            var dateInfo = {};
+            dateInfo.ComponentType = "textfield";
+            dateInfo.ComponentName = "Date";
+            collectorComponent.push(dateInfo);
+            var weekInfo = {};
+            weekInfo.ComponentType = "textfield";
+            weekInfo.ComponentName = "Week";
+            collectorComponent.push(weekInfo);
+            var machineInfo = {};
+            machineInfo.ComponentType = "textfield";
+            machineInfo.ComponentName = "Machine";
+            collectorComponent.push(machineInfo);
+            var brandInfo = {};
+            brandInfo.ComponentType = "textfield";
+            brandInfo.ComponentName = "Brand";
+            collectorComponent.push(brandInfo);
+            var prodtechInfo = {};
+            prodtechInfo.ComponentType = "textfield";
+            prodtechInfo.ComponentName = "Prodtech";
+            collectorComponent.push(prodtechInfo);
+            var mekanikInfo = {};
+            mekanikInfo.ComponentType = "textfield";
+            mekanikInfo.ComponentName = "Mekanik";
+            collectorComponent.push(mekanikInfo);
+            var foremanInfo = {};
+            foremanInfo.ComponentType = "textfield";
+            foremanInfo.ComponentName = "gwGeneral";
+            collectorComponent.push(foremanInfo);
+            var elektrikInfo = {};
+            elektrikInfo.ComponentType = "textfield";
+            elektrikInfo.ComponentName = "Elektrik";
+            collectorComponent.push(elektrikInfo);
+            var teamLeaderInfo = {};
+            teamLeaderInfo.ComponentType = "textfield";
+            teamLeaderInfo.ComponentName = "TeamLeader";
+            collectorComponent.push(teamLeaderInfo);
+
+            var poNumberInfo = {};
+            poNumberInfo.ComponentType = "textfield";
+            poNumberInfo.ComponentName = "PONumber";
+            collectorComponent.push(poNumberInfo);
+
+            var shiftInfo = {};
+            shiftInfo.ComponentType = "textfield";
+            shiftInfo.ComponentName = "Shift";
+            collectorComponent.push(shiftInfo);
+            var groupInfo = {};
+            groupInfo.ComponentType = "textfield";
+            groupInfo.ComponentName = "Group";
+            collectorComponent.push(groupInfo);
+            var startInfo = {};
+            startInfo.ComponentType = "textfield";
+            startInfo.ComponentName = "Start";
+            collectorComponent.push(startInfo);
+            var stopInfo = {};
+            stopInfo.ComponentType = "textfield";
+            stopInfo.ComponentName = "Stop";
+            collectorComponent.push(stopInfo);
+            //var machineTypeInfo = {};
+            //machineTypeInfo.ComponentType = "textfield";
+            //machineTypeInfo.ComponentName = "MachineType";
+            //collectorComponent.push(machineTypeInfo);
+
+
+
+        }
+        function collectImageComponent() {
+            var imgUrl1 = $("#image_1").attr('src');
+            var imageUrl1 = {};
+            imageUrl1.ComponentType = "imagefield";
+            imageUrl1.ComponentName = "Image1";
+            imageUrl1.ImagePath = imgUrl1;
+            collectorComponent.push(imageUrl1);
+        }
+        function collectInformationValue() {
+            var dateInfoValue = {};
+            dateInfoValue.Value = $('#txtDateInfo').val();
+            dateInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(dateInfoValue);
+            var weekInfoValue = {};
+            weekInfoValue.Value = $('#txtWeekNumber').val();
+            weekInfoValue.ValueType = "Numeric";
+            collectorValue.push(weekInfoValue);
+            var machineInfoValue = {};
+            machineInfoValue.Value = $('#machInfo').val();
+            machineInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(machineInfoValue);
+            var brandInfoValue = {};
+            brandInfoValue.Value = $('#brandInfo').val();
+            brandInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(brandInfoValue);
+            var prodTechInfoValue = {};
+            var tem_value = $('#prodTech').val();
+            if (Array.isArray(tem_value)) {
+                tem_value = tem_value.join('___');
+            }
+            prodTechInfoValue.Value = tem_value;
+            prodTechInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(prodTechInfoValue);
+            var mekanikInfoValue = {};
+            mekanikInfoValue.Value = $('#mekanik').val();
+            mekanikInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(mekanikInfoValue);
+            var foremanInfoValue = {};
+            foremanInfoValue.Value = $('#gwGeneral').val();
+            foremanInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(foremanInfoValue);
+            var elektrikInfoValue = {};
+            elektrikInfoValue.Value = $('#elektrik').val();
+            elektrikInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(elektrikInfoValue);
+            var teamLeaderInfoValue = {};
+            teamLeaderInfoValue.Value = $('#teamLeader').val();
+            teamLeaderInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(teamLeaderInfoValue);
+            
+            var poNumberInfoValue = {};
+            poNumberInfoValue.Value = $('#PONumber').val();
+            poNumberInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(poNumberInfoValue);
+            var shiftInfoValue = {};
+            shiftInfoValue.Value = $('#shift').val();
+            shiftInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(shiftInfoValue);
+            var groupInfoValue = {};
+            groupInfoValue.Value = $('#group').val();
+            groupInfoValue.ValueType = "NonNumeric";
+            collectorValue.push(groupInfoValue);
+            var startInfoValue = {};
+            startInfoValue.Value = $('#inputTimeStart').val();
+            startInfoValue.ValueType = "Numeric";
+            collectorValue.push(startInfoValue);
+            var stopInfoValue = {};
+            stopInfoValue.Value = $('#inputTimeStop').val();
+            stopInfoValue.ValueType = "Numeric";
+            collectorValue.push(stopInfoValue);
+            //var machTypeInfoValue = {};
+            //machTypeInfoValue.Value = $('#machType').val();
+            //machTypeInfoValue.ValueType = "Numeric";
+            //collectorValue.push(machTypeInfoValue);
+            //console.log(collectorValue);
+        }
+        function collectImageValue() {
+            var imageUrl1 = $('#image_1_show').find('#image_1').first().attr('src');
+            var imageVal1 = {};
+            imageVal1.Value = imageUrl1;
+            imageVal1.ValueType = "ImageURL";
+            collectorValue.push(imageVal1);
+        }
+
+    </script>
+
+
+    <script>
+        var selected, remark;
+
+        var isUrlLink = false;
+        var img1Content = "";
+        var isImg1 = false;
+        var imageIndex = 0;
+        var max = 1;
+
+        function defaultDisplay() {
+            $("#image_1_show").hide();
+            $("#image_1_hide").show();
+        }
+
+        function switchDisplay() {
+            if (isImg1 == true) {
+                $("#image_1_show").show();
+                $("#image_1_hide").hide();
+            }
+        }
+
+
+        function infoId(e) {
+            console.log(e.id);
+
+            if (e.id == "image_1") {
+                isImg1 = true;
+            }
+        }
+
+        function renderImage(link, state) {
+
+            if (link == null || link == "") {
+                isUrlLink = false;
+            }
+            else {
+
+                isUrlLink = true;
+                console.log("link " + link);
+                console.log("state: " + state);
+
+                if (state == "image_1") {
+                    img1Content = link;
+                    document.getElementById("image_1_show").innerHTML = '<img class="input-img rounded mx-auto d-block" src="' + img1Content + '" onclick="infoId(this)" width=160px; id="image_1" data-toggle="modal" data-target="#photo-modal" />';
+                }
+
+            }
+        }
+
+        $("#t_splacing").click(function () {
+            isImg[0] = true;
+        });
+
+        const buttonDelete = `<i class="fa fa-trash"></i>`;
+        function generateOutputTable(arr, targetTable) {
+            let r = "";
+            if (arr.length == 0) return "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                r += '<tr>';
+                r += `<td id="type_${i}">${arr[i].type}</td>`;
+                r += `<td id="weight_${i}">${arr[i].Weight}</td>`;
+                r += `<td id="remark_${i}">${arr[i].Remark}</td>`;
+                r += `<td class="tx-center"><span onClick="javascript:deleteOutput(this)" data-id="${arr[i].id}" data-target-table="${targetTable}">${buttonDelete}</span></td>`;
+                r += '</tr>';
+            }
+            return r;
+        }
+
+        $(document).ready(function () {
+            var lphID = @(Model.LPH.ID);
+            $('#dtApproval').dataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "filter": false,
+                "bLengthChange": false,
+                "orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"order": [[ 3, "asc" ]],
+                "ajax": {
+                    "url": fastApp.BaseUrl + '/Ripper/GetApproverList?lphid='+ lphID,
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columnDefs":
+                    [{
+                        "targets": [0],
+                      "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [1],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [2],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [3],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [4],
+                        "searchable": true,
+                        "orderable": true
+                        },
+                     //{
+                     //       "targets": [5],
+                     //       "searchable": true,
+                     //       "orderable": true
+                     //   },
+
+                    ],
+
+                "columns": [
+
+                    { "data": "User", "name": "User", "title": "Name", "autoWidth": false },
+                    { "data": "Role", "name": "Role", "title": "Role", "autoWidth": false },
+                    { "data": "Status", "name": "Status", "title": "Status", "autoWidth": false },
+                    //{ "data": "Approver", "name": "Approver", "title": "Approver", "autoWidth": false },
+                    {
+                        "data": "ModifiedDate",
+                        render: function (data, type, row) {
+                            if (data)
+                                return moment(data).format("DD-MMM-YY HH:mm");
+                            else
+                                return '';
+                        }
+                    },
+                    { "data": "Notes", "name": "Notes", "title": "Notes", "autoWidth": false }
+                ],
+                "fnRowCallback": function (nRow, data, iDisplayIndex, iDisplayIndexFull) {
+                    $('td', nRow).css('background-color', data['Color']);
+                    $('#dtApproval_paginate')[0].style.display = "none";
+                }
+            });
+            defaultDisplay();
+
+            $('#phase-modal').on('next', function (e, i, info) {
+
+                const tr = $('#output ~ tfoot tr.input');
+                switch (i) {
+                    case 0:
+                        if (!selected) {
+                            info.shouldReturn = true;
+                            return;
+                        } else {
+                            $(tr).find('input[name="TypeOutput"]').val(selected);
+                            selected = null;
+                            $(this).find(".next").show();
+                        }
+                        break;
+                    case 1:
+                        const remark = $("#outputRemark").val();
+                        if (remark.length == 0) {
+                            info.shouldReturn = true;
+                            return;
+                        } else {
+                            info.shouldHide = true;
+                            $(tr).find('input[name="RemarkOutput"]').val(remark);
+                            $(tr).find('input[name="WeightOutput"]').val($('#weightOutput').val());
+                            $('.add-to-table[data-target="output"]').click();
+                        }
+                        break;
+                }
+            });
+            $('#phase-modal').on('hide', function (e) {
+                selected = null;
+                $(this).find(".next").hide();
+            });
+            $('#phase-modal').on('show.bs.modal', function (e) {
+                $('#table-error-submit').remove();
+            });
+            $('#photo-modal').on('next', function (e, i, info) {
+                info.shouldHide = true;
+                if (isUrlLink == true) switchDisplay();
+                else defaultDisplay();
+            });
+            $('#photo-modal').on('hide', function (e) {
+            });
+            $('#scan-modal').on('next', function (e, i, info) {
+                info.shouldHide = true;
+            });
+            $('#scan-modal').on('hide', function (e) {
+            });
+        });</script>
+
+    <script>
+
+        // Video Part
+        var video = document.querySelector("#videoElement");
+        var hdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var hhdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var vgaConstraints = {
+            video: {
+                mandatory: {
+                    maxWidth: 160,
+                    maxHeight: 120
+                }
+            }
+        };
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            document.getElementById("demo").innerHTML = "";
+
+            try {
+                navigator.getUserMedia(hhdConstraints, handleVideo, videoError);
+            } catch (error) {
+                navigator.getUserMedia(hdConstraints, handleVideo, videoError);
+            }
+        }
+
+        function handleVideo(stream) {
+            try {
+                this.srcObject = stream;
+            } catch (error) {
+                this.src = window.URL.createObjectURL(stream);
+            }
+        }
+
+        function videoError(e) {
+            // do something
+        }</script>
+
+    <script>
+        // Capture Image Part
+        var player = document.getElementById('videoElement');
+        var snapshotCanvas = document.getElementById('snapshot');
+        var captureButton = document.getElementById('capture');
+        var captureButton3 = document.getElementById('capture3');
+        var textBottom = document.getElementById('saveText');
+
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        var txfname = "img_text";
+        var XdatStr = 'date';
+
+        textBottom.addEventListener('click', function () {
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            XdateStr = dateStr;
+            txfname = 'IMG_' + dateStr;
+
+            saveTextAsFile(txfname);
+            pcanvas2blob().then(download2X);
+
+            document.getElementById("demo").innerHTML = "saved ";
+
+        });
+
+        captureButton.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Reading PDF417.";
+
+            var VH = 1080;
+            var VW = 1920;
+
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var buf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, buf);
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var b = _pdf417JS(buf, VH, VW, 1024);
+
+            var heapBu = new Uint8Array(Module.HEAPU8.buffer, buf, 1028);
+            var vanz = bin2Strung(heapBu);
+
+
+            if (b <= 0) {
+                vanz = "No Read.";
+            }
+
+            Module._free(buf);
+            document.getElementById("demo").innerHTML = vanz;
+
+        });
+
+        captureButton3.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = " OCRing MRZ. ";
+
+            var VH = 1080;
+            var VW = 1920;
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4; //1280*720*4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var bluf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, bluf);
+
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var c = _DLreadJS(bluf, VH, VW, 1024);
+
+            var heapBuc = new Uint8Array(Module.HEAPU8.buffer, bluf, 1028);
+            var vanc = bin2Strung(heapBuc);
+
+            if (c <= 0) {
+                vanc = "No Read.";
+            }
+            Module._free(bluf);
+            document.getElementById("demo").innerHTML = vanc;
+        });
+
+        snapHat.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Image captured";
+
+            takeASnap();
+            //.then(download);
+        });
+
+        var state = "";
+        function takeASnap() {
+
+            canvas.width = 1280;//video.videoWidth; // set its size to the one of the video
+            canvas.height = 720;// video.videoHeight;
+            ctx.drawImage(video, 0, 0, 1280, 720); // the video
+
+            var jpegUrl = ctx.canvas.toDataURL("image/jpeg"); // get base64 output - no longer using toBlob
+
+
+            if (isImg1 == true) {
+                state = "image_1";
+            }
+
+            renderImage(jpegUrl, state);
+        }
+
+        function pcanvas2blob() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+            });
+        }
+
+        function download2X(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            a.download = 'IMG_' + XdateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function download(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+
+            a.download = 'IMG_' + dateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+
+        function download_png(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            a.download = 'IMG_' + dateStr + '.png';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function canvaSnap() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/png'); // request a Blob from the canvas
+            });
+        }
+
+        function saveTextAsFile(txt_name) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var res = ocr_text.replace(/<br>/g, "\r\n");
+            var res2 = res.replace(/&lt;/g, '<');
+
+            var blab = new Blob([res2], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+
+            a.click();
+        }
+
+        function saveImageAndText(fname) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var blab = new Blob([ocr_text], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+            a.click();
+        }</script>
+
+    <script>
+
+        function bin2Strung(array) {
+            var result = "";
+            var max = 2048;
+            for (var i = 0; i < max; i++) {
+                var v = String.fromCharCode(array[i]);
+
+                if (array[i] == 10) {
+                    result += "<br/>";
+                }
+                else {
+                    if (array[i] == 60) {
+                        //result += "&#60";
+                        result += "&lt";
+                    }
+                    else {
+                        result += String.fromCharCode(array[i]);
+                    }
+                }
+                if (array[i] == 0) {
+                    i = max;
+                }
+            }
+            return result;
+        }
+
+        function myFunction() {
+            document.getElementById("demo").innerHTML = "Doing My Best!";
+        }</script>
+    <script>
+        function inputBarcode(event) {
+            console.log("lilili");
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                console.log("lalalalala");
+                getvaluebarcode();
+            }
+        }
+
+        function getvaluebarcode() {
+            const vals = $("#scanner-inputTable").val().split("_");
+            console.log("value after split "+vals.length);
+            $("#scanner-inputTable").val("");
+            if (vals.length != 2) {
+                alert("Barcode not valid!");
+                return;
+            }
+
+            $.ajax({
+                url: "@Url.Action("GetBarcode", "Ripper")",
+                type: 'POST',
+                data: JSON.stringify({
+                    lphid: vals[0],
+                    datetime: vals[1]
+                }),
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    console.log(result);
+                    if (result.Status == "True") {
+                        $('#inputTable ~ tfoot tr.input input[name="datetime"]').val(vals.join("_"));
+                        for (var i = 0; i < result.message.length; i++) {
+                            if (result.message[i].FieldName == "PO_num") {
+                                $('#inputTable ~ tfoot tr.input input[name="PONumberInput"]').val(result.message[i].Value);
+                            } else if (result.message[i].FieldName == "FACode") {
+                                var newOption = new Option(result.message[i].Value, result.message[i].Value, true, true);
+                                $('[name=FACodeInput]').append(newOption).trigger('change');
+                                $('#inputTable ~ tfoot tr.input input[name="FACodeInput"]').val(result.message[i].Value).trigger("change");
+                            } else if (result.message[i].FieldName == "AsalLU") {
+                                $('#inputTable ~ tfoot tr.input input[name="AsalLUInput"]').val(result.message[i].Value);
+                            } else if (result.message[i].FieldName == "MachineVal") {
+                                $('#inputTable ~ tfoot tr.input input[name="MachineInput"]').val(result.message[i].Value);
+                            } else if (result.message[i].FieldName == "MachineNumVal") {
+                                $('#inputTable ~ tfoot tr.input input[name="MachineNumValInput"]').val(result.message[i].Value);
+                            } else if (result.message[i].FieldName == "CRCode") {
+                                $('#inputTable ~ tfoot tr.input input[name="CRCodeInput"]').val(result.message[i].Value);
+                            } else if (result.message[i].FieldName == "ResourceCigarette") {
+                                $('#inputTable ~ tfoot tr.input input[name="ResourceCigaretteInput"]').val(result.message[i].Value);
+                            } else if (result.message[i].FieldName == "ItemVal") {
+                                $('[name=TypeInput]').val(result.message[i].Value).trigger("change");
+                            } else if (result.message[i].FieldName == "TipeCF") {
+                                $('[name=TypeCFInput]').val(result.message[i].Value).trigger("change");
+                            } else if (result.message[i].FieldName == "WeightVal") {
+                                $('#inputTable ~ tfoot tr.input input[name="WeightInput"]').val(result.message[i].Value);
+                            }
+                        }
+                        $('.add-to-table[data-target="inputTable"]').click();
+                        $('#scanner-inputTable').val("");
+                    }
+                    else {
+                        alert(result.message);
+                    }
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        }
+    </script>
+    <script>
+        function detectBrowser() {
+            var ua = navigator.userAgent, tem,
+                M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+            if (/trident/i.test(M[1])) {
+                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                return 'IE ' + (tem[1] || '');
+            }
+            if (M[1] === 'Chrome') {
+                tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
+                if (tem != null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+            }
+            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
+            if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+            return M.join(' ');
+        };
+        if (detectBrowser().indexOf("Chrome") < 0) {
+            $('input[type=number]').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+        }
+    </script>
+    <script>
+        function printImage(element, child) {
+            let imagedata = $('#' + element).find('#' + child).attr('src');
+            if (imagedata == null) {
+                imagedata = $('#' + child+'_hide').find('#' + child).attr('src');
+            }
+            if (imagedata.length > 200) {
+                let dataimage = new Image();
+                let windowOpen = window.open("");
+                dataimage.src = imagedata;
+                windowOpen.document.write(dataimage.outerHTML);
+                console.log(imagedata);
+                return;
+            } else {
+                pwin = window.open(imagedata, "_blank");
+            }
+
+        }
+    </script>
+}

@@ -1,0 +1,100 @@
+﻿@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Timbangan Test";
+    var selected = "";
+}
+
+<div class="content content-fixed">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <h4 class="mg-b-0 tx-spacing--1">Timbangan Test</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label class="col-3 col-form-label">Cara 1</label>
+                            <div class="col-5">
+                                <input type="text" class="form-control" id="cara1">
+                            </div>
+                            <label class="col-4 col-form-label">Ajax Biasa</label>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-3 col-form-label">Cara 2</label>
+                            <div class="col-5">
+                                <input type="text" class="form-control" id="cara2">
+                            </div>
+                            <label class="col-4 col-form-label">Cara CRIS</label>
+                        </div>
+                    </div>
+                </div>
+            </div><!--INFORMATION-->
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div id="iframeTimbangan" class="d-none"></div>
+
+@section Scripts{
+
+
+    <script>
+
+        function getTimbangan() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+
+            $.ajax({
+                url: url,
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: "callback",
+                success: function (data) {
+                    $('#cara1').val(data.Weight);
+                },
+                error: function (httpReq, status, exception) {
+                    console.log("timbangan not found");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            setInterval(getTimbangan, 500);
+        });
+    </script>
+
+    <script src="~/Scripts/timbangan_lab/jquery.jsonp-2.4.0.js"></script>
+
+    <script>
+        var interval;
+        var jsonpService = false;
+
+        function getTimbanganCRIS() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+
+            $.jsonp({
+                method: "POST",
+                url: url,
+                callbackParameter: "callback",
+                error: function (xOptions, status) {
+
+                    if (!jsonpService) {
+                        alert("Weghing Instrument Service Error");
+                        clearInterval(interval);
+                    }
+                },
+            });
+
+            callback = function (res) {
+                jsonpService = true;
+                $('#cara2').val(res.Weight);
+            };
+        }
+
+        $(document).ready(function () {
+            interval = setInterval(getTimbanganCRIS, 1000);
+        });
+    </script>
+}

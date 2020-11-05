@@ -1,0 +1,334 @@
+﻿@model Fast.Web.Models.Report.ReportWeeklyKPIModel
+@using Fast.Web.Resources;
+@{
+    var start = 2;
+    if (ViewBag.showall == 1)
+    {
+
+    }
+    else
+    {
+        if (Model.Header.Count() > 4)
+        {
+            start = Model.Header.Count() - 5;
+        }
+    }
+}
+
+<style>
+    .table thead th {
+        vertical-align: middle;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        display: none !important;
+    }
+
+    @if (ViewBag.showall == 1)
+    {
+        @:.dataTables_scrollHead table, .dataTables_scrollBody table {
+        @:    width: @(Model.Header.Count()*120)px !important;
+        @:}
+    }
+</style>
+
+<div class="card-header">
+    <div class="row pd-r-10-f">
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Production Center</label>
+            <select class="form-control select2" id="PC" name="PC">
+                <option value="">All Production Center</option>
+                <option value="PB" @(ViewBag.PC == "PB" ? "selected" : "")>PB - SIS Sukorejo</option>
+                <option value="PJ" @(ViewBag.PC == "PJ" ? "selected" : "")>PJ - Sampoerna Sukorejo</option>
+                <option value="PK" @(ViewBag.PC == "PK" ? "selected" : "")>PK - Sampoerna Karawang</option>
+                <option value="PI" @(ViewBag.PC == "PI" ? "selected" : "")>PI - PMID Karawang</option>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Year</label>
+            <input class="form-control" name="year" id="year" type="number" value="@(ViewBag.year)">
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Start Week for Calculation</label>
+            <input class="form-control" name="week" id="week" type="number" value="@(ViewBag.week)">
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">List</label>
+            <select class="form-control select2" id="showall" name="showall">
+                <option value="0">Show Last 4 Weeks</option>
+                <option value="1" @(ViewBag.showall == 1 ? "selected" : "")>Show All Data</option>
+            </select>
+        </div>
+
+        <div class="col-sm-2 mg-t-30"><button onclick="refresh()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-search mg-r-10"></i> Search</button></div>
+        <div class="col-sm-2 mg-t-30" id="buttonexcel"></div>
+
+    </div>
+</div>
+<div class="card-body">
+    <table class="table table-bordered" id="reportKPI">
+        <thead class="thead-primary font-weight-bold">
+            <tr>
+                <th>KPI</th>
+                <th>UOM</th>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@Model.Header[i]</th>
+                }
+                @for (int i = start; i < Model.Header.Count(); i++)
+                {
+                    <th>@Model.Header[i]</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Volume</td>
+                <td>Th Cigs</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.Volume[i]))</th>
+                }
+                @for (int i = start; i < Model.Volume.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.Volume[i]))</th>
+                }
+            </tr>
+            <tr>
+                <td>Uptime</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.Uptime[i], 2))</th>
+                }
+                @for (int i = start; i < Model.Uptime.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.Uptime[i], 2))</th>
+                }
+            </tr>
+            <!--
+            <tr>
+                <td>Uptime Theo</td>
+                <td></td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th></th>
+                }
+                @for (int i = start; i < Model.UptimeTheo.Count(); i++)
+                {
+                    <th>@Model.UptimeTheo[i]</th>
+                }
+            </tr>
+            -->
+            <tr>
+                <td>CRR</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.CRR[i], 2))</th>
+                }
+                @for (int i = start; i < Model.CRR.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.CRR[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Actual Wet Yield</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.ActYield[i], 2))</th>
+                }
+                @for (int i = start; i < Model.ActYield.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.ActYield[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>DIM Waste</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.DIMWaste[i], 2))</th>
+                }
+                @for (int i = start; i < Model.DIMWaste.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.DIMWaste[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Tax Stamp Waste</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.TaxStampWaste[i], 2))</th>
+                }
+                @for (int i = start; i < Model.TaxStampWaste.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.TaxStampWaste[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Claimable</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.Claimable[i], 2))</th>
+                }
+                @for (int i = start; i < Model.Claimable.Count(); i++)
+                {
+                    <th>@(Model.Volume[i] == 0 ? 0 : Math.Round((Model.ClaimableInThStick[i] * 100 / Model.Volume[i]), 2))</th>
+                }
+            </tr>
+            <!--
+            <tr>
+                <td>Claimable in Th Stick</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th></th>
+                }
+                @for (int i = start; i < Model.ClaimableInThStick.Count(); i++)
+                {
+                    <th>@Model.ClaimableInThStick[i]</th>
+                }
+            </tr>
+            -->
+            <tr>
+                <td style="background-color:cornflowerblue; color:white; font-weight:bold">DIM Loss Tree (Focus)</td>
+                <td style="background-color:cornflowerblue;"></td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <td style="background-color:cornflowerblue;"></td>
+                }
+                @for (int i = start; i < Model.Header.Count(); i++)
+                {
+                    <td style="background-color:cornflowerblue;"></td>
+                }
+            </tr>
+            <tr>
+                <td>Filter Rod</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.FilterRod[i], 2))</th>
+                }
+                @for (int i = start; i < Model.FilterRod.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.FilterRod[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Hinge Lid Blank</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.HingeLidBlank[i], 2))</th>
+                }
+                @for (int i = start; i < Model.HingeLidBlank.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.HingeLidBlank[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Inner Liner</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.InnerLiner[i], 2))</th>
+                }
+                @for (int i = start; i < Model.InnerLiner.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.InnerLiner[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Tipping Paper</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.TippingPaper[i], 2))</th>
+                }
+                @for (int i = start; i < Model.TippingPaper.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.TippingPaper[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Wrapping Film</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.WrappingFilm[i], 2))</th>
+                }
+                @for (int i = start; i < Model.WrappingFilm.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.WrappingFilm[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Inner Frame</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.InnerFrame[i], 2))</th>
+                }
+                @for (int i = start; i < Model.InnerFrame.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.InnerFrame[i], 2))</th>
+                }
+            </tr>
+            <tr>
+                <td>Cigarette Paper</td>
+                <td>%</td>
+                @for (int i = 0; i < 2; i++)
+                {
+                    <th>@(Math.Round(Model.CigarettePaper[i], 2))</th>
+                }
+                @for (int i = start; i < Model.CigarettePaper.Count(); i++)
+                {
+                    <th>@(Math.Round(Model.CigarettePaper[i], 2))</th>
+                }
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function refresh() {
+        $('#loading_overlay').removeClass('d-none');
+        $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/ReportKPI?year=" + $('#year').val() + "&week=" + $('#week').val() + "&showall=" + $('#showall').val() + "&PC=" + $('#PC').val(), function () {
+            $('#loading_overlay').addClass('d-none');
+        });
+    }
+
+    var table = $('#reportKPI').dataTable({
+        @if (ViewBag.showall == 1)
+        {
+            @:scrollX: true,
+        }
+        order: [],
+        ordering: false,
+        searching: false,
+        paging: false,
+        lengthChange: false,
+        language: {
+            searchPlaceholder: 'Search...',
+            sSearch: '',
+            lengthMenu: '_MENU_ items/page',
+        }
+    });
+
+    var button = new $.fn.dataTable.Buttons(table, {
+        buttons: [
+            {
+                "text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+                "extend": 'excel',
+                "className": 'btn pd-x-15 btn-outline-success btn-uppercase btn-block',
+                "title": 'Report KPI',
+                "extension": '.xlsx',
+                "titleAttr": 'EXCEL',
+            }
+        ]
+    }).container().appendTo($('#buttonexcel'));
+</script>

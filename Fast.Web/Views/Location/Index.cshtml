@@ -1,0 +1,472 @@
+﻿@model Fast.Web.Models.LocationTreeModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/styles.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/jquery.treegrid.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/default.min.css" />
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.LocationList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.LocationManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+
+					@if (Model.Access.hasPrint)
+					{
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+						<div id="buttonprint" class="dtButton"></div>
+					}
+					@if (Model.Access.hasWrite)
+					{
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddLocation">
+							<i data-feather="plus" class="mg-r-5"></i> @UIResources.NEW
+						</button>
+					}
+				</div>
+			</div>
+		</div>
+		<div data-label="TreeViewNode" class="df-example demo-table dtMarginTop">
+			<table class="tree table-bordered">
+				<thead>
+					<tr class="headerTree">
+						<td>@UIResources.LocationStructure</td>
+						<td>@UIResources.LocationCode</td>
+						@if (Model.Access.hasWrite)
+						{
+							<td>@UIResources.PageAction</td>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var pc in Model.ProductionCenters)
+					{
+						<tr class="treegrid-@pc.Index">
+							<td>@pc.Description</td>
+							<td>ID-@pc.Code</td>
+							@if (Model.Access.hasWrite)
+							{
+								<td>
+									<button class="btn-menu btn-default" onclick="EditPCActions(@pc.LocationID)" data-toggle="modal" data-target="#modalEditLocation" title="Edit"><i class="fa fa-edit"></i></button>
+									<button class="btn-menu btn-default" onclick="DeleteActions(@pc.LocationID, '@pc.Description')" title="Delete"><i class="fa fa-trash-alt"></i></button>
+								</td>
+							}
+						</tr>
+						foreach (var d in pc.Departments)
+						{
+							<tr class="treegrid-@d.Index  treegrid-parent-@pc.Index">
+								<td>@d.Description</td>
+								<td>ID-@pc.Code-@d.Code</td>
+								@if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditDepActions(@d.LocationID)" data-toggle="modal" data-target="#modalEditLocation" title="Edit"><i class="fa fa-edit"></i></button>
+										<button class="btn-menu btn-default" onclick="DeleteActions(@d.LocationID, '@d.Description')" title="Delete"><i class="fa fa-trash-alt"></i></button>
+									</td>
+								}
+							</tr>
+							foreach (var sd in d.SubDepartments)
+							{
+								<tr class="treegrid-@sd.Index  treegrid-parent-@d.Index">
+									<td>@sd.Description</td>
+									<td>ID-@pc.Code-@d.Code-@sd.Code</td>
+									@if (Model.Access.hasWrite)
+									{
+										<td>
+											<button class="btn-menu btn-default" onclick="EditSubActions(@sd.LocationID)" data-toggle="modal" data-target="#modalEditLocation" title="Edit"><i class="fa fa-edit"></i></button>
+											<button class="btn-menu btn-default" onclick="DeleteActions(@sd.LocationID, '@sd.Description')" title="Delete"><i class="fa fa-trash-alt"></i></button>
+										</td>
+									}
+								</tr>
+							}
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditLocation" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content" id="EditDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddLocation" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		@using (Html.BeginForm("Create", "Location", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm", @style = "margin:auto;min-width:440px;" }))
+		{
+			@Html.AntiForgeryToken()
+			<div class="modal-content">
+				<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+					<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</a>
+					<div class="media align-items-center">
+						<span class="tx-color-03 d-none d-sm-block"><i data-feather="plus-square" class="wd-60 ht-60"></i></span>
+						<div class="media-body mg-sm-l-20">
+							<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewLocation</h4>
+							<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+						</div>
+					</div><!-- media -->
+				</div><!-- modal-header -->
+				<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+					<div class="form-row" id="divPC">
+						<div class="form-group mg-l-10 col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ProductionCenter</label>
+						</div>
+						<div class="form-group mg-l-10 col-7">
+							@Html.DropDownListFor(p => p.ProductionCenterCode, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProductionCenter" })
+						</div>
+					</div>
+					<div class="form-row" id="divDept">
+						<div class="form-group mg-l-10 col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Department</label>
+						</div>
+						<div class="form-group mg-l-10 col-7">
+							@Html.DropDownListFor(p => p.DepartmentCode, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment" })
+						</div>
+
+					</div>
+					<div class="form-row" id="divSubDept">
+						<div class="form-group mg-l-10 col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.SubDepartment</label>
+						</div>
+						<div class="form-group mg-l-10 col-7">
+							@Html.DropDownListFor(p => p.SubDepartmentCode, (IEnumerable<SelectListItem>)ViewBag.SubDeparmentList, new { @class = "form-control", @id = "ddlSubDepartment" })
+						</div>
+					</div>
+					<hr style="margin-top:0" />
+					<div class="form-row" id="divCode">
+						<div class="form-group mg-l-10 col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Code <span style="color:red">*</span></label>
+						</div>
+						<div class="form-group mg-l-10 col-7">
+							@Html.TextBoxFor(x => x.Code, null, new { @class = "form-control", @id = "tbCode" })
+						</div>
+
+					</div>
+					<div class="form-row" id="divDesc">
+						<div class="form-group mg-l-10 col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Description <span style="color:red">*</span></label>
+						</div>
+						<div class="form-group mg-l-10 col-7">
+							@Html.TextBoxFor(x => x.Description, null, new { @class = "form-control", @id = "tbDescription" })
+						</div>
+					</div>
+				</div><!-- modal-body -->
+				<div class="modal-footer pd-x-20 pd-y-15">
+					<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+					<button type="button" class="btn btn-primary" id="btnAdd" onclick="AddActions()">@UIResources.AddNew</button>
+				</div>
+			</div><!-- modal-content -->
+		}
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<script src="~/Content/theme/lib/jquery-treegrid/js/jquery.treegrid.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/jquery/jquery.min.js"></script>
+	<script src="~/Content/theme/lib/jquery-treegrid/js/jquery.treegrid.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('.tree').treegrid();
+
+            $.noConflict();
+        });
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		var result = "@ViewBag.Result";
+		if (result != "") {
+			if (result == "True") {
+				var message = "@ViewBag.Message";
+
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: message,
+					width: "400px",
+					type: 'success',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright,
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+			else {
+				var error = "@ViewBag.ErrorMessage";
+
+				var notice = new PNotify({
+					title: "@UIResources.ErrorMessage",
+					text: error,
+					width: "400px",
+					type: 'error',
+					addclass: 'stack-bottomright',
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+
+			setTimeout(function () {
+				window.location.href = fastApp.BaseUrl + '/Location/Index';
+			}, 2000);
+		}
+
+		$('#divDept').hide();
+		$('#divSubDept').hide();
+
+		$('#ddlProductionCenter').change(function () {
+			if ($('#ddlProductionCenter').val() == "0") {
+				$('#divDept').hide();
+				$('#divSubDept').hide();
+				$("#tbCode").removeAttr("disabled");
+				$("#tbDescription").removeAttr("disabled");
+			} else {
+				if ($('#ddlProductionCenter').val().indexOf("#") < 0) {
+					$("#tbCode").removeAttr("disabled");
+					$("#tbDescription").removeAttr("disabled");
+					$('#divDept').show();
+					$.ajax({
+						type: "post",
+						url: fastApp.BaseUrl + "/Location/GetDepartmentByProductionCenter",
+						data: { code: $('#ddlProductionCenter').val() },
+						datatype: "json",
+						traditional: true,
+						success: function (data) {
+							var ddlTemp = "<select id='ddlDepartment'>";
+							ddlTemp = ddlTemp + '<option value="0">- Create New -</option>';
+							for (var i = 0; i < data.length; i++) {
+								if (data[i].Value.indexOf("#") >= 0) {
+									ddlTemp = ddlTemp + '<option style="background-color: lightgreen;" value=' + data[i].Value + '>' + data[i].Text + '</option>';
+								} else {
+									ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+								}
+							}
+							ddlTemp = ddlTemp + '</select>';
+							$('#ddlDepartment').html(ddlTemp);
+						}
+					});
+				} else {
+					$("#tbCode").val('');
+					$("#tbDescription").val('');
+					$("#tbCode").attr("disabled", true);
+					$("#tbDescription").attr("disabled", true);
+					$('#divDept').hide();
+					$('#divSubDept').hide();
+				}
+			}
+		});
+
+		$('#ddlDepartment').change(function () {
+			if ($('#ddlDepartment').val() == "0") {
+				$('#divSubDept').hide();
+				$("#tbCode").removeAttr("disabled");
+				$("#tbDescription").removeAttr("disabled");
+			} else {
+				if ($('#ddlDepartment').val().indexOf("#") < 0) {
+					$("#tbCode").removeAttr("disabled");
+					$("#tbDescription").removeAttr("disabled");
+					$('#divSubDept').show();
+					$.ajax({
+						type: "post",
+						url: fastApp.BaseUrl + "/Location/GetSubDepartmentByDepartment",
+						data: { code: $('#ddlDepartment').val(), pcCode: $('#ddlProductionCenter').val() },
+						datatype: "json",
+						traditional: true,
+						success: function (data) {
+							var ddlTemp = "<select id='ddlSubDepartment'>";
+							ddlTemp = ddlTemp + '<option value="0">- Create New -</option>';
+							for (var i = 0; i < data.length; i++) {
+								if (data[i].Value.indexOf("#") >= 0) {
+									ddlTemp = ddlTemp + '<option style="background-color: lightgreen;" value=' + data[i].Value + '>' + data[i].Text + '</option>';
+								} else {
+									ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+								}
+							}
+							ddlTemp = ddlTemp + '</select>';
+							$('#ddlSubDepartment').html(ddlTemp);
+						}
+					});
+				} else {
+					$("#tbCode").val('');
+					$("#tbDescription").val('');
+					$("#tbCode").attr("disabled", true);
+					$("#tbDescription").attr("disabled", true);
+					$('#divSubDept').hide();
+				}
+			}
+		});
+
+		$('#ddlSubDepartment').change(function () {
+			if ($('#ddlSubDepartment').val() == "0") {
+				$("#tbCode").removeAttr("disabled");
+				$("#tbDescription").removeAttr("disabled");
+				$("#btnAdd").removeAttr("disabled");
+			} else {
+				if ($('#ddlSubDepartment').val().indexOf("#") < 0) {
+					$("#btnAdd").attr("disabled", true);
+				} else {
+					$("#tbCode").val('');
+					$("#tbDescription").val('');
+					$("#tbCode").attr("disabled", true);
+					$("#tbDescription").attr("disabled", true);
+					$("#btnAdd").removeAttr("disabled");
+				}
+			}
+		});
+
+		function EditSubActions(id) {
+			$("#EditDialog").load(fastApp.BaseUrl + "/Location/EditSub/" + id);
+		};
+
+		function EditDepActions(id) {
+			$("#EditDialog").load(fastApp.BaseUrl + "/Location/EditDep/" + id);
+		};
+
+		function EditPCActions(id) {
+			$("#EditDialog").load(fastApp.BaseUrl + "/Location/EditPC/" + id);
+		};
+
+		var DeleteActions = function (ID, Name) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteLocation(ID);
+			});
+		};
+
+		function DeleteLocation(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Location/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						location.reload();
+					}, 1000);
+				}
+			});
+		};
+
+		function AddActions() {
+			if (($('#ddlSubDepartment').is(":visible") && $('#ddlSubDepartment').val() == "0") || ($('#ddlDepartment').is(":visible") && $('#ddlDepartment').val() == "0") ||
+				($('#ddlProductionCenter').is(":visible") && $('#ddlProductionCenter').val() == "0") || ($('#ddlCountry').is(":visible") && $('#ddlCountry').val() == "0")) {
+				if ($('#tbCode').val() == '' || $('#tbDescription').val() == '') {
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: "@UIResources.CodeDescRequired",
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+
+					return (false);
+				}
+			}
+
+			document.getElementById('AddModalForm').submit();
+			return(true);
+		}
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "Location")';
+		};
+	</script>
+}
+

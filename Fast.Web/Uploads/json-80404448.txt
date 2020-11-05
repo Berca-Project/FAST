@@ -1,0 +1,36 @@
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"53df5ca1-7a53-4db6-9eae-428c96aea95c","RtcFlowAvg":"2","RtcBatchNo":"2","RtcTotalizer":"2","RtcMCRtc":"2"}]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[{"id":"fdc064e7-7aa9-4d7b-bb4f-ce402d354739","SmallLaminaFlowAvg":"4","SmallLaminaBatchNo":"5","SmallLaminaTotalizer":"6","SmallLaminaMC":"7"}]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"5129a051-566b-4789-9d16-c009800b75d2","CloveFlowAvg":"1","CloveBatchNo":"1","CloveTotalizer":"1","CloveMCClove":"1"}]
+-------------------------------------------
+
+Log Entry : 10:32:04 PM Friday, September 18, 2020
+Message : 9/18/2020 10:32:04 PM 80404448 APPROVE JSON LPHID=17482 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------

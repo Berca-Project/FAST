@@ -1,0 +1,1969 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow:hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">CSF</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH CSF Infeed</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                @if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+                {
+                    @: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+                }
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Thu / 05-Sep-19">
+                                </div>
+
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Shift</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control" disabled value="3">
+                                </div>
+                                <label class="col-3 col-form-label tx-right">Week</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" disabled value="22">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Prodtech</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Dimastya Subekti">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor</label>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" disabled value="Andi">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Infeed
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Batch No.</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" value="839102403">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" style="padding-right:0px"></label>
+                                    <div class="col-7">
+                                        <button class="btn btn-sm mg-b-10 btn-primary" id="get-pss-data-infeed" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">SAP Batch</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedSapBatch">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Blend</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedBlend">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Formula Rev.</label>
+                                    <div class="col-7">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="infeedFormulaRev">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">SILO Destination</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedSiloDestination">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Start</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedStart">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Stop</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedStop">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Duration</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedDuration">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">No TPC</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedTpc">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Quantity Weighter</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="infeedQuantityWeighter">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" style="padding-right:0px"></label>
+                                    <div class="col-7">
+                                        <button class="btn btn-sm btn-primary" onclick="javascript:addRow(this)" data-target="infeedCsf" style="padding: 0.391rem 0.5rem;">Add To Table</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped ">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="min-width:90px">Batch No</th>
+                                        <th style="min-width:90px">SAP Batch</th>
+                                        <th>Blend</th>
+                                        <th style="min-width:110px">Formula Rev.</th>
+                                        <th style="min-width:130px">SILO Destination</th>
+                                        <th>Start</th>
+                                        <th>Stop</th>
+                                        <th>Duration</th>
+                                        <th style="min-width:90px">No TPC</th>
+                                        <th style="min-width:150px">Quantity Weighter</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="infeedCsf"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFEED-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Conditioning
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Batch No.</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" value="839102403">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" style="padding-right:0px"></label>
+                                    <div class="col-7">
+                                        <button class="btn btn-sm mg-b-10 btn-primary" id="get-pss-data-conditioning" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">SAP Batch</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningSapBatch">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Blend</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningBlend">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Formula Rev.</label>
+                                    <div class="col-7">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="conditioningFormulaRev">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Start</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningStart">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Stop</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningStop">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Duration</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningDuration">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">SILO Destination</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningSiloDestination">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Flow Rate Input 1</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningFri1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Flow Rate Input 2</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningFri2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Totalizer Water App 1</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningTwa1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Totalizer Water App 2</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningTwa2">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Quantity WeightCon 1</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningQw1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Quantity WeightCon 2</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="conditioningQw2">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" style="padding-right:0px"></label>
+                                    <div class="col-7">
+                                        <button class="btn btn-sm btn-primary" onclick="javascript:addRow(this)" data-target="conditioningCsf" style="padding: 0.391rem 0.5rem;">Add To Table</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped ">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="min-width:90px">Batch No</th>
+                                        <th style="min-width:90px">SAP Batch</th>
+                                        <th>Blend</th>
+                                        <th style="min-width:110px">Formula Rev.</th>
+                                        <th>Start</th>
+                                        <th>Stop</th>
+                                        <th>Duration</th>
+                                        <th style="min-width:130px">SILO Destination</th>
+                                        <th style="min-width:150px">Flow Rate Input 1</th>
+                                        <th style="min-width:150px">Flow Rate Input 2</th>
+                                        <th style="min-width:160px">Totalizer Water App 1</th>
+                                        <th style="min-width:160px">Totalizer Water App 2</th>
+                                        <th style="min-width:160px">Quantity WeightCon 1</th>
+                                        <th style="min-width:160px">Quantity WeightCon 2</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="conditioningCsf"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--CONDITIONING-->
+
+            <div class="col-6 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Lot
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th>Number</th>
+                                        <th>Qty</th>
+                                        <th width="70px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>5048.229</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="lot">
+                                    <tr>
+                                        <td>lo8485</td>
+                                        <td>4508.2290</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>lo8034</td>
+                                        <td>540.0000</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0.0000</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="lot" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--LOT-->
+
+            <div class="col-6 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Results
+                    </div>
+                    <div class="card-body">
+                        <table cellspacing="5" style="width: 100%;border-collapse: unset;">
+                            <thead>
+                                <tr class="tx-center">
+                                    <th></th>
+                                    <th>Target</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Steam Pressure 1 (Bar)</td>
+                                    <td>1.8</td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>Clove Temp Exi 1 (&deg;C)</td>
+                                    <td>70</td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>Residence Time (detik)</td>
+                                    <td></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Cutting Drying + Packing</div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-1 mg-b-10">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Batch No.</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" value="839102403">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label" style="padding-right:0px"></label>
+                                    <div class="col-8">
+                                        <button class="btn btn-sm mg-b-10 btn-primary" id="get-pss-data-cutting" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">SAP Batch</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="cuttingSapBatch">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Blend</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="cuttingBlend">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1 mg-b-10">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Formula Rev.</label>
+                                    <div class="col-8">
+                                        <div class="input-group">
+                                            <input id="cuttingFormulaRev" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" style="margin-bottom: 0;">
+                                    <label class="col-4 col-form-label">Start/Stop</label>
+                                    <div class="col-3">
+                                        <input type="text" class="form-control" id="cuttingStart">
+                                    </div>
+                                    <label class="col-form-label">/</label>
+                                    <div class="col-3">
+                                        <input type="text" class="form-control" id="cuttingStop">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Duration</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="cuttingDuration">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Silo Destination</label>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="cuttingSilodestination">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1 mg-b-10">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Totalizer Material</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="cuttingTotalizermaterial">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Totalizer FLavour</label>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" id="cuttingTotalizerflavour">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">MC Out Flavour</label>
+                                    <div class="col-7">
+                                        <div class="input-group">
+                                            <input id="cuttingMcoutflavour" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" style="padding-right:0px"></label>
+                                    <div class="col-7">
+                                        <button class="btn btn-sm btn-primary" onclick="javascript:addRow(this)" data-target="cuttingCsf" style="padding: 0.391rem 0.5rem;">Add To Table</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Line 1</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingTwv1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">MC Out Microwave</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingMom1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Remark</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingRemark1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Line 2</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingTwv2">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">MC Out Microwave</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingMom2">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Remark</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingRemark2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Line 3</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingTwv3">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">MC Out Microwave</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingMom3">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Remark</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingRemark3">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Line 4</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingTwv4">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">MC Out Microwave</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingMom4">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-7 col-form-label">Remark</label>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="cuttingRemark4">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Total Flavour 1 &#38; 2</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingTwv1n2">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">MC Out Microwave</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingMom1n2">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Remark</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingRemark1n2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Total Flavour 3 &#38; 4</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingTwv3n4">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">MC Out Microwave</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingMom3n4">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Remark</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingRemark3n4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Total Final Weigher</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Totalizer Weigher Vibro</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingTwvtfw">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">MC Out Microwave</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingMomtfw">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">Remark</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="cuttingRemarktfw">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped ">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:90px">Batch No</th>
+                                        <th rowspan="2" style="min-width:90px">SAP Batch</th>
+                                        <th rowspan="2">Blend</th>
+                                        <th rowspan="2" style="min-width:110px">Formula Rev.</th>
+                                        <th rowspan="2">Start</th>
+                                        <th rowspan="2">Stop</th>
+                                        <th rowspan="2">Duration</th>
+                                        <th rowspan="2" style="min-width:130px">SILO Destination</th>
+                                        <th rowspan="2" style="min-width:150px">Totalizer Material</th>
+                                        <th rowspan="2" style="min-width:130px">Totalizer Flavour</th>
+                                        <th rowspan="2" style="min-width:130px">MC Out Flavour</th>
+                                        <th colspan="3" class="tx-center">Line 1</th>
+                                        <th colspan="3" class="tx-center">Line 2</th>
+                                        <th colspan="3" class="tx-center">Line 3</th>
+                                        <th colspan="3" class="tx-center">Line 4</th>
+                                        <th colspan="3" class="tx-center">Total Flavour 1 &amp; 2</th>
+                                        <th colspan="3" class="tx-center">Total Flavour 3 &amp; 4</th>
+                                        <th colspan="3" class="tx-center">Total Final Weighter</th>
+                                        <th rowspan="2">Action</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                        <th style="min-width:180px">Totalizer Weighter Vibro</th>
+                                        <th style="min-width:150px">MC Out Microwave</th>
+                                        <th>Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cuttingCsf"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-5 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Packing CSF
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="37.5%"></th>
+                                    <th width="10%">Target</th>
+                                    <th class="tx-center" width="17.5%">Result 1</th>
+                                    <th class="tx-center" width="17.5%">Result 2</th>
+                                    <th class="tx-center" width="17.5%">Result 3</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Thickness line 1</td>
+                                    <td>1.8</td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>Thickness line 2</td>
+                                    <td>70</td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>Thickness line 3</td>
+                                    <td>70</td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>M.wave Running Line 1</td>
+                                    <td>70</td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>M.wave Running Line 2</td>
+                                    <td>70</td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <td>M.wave Running Line 3</td>
+                                    <td>70</td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="text" class="form-control"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!--Packing CSF-->
+
+            <div class="col-7 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Packing Line
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="width:30%" ;>No Ops Packing</th>
+                                        <th colspan="3">Packing Time</th>
+                                        <th rowspan="2">Total Box</th>
+                                        <th rowspan="2">QTY (Kg)</th>
+                                        <th rowspan="2" width="70px"></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Start</th>
+                                        <th>Stop</th>
+                                        <th>Total</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>48</td>
+                                        <td>5280</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="packingline">
+                                    <tr>
+                                        <td>PJ- 1019101804</td>
+                                        <td>23:00</td>
+                                        <td>01:00</td>
+                                        <td>120</td>
+                                        <td>48</td>
+                                        <td>5280</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="packingline" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PJ- </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="packingline" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PJ- </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="packingline" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="packingline" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--Packing Line-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+                    <div class="card-body" style="padding:10px">
+                        <div class="row" style="margin:0">
+                            <div class="col-2" style="padding: 0 10px 0 0">
+                                <table class="table table-bordered table-hover table-striped" style="min-height:150px;">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th class="tx-center"><label class="tx-center" style="margin:0px;"> Weight</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin-left: 0; margin-right: 0">
+                                                    <div class="col-12 tx-center" style="margin-right:0px;">
+                                                        <label class="tx-center font-weight-bold" style="font-size:32px;margin-right:0px;">19.55 Kg</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-3 tx-center">
+                                                        <label class="tx-center">&nbsp;</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <button type="button" class="phase-show btn btn-lg btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-waste-modal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-10">
+                                <table class="table table-bordered table-hover table-striped ">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th style="width: 45%">Waste</th>
+                                            <th style="width: 30%">Kind</th>
+                                            <th style="width: 15%">Weight</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td></td>
+                                            <td>35</td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="waste"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- WASTE -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Downtime</th>
+                                        <th>Problem</th>
+                                        <th>Description</th>
+                                        <th style="width:60px;">Start</th>
+                                        <th style="width:60px;">End</th>
+                                        <th style="width:80px;">Duration</th>
+                                        <th>PIC</th>
+                                        <th>Status</th>
+                                        <th>Action Plan</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>180 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="machine-problem">
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">301 Minor Stop</option>
+                                                <option value="302">302 Proces Adjustment</option>
+                                                <option value="401">401 Breakdown</option>
+                                                <option value="501">501 Distruption of Material Flow</option>
+                                                <option value="601">601 Cleaning</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Done</option>
+                                                <option value="2">On Progres</option>
+                                                <option value="3">Pending</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">SLAC</option>
+                                                <option value="302">CBM</option>
+                                                <option value="303">PM</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bagas</td>
+                                    <td>Requester</td>
+                                    <td>Submit to Supervisor</td>
+                                    <td>05-Sep-19 13:15</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagus</td>
+                                    <td>Supervisor</td>
+                                    <td>Confirmed</td>
+                                    <td>05-Sep-19 13:25</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!--APPROVAL SEGMENT-->
+
+        </div>
+    </div>
+</div>
+      </div>
+
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+<div class="modal fade wizard-modal" id="phase-waste-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div class="stepper row">
+                    <div class="stepper-step col active">
+                        <a class="btn stepper-btn">1</a>
+                        <p><small>Waste</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">2</a>
+                        <p><small>Kind</small></p>
+                    </div>
+                </div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Machine</h5>
+                            <hr />
+                            <center class="waste">
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Machine Number</h5>
+                            <hr />
+                            <center class="kind">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>$(function () {
+$('.select2').select2({
+		allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+        })</script>
+    <script>const machineProblemRow = `<td>301 Minor Stop</td><td>Bobbin Putus</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+        const machineProblemEditRow = `<td><select class="form-control select2"><option label="Choose one"></option><option value="301">301 Minor Stop</option><option value="302">302 Proces Adjustment</option><option value="401">401 Breakdown</option><option value="501">501 Distruption of Material Flow</option><option value="601">601 Cleaning</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem" class="fa fa-trash"></i></td>`;
+        const infeedCsfRow = `
+<td>839102403</td>
+<td>1320316</td>
+<td>AA32S</td>
+<td>26</td>
+<td>43010.00</td>
+
+<td>16:00</td>
+<td>17:00</td>
+<td>60 Mnt</td>
+<td>2584</td>
+<td>4831.7800</td>
+<td class="tx-center">
+<div class="btn-group">
+<i onclick="javascript:toEdit(this)" data-target="infeedCsf" class="fa fa-edit"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const infeedCsfEditRow = `
+<td><input type="text" class="form-control" value="839102403"></td>
+<td><input type="text" class="form-control" value="1320316"></td>
+<td><input type="text" class="form-control" value="AA32S"></td>
+<td><input type="text" class="form-control" value="26"></td>
+<td><input type="text" class="form-control" value="43010.00"></td>
+
+<td><input type="text" class="form-control" value="16:00"></td>
+<td><input type="text" class="form-control" value="17:00"></td>
+<td><input type="text" class="form-control" value="60 Mnt"></td>
+<td><input type="text" class="form-control" value="2584"></td>
+<td><input type="text" class="form-control" value="4831.7800"></td>
+<td class="tx-center">
+<div class="btn-group">
+<i data-target="infeedCsf" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const lotRow = `
+<td>lo8482</td>
+<td>5207.2900</td>
+<td class="tx-center">
+<div class="btn-group">
+<i onclick="javascript:toEdit(this)" data-target="lot" class="fa fa-edit"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const lotEditRow = `
+<td><input type="text" class="form-control" value="lo8482"></td>
+<td><input type="text" class="form-control" value="5207.2900"></td>
+<td class="tx-center">
+<div class="btn-group">
+<i data-target="lot" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const conditioningCsfRow = `
+<td>839102403</td>
+<td>1320316</td>
+<td>AA32S</td>
+<td>26</td>
+<td>06:30</td>
+
+<td>08:30</td>
+<td>120 Mnt</td>
+<td>60008.00</td>
+<td>3000.00</td>
+<td>0.00</td>
+
+<td>1389.36</td>
+<td>0.00</td>
+<td>4831.75</td>
+<td>0.00</td>
+<td class="tx-center">
+<div class="btn-group">
+<i onclick="javascript:toEdit(this)" data-target="conditioningCsf" class="fa fa-edit"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const conditioningCsfEditRow = `
+<td><input type="text" class="form-control" value="839102403"></td>
+<td><input type="text" class="form-control" value="1320316"></td>
+<td><input type="text" class="form-control" value="AA32S"></td>
+<td><input type="text" class="form-control" value="26"></td>
+<td><input type="text" class="form-control" value="06:30"></td>
+
+<td><input type="text" class="form-control" value="08:30"></td>
+<td><input type="text" class="form-control" value="120 Mnt"></td>
+<td><input type="text" class="form-control" value="60008.00"></td>
+<td><input type="text" class="form-control" value="3000.00"></td>
+<td><input type="text" class="form-control" value="0.00"></td>
+
+<td><input type="text" class="form-control" value="1389.36"></td>
+<td><input type="text" class="form-control" value="0.00"></td>
+<td><input type="text" class="form-control" value="4831.75"></td>
+<td><input type="text" class="form-control" value="0.00"></td>
+<td class="tx-center">
+<div class="btn-group">
+<i data-target="conditioningCsf" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const cuttingCsfRow = `
+<td>839102403</td>
+<td>1323692</td>
+<td>AA30S</td>
+<td>33</td>
+<td>14:00</td>
+
+<td>17:00</td>
+<td>300 Mnt</td>
+<td>60031</td>
+<td>5127.937</td>
+<td>75.69991</td>
+
+<td>14.3</td>
+
+<td>1871.19</td>
+<td>15.17</td>
+<td>1871.19</td>
+
+<td>2160.69</td>
+<td>14.12</td>
+<td>250.00</td>
+
+<td>2238.26</td>
+<td>13.28</td>
+<td>250.00</td>
+
+<td>2238.26</td>
+<td>13.28</td>
+<td>250.00</td>
+
+<td>2238.26</td>
+<td>13.28</td>
+<td>250.00</td>
+
+<td>2238.26</td>
+<td>13.28</td>
+<td>250.00</td>
+
+<td>2238.26</td>
+<td>13.28</td>
+<td>250.00</td>
+<td class="tx-center">
+<div class="btn-group">
+<i onclick="javascript:toEdit(this)" data-target="cuttingCsf" class="fa fa-edit"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        const cuttingCsfEditRow = `
+<td><input type="text" class="form-control" value="839102403"></td>
+<td><input type="text" class="form-control" value="1320316"></td>
+<td><input type="text" class="form-control" value="AA32S"></td>
+<td><input type="text" class="form-control" value="26"></td>
+<td><input type="text" class="form-control" value="14:00"></td>
+
+<td><input type="text" class="form-control" value="17:00"></td>
+<td><input type="text" class="form-control" value="300 Mnt"></td>
+<td><input type="text" class="form-control" value="60031"></td>
+<td><input type="text" class="form-control" value="5127.937"></td>
+<td><input type="text" class="form-control" value="75.69991"></td>
+
+<td><input type="text" class="form-control" value="14.3"></td>
+
+<td><input type="text" class="form-control" value="1871.19"></td>
+<td><input type="text" class="form-control" value="15.17"></td>
+<td><input type="text" class="form-control" value="1871.19"></td>
+
+<td><input type="text" class="form-control" value="2160.69"></td>
+<td><input type="text" class="form-control" value="14.12"></td>
+<td><input type="text" class="form-control" value="250.00"></td>
+
+<td><input type="text" class="form-control" value="2238.26"></td>
+<td><input type="text" class="form-control" value="13.28"></td>
+<td><input type="text" class="form-control" value="250.00"></td>
+
+<td><input type="text" class="form-control" value="2238.26"></td>
+<td><input type="text" class="form-control" value="13.28"></td>
+<td><input type="text" class="form-control" value="250.00"></td>
+
+<td><input type="text" class="form-control" value="2238.26"></td>
+<td><input type="text" class="form-control" value="13.28"></td>
+<td><input type="text" class="form-control" value="250.00"></td>
+
+<td><input type="text" class="form-control" value="2238.26"></td>
+<td><input type="text" class="form-control" value="13.28"></td>
+<td><input type="text" class="form-control" value="250.00"></td>
+
+<td><input type="text" class="form-control" value="2238.26"></td>
+<td><input type="text" class="form-control" value="13.28"></td>
+<td><input type="text" class="form-control" value="250.00"></td>
+<td class="tx-center">
+<div class="btn-group">
+<i data-target="cuttingCsf" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>`;
+        function toEdit(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $(button).parents("tr").html(machineProblemEditRow);
+                    break;
+                case "lot":
+                    $(button).parents("tr").html(lotEditRow);
+                    break;
+                case "infeedCsf":
+                    $(button).parents("tr").html(infeedCsfEditRow);
+                    break;
+                case "conditioningCsf":
+                    $(button).parents("tr").html(conditioningCsfEditRow);
+                    break;
+                case "cuttingCsf":
+                    $(button).parents("tr").html(cuttingCsfEditRow);
+                    break;
+            }
+        }
+        function toNormal(button) {
+            if (confirm("Are you sure?")) {
+                const target = $(button).data("target");
+                switch (target) {
+                    case "machine-problem":
+                        $(button).parents("tr").html(machineProblemRow);
+                        break;
+                    case "lot":
+                        $(button).parents("tr").html(lotRow);
+                        break;
+                    case "infeedCsf":
+                        $(button).parents("tr").html(infeedCsfRow);
+                        break;
+                    case "conditioningCsf":
+                        $(button).parents("tr").html(conditioningCsfRow);
+                        break;
+                    case "cuttingCsf":
+                        $(button).parents("tr").html(cuttingCsfRow);
+                        break;
+                }
+            }
+        }
+        function addRow(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $("#" + target).append($(`<tr>${machineProblemRow}</tr>`));
+                    break;
+                case "lot":
+                    $("#" + target).append($(`<tr>${lotRow}</tr>`));
+                    break;
+                case "infeedCsf":
+                    $("#" + target).append($(`<tr>${infeedCsfRow}</tr>`));
+                    break;
+                case "conditioningCsf":
+                    $("#" + target).append($(`<tr>${conditioningCsfRow}</tr>`));
+                    break;
+                case "cuttingCsf":
+                    $("#" + target).append($(`<tr>${cuttingCsfRow}</tr>`));
+                    break;
+            }
+        }
+        function removeRow(button) {
+            if (confirm("Are you sure?")) {
+                $(button).parents("tr").remove();
+            }
+        }
+        const infeedPssData = {
+            infeedBlend: "AA32S",
+            infeedSapBatch: "1320316",
+            infeedFormulaRev: "26",
+            infeedStart: "16:00",
+            infeedStop: "17:00",
+            infeedDuration: "60 Mnt",
+            infeedTpc: "2584",
+            infeedSiloDestination: "43010.00",
+            infeedQuantityWeighter: "4831.7800",
+        };
+        const conditioningPssData = {
+            conditioningBlend: "AA32S",
+            conditioningSapBatch: "1320315",
+            conditioningFormulaRev: "26",
+            conditioningStart: "06:30",
+            conditioningStop: "08:30",
+            conditioningDuration: "120 Mnt",
+            conditioningSiloDestination: "60008.00",
+            conditioningFri1: "3000.00",
+            conditioningFri2: "0.00",
+            conditioningTwa1: "1389.36",
+            conditioningTwa2: "0.00",
+            conditioningQw1: "4831.75",
+            conditioningQw2: "0.00",
+        };
+        const cuttingPssData = {
+            cuttingBlend: "AA30S",
+            cuttingSapBatch: "1323692",
+            cuttingFormulaRev: "33",
+            cuttingStart: "14:00",
+            cuttingStop: "17:00",
+            cuttingDuration: "300 Mnt",
+            cuttingSilodestination: "60031",
+            cuttingTotalizermaterial: "5127.937",
+            cuttingTotalizerflavour: "75.69991",
+            cuttingMcoutflavour: "14.3",
+
+            cuttingTwv1: "1871.19",
+            cuttingMom1: "15.17",
+            cuttingRemark1: "1871.19",
+
+            cuttingTwv2: "2160.69",
+            cuttingMom2: "14.12",
+            cuttingRemark2: "250.00",
+
+            cuttingTwv3: "2238.26",
+            cuttingMom3: "13.28",
+            cuttingRemark3: "250.00",
+
+            cuttingTwv4: "2238.26",
+            cuttingMom4: "13.28",
+            cuttingRemark4: "250.00",
+
+            cuttingTwv1n2: "2238.26",
+            cuttingMom1n2: "13.28",
+            cuttingRemark1n2: "250.00",
+
+            cuttingTwv3n4: "2238.26",
+            cuttingMom3n4: "13.28",
+            cuttingRemark3n4: "250.00",
+
+            cuttingTwvtfw: "2238.26",
+            cuttingMomtfw: "13.28",
+            cuttingRemarktfw: "250.00",
+        };
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $('#get-pss-data-infeed').click(function () {
+                for (var prop in infeedPssData) {
+                    if (Object.prototype.hasOwnProperty.call(infeedPssData, prop)) {
+                        $("#" + prop).val(infeedPssData[prop]);
+                    }
+                }
+            });
+            $('#get-pss-data-conditioning').click(function () {
+                for (var prop in conditioningPssData) {
+                    if (Object.prototype.hasOwnProperty.call(conditioningPssData, prop)) {
+                        $("#" + prop).val(conditioningPssData[prop]);
+                    }
+                }
+            });
+            $('#get-pss-data-cutting').click(function () {
+                for (var prop in cuttingPssData) {
+                    if (Object.prototype.hasOwnProperty.call(cuttingPssData, prop)) {
+                        $("#" + prop).val(cuttingPssData[prop]);
+                    }
+                }
+            });
+        });</script>
+    <script>function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+        function generateRow(data, targetTable) {
+            let r = "";
+            for (var prop in data) {
+                if (Object.prototype.hasOwnProperty.call(data, prop)) {
+                    if (prop == "id") continue;
+                    r += `<td data-name="${prop}">${data[prop]}</td>`;
+                }
+            }
+            r += `<td class="tx-center">`;
+            r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                var tableBody = "";
+                switch (targetTable) {
+                    case "#waste":
+                        crrData = deleteFromArray(id, wasteData);
+                        tableBody = generateTable(wasteData, targetTable);
+                        break;
+                }
+                $(targetTable).html(tableBody);
+            }
+        }
+        function editData(button) {
+            const tds = $(button).parents("tr").children('td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                if (i != tdsCount - 1) {
+                    const html = $(e).html();
+                    $(e).html(`<input type="text" class="form-control" value="${html}">`);
+                } else {
+                    const edit = $(e).find(".edit");
+                    $(edit).attr("onclick", "javascript:normalData(this)");
+                    $(edit).removeClass("fa-edit");
+                    $(edit).addClass("fa-save");
+                }
+            });
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                let row = "";
+                switch (targetTable) {
+                    case "#waste":
+                        const index = findInArray(id, wasteData);
+                        $(tds).each(function (i, e) {
+                            if (i != tdsCount - 1) {
+                                wasteData[index][$(e).data("name")] = $(e).find("input").val();
+                            } else {
+                                const edit = $(e).find(".edit");
+                                $(edit).attr("onclick", "javascript:editData(this)");
+                                $(edit).removeClass("fa-save");
+                                $(edit).addClass("fa-edit");
+                            }
+                        });
+                        row = generateRow(wasteData[index], targetTable)
+                        console.log(wasteData);
+                        break;
+                }
+                $(button).parents("tr").html(row);
+            }
+        }
+        const wasteOpt = [
+            {
+                category: "Line 400, hopper-silo LU",
+                child: [
+                    "Dust Cyclone & Screen Dryer",
+                    "Vibro Infeed DRYR - 0006/0027",
+                ]
+            },
+            {
+                category: "Line 200, Unload silo - Cutter",
+                child: [
+                    "Dust Bag Cutter",
+                ]
+            },
+            {
+                category: "Line 100, Feeding - silo Bulking String Removel / MPS",
+                child: [
+                    "Angkup Kotor",
+                    "Sampah Cyclone (CVIB - 0204)",
+                    "Sampah Angkup (CVIB - 0204)",
+                    "Sampah Vibro (CVIB - 0201)",
+                    "Dust Seiving Sibro (CVIB - 0201)",
+                    "Dust Angkup Vibro (CVIB - 0049)",
+                    "Dust Collector Clasif (CSFR - 0004)",
+                    "Heaviest / batu (CSFR - 004)",
+                    "Dust0052 (New Dustbag)",
+                    "Karung Goni (satuan lembar)",
+                    "Penggantian Velcro (CROL - 0228)",
+                ]
+            },
+        ];
+        var wasteNewData = {};
+        var wasteData = [
+            {
+                id: uuidv4(),
+                category: "Line 100, Feeding-silo Bulking String Removel / MPS",
+                kind: "Sampah Angkup",
+                weight: "34",
+            },
+            {
+                id: uuidv4(),
+                category: "Line 100, Feeding-silo Bulking String Removel / MPS",
+                kind: "Dust Collector Clasif",
+                weight: "3",
+            },
+            {
+                id: uuidv4(),
+                category: "Line 400, hopper-silo LU",
+                kind: "Dust Cyclone Dryer",
+                weight: "91",
+            },
+        ];
+
+
+        var selected;
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item').siblings('.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $("#waste").html(generateTable(wasteData, "#waste"));
+
+            $(".wizard-modal .next").click(function () {
+                wizardButtonNext(this);
+            });
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item').siblings('.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+            $('#phase-waste-modal').on('show.bs.modal', function (e) {
+                let opts = [];
+                for (var i = 0; i < wasteOpt.length; i++) {
+                    opts.push(wasteOpt[i].category);
+                }
+                $(this).find(".waste").html(generateWizardButton(opts));
+            });
+            $('#phase-waste-modal').on('next', function (e, i, info) {
+                if (!selected) {
+                    info.shouldReturn = true;
+                    return;
+                }
+                switch (i) {
+                    case 0:
+                        wasteNewData.category = selected;
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            if (wasteOpt[i].category == selected) {
+                                $(this).find(".kind").html(generateWizardButton(wasteOpt[i].child));
+                            }
+                        }
+                        selected = null;
+                        break;
+                    case 1:
+                        info.shouldHide = true;
+                        wasteNewData.id = uuidv4();
+                        wasteNewData.kind = selected;
+                        wasteNewData.weight = "19.55";
+                        wasteData.push(wasteNewData);
+                        tableBody = generateTable(wasteData, '#waste');
+                        $('#waste').html(tableBody);
+                        break;
+                }
+            });
+            $('#phase-waste-modal').on('hide', function (e) {
+                wasteNewData = {};
+                selected = null;
+            });
+        });
+    </script>
+}
+
+
+

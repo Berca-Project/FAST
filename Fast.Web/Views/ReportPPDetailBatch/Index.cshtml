@@ -1,0 +1,569 @@
+﻿@model Fast.Web.Models.Report.ParamExportRawModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 25px;
+            border-radius: 0.25rem;
+        }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+                font-size: 13px;
+                padding: 0 0 0 5px;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                line-height: 16px;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+                line-height: 15px;
+            }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            padding-left: 5px;
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+            .select2-results__option[aria-selected=true] {
+                background: green !important;
+                color: white !important;
+            }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Detail Batch</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Detail Batch</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5" id="extractData"><i class="fas fa-file-excel"></i> Extract Excel</button>
+                @*<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>
+                    <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export CSV</button>*@
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:4">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider-text divider-vertical"></div>
+                        <div style="flex:4">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Prod. Center</label>
+                                <div class="col-7">
+                                    <select name="prodCenter" class="form-control">
+                                        @foreach (SelectListItem i in ViewBag.ProductionCenterList)
+                                        {
+                                            <option value="@(i.Value)">@i.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Filter Line</label>
+                                <div class="col-7">
+                                    <select name="line" class="form-control select2" multiple>
+                                        <optgroup label="Intermediate Line">
+                                            <option value="LPHPrimaryCloveInfeedConditioningController">Clove Feeding & Conditioning</option>
+                                            <option value="LPHPrimaryCloveCutDryPackingController">Clove Cut Dry & Packing</option>
+                                            <option value="LPHPrimaryCSFInfeedConditioningController">Csf Feeding & Conditioning</option>
+                                            <option value="LPHPrimaryCSFCutDryPackingController">Csf Cut Dry & Packing</option>
+                                            <option value="LPHPrimaryRTCController">RTC</option>
+                                            <option value="LPHPrimaryDietController">DIET</option>
+                                        </optgroup>
+                                        <optgroup label="Kretek Line">
+                                            <option value="LPHPrimaryKretekLineFeedingController">Feeding KR & RJ</option>
+                                            <option value="LPHPrimaryKretekLineConditioningController">DCCC KR & RJ</option>
+                                            <option value="LPHPrimaryKretekLineCuttingDryingController">Cut Dry</option>
+                                            <option value="LPHPrimaryKretekLineAddbackController">Addback</option>
+                                            <option value="LPHPrimaryKretekLinePackingController">Packing</option>
+                                            <option value="LPHPrimaryCresFeedingConditioningController">CRES Feeding & DCCC</option>
+                                            <option value="LPHPrimaryCresDryingPackingController">CRES Cut Dry & Packing</option>
+                                            <option value="LPHPrimaryKitchenController">Casing Kitchen</option>
+                                        </optgroup>
+                                        <optgroup label="White Line">
+                                            <option value="LPHPrimaryWhiteLineFeedingWhiteController">Feeding White</option>
+                                            <option value="LPHPrimaryWhiteLineDCCCController">DCCC</option>
+                                            <option value="LPHPrimaryWhiteLineCuttingFTDController">Cutting + FTD</option>
+                                            <option value="LPHPrimaryWhiteLineAddbackController">Addback</option>
+                                            <option value="LPHPrimaryWhiteLinePackingWhiteController">Packing White</option>
+                                            <option value="LPHPrimaryWhiteLineFeedingSPMController">Feeding SPM</option>
+                                            <option value="LPHPrimaryISWhiteFeedingController">Feeding IS White</option>
+                                            <option value="LPHPrimaryISWhiteCutDryController">Cut Dry IS White</option>
+                                        </optgroup>
+                                        <optgroup label="White Line OTP">
+                                            <option value="LPHPrimaryWhiteLineOTPController">PP SIS - Process Note</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div style="flex:3">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Batch No</label>
+                                <div class="col-7">
+                                    <!--PAKE SELECT2-->
+                                    <input type="text" class="form-control" name="opsnumb">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div style="flex:2;max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <ul id="line-tabs" class="nav nav-tabs">
+            </ul>
+
+            <div id="lines" class="carousel" data-pause="true" style="width:100%;">
+                <div class="carousel-inner">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <!-- Resources -->
+
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <!------------------------ ACT BTN SEARCH ------------------------------------>
+    <script>
+        function showError(errorMsg) {
+            var notice = new PNotify({
+                title: "@UIResources.ErrorMessage",
+                text: errorMsg,
+                width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+                hide: false,
+                buttons: {
+                    sticker: false
+                }
+            });
+
+            notice.get().click(function () {
+                notice.remove();
+            });
+        }
+        var searchResult = null;
+        function checkSearchResult() {
+            let result = false;
+            for (var prop in searchResult) {
+                if (Object.prototype.hasOwnProperty.call(searchResult, prop)) {
+                    result |= searchResult[prop][0].length > 0
+                }
+            }
+            return result;
+        }
+        function tabAction() {
+            $(this).siblings().children().removeClass("active");
+            $(this).children().toggleClass("active");
+            const index = $(this).index() + 1;
+            $("#lines .carousel-item.active").removeClass("active");
+            const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+            $(carouselItem).toggleClass("active");
+            $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({
+                    "top": top,
+                    "position": "sticky",
+                    "z-index": "100",
+                });
+            });
+        }
+        function getKeyByValue(object, value) {
+            return Object.keys(object).find(key => object[key] === value);
+        }
+        function splitSortingAddbackData(data){
+            var initialAddbackData = {
+                'WhiteLineAddback-Materials' : [
+                    [
+                        'PSS Batch' ,'SAP Batch'    ,'Blend'    ,'Flavour-Blend Addback'    ,'Flavour-Total Qty 1'  ,'Flavour-Batch No 1'   ,'Flavour-Total Qty 2'  ,'Flavour-Batch No 2'   ,'Expanded Tob-Blend Addback'   ,'Expanded Tob-Total Wet'   ,'Expanded Tob-Total Box'   ,'Expanded Tob-Batch No'    ,'IS-Blend Addback' ,'IS-Total Wet' ,'IS-Total Box' ,'IS-Batch No'  ,'RIFTAB-Blend Addback' ,'RIFTAB-Total Wet' ,'RIFTAB-Total Box' ,'RIFTAB-Batch No'  ,'Small Lamina-Blend Addback'   ,'Small Lamina-Total Wet'   ,'Small Lamina-Total Box'   ,'Small Lamina-Batch No'    ,'Ripper Short-Blend Addback 1' ,'Ripper Short-Total Box 1' ,'Ripper Short-Total Qty 1' ,'Ripper Short-Batch No 1'  ,'Ripper Short-Blend Addback 2' ,'Ripper Short-Total Box 2' ,'Ripper Short-Total Qty 2' ,'Ripper Short-Batch No 2'  ,'Ripper Short-Blend Addback 3' ,'Ripper Short-Total Box 3' ,'Ripper Short-Total Qty 3' ,'Ripper Short-Batch No 3'
+
+                    ]
+                ]
+                , 'WhiteLineAddback-ProcessData' : [
+                    [
+                        'PSS Batch' ,'SAP Batch'    ,'Blend'    ,'Final OV' ,'Expanded Tob-OV'  ,'IS-OV'    ,'RIFTAB-OV'    ,'Small Lamina-OV'  ,'Ripper Short-OV'  ,'Master-OV'    ,'Flavour-Flow Avg' ,'Final-Flow Avg'   ,'Expanded Tob-Flow Avg'    ,'IS-Flow Avg'  ,'RIFTAB-Flow Avg'  ,'Small Lamina-Flow Avg'    ,'Ripper Short-Flow Avg'    ,'Master-Flow Avg'  ,'Final-Total Dry'  ,'Expanded Tob-Total Dry'   ,'IS-Total Dry' ,'RIFTAB-Total Dry' ,'Small Lamina-Total Dry'   ,'Ripper Short-Total Dry'   ,'Master-Total Dry' ,'IS-Silo LU'   ,'Expanded Tob-Silo LU' ,'RIFTAB-Silo LU'   ,'SILO Destination' ,'Total Wet Master' ,'Total Wet Final'  ,'Start'    ,'Stop' ,'Duration'
+
+                    ]
+                ]
+            }
+            if(data['data']['WhiteLineAddback-Addback']){
+                var tmp = data['data']['WhiteLineAddback-Addback'];
+                $.each(tmp, function(keyCurr, valueCurr){
+                    if(keyCurr > 0 ){
+                        $.each(initialAddbackData, function(keyNew, valueNew){
+                            console.log(keyNew,valueNew)
+                            var _array = [];
+                            var i = 0;
+                            $.each(initialAddbackData[keyNew], function(idx, item){
+                                if(i==0){
+                                    $.each(item, function(key, value){
+                                        var _index = getKeyByValue(tmp[0], value);
+                                        var _value = _index ? valueCurr[_index] : '';
+                                        _array.push(_value)
+                                    });
+                                }
+                                i++;
+                            });
+                            initialAddbackData[keyNew].push(_array);
+                            data['data'][keyNew] = initialAddbackData[keyNew];
+                        });
+                    }
+                });
+                delete data['data']['WhiteLineAddback-Addback'];
+                console.log(data);
+
+            }
+            return data;
+        }
+        $(document).ready(function () {
+            $("#extractData").on("click", function () {
+                if (searchResult == null) {
+                    showError("Do search first!");
+                    return;
+                } else if (!checkSearchResult()) {
+                    showError("Empty data!");
+                    return;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ExtractExcel", "ReportPPDetailBatch")",
+                    data: JSON.stringify({
+                        data: JSON.stringify(searchResult),
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        window.location = "@Url.Action("DownloadExcel", "ReportPPDetailBatch")";
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            });
+            $("#btnSearch").on("click", function () {
+                const startDate = $("[name=start]").val();
+                if (startDate == "") {
+                    showError("Start Date can't be empty");
+                    return;
+                }
+                const endDate = $("[name=end]").val();
+                if (endDate == "") {
+                    showError("End Date can't be empty");
+                    return;
+                }
+                const ppMain = $("[name=prodCenter]").val();
+                if (ppMain == "") {
+                    showError("Production Center can't be empty");
+                    return;
+                }
+                const ppType = $("[name=line]").val();
+                if (ppType == null) {
+                    showError("Line can't be empty");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetData", "ReportPPDetailBatch")",
+                    data: JSON.stringify({
+                        startDate: startDate,
+                        endDate: endDate,
+                        prodCenterID: ppMain,
+                        lphHeader: ppType,
+                        batch: $("[name=opsnumb]").val(),
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        console.log(result);
+
+            result = splitSortingAddbackData(result);
+
+                        searchResult = result.data;
+
+                        let tabs = "";
+                        let carousels = "";
+                        for (var prop in searchResult) {
+                            if (Object.prototype.hasOwnProperty.call(searchResult, prop)) {
+                                if (searchResult[prop][0].length <= 0) continue;
+                                tabs += `<li class="nav-item"><a class="nav-link">${prop}</a></li>`;
+                                carousels += `<div class="carousel-item"><div class="tableWrapper" style="max-height:300px"><table class="table table-bordered table-hover table-striped" style="margin-bottom:0;"><thead class="thead-info">`;
+                                for (let j = 0; j < searchResult[prop][0].length; j++)
+                                    carousels += `<th>${searchResult[prop][0][j]}</th>`;
+                                carousels += `</thead><tbody>`;
+                                for (let i = 1; i < searchResult[prop].length; i++) {
+                                    carousels += "<tr>";
+                                    for (let j = 0; j < searchResult[prop][i].length; j++)
+                                        carousels += `<td>${searchResult[prop][i][j] || ""}</td>`;
+                                    carousels += "</tr>";
+                                }
+                                carousels += `<tbody>`;
+                                carousels += `</table></div></div>`;
+                            }
+                        }
+                        $("#line-tabs").html(tabs);
+                        $("#lines .carousel-inner").html(carousels);
+
+                        $("#line-tabs li").off('click', tabAction).on('click', tabAction);
+                        $("#line-tabs").children().first().find(".nav-link").click();
+                        $('#loading_overlay').addClass('d-none');
+                    }
+                });
+            })
+        });
+    </script>
+
+
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+
+    <!------------------------ SELECT2 ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.select2').each(function (i, e) {
+                const param = {
+                    allowClear: true,
+                    placeholder: 'Choose one',
+                    searchInputPlaceholder: 'Search options'
+                };
+                if ($(e).attr("multiple") == "multiple") {
+                    param.placeholder = 'Choose one or more';
+                    param.allowClear = false;
+                }
+                $(e).select2(param);
+            });
+        });
+    </script>
+}

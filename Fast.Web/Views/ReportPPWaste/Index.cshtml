@@ -1,0 +1,610 @@
+﻿@model Fast.Web.Models.Report.ParamExportRawModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Waste</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Waste</h4>
+            </div>
+            <div class="d-none d-md-block">
+                @*<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>*@
+                <button id ="btnExport" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export </button>
+                <button id ="btnDashboard" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i> Set for Dashboard </button>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <input type="text" class="form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider-text divider-vertical"></div>
+                        <div style="flex:2">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Prod. Center</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="prodCenter">
+                                        @foreach (System.Web.Mvc.SelectListItem item in ViewBag.ProductionCenterList)
+                                        {
+                                            <option value="@(item.Value)">@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Filter Line</label>
+                                <div class="col-8">
+                                    <select name="lph" class="form-control">
+                                        <optgroup label="Intermediate Line">
+                                            <option value="LPHPrimaryCloveInfeedConditioningController">Clove Feeding & Conditioning</option>
+                                            <option value="LPHPrimaryCloveCutDryPackingController">Clove Cut Dry & Packing</option>
+                                            <option value="LPHPrimaryCSFInfeedConditioningController">Csf Feeding & Conditioning</option>
+                                            <option value="LPHPrimaryCSFCutDryPackingController">Csf Cut Dry & Packing</option>
+                                            <option value="LPHPrimaryRTCController">RTC</option>
+                                            <option value="LPHPrimaryDietController">DIET</option>
+                                        </optgroup>
+                                        <optgroup label="Kretek Line">
+                                            <option value="LPHPrimaryKretekLineFeedingController">Feeding KR & RJ</option>
+                                            <option value="LPHPrimaryKretekLineConditioningController">DCCC KR & RJ</option>
+                                            <option value="LPHPrimaryKretekLineCuttingDryingController">Cut Dry</option>
+                                            <option value="LPHPrimaryKretekLineAddbackController">Addback</option>
+                                            <option value="LPHPrimaryKretekLinePackingController">Packing</option>
+                                            <option value="LPHPrimaryCresFeedingConditioningController">CRES Feeding & DCCC</option>
+                                            <option value="LPHPrimaryCresDryingPackingController">CRES Cut Dry & Packing</option>
+                                            <option value="LPHPrimaryKitchenController">Casing Kitchen</option>
+                                        </optgroup>
+                                        <optgroup label="White Line">
+                                            <option value="LPHPrimaryWhiteLineFeedingWhiteController">Feeding White</option>
+                                            <option value="LPHPrimaryWhiteLineDCCCController">DCCC</option>
+                                            <option value="LPHPrimaryWhiteLineCuttingFTDController">Cutting + FTD</option>
+                                            <option value="LPHPrimaryWhiteLineAddbackController">Addback</option>
+                                            <option value="LPHPrimaryWhiteLinePackingWhiteController">Packing White</option>
+                                            <option value="LPHPrimaryWhiteLineFeedingSPMController">Feeding SPM</option>
+                                            <option value="LPHPrimaryISWhiteFeedingController">Feeding IS White</option>
+                                            <option value="LPHPrimaryISWhiteCutDryController">Cut Dry IS White</option>
+                                        </optgroup>
+                                        <optgroup label="White Line OTP">
+                                            <option value="LPHPrimaryWhiteLineOTPController">PP SIS - Process Note</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div style="flex:2">
+                            <div class="form-group row">
+                                <label class="col-4 form-label">Waste</label>
+                                <div class="col-8">
+                                    <!--PAKE SELECT2-->
+                                    <input type="text" class="form-control" name="waste">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 form-label">Waste Type</label>
+                                <div class="col-8">
+                                    <!--PAKE SELECT2-->
+                                    <input type="text" class="form-control" name="wastetype">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+                    <div class="card-body">
+                        <div class="tableWrapper col-12" style="min-height:400px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:60px;">Week</th>
+                                        <th rowspan="2" style="min-width:60px;">Year</th>
+                                        <th rowspan="2" style="min-width:200px;">Area</th>
+                                        <th rowspan="2" style="min-width:200px;">Waste</th>
+                                        <th rowspan="2" style="min-width:100px;">Waste Type</th>
+                                        <th colspan="3">Senin</th>
+                                        <th colspan="3">Selasa</th>
+                                        <th colspan="3">Rabu</th>
+                                        <th colspan="3">Kamis</th>
+                                        <th colspan="3">Jumat</th>
+                                        <th colspan="3">Sabtu</th>
+                                        <th colspan="3">Minggu</th>
+                                        <th rowspan="2" style="min-width:110px;">Total</th>
+                                        @*<th rowspan="2" style="min-width:110px;">Total Wet</th>
+                                        <th rowspan="2" style="min-width:110px;">OV</th>
+                                        <th rowspan="2" style="min-width:110px;">Total Dry</th>*@
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+
+                                        <th style="min-width:70px;">Shift 1</th>
+                                        <th style="min-width:70px;">Shift 2</th>
+                                        <th style="min-width:70px;">Shift 3</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="PPwaste" class="tx-center">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--Waste-->
+
+            @*<div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste Summary</div>
+                    <div class="card-body">
+                        <div class="tableWrapper col-12" style="min-height:300px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Wet Waste</th>
+                                        <th style="min-width:90px;">Dry Waste</th>
+                                        <th style="min-width:120px;">Dust Primary</th>
+                                    </tr>
+                                <tbody id="PPSumWaste" class="tx-center">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>*@ <!--Waste Summary-->
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+    <!-- Resources -->
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+
+    <!------------------------ STICKY ------------------------------------>
+    <script>
+        $('.tableWrapper thead tr').each(function () {
+            const top = $(this).position().top;
+            $(this).children().css({
+                "top": top,
+                "position": "sticky",
+                "z-index": "100",
+            });
+        });
+    </script>
+
+    <!------------------------ ACT BTN SEARCH ------------------------------------>
+    <script>
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+        }
+        
+        function toFloat(a) {
+            return parseFloat((a == null || a == "" || isNaN(a)) ? 0 : a);
+        }
+        function toTime(str) {
+            const milliseconds = str.substring(str.lastIndexOf("(") + 1, str.lastIndexOf(")"));
+            return moment(parseInt(milliseconds)).format("HH:mm");
+        }
+        var WasteTableData;
+        var param;
+        $(document).ready(function () {
+
+            $("#btnSearch").on("click", function () {
+                param = {
+                    StartDate: $("[name=start]").val(),
+                    EndDate: $("[name=end]").val(),
+                    LPH: $("[name=lph]").val(),
+                    ProdCenterID: $("[name=prodCenter]").val(),
+                    Waste: $('[name=waste]').val(),
+                    WasteType: $('[name=wastetype]').val(),
+                };
+                if (param.StartDate == "") {
+                    showError("Start Date can't be empty");
+                    return;
+                }
+                if (param.EndDate == "") {
+                    showError("End Date can't be empty");
+                    return;
+                }
+                if (param.ProdCenterID == "0") {
+                    showError("Production Center can't be empty");
+                    return;
+                }
+                if (param.LPH == "") {
+                    showError("Line can't be empty");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "post",
+                    url: fastApp.BaseUrl + "/ReportPPWaste/GetReportWithParam",
+                    data: param,
+                    datatype: "json",
+                    traditional: true,
+                    success: function (result) {
+                        //let startDate = moment;m (param.StartDate, 'DD-MMM-YYYY');
+                        //let endDate = moment(param.EndDate, 'DD-MMM-YYYY');
+                        //let headerView = "";
+                        //let shiftView = "";
+                        let rowView = "";
+
+                        //for (let i = startDate; i <= endDate; i.add(1, 'days')) {
+                        //    const date = i.format('ddd, DD-MM-YYYY');
+                        //    headerView += `<th colspan="3" style="min-width:100px;">${date}</th>`;
+                        //    shiftView += `<th style="min-width:75px;">Shift 1</th><th style="min-width:75px;">Shift 2</th><th style="min-width:75px;">Shift 3</th>`;
+                        //}
+                        for (let i = 0; i < result.Waste.length; i++) {
+                            rowView += `
+                                <tr>
+                                    <td>${result.Waste[i].Week}</td>
+                                    <td>${result.Waste[i].Year}</td>
+                                    <td>${result.Waste[i].Area}</td>
+                                    <td>${result.Waste[i].Waste}</td>
+                                    <td>${result.Waste[i].WasteType}</td>
+                                `;
+                            ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].forEach(function (v, vi) {
+                                for (let j = 1; j <= 3; j++) {
+                                    for (let k = 0; k < result.Waste[i].WasteDetail.length; k++) {
+                                        if (v == result.Waste[i].WasteDetail[k].Date && result.Waste[i].WasteDetail[k].Shift == j) {
+                                            rowView += `<td>${result.Waste[i].WasteDetail[k].Value}</td>`;
+                                            break;
+                                        } else if (k == result.Waste[i].WasteDetail.length - 1) {
+                                            rowView += `<td>-</td>`;
+                                        }
+                                    }
+                                }
+                            });
+                            
+                            var totalVal = toFloat(result.Waste[i].Total);
+                            rowView += `<td>${parseFloat(totalVal).toFixed(1)}</td></tr>`;
+                        }
+                        //$("#waste-date-start").nextUntil("#waste-date-end").remove();
+                        //$(headerView).insertAfter("#waste-date-start");
+                        //$("#waste-shift-area").html(shiftView);
+                        $("#PPwaste").html(rowView);
+                        WasteTableData = result.Waste;
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+                //const prodCenter = $("[name=prodCenter]").val();
+                //const opt = htmlEncode($("[name=line]").val());
+                //if (prodCenter != "" && opt != "") for (let i = 0; i < loc[prodCenter].length; i++) {
+                //    for (let j = 0; j < loc[prodCenter][i].opts.length; j++)
+                //        if (loc[prodCenter][i].opts[j].opt == opt && loc[prodCenter][i].opts[j].data != "")
+                //            $("#PPwaste").html(loc[prodCenter][i].opts[j].data);
+                //} else $("#PPwaste").html("");
+            })
+
+
+             //export
+            $("#btnExport").on("click", function () {
+                console.log("Yang dikirim : " + WasteTableData);
+               
+                
+			    var datajson = JSON.stringify({
+				    waste: WasteTableData
+			    });
+                
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: fastApp.BaseUrl + "/ReportPPWaste/ExportTable",
+                    data: datajson,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        $('#loading_overlay').addClass('d-none');
+                        if (result.Status) {
+                             window.location = fastApp.BaseUrl + "/ReportPPWaste/Download";
+                        }
+                    },
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            })
+            $("#btnDashboard").on("click", function () {
+                if (WasteTableData == null) {
+                    showError("Do search first!");
+                    return;
+                } else if (WasteTableData == []) {
+                    showError("Empty data!");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: fastApp.BaseUrl + "/ReportPPWaste/SetDashboard",
+                    data: JSON.stringify({
+                        waste: WasteTableData,
+                        location:param.ProdCenterID,
+                        type:param.LPH,
+			        }),
+                    contentType: "application/json; charset=utf-8",
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            })
+        });
+    </script>
+
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+}

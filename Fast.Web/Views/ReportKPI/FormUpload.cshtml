@@ -1,0 +1,116 @@
+﻿@model Fast.Web.Models.Report.ReportKPIFormModel
+@using Fast.Web.Resources;
+@{ 
+    var FullType = Model.Type;
+    if (Model.Type == "ProdVol")
+    {
+        FullType = "Production Volume";
+    }
+    else if (Model.Type == "CRR")
+    {
+        FullType = "CRR Uptime";
+    }
+}
+
+<!-- Specific Page Vendor CSS -->
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<style>
+    .fixedHeight {
+        font-size: 14px;
+        max-height: 300px;
+        margin-bottom: 10px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+</style>
+
+@using (Html.BeginForm("FormUpload", "ReportKPI", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm", @encType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+        <div class="media align-items-center">
+            <span class="tx-color-03 d-none d-sm-block"><i class="fa fa-upload fa-3x"></i></span>
+            <div class="media-body mg-sm-l-20">
+                <h4 class="tx-18 tx-sm-20 mg-b-2">Upload @FullType</h4>
+                <p class="tx-13 tx-color-03 mg-b-0">For KPI Report Calculation</p>
+            </div>
+        </div><!-- media -->
+    </div><!-- modal-header -->
+    <div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+        <div class="row row-sm mg-b-10">
+            @Html.HiddenFor(x => x.Type)
+            <div class="col-4">
+                <label class="col-form-label mg-b-5 tx-color-03">Download Example</label>
+            </div>
+
+            <div class="col-8">
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton btn-block" data-dismiss="modal" id="btnGenerate">
+                    <i data-feather="download" class="mg-r-5"></i> @UIResources.Download
+                </button>
+            </div>
+            <div class="col-12">
+                <br />
+            </div>
+
+            @if (Model.Type == "Yield" || Model.Type == "DIM" || Model.Type == "CRR")
+            {
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="col-form-label mg-b-5 tx-color-03">Year</label>
+                        </div>
+                        <div class="col-3">
+                            @Html.TextBoxFor(x => x.Year, null, new { @type = "number", @class = "form-control", @id = "year", @required = "required", @onkeypress = "return blockSpecialChar(event)" })
+                        </div>
+                        <div class="col-2 offset-2">
+                            <label class="col-form-label mg-b-5 tx-color-03">Week</label>
+                        </div>
+                        <div class="col-3">
+                            @Html.TextBoxFor(x => x.Week, null, new { @type = "number", @class = "form-control", @id = "week", @required = "required", @onkeypress = "return blockSpecialChar(event)" })
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.Type == "Yield")
+            {
+                <div class="col-12 mg-t-10">
+                    <div class="row">
+                        <div class="col-5">
+                            <label class="col-form-label mg-b-5 tx-color-03">Production Center</label>
+                        </div>
+                        <div class="col-7">
+                            <select class="form-control select2" id="PC" name="PC">
+                                <option value="PB" selected>PB - SIS Sukorejo</option>
+                                <option value="PJ">PJ - Sampoerna Sukorejo</option>
+                                <option value="PK">PK - Sampoerna Karawang</option>
+                                <option value="PI">PI - PMID Karawang</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+            <div class="col-12 dtMarginTop">
+                <div class="form-control-static">
+                    <span class="btn btn-success fileinput-button btn-block">
+                        @Html.TextBoxFor(x => x.Excel, null, new { @type = "file", @accept = ".xls, .xlsx", @id = "customFile" })
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer pd-x-20 pd-y-15">
+        <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+        <button type="submit" class="btn btn-primary" id="btnSubmit">@UIResources.Upload</button>
+    </div>
+}
+
+
+<script type="text/javascript">
+    $('#btnGenerate').on('click', function (e) {
+        e.preventDefault();
+        var url = fastApp.BaseUrl + '/Uploads/report/KPI/@(Model.Type).xls';
+        window.open(url,'_blank');
+    });
+</script>

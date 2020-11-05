@@ -1,0 +1,1106 @@
+﻿@model Tuple<List<Fast.Web.Models.Report.DailyModel>,List<Fast.Web.Models.Report.TargetModel>, Fast.Web.Models.Report.WTDModel,Fast.Web.Models.Report.MTDModel>
+@using Fast.Web.Resources;
+
+@if (Model.Item1.Count > 0)
+{
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-info">
+            <tr>
+                <th>All</th>
+                <th>Trend</th>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        <th>@Model.Item1[i].DateValue.ToString("dd-MMM-yy")</th>
+                    }
+                }
+                <th>WTD</th>
+                <th>MTD</th>
+                <th>MTG</th>
+                <th>Target</th>
+            </tr>
+        </thead>
+        @{decimal d2_MTBF = Model.Item1[0].MTBFValue + Model.Item1[1].MTBFValue + Model.Item1[2].MTBFValue;
+            decimal d1_MTBF = Model.Item1[3].MTBFValue + Model.Item1[4].MTBFValue + Model.Item1[5].MTBFValue;
+            decimal d_MTBF = Model.Item1[6].MTBFValue + Model.Item1[7].MTBFValue + Model.Item1[8].MTBFValue;
+            decimal d2_Working = Model.Item1[0].WorkingValue + Model.Item1[1].WorkingValue + Model.Item1[2].WorkingValue;
+            decimal d1_Working = Model.Item1[3].WorkingValue + Model.Item1[4].WorkingValue + Model.Item1[5].WorkingValue;
+            decimal d_Working = Model.Item1[6].WorkingValue + Model.Item1[7].WorkingValue + Model.Item1[8].WorkingValue;
+            decimal d2_ProdVol = Model.Item1[0].ProdVolumeValue + Model.Item1[1].ProdVolumeValue + Model.Item1[2].ProdVolumeValue;
+            decimal d1_ProdVol = Model.Item1[3].ProdVolumeValue + Model.Item1[4].ProdVolumeValue + Model.Item1[5].ProdVolumeValue;
+            decimal d_ProdVol = Model.Item1[6].ProdVolumeValue + Model.Item1[7].ProdVolumeValue + Model.Item1[8].ProdVolumeValue;
+            decimal d2_CPQI = (((Model.Item1[0].ProdVolumeValue * Model.Item1[0].CPQIValue)
+                        + (Model.Item1[1].ProdVolumeValue * Model.Item1[1].CPQIValue)
+                        + (Model.Item1[2].ProdVolumeValue * Model.Item1[2].CPQIValue))
+                        / (Model.Item1[0].ProdVolumeValue + Model.Item1[1].ProdVolumeValue + Model.Item1[2].ProdVolumeValue));
+            decimal d1_CPQI = (((Model.Item1[3].ProdVolumeValue * Model.Item1[3].CPQIValue)
+                         + (Model.Item1[4].ProdVolumeValue * Model.Item1[4].CPQIValue)
+                         + (Model.Item1[5].ProdVolumeValue * Model.Item1[5].CPQIValue))
+                         / (Model.Item1[3].ProdVolumeValue + Model.Item1[4].ProdVolumeValue + Model.Item1[5].ProdVolumeValue));
+            decimal d_CPQI = (((Model.Item1[6].ProdVolumeValue * Model.Item1[6].CPQIValue)
+                          + (Model.Item1[7].ProdVolumeValue * Model.Item1[7].CPQIValue)
+                          + (Model.Item1[8].ProdVolumeValue * Model.Item1[8].CPQIValue))
+                          / (Model.Item1[6].ProdVolumeValue + Model.Item1[7].ProdVolumeValue + Model.Item1[8].ProdVolumeValue));
+            decimal d2_VQI = (((Model.Item1[0].ProdVolumeValue * Model.Item1[0].VQIValue)
+                        + (Model.Item1[1].ProdVolumeValue * Model.Item1[1].VQIValue)
+                        + (Model.Item1[2].ProdVolumeValue * Model.Item1[2].VQIValue))
+                        / (Model.Item1[0].ProdVolumeValue + Model.Item1[1].ProdVolumeValue + Model.Item1[2].ProdVolumeValue));
+            decimal d1_VQI = (((Model.Item1[3].ProdVolumeValue * Model.Item1[3].VQIValue)
+                         + (Model.Item1[4].ProdVolumeValue * Model.Item1[4].VQIValue)
+                         + (Model.Item1[5].ProdVolumeValue * Model.Item1[5].VQIValue))
+                         / (Model.Item1[3].ProdVolumeValue + Model.Item1[4].ProdVolumeValue + Model.Item1[5].ProdVolumeValue));
+            decimal d_VQI = (((Model.Item1[6].ProdVolumeValue * Model.Item1[6].VQIValue)
+                          + (Model.Item1[7].ProdVolumeValue * Model.Item1[7].VQIValue)
+                          + (Model.Item1[8].ProdVolumeValue * Model.Item1[8].VQIValue))
+                          / (Model.Item1[6].ProdVolumeValue + Model.Item1[7].ProdVolumeValue + Model.Item1[8].ProdVolumeValue));
+            decimal d2_STRS = (((Model.Item1[0].ProdVolumeValue * Model.Item1[0].STRSValue)
+                       + (Model.Item1[1].ProdVolumeValue * Model.Item1[1].STRSValue)
+                       + (Model.Item1[2].ProdVolumeValue * Model.Item1[2].STRSValue))
+                       / (Model.Item1[0].ProdVolumeValue + Model.Item1[1].ProdVolumeValue + Model.Item1[2].ProdVolumeValue));
+            decimal d1_STRS = (((Model.Item1[3].ProdVolumeValue * Model.Item1[3].STRSValue)
+                         + (Model.Item1[4].ProdVolumeValue * Model.Item1[4].STRSValue)
+                         + (Model.Item1[5].ProdVolumeValue * Model.Item1[5].STRSValue))
+                         / (Model.Item1[3].ProdVolumeValue + Model.Item1[4].ProdVolumeValue + Model.Item1[5].ProdVolumeValue));
+            decimal d_STRS = (((Model.Item1[6].ProdVolumeValue * Model.Item1[6].STRSValue)
+                          + (Model.Item1[7].ProdVolumeValue * Model.Item1[7].STRSValue)
+                          + (Model.Item1[8].ProdVolumeValue * Model.Item1[8].STRSValue))
+                          / (Model.Item1[6].ProdVolumeValue + Model.Item1[7].ProdVolumeValue + Model.Item1[8].ProdVolumeValue));
+            decimal d2_CRR = (((Model.Item1[0].ProdVolumeValue * Model.Item1[0].CRRValue)
+                        + (Model.Item1[1].ProdVolumeValue * Model.Item1[1].CRRValue)
+                        + (Model.Item1[2].ProdVolumeValue * Model.Item1[2].CRRValue))
+                        / (Model.Item1[0].ProdVolumeValue + Model.Item1[1].ProdVolumeValue + Model.Item1[2].ProdVolumeValue));
+            decimal d1_CRR = (((Model.Item1[3].ProdVolumeValue * Model.Item1[3].CRRValue)
+                         + (Model.Item1[4].ProdVolumeValue * Model.Item1[4].CRRValue)
+                         + (Model.Item1[5].ProdVolumeValue * Model.Item1[5].CRRValue))
+                         / (Model.Item1[3].ProdVolumeValue + Model.Item1[4].ProdVolumeValue + Model.Item1[5].ProdVolumeValue));
+            decimal d_CRR = (((Model.Item1[6].ProdVolumeValue * Model.Item1[6].CRRValue)
+                          + (Model.Item1[7].ProdVolumeValue * Model.Item1[7].CRRValue)
+                          + (Model.Item1[8].ProdVolumeValue * Model.Item1[8].CRRValue))
+                          / (Model.Item1[6].ProdVolumeValue + Model.Item1[7].ProdVolumeValue + Model.Item1[8].ProdVolumeValue));
+            decimal d2_Uptime = (((Model.Item1[0].ProdVolumeValue + Model.Item1[1].ProdVolumeValue + Model.Item1[2].ProdVolumeValue) /
+                   (((Model.Item1[0].ProdVolumeValue / Model.Item1[0].UptimeValue) * 100) +
+                   (((Model.Item1[1].ProdVolumeValue / Model.Item1[1].UptimeValue) * 100) +
+                   (((Model.Item1[2].ProdVolumeValue / Model.Item1[2].UptimeValue) * 100))))) * 100);
+            decimal d1_Uptime = (((Model.Item1[3].ProdVolumeValue + Model.Item1[4].ProdVolumeValue + Model.Item1[5].ProdVolumeValue) /
+                 (((Model.Item1[3].ProdVolumeValue / Model.Item1[3].UptimeValue) * 100) +
+                 (((Model.Item1[4].ProdVolumeValue / Model.Item1[4].UptimeValue) * 100) +
+                 (((Model.Item1[5].ProdVolumeValue / Model.Item1[5].UptimeValue) * 100))))) * 100);
+            decimal d_Uptime = (((Model.Item1[6].ProdVolumeValue + Model.Item1[7].ProdVolumeValue + Model.Item1[8].ProdVolumeValue) /
+              (((Model.Item1[6].ProdVolumeValue / Model.Item1[6].UptimeValue) * 100) +
+              (((Model.Item1[7].ProdVolumeValue / Model.Item1[7].UptimeValue) * 100) +
+              (((Model.Item1[8].ProdVolumeValue / Model.Item1[8].UptimeValue) * 100))))) * 100);
+
+            decimal target_ProdVol = 0;
+            decimal target_CPQI = 0;
+            decimal target_VQI = 0;
+            decimal target_STRS = 0;
+            decimal target_CRR = 0;
+            decimal target_Uptime = 0;
+            decimal mtg_ProdVol = 0;
+            decimal mtg_CPQI = 0;
+            decimal mtg_VQI = 0;
+            decimal mtg_STRS = 0;
+            decimal mtg_CRR = 0;
+            decimal mtg_Uptime = 0;
+
+            for (int i = 0; i < Model.Item2.Count(); i++)
+            {
+                if (Model.Item2[i].KPI == "CPQI")
+                {
+                    target_CPQI = Model.Item2[i].ValueTarget;
+                }
+                if (Model.Item2[i].KPI == "VQI")
+                {
+                    target_VQI = Model.Item2[i].ValueTarget;
+                }
+                if (Model.Item2[i].KPI == "STRS")
+                {
+                    target_STRS = Model.Item2[i].ValueTarget;
+                }
+                if (Model.Item2[i].KPI == "CRR")
+                {
+                    target_CRR = Model.Item2[i].ValueTarget;
+                }
+                if (Model.Item2[i].KPI == "Production Volume")
+                {
+                    target_ProdVol = Model.Item2[i].ValueTarget;
+                }
+                if (Model.Item2[i].KPI == "Uptime")
+                {
+                    target_Uptime = Model.Item2[i].ValueTarget;
+                }
+            }
+            for (int i = 0; i < Model.Item2.Count(); i++)
+            {
+                if (Model.Item2[i].KPI == "Production Volume")
+                {
+                    mtg_ProdVol = (Model.Item2[i].ValueTarget - Convert.ToDecimal(Model.Item4.ProdVolume_MTD));
+                }
+            }
+
+            mtg_CPQI = ((target_ProdVol * target_CPQI) - (Convert.ToDecimal(Model.Item4.ProdVolume_MTD) * Convert.ToDecimal(Model.Item4.CPQI_MTD))) / mtg_ProdVol;
+            mtg_VQI = ((target_ProdVol * target_VQI) - (Convert.ToDecimal(Model.Item4.ProdVolume_MTD) * Convert.ToDecimal(Model.Item4.VQI_MTD)))  / mtg_ProdVol;
+            mtg_STRS = ((target_ProdVol * target_STRS) - (Convert.ToDecimal(Model.Item4.ProdVolume_MTD) * Convert.ToDecimal(Model.Item4.STRS_MTD))) / mtg_ProdVol;
+            mtg_CRR = ((target_ProdVol * target_CRR) - (Convert.ToDecimal(Model.Item4.ProdVolume_MTD) * Convert.ToDecimal(Model.Item4.CRR_MTD))) / mtg_ProdVol;
+
+            decimal mtd_Theo = 0;
+            mtd_Theo = (Convert.ToDecimal(Model.Item4.ProdVolume_MTD) / Convert.ToDecimal(Model.Item4.ProdVolume_MTD)) * 100;
+
+            decimal target_Theo = 0;
+            target_Theo = (target_ProdVol / target_Uptime) * 100;
+
+            decimal mtg_Theo = 0;
+            mtg_Theo = target_Theo - mtd_Theo;
+
+            mtg_Uptime = (mtg_ProdVol / mtg_Theo) * 100;
+        }
+        <tbody>
+            <tr>
+                <td><b>MTBF</b></td>
+                <td>
+                    @if (d2_MTBF == d1_MTBF && d1_MTBF == d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_MTBF == d1_MTBF && d1_MTBF < d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_MTBF == d1_MTBF && d1_MTBF > d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_MTBF < d1_MTBF && d1_MTBF > d_MTBF && d2_MTBF > d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_MTBF > d1_MTBF && d1_MTBF < d_MTBF && d2_MTBF < d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_MTBF > d1_MTBF && d1_MTBF > d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_MTBF < d1_MTBF && d1_MTBF < d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_MTBF < d1_MTBF && d1_MTBF > d_MTBF && d2_MTBF < d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_MTBF > d1_MTBF && d1_MTBF < d_MTBF && d2_MTBF > d_MTBF)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_MTBF.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d1_MTBF.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_MTBF.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.MTBF_WTD</td>
+                <td style="text-align:right;">@Model.Item4.MTBF_MTD</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "MTBF")
+                    {
+                        <td style="text-align:right;">@((Model.Item2[i].ValueTarget - Convert.ToDecimal(Model.Item4.MTBF_MTD)).ToString("n"))</td>
+                    }
+                }
+
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "MTBF")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].MTBFValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].MTBFValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].MTBFValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>CPQI</b></td>
+                <td>
+                    @if (d2_CPQI == d1_CPQI && d1_CPQI == d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_CPQI == d1_CPQI && d1_CPQI < d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CPQI == d1_CPQI && d1_CPQI > d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_CPQI < d1_CPQI && d1_CPQI > d_CPQI && d2_CPQI > d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_CPQI > d1_CPQI && d1_CPQI < d_CPQI && d2_CPQI < d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CPQI > d1_CPQI && d1_CPQI > d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_CPQI < d1_CPQI && d1_CPQI < d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CPQI < d1_CPQI && d1_CPQI > d_CPQI && d2_CPQI < d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CPQI > d1_CPQI && d1_CPQI < d_CPQI && d2_CPQI > d_CPQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_CPQI.ToString("n"))
+
+                </td>
+                <td style="text-align:right;">
+                    @(d1_CPQI.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_CPQI.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.CPQI_WTD</td>
+                <td style="text-align:right;">@Model.Item4.CPQI_MTD</td>
+                <td style="text-align:right;">@(mtg_CPQI.ToString("n"))</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "CPQI")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].CPQIValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].CPQIValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].CPQIValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>VQI</b></td>
+                <td>
+                    @if (d2_VQI == d1_VQI && d1_VQI == d_VQI)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_VQI == d1_VQI && d1_VQI < d_VQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_VQI == d1_VQI && d1_VQI > d_VQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_VQI < d1_VQI && d1_VQI > d_VQI && d2_VQI > d_VQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_VQI > d1_VQI && d1_VQI < d_VQI && d2_VQI < d_VQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_VQI > d1_VQI && d1_VQI > d_VQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_VQI < d1_VQI && d1_VQI < d_VQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_VQI < d1_VQI && d1_VQI > d_VQI && d2_VQI < d_VQI)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_VQI > d1_VQI && d1_VQI < d_VQI && d2_VQI > d_VQI)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_VQI.ToString("n"))
+
+                </td>
+                <td style="text-align:right;">
+                    @(d1_VQI.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_VQI.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.VQI_WTD</td>
+                <td style="text-align:right;">@Model.Item4.VQI_MTD</td>
+                <td style="text-align:right;">@(mtg_VQI.ToString("n"))</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "VQI")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].VQIValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].VQIValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].VQIValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>Working Time</b></td>
+                <td>
+                    @if (d2_Working == d1_Working && d1_Working == d_Working)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_Working == d1_Working && d1_Working < d_Working)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Working == d1_Working && d1_Working > d_Working)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_Working < d1_Working && d1_Working > d_Working && d2_Working > d_Working)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_Working > d1_Working && d1_Working < d_Working && d2_Working < d_Working)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Working > d1_Working && d1_Working > d_Working)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_Working < d1_Working && d1_Working < d_Working)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Working < d1_Working && d1_Working > d_Working && d2_Working < d_Working)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Working > d1_Working && d1_Working < d_Working && d2_Working > d_Working)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_Working.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d1_Working.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_Working.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.Working_WTD</td>
+                <td style="text-align:right;">@Model.Item4.Working_MTD</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "Working Time")
+                    {
+                        <td style="text-align:right;">@((Model.Item2[i].ValueTarget - Convert.ToDecimal(Model.Item4.Working_MTD)).ToString("n"))</td>
+                    }
+                }
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "Working Time")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].WorkingValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].WorkingValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].WorkingValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>Uptime</b></td>
+                <td>
+                    @if (d2_Uptime == d1_Uptime && d1_Uptime == d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_Uptime == d1_Uptime && d1_Uptime < d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Uptime == d1_Uptime && d1_Uptime > d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_Uptime < d1_Uptime && d1_Uptime > d_Uptime && d2_Uptime > d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_Uptime > d1_Uptime && d1_Uptime < d_Uptime && d2_Uptime < d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Uptime > d1_Uptime && d1_Uptime > d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_Uptime < d1_Uptime && d1_Uptime < d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Uptime < d1_Uptime && d1_Uptime > d_Uptime && d2_Uptime < d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_Uptime > d1_Uptime && d1_Uptime < d_Uptime && d2_Uptime > d_Uptime)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_Uptime.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d1_Uptime.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_Uptime.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.Uptime_WTD</td>
+                <td style="text-align:right;">@Model.Item4.Uptime_MTD</td>
+                <td style="text-align:right;">@(mtg_Uptime.ToString("n"))</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "Uptime")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].UptimeValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].UptimeValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].UptimeValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>STRS</b></td>
+                <td>
+                    @if (d2_STRS == d1_STRS && d1_STRS == d_STRS)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_STRS == d1_STRS && d1_STRS < d_STRS)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_STRS == d1_STRS && d1_STRS > d_STRS)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_STRS < d1_STRS && d1_STRS > d_STRS && d2_STRS > d_STRS)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_STRS > d1_STRS && d1_STRS < d_STRS && d2_STRS < d_STRS)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_STRS > d1_STRS && d1_STRS > d_STRS)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_STRS < d1_STRS && d1_STRS < d_STRS)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_STRS < d1_STRS && d1_STRS > d_STRS && d2_STRS < d_STRS)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_STRS > d1_STRS && d1_STRS < d_STRS && d2_STRS > d_STRS)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_STRS.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d1_STRS.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_STRS.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.STRS_WTD</td>
+                <td style="text-align:right;">@Model.Item4.STRS_MTD</td>
+                <td style="text-align:right;">@(mtg_STRS.ToString("n"))</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "STRS")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].STRSValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].STRSValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].STRSValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>Production Volume</b></td>
+                <td>
+                    @if (d2_ProdVol == d1_ProdVol && d1_ProdVol == d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_ProdVol == d1_ProdVol && d1_ProdVol < d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_ProdVol == d1_ProdVol && d1_ProdVol > d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_ProdVol < d1_ProdVol && d1_ProdVol > d_ProdVol && d2_ProdVol > d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_ProdVol > d1_ProdVol && d1_ProdVol < d_ProdVol && d2_ProdVol < d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_ProdVol > d1_ProdVol && d1_ProdVol > d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_ProdVol < d1_ProdVol && d1_ProdVol < d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_ProdVol < d1_ProdVol && d1_ProdVol > d_ProdVol && d2_ProdVol < d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_ProdVol > d1_ProdVol && d1_ProdVol < d_ProdVol && d2_ProdVol > d_ProdVol)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_ProdVol.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d1_ProdVol.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_ProdVol.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.ProdVolume_WTD</td>
+                <td style="text-align:right;">@Model.Item4.ProdVolume_MTD</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "Production Volume")
+                    {
+                        <td style="text-align:right;">@((Model.Item2[i].ValueTarget - Convert.ToDecimal(Model.Item4.ProdVolume_MTD)).ToString("n"))</td>
+                    }
+                }
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "Production Volume")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].ProdVolumeValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].ProdVolumeValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].ProdVolumeValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>CRR</b></td>
+                <td>
+                    @if (d2_CRR == d1_CRR && d1_CRR == d_CRR)
+                    {
+                        <center><i class='fas fa-caret-right'></i></center>
+                    }
+                    @if (d2_CRR == d1_CRR && d1_CRR < d_CRR)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CRR == d1_CRR && d1_CRR > d_CRR)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_CRR < d1_CRR && d1_CRR > d_CRR && d2_CRR > d_CRR)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_CRR > d1_CRR && d1_CRR < d_CRR && d2_CRR < d_CRR)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CRR > d1_CRR && d1_CRR > d_CRR)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                    @if (d2_CRR < d1_CRR && d1_CRR < d_CRR)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CRR < d1_CRR && d1_CRR > d_CRR && d2_CRR < d_CRR)
+                    {
+                        <center><i class='fas fa-caret-up'></i></center>
+                    }
+                    @if (d2_CRR > d1_CRR && d1_CRR < d_CRR && d2_CRR > d_CRR)
+                    {
+                        <center><i class='fas fa-caret-down'></i></center>
+                    }
+                </td>
+                <td style="text-align:right;">
+                    @(d2_CRR.ToString("n"))
+
+                </td>
+                <td style="text-align:right;">
+                    @(d1_CRR.ToString("n"))
+                </td>
+                <td style="text-align:right;">
+                    @(d_CRR.ToString("n"))
+                </td>
+                <td style="text-align:right;">@Model.Item3.CRR_WTD</td>
+                <td style="text-align:right;">@Model.Item4.CRR_MTD</td>
+                <td style="text-align:right;">@(mtg_CRR.ToString("n"))</td>
+                @for (int i = 0; i < Model.Item2.Count(); i++)
+                {
+                    if (Model.Item2[i].KPI == "CRR")
+                    {
+                        <td style="text-align:right;">@Model.Item2[i].ValueTarget.ToString("n")</td>
+                    }
+                }
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 1</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 0 || i % 3 == 0)
+                    {
+                        if (Model.Item1[i].Shift == "1")
+                        {
+                            <td>@Model.Item1[i].CRRValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 2</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 1 || i % 3 == 1)
+                    {
+                        if (Model.Item1[i].Shift == "2")
+                        {
+                            <td>@Model.Item1[i].CRRValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="text-align:right;">
+                <td>Shift 3</td>
+                <td></td>
+                @for (int i = 0; i < Model.Item1.Count(); i++)
+                {
+                    if (i == 2 || i % 3 == 2)
+                    {
+                        if (Model.Item1[i].Shift == "3")
+                        {
+                            <td>@Model.Item1[i].CRRValue.ToString("n")</td>
+                        }
+                    }
+                }
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4" style="text-align:center;"><h3>@UIResources.DataNotFound</h3></div>
+        <div class="col-md-4"></div>
+    </div>
+}

@@ -1,0 +1,195 @@
+﻿@model Fast.Web.Models.Report.InputDailyModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+
+}
+
+
+@using (Html.BeginForm("Create", "InputDaily", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div class="content content-fixed lph-form">
+        <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+            <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                            <li class="breadcrumb-item"><a href="#">Report</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Input Data Shift Daily</li>
+                        </ol>
+                    </nav>
+                    <h4 class="mg-b-0 tx-spacing--1">Input Data Shift Daily</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mg-b-20">
+                    <div class="card">
+                        <div class="card-body">
+
+                            <div class="form-group row">
+                                <label class="flex-1 mg-l-10 col-1">Tgl</label>
+                                <div class="flex-1 mg-l-10 col-2">
+                                    @Html.TextBoxFor(x => x.Date, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDate", autocomplete = "off" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="flex-1 mg-l-10 col-1">Shift</label>
+                                <div class="flex-1 mg-l-10 col-1">
+                                    @Html.DropDownListFor(x => x.Shift, (IEnumerable<SelectListItem>)ViewBag.ShiftList, new { @class = "form-control", @id = "ddlShift" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="flex-1 mg-l-10 col-1">LU</label>
+                                <div class="flex-1 mg-l-10 col-1">
+                                    @Html.TextBoxFor(x => x.LinkUp, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <hr/>
+                            <br />
+                            <div class="form-group">
+                                <div class="d-flex">
+                                    <div class="flex-1 mg-l-10"></div>
+                                    <div class="flex-1 mg-l-10"><label>MTBF</label></div>
+                                    <div class="flex-1 mg-l-10"><label>CPQI</label></div>
+                                    <div class="flex-1 mg-l-10"><label>VQI</label></div>
+                                    <div class="flex-1 mg-l-10"><label>Working Time</label></div>
+                                    <div class="flex-1 mg-l-10"><label>Uptime</label></div>
+                                    <div class="flex-1 mg-l-10"><label>STRS</label></div>
+                                    <div class="flex-1 mg-l-10"><label>Prod Volume</label></div>
+                                    <div class="flex-1 mg-l-10"><label>CRR</label></div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <div class="d-flex">
+                                    <label class="flex-1 mg-l-10">Value</label>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.MTBFValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.CPQIValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.VQIValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.WorkingValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.UptimeValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.STRSValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.ProdVolumeValue, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextBoxFor(x => x.CRRValue, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="d-flex">
+                                    <label class="flex-1 mg-l-10">Focus</label>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.MTBFFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.CPQIFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.VQIFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.WorkingFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.UptimeFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.STRSFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.ProdVolumeFocus, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.CRRFocus, new { @class = "form-control" })
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="d-flex">
+                                    <label class="flex-1 mg-l-10">Action Plan</label>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.MTBFActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.CPQIActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.VQIActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.WorkingActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.UptimeActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.STRSActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.ProdVolumeActPlan, new { @class = "form-control" })
+                                    </div>
+                                    <div class="flex-1 mg-l-10">
+                                        @Html.TextAreaFor(x => x.CRRActPlan, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                    
+                            </div>
+                                <br />
+                                <div class="modal-footer pd-x-20 pd-y-15">
+                                    <button id="btnCancel"type="button" class="btn btn-white">@UIResources.Cancel</button>
+                                    <button type="submit" class="btn btn-primary">@UIResources.Save</button>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+            </div><!-- row -->
+        </div><!-- container -->
+    </div>
+}
+
+
+
+
+@section Scripts{
+  
+
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>   
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+         $('#tbDate').datepicker({
+                format: "dd-MM-yyyy",
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+        $("#btnCancel").on("click", function () {
+            window.location.href = fastApp.BaseUrl  + '/InputDaily/Index';
+        });
+    </script>
+     
+ 
+}
+
+
+

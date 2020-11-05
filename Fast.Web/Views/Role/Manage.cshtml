@@ -1,0 +1,259 @@
+﻿@model Fast.Web.Models.JobTitleTreeModel
+@using Fast.Web.Resources;
+
+
+<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+	<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</a>
+	<div class="media align-items-center">
+		<span class="tx-color-03 d-none d-sm-block"><i data-feather="users" class="wd-60 ht-60"></i></span>
+		<div class="media-body mg-sm-l-20">
+			<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.RoleManagement</h4>
+			<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+		</div>
+	</div><!-- media -->
+</div><!-- modal-header -->
+<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+	<div class="row row-sm mg-b-10">
+		<div class="col-2">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.RoleOrSecurity</label>
+		</div>
+		<div class="col-3">
+			@Html.DropDownListFor(x => x.RoleName, (IEnumerable<SelectListItem>)ViewBag.RoleList, new { @class = "form-control", @id = "ddlRole" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10" id="divNewRole">
+		<div class="col-2">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.RoleName</label>
+		</div>
+		<div class="col-3">
+			@Html.TextBoxFor(x => x.Name, null, new { @class = "form-control", @id = "tbName" })
+		</div>
+		<div class="col-sm-1">
+		</div>
+		<div class="col-2">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Description</label>
+		</div>
+		<div class="col-3">
+			@Html.TextBoxFor(x => x.Description, null, new { @class = "form-control", @id = "tbDescription" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10" id="twoPanel">
+		<div class="col-sm-5">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Available Title</label>
+			@Html.ListBoxFor(x => x.AvailableTitles, (IEnumerable<SelectListItem>)ViewBag.AvailableTitles, new { @multiple = "multiple", @class = "form-control", @id = "ddlAvailableTitles", @style = "width: 100%;height:205px;", @size = 10 })
+		</div>
+		<div class="col-sm-1 mg-t-80">
+			<button type="button" class="form-control mg-b-5" id="btnMoveRight">></button>
+			<button type="button" class="form-control" id="btnMoveLeft"><</button>
+		</div>
+		<div class="col-sm-6">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Selected Title</label>
+			@Html.ListBoxFor(x => x.SelectedTitles, (IEnumerable<SelectListItem>)ViewBag.SelectedTitles, new { @multiple = "multiple", @class = "form-control", @id = "ddlSelectedTitles", @style = "width: 100%;height:205px;", @size = 10 })
+		</div>
+	</div>
+</div><!-- modal-body -->
+<div class="modal-footer pd-x-20 pd-y-15">
+	<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+	<button type="button" class="btn btn-primary" id="btnAdd" data-dismiss="modal">@UIResources.Save</button>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#divNewRole").hide();
+
+		$('#ddlAvailableTitles').find('option').each(function () {
+			$(this).dblclick(function (e) {
+				var selectedOpts = $('#ddlAvailableTitles option:selected');
+				$('#ddlSelectedTitles').append($(selectedOpts).clone());
+				$(selectedOpts).remove();
+				e.preventDefault();
+			});
+		});
+
+		$('#ddlSelectedTitles').find('option').each(function () {
+			$(this).dblclick(function (e) {
+				var selectedOpts1 = $('#ddlSelectedTitles option:selected');
+				$('#ddlAvailableTitles').append($(selectedOpts1).clone());
+				$(selectedOpts1).remove();
+				e.preventDefault();
+			});
+		});
+
+		$("#btnMoveRight").click(function (e) {
+			var selectedOpts = $('#ddlAvailableTitles option:selected');
+			if (selectedOpts.length == 0) {
+
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: "@UIResources.NothingToMove",
+					width: "400px",
+					type: 'error',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+
+				e.preventDefault();
+			}
+
+			$('#ddlSelectedTitles').append($(selectedOpts).clone());
+			$(selectedOpts).remove();
+			e.preventDefault();
+		});
+
+		$("#btnMoveLeft").click(function (e) {
+			var selectedOpts = $('#ddlSelectedTitles option:selected');
+			if (selectedOpts.length == 0) {
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: "@UIResources.NothingToMove",
+					width: "400px",
+					type: 'error',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+
+				e.preventDefault();
+			}
+
+			$('#ddlAvailableTitles').append($(selectedOpts).clone());
+			$(selectedOpts).remove();
+			e.preventDefault();
+		});
+
+		$('#ddlRole').change(function () {
+
+			if ($('#ddlRole').val() == "0") {
+				$("#divNewRole").show();
+				$("#tbName").val('');
+				$("#tbDescription").val('');
+			} else {
+				$("#divNewRole").hide();
+			}
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Role/GetJobTitleByRole",
+				data: { role: $('#ddlRole').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSelectedTitles'>";
+
+					for (var i = 0; i < data.length; i++) {
+						if (data[i].Value.indexOf("#") == -1) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+					}
+
+					ddlTemp = ddlTemp + '</select>';
+
+					$('#ddlSelectedTitles').html(ddlTemp);
+
+					var ddlTemp1 = "<select id='ddlAvailableTitles'>";
+
+					for (var i = 0; i < data.length; i++) {
+						if (data[i].Value.indexOf("#") != -1) {
+							ddlTemp1 = ddlTemp1 + '<option value=' + data[i].Value.replace('#','') + '>' + data[i].Text + '</option>';
+						}
+					}
+
+					ddlTemp1 = ddlTemp1 + '</select>';
+
+					$('#ddlAvailableTitles').html(ddlTemp1);
+				}
+			});
+		});
+
+		$('#btnAdd').on('click', function () {
+			if ($('#ddlRole').val() == "0" && $("#tbName").val() == "" && $("#tbDescription").val() == "") {
+				alert("@UIResources.NameDescriptionRequired");
+			}
+			else {
+				var selectedTitles = new Array();
+				$('#ddlSelectedTitles option').each(function () {
+					selectedTitles.push($(this)[0].text);
+				});
+
+				var name = $('#tbName').val();
+				var description = $('#tbDescription').val();
+				var roleName = $('#ddlRole').val();
+
+				//Send the JSON array to Controller using AJAX.
+				$.ajax({
+					 type: "POST",
+					 url: fastApp.BaseUrl + '/Role/Manage?' + $.param({ name: name, description: description, roleName: roleName }),
+					 data: JSON.stringify(selectedTitles),
+					 contentType: "application/json; charset=utf-8",
+					 dataType: "json",
+					 success: function (result) {
+							if (result.Status) {
+								var notice = new PNotify({
+									title: "@UIResources.Confirmation",
+									text: "@UIResources.CreateOrEditSucceed",
+									width: "400px",
+									type: 'success',
+									addclass: 'stack-bottomright',
+									stack: stack_bottomright
+								});
+
+								notice.get().click(function () {
+									notice.remove();
+								});
+							}
+							else {
+								if (result.ErrorMessage) {
+									var notice = new PNotify({
+										title: "@UIResources.ErrorMessage",
+										text: result.ErrorMessage,
+										width: "400px",
+										type: 'error',
+										addclass: 'stack-bottomright',
+										hide: false,
+										buttons: {
+											sticker: false
+										}
+									});
+
+									notice.get().click(function () {
+										notice.remove();
+									});
+								}
+								else {
+									var notice = new PNotify({
+										title: "@UIResources.ErrorMessage",
+										text: "@UIResources.CreateOrEditFailed",
+										width: "400px",
+										type: 'error',
+										addclass: 'stack-bottomright',
+										hide: false,
+										buttons: {
+											sticker: false
+										}
+									});
+
+									notice.get().click(function () {
+										notice.remove();
+									});
+								}
+							}
+					 },
+					 complete: function (data) {
+					 	setTimeout(function () {
+							window.location.href = fastApp.BaseUrl + '/Role/Index';
+						}, 1000);
+					 }
+				});
+			}
+		});
+	});
+</script>

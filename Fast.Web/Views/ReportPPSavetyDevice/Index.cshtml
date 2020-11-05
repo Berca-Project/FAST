@@ -1,0 +1,688 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Safety Device</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Safety Device</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>
+                <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export CSV</button>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group col-12" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label tx-right">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        <option value="pp">PP - PP White - Karawang</option>
+                                        <option value="pk">PK - PP Kretek - Karawang</option>
+                                        <option value="pj">PJ - PP Kretek - Sukorejo</option>
+                                        <option value="pb">PB - PP White - SIS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Filter Line</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" name="line">
+                                        <option label="Select Line"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="safetydevice">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Safety Device</div>
+                    <div class="card-body row">
+
+                        <div class="tableWrapper col-12" style="min-height:280px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:60px;">Tgl Transaksi</th>
+                                        <th style="min-width:60px;">Shift</th>
+                                        <th style="min-width:100px;">Area Safety</th>
+                                        <th style="min-width:90px;">Kode</th>
+                                        <th style="min-width:160px;">Deskripsi</th>
+                                        <th style="min-width:90px;">Value</th>
+                                        <th style="min-width:120px;">Validator</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="PPsavetyDevice">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div class="card collect-component" id="safetydevice">
+                        <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+                        <div class="card-body row">
+
+                            <div class="content col-9">
+                                <canvas id="chwaste" height="100"></canvas>
+                            </div>
+
+                            <div class="divider-text divider-vertical" style="height:280px; margin:2em 5em 0em 2em;"></div>
+
+                            <div class="card col-2 pd-l-10 pd-t-10 mg-t-20" style="height:280px;">
+                                <label style="font-weight:bold;">Area</label>
+                                <input type="text" class="form-control" name="search" placeholder="Search Area" />
+
+                                <br />
+
+                                <label style="font-weight:bold;">Legend</label>
+                                <div class="mg-b-0 mg-l-10">
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Shift 1</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Shift 2</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#444444;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Shift 3</span>
+                                    </div>
+                                </div>
+                                <br />
+                                <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHide" style="margin: auto 0 20px 0;">Show Table</button>
+                            </div>
+
+                            <hr />
+
+
+                        </div>
+                    </div>
+                </div> Sampling Protocol-->
+
+
+            </div><!-- row -->
+
+        </div><!-- container -->
+    </div><!-- content -->
+    <!-- content -->
+
+
+    @section Scripts{
+        <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+        <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+        <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+        <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+        <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+        <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+        <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+        <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+        <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+        <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+        <script>
+            /* chart.js chart examples */
+
+            // chart colors
+            var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+            var chBar = document.getElementById("chwaste");
+            var chartData = {
+                labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
+                datasets: [{
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: colors[0]
+                },
+                {
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: colors[1]
+                },
+                {
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: colors[2]
+                }]
+            };
+
+            if (chBar) {
+                new Chart(chBar, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                barPercentage: 0.4,
+                                categoryPercentage: 0.5
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: false
+                                }
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                });
+            }
+        </script> @*chrph1*@
+
+
+        <script>
+            $(document).ready(function () {
+                $("#line-tabs li").click(function () {
+                    $(this).siblings().children().removeClass("active");
+                    $(this).children().toggleClass("active");
+                    const index = $(this).index() + 1;
+                    $("#lines .carousel-item.active").removeClass("active");
+                    const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                    $(carouselItem).toggleClass("active");
+                    $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                        const top = $(this).position().top;
+                        $(this).children().css({ "top": top });
+                    });
+                    ieFix();
+                });
+            });
+        </script> @*tabbel wrapper*@
+
+        <script>
+            $("#btnShowHide").click(function () {
+                var x = document.getElementById("collapseExample");
+                if (x.style.display === 'none') {
+                    x.style.display = '';
+                    $('.tableWrapper thead tr').each(function () {
+                        const top = $(this).position().top;
+                        $(this).children().css({
+                            "top": top,
+                            "position": "sticky",
+                            "z-index": "100",
+                        });
+                    });
+                    $(this).text("Hide Table");
+                } else {
+                    x.style.display = 'none';
+                    $(this).text("Show Table");
+                }
+            });
+        </script> @*hide button*@
+
+        <!------------------------ STICKY ------------------------------------>
+        <script>
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({
+                    "top": top,
+                    "position": "sticky",
+                    "z-index": "100",
+                });
+            });
+        </script>
+
+        <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+        <script>
+            const loc = {
+                pp: [
+                    {
+                        groupname: "White Line PMID",
+                        opts: [
+                            {
+                                opt: "Feeding White",
+                                data: ``,
+                            },
+                            {
+                                opt: "DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "Cutting FTD",
+                                data: ``,
+                            },
+                            {
+                                opt: "Addback",
+                                data: ``,
+                            },
+                            {
+                                opt: "Packing White",
+                                data: ``,
+                            },
+                            {
+                                opt: "Feeding SPM",
+                                data: ``,
+                            },
+                            {
+                                opt: "Feeding IS White",
+                                data: ``,
+                            },
+                            {
+                                opt: "Cut Dry IS White",
+                                data: ``,
+                            },
+                        ],
+                    },
+                ],
+                pk: [
+                    {
+                        groupname: "Intermediate Line",
+                        opts: [
+                            {
+                                opt: "Clove Feeding &amp; DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "Clove Cut Dry &amp; Packing",
+                                data: ``,
+                            },
+                            {
+                                opt: "CSF Feeding &amp; DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "CSF Cut Dry &amp; Packing",
+                                data: ``,
+                            },
+                            {
+                                opt: "RTC",
+                                data: ``,
+                            },
+                            {
+                                opt: "DIET",
+                                data: ``,
+                            },
+                            {
+                                opt: "Casing Kitchen",
+                                data: ``,
+                            },
+                        ],
+                    },
+                    {
+                        groupname: "Kretek Line",
+                        opts: [
+                            {
+                                opt: "Feeding KR &amp; RJ",
+                                data: ``,
+                            },
+                            {
+                                opt: "DCCC KR &amp; RJ",
+                                data: ``,
+                            },
+                            {
+                                opt: "Cut Dry",
+                                data: ``,
+                            },
+                            {
+                                opt: "Addback",
+                                data: ``,
+                            },
+                            {
+                                opt: "Packing",
+                                data: ``,
+                            },
+                            {
+                                opt: "CRES Feeding &amp; DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "CRES Cut Dry &amp; Packing",
+                                data: ``,
+                            },
+                        ],
+                    },
+                ],
+                pj: [
+                    {
+                        groupname: "Intermediate Line",
+                        opts: [
+                            {
+                                opt: "Clove Feeding &amp; DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "Clove Cut Dry &amp; Packing",
+                                data: ``,
+                            },
+                            {
+                                opt: "CSF Feeding &amp; DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "CSF Cut Dry &amp; Packing",
+                                data: ``,
+                            },
+                            {
+                                opt: "RTC",
+                                data: ``,
+                            },
+                            {
+                                opt: "DIET",
+                                data: ``,
+                            },
+                            {
+                                opt: "Casing Kitchen",
+                                data: ``,
+                            },
+                        ],
+                    },
+                    {
+                        groupname: "Kretek Line",
+                        opts: [
+                            {
+                                opt: "Feeding KR &amp; RJ",
+                                data: ``,
+                            },
+                            {
+                                opt: "DCCC KR &amp; RJ",
+                                data: ``,
+                            },
+                            {
+                                opt: "Cut Dry",
+                                data: ``,
+                            },
+                            {
+                                opt: "Addback",
+                                data: ``,
+                            },
+                            {
+                                opt: "Packing",
+                                data: ``,
+                            },
+                            {
+                                opt: "CRES Feeding &amp; DCCC",
+                                data: ``,
+                            },
+                            {
+                                opt: "CRES Cut Dry &amp; Packing",
+                                data: ``,
+                            },
+                        ],
+                    },
+                ],
+                pb: [
+                    {
+                        groupname: "White Line OTP",
+                        opts: [
+                            {
+                                opt: "PP SIS - Process Note",
+                                data: ``,
+                            },
+                        ]
+                    }
+                ],
+            }
+            const $tmpDiv = $('<div/>');
+            htmlEncode = (value) => $tmpDiv.text(value).html();
+            htmlDecode = (value) => $tmpDiv.html(value).text();
+            $(document).ready(function () {
+                $(".selectable-section").hide();
+                $("[name=prodCenter]").on("change", function () {
+                    let opt = '<option label="Select Line"></option>';
+                    const val = $(this).val();
+                    if (val != "") for (let i = 0; i < loc[val].length; i++) {
+                        opt += `<optgroup label="${loc[val][i].groupname}">`;
+                        for (let j = 0; j < loc[val][i].opts.length; j++)
+                            opt += `<option value="${loc[val][i].opts[j].opt}">${loc[val][i].opts[j].opt}</option>`;
+                        opt += `</optgroup>`;
+                    }
+                    $("[name=line]").html(opt);
+                })
+            });
+        </script>
+
+        <!------------------------ ACT BTN SEARCH ------------------------------------>
+        <script>
+            $(document).ready(function () {
+                $("#btnSearch").on("click", function () {
+                    const prodCenter = $("[name=prodCenter]").val();
+                    const opt = htmlEncode($("[name=line]").val());
+                    if (prodCenter != "" && opt != "") for (let i = 0; i < loc[prodCenter].length; i++) {
+                        for (let j = 0; j < loc[prodCenter][i].opts.length; j++)
+                            if (loc[prodCenter][i].opts[j].opt == opt && loc[prodCenter][i].opts[j].data != "")
+                                $("#PPsavetyDevice").html(loc[prodCenter][i].opts[j].data);
+                    } else $("#PPsavetyDevice").html("");
+                })
+            });
+        </script>
+
+        <!------------------------ DATEPICKER ------------------------------------>
+        <script>
+            $(document).ready(function () {
+                $('.input-daterange').datepicker({
+                    calendarWeeks: true,
+                    enableOnReadonly: true,
+                    todayHighlight: true,
+                    //format: 'D, dd-M-yy',
+                    language: 'id-ID',
+                });
+                $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                    $("[name='end']").datepicker('setStartDate', selected.date);
+                    $("[name='weekStart']").val(moment(selected.date).format("W"));
+                });
+                $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                    $("[name='start']").datepicker('setEndDate', selected.date);
+                    $("[name='weekEnd']").val(moment(selected.date).format("W"));
+                });
+            });
+        </script>
+    }

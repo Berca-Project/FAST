@@ -1,0 +1,49 @@
+﻿@model Fast.Web.Models.TrainingTitleMachineTypeModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Edit", "TrainingMachineType", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.ID, new { @Id = "ID" })
+	@Html.HiddenFor(x => x.TrainingTitleID, new { @Id = "TrainingTitleID" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.EditTrainingMachineType</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.TrainingTitle</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.TrainingTitleID, (IEnumerable<SelectListItem>)ViewBag.TrainingTitleList, new { @class = "form-control", @id = "ddlTraining", @disabled = "disabled" })
+			</div>
+			<div class="col-4">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.MachineTypeList</label>
+			</div>
+			<div class="col-8">
+				@Html.DropDownListFor(x => x.MachineTypeIDs, (MultiSelectList)ViewBag.MachineTypeList, new { @multiple = "multiple", @class = "form-control", @id = "ddlMachineType", @style = "width: 100%" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#ddlMachineType').select2({
+			dropdownParent: $('#modalEditMachineType')
+		});
+	});
+</script>

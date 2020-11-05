@@ -1,0 +1,481 @@
+﻿@model Fast.Web.Models.CalendarModel
+@using Fast.Web.Resources;
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/theme/lib/calendar-report/calendarTab.css" rel="stylesheet" />
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+}
+@section Styles{
+
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.Calendar</h4>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+			@using (Html.BeginForm("GetPDF", "Calendar", FormMethod.Post))
+			{
+				<div class="row">
+					<div class="col-sm-1">
+						<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Country</label>
+					</div>
+					<div class="col-sm-2">
+						@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry1" })
+					</div>
+					<div class="col-sm-1">
+						<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ProdCenter</label>
+					</div>
+					<div class="col-sm-2">
+						@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+					</div>
+					<div class="col-sm-1">
+						<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Department</label>
+					</div>
+					<div class="col-sm-2">
+						@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment1" })
+					</div>
+					<div class="col-sm-1">
+						<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.SubDepart</label>
+					</div>
+					<div class="col-sm-2">
+						@Html.DropDownListFor(x => x.LocationID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment1" })
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-sm-1">
+						<input type="hidden" name="idLoc" id="idLoc">
+					</div>
+					<div class="col-md-2">
+						<button id="btnGetReport" type="button" class="btn btn-sm pd-x-15 btn-primary btn-block btn-uppercase"><i class="wd-10 mg-r-5"></i>Show On Screen</button>
+					</div>
+					<div class="col-sm-1">
+					</div>
+					<div class="col-sm-2">
+						<button id="submitButton" class="btn btn-sm pd-x-15 btn-primary btn-block btn-uppercase" type="submit">Get PDF</button>
+					</div>
+				</div>
+			}
+		</div>
+		<br />
+		<div class="row" id="reportArea">
+			<div class="col-md-8">
+				<h5>Calendar (Group Type)</h5>
+				<font size="1">
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calJan">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calFeb">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calMar">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calApr">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calMay">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calJun">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calJul">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calAugust">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calSept">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calOkt">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calNov">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast cal" id="calDec">
+						<thead>
+							<tr>
+								<th>@UIResources.ID</th>
+								<th>@UIResources.Day</th>
+								<th>@UIResources.Date</th>
+								<th>@UIResources.Shift1</th>
+								<th>@UIResources.Shift2</th>
+								<th>@UIResources.Shift3</th>
+								<th>@UIResources.Location</th>
+								<th>@UIResources.GroupType</th>
+							</tr>
+						</thead>
+					</table>
+				</font>
+			</div>
+			<div data-label="Holiday" class="col-md-4">
+				<h5>Holiday Information</h5>
+				<font size="1">
+					<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast " id="holidayTable">
+						<thead>
+							<tr class="hol">
+								<th>@UIResources.ID</th>
+								<th>Bulan</th>
+								<th>Tgl</th>
+								<th>Informasi</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<div id="legend">
+					</div>
+					<br />
+					<div class="row mg-l-0">
+						<div class="col-md-1 purpleLabel"></div>&nbsp;&nbsp;Group A &nbsp;&nbsp;&nbsp; <div class="col-md-1 lightYellowLabel"></div>&nbsp;&nbsp;Group C
+					</div>
+					<br />
+					<div class="row mg-l-0">
+						<div class="col-md-1 peachLabel"></div>&nbsp;&nbsp;Group B &nbsp;&nbsp;&nbsp; <div class="col-md-1 whiteLabel"></div>&nbsp;&nbsp;Group D
+					</div>
+				</font>
+				<br />
+				<h5>Working Days Summary</h5>
+				<font size="1">
+					<table id="workingSummaryTable" class="table table-bordered table-striped mb-none border-bottom-0 table-fast ">
+						<thead>
+							<tr class="hol">
+								<th>Month</th>
+								<th>Days</th>
+								<th>Holiday</th>
+								<th>Leave</th>
+								<th>Prod Off</th>
+								<th>Shift Off</th>
+								<th>Work Days</th>
+							</tr>
+						</thead>
+					</table>
+					<br />
+					<table id="workingGroupSummaryTable" class="table table-bordered table-striped mb-none border-bottom-0 table-fast ">
+						<thead>
+							<tr class="hol">
+								<th>Month</th>
+								<th>A</th>
+								<th>B</th>
+								<th>C</th>
+								<th>D</th>
+							</tr>
+						</thead>
+					</table>
+				</font>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+	<script type="text/javascript">
+		var isDev = '@System.Configuration.ConfigurationManager.AppSettings["IsDev"]';
+		var fastApp = fastApp || {};
+		if (isDev == 'true') {
+			fastApp.BaseUrl = '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]';
+		} else {
+			fastApp.BaseUrl = '@Url.Content("~")';
+		}
+	</script>
+	<script src="~/Content/theme/lib/calendar-report/calendar.js"></script>
+	<script type="text/javascript">
+
+		var idLoc = 0;
+		var locationId = 0;
+		var locationType = 'country';
+
+		$('#btnGetReport').on('click', function () {
+			if ($('#ddlProdCenter1').val() == '0') {
+				locationId = $('#ddlCountry1').val();
+				locationType = 'country';
+			} else if ($('#ddlDepartment1').val() == '0') {
+				locationId = $('#ddlProdCenter1').val();
+				locationType = 'productioncenter';
+			} else if ($('#ddlSubDepartment1').val() == '0') {
+				locationId = $('#ddlDepartment1').val();
+				locationType = 'department';
+			} else {
+				locationId = $('#ddlSubDepartment1').val();
+				locationType = 'subdepartment';
+			}
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/CheckCalendar",
+				data: { locID: locationId, locType: locationType },
+				traditional: true,
+				success: function (data) {
+					if (data.length > 0) {
+
+						idLoc = data[0].Value;
+
+						collectCalendar();
+
+						$.ajax({
+							type: "post",
+							url: fastApp.BaseUrl + "/Calendar/GetHolidayType",
+							datatype: "json",
+							traditional: true,
+							success: function (data) {
+								var legendList = "";
+								for (var i = 0; i < data.length; i++) {
+									legendList = legendList + '<div class="row mg-l-0">';
+									legendList = legendList + '<div class="col-md-1" style="background-color:' + data[i].Value + '"></div>&nbsp;&nbsp;' + data[i].Text;
+									legendList = legendList + '</div><br />';
+								}
+								$('#legend').html(legendList);
+							}
+						});
+
+						$("#idLoc").val(idLoc);
+						$("#reportArea").show();
+
+					} else {
+
+						$("#reportArea").hide();
+
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.NoDataInSelectedCriteria",
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			});
+		});
+
+		$(document).ready(function () {
+			$("#reportArea").hide();
+		});
+
+		$('#ddlCountry1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/GetProductionCenterByCountryID",
+				data: { id: $('#ddlCountry1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlProdCenter1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlProdCenter1').html(ddlTemp);
+					$('#ddlDepartment1').html("<select id='ddlDepartment1'><option value='0'>- Please Select -</option></select>");
+					$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlProdCenter1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenter1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartment1').html(ddlTemp);
+					$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlDepartment1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartment1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartment1').html(ddlTemp);
+				}
+			});
+		});
+
+		$('#ddlSubDepartment1').change(function () {
+			var valueLoc = $(this).val();
+			idLoc = valueLoc;
+			$("#idLoc").val(idLoc);
+		});
+	</script>
+}
+

@@ -1,0 +1,144 @@
+﻿@model Fast.Web.Models.Report.RekapProduksiRPH1Model
+@using Fast.Web.Resources;
+
+<div class="card-header bg-primary tx-white tx-center font-weight-bold">RPH1</div>
+<div class="card-body row">
+    <div class="col-12 row" id="collapseExample" style="display:none;">
+        <div class="content col-9">
+            <canvas id="chrph1" height="100"></canvas>
+        </div>
+
+        <div class="divider-text divider-vertical" style="height:280px; margin:2em 5em 0em 2em;"></div>
+
+        <div class="card col-2 pd-l-10 pd-t-10 mg-t-20" style="height:180px;">
+            <label style="font-weight:bold;">Legend</label>
+            <div class="mg-b-0 mg-l-10">
+                <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                    <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                    <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Total Shift</span>
+                </div>
+                <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                    <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                    <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; MIO</span>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+
+    <div class="col-12 tx-center">
+        <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHide" style="margin: auto 0 15px 0;">Show Chart</button>
+    </div>
+
+    <div class="tableWrapper" style="min-height:450px;">
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="thead-info tx-center">
+                <tr>
+                    <th rowspan="2" style="min-width:100px;">Location</th>
+                    <th rowspan="2" style="min-width:260px;">Brand</th>
+                    <th rowspan="2" style="min-width:110px;">Item Code</th>
+                    <th rowspan="2" style="min-width:190px;">M/C</th>
+
+                    @for (var dt = Model.StartDate; dt <= Model.EndDate; dt = dt.AddDays(1))
+                    {
+                        <th colspan="3" style="min-width:90px;">@(dt.ToString("dddd, dd MMM yyyy"))</th>
+                    }
+
+                    <th colspan="3">Output</th>
+                </tr>
+                <tr>
+                    @for (var dt = Model.StartDate; dt <= Model.EndDate; dt = dt.AddDays(1))
+                    {
+                        <th style="min-width:90px;">Shift 1</th>
+                        <th style="min-width:90px;">Shift 2</th>
+                        <th style="min-width:90px;">Shift 3</th>
+                    }
+
+                    <th style="min-width:90px;">Box</th>
+                    <th style="min-width:120px;">Stick per Box</th>
+                    <th style="min-width:90px;">mio</th>
+                </tr>
+            </thead>
+            <tbody id="rph1" class="tx-center">
+                @foreach (var wppM in Model.wppSimpleList)
+                {
+                    <tr>
+                        <td rowspan="2">@wppM.Location</td>
+                        <td rowspan="2">@wppM.Description</td>
+                        <td rowspan="2">@wppM.Brand</td>
+                        <td rowspan="2">@wppM.Packer</td>
+
+                        @for (var dt = Model.StartDate; dt <= Model.EndDate; dt = dt.AddDays(1))
+                        {
+                            var wpp = Model.wppList.Where(x => x.Date == dt && x.Location == wppM.Location && x.Brand == wppM.Brand && x.Maker == wppM.Maker && x.Packer == wppM.Packer && x.Description == wppM.Description).FirstOrDefault();
+
+                            if (wpp == null)
+                            {
+                                <td style="background-color:#1e90ff40;">0</td>
+                                <td style="background-color:#1e90ff40;">0</td>
+                                <td style="background-color:#1e90ff40;">0</td>
+                            }
+                            else
+                            {
+                                <td style="background-color:#1e90ff40;">@wpp.Shift1</td>
+                                <td style="background-color:#1e90ff40;">@wpp.Shift2</td>
+                                <td style="background-color:#1e90ff40;">@wpp.Shift3</td>
+                            }
+                        }
+
+                        <td style="background-color:#1e90ff40;">5306.55</td>
+                        <td style="background-color:#1e90ff40;">9600</td>
+                        <td style="background-color:#1e90ff40;">50.942879999999995</td>
+                    </tr>
+
+                    <tr>
+                        <td>287</td>
+                        <td>275</td>
+                        <td>285</td>
+                        <td>284</td>
+                        <td>291</td>
+                        <td>279</td>
+                        <td>274</td>
+                        <td>264</td>
+                        <td>284</td>
+                        <td></td>
+                        <td>276</td>
+                        <td>281</td>
+                        <td>214</td>
+                        <td>273</td>
+                        <td>290</td>
+                        <td>281</td>
+                        <td>296</td>
+                        <td>296</td>
+                        <td>297</td>
+                        <td>284</td>
+                        <td>290</td>
+                        <td>5601</td>
+                        <td>9600</td>
+                        <td>53.769599999999997</td>
+                    </tr>
+                }
+            </tbody>
+            </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.input-daterange').datepicker({
+            calendarWeeks: true,
+            enableOnReadonly: true,
+            todayHighlight: true,
+            //format: 'D, dd-M-yy',
+            language: 'id-ID',
+        });
+        $(".input-daterange [name='start']").on('changeDate', function (selected) {
+            $("[name='end']").datepicker('setStartDate', selected.date);
+            $("[name='weekStart']").val(moment(selected.date).format("W"));
+        });
+        $(".input-daterange [name='end']").on('changeDate', function (selected) {
+            $("[name='start']").datepicker('setEndDate', selected.date);
+            $("[name='weekEnd']").val(moment(selected.date).format("W"));
+        });
+    });
+</script>

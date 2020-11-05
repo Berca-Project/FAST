@@ -1,0 +1,149 @@
+﻿@model List<Fast.Web.Models.ChecklistComponentModel>
+@using Fast.Web.Resources;
+
+@{
+    App.dictionary = new Dictionary<string, string> {
+        { "button_ok"         ,"Button OK" },
+        { "button_nok"        ,"Button NOK" },
+        { "input_text"        ,"Input Text" },
+        { "input_number"      ,"Input Number" },
+        { "input_date"        ,"Input Date" },
+        { "input_checkbox"    ,"Input Checkbox" },
+        { "input_file"        ,"Input Upload Image" },
+    };
+
+    App.counter = -1;
+}
+
+@helper GenerateTable(List<Fast.Web.Models.ChecklistComponentModel> components)
+{
+    var headers = components.Where(x => x.ComponentType.Trim() == "header").OrderBy(x => x.OrderNum).ToList();
+    var contents = components.Where(x => x.ComponentType.Trim() != "header").ToList();
+    var max_cell = components.Max(x => x.ColumnNum);
+
+    <table class="table table-bordered table-primary">
+        <thead>
+            <tr>
+                @foreach (var header in headers)
+                {
+                    <th style="width:@(Math.Round((double)100/headers.Count(), 2))%">@header.ComponentName</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i <= max_cell; i++)
+            {
+
+                var comps = contents.Where(x => x.ColumnNum == i).OrderBy(x => x.OrderNum).ToList();
+
+                if (i % headers.Count() == 0)
+                {
+                    if (i == 0)
+                    {
+                        @Html.Raw("<tr>")
+                    }
+                    else
+                    {
+                        @Html.Raw("</tr><tr>")
+                    }
+
+                }
+
+            <td style="width:@(Math.Round((double)100/headers.Count(), 2))%">
+
+                @foreach (var compo in comps)
+                {
+                    App.counter++;
+                    if (compo.ComponentType.Trim() == "label")
+                    {
+                        <input name="[@App.counter].ID" type="hidden" value="@compo.ID" />
+                        <input name="[@App.counter].ComponentName" type="text" class="form-control" placeholder="Label" />
+                    }
+                    else if (compo.ComponentType.Trim() == "image")
+                    {
+                        <input name="[@App.counter].ID" type="hidden" value="@compo.ID" />
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="upload@(App.counter)" name="[@App.counter].ComponentFile" accept="image/*">
+                            <label class="custom-file-label" for="upload@(App.counter)">Upload your images here</label>
+                        </div>
+						<small class="form-text text-muted">Recommended image size: 600x600 pixels</small>
+                    }
+                    else if (compo.ComponentType.Trim() == "input_option")
+                    {
+                        <input name="[@App.counter].ID" type="hidden" value="@compo.ID" />
+                        <input type="text" name="[@App.counter].ComponentName" class="form-control tags-input mg-t-5" data-role="tagsinput" placeholder="Type option with comma" />
+                    }
+                    else
+                    {
+                        App.counter--;
+
+                        <label class="d-block mg-t-9">@App.dictionary[compo.ComponentType.Trim()]</label>
+                    }
+                }
+
+
+            </td>
+        }
+            @Html.Raw("</tr>")
+            </tbody>
+        </table>
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item"><a href="#">Create</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Content Detail</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Specify Checklist Content for [@ViewBag.Checklist.MenuTitle] @ViewBag.Checklist.Header</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                @using (Html.BeginForm("Detail", "Checklist", FormMethod.Post, new { @class="preventDoubleSubmission", @autocomplete = "false", encType = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("ChecklistID", new Uri(Context.Request.Url.ToString()).Segments.Last())
+
+                    <div class="card">
+                        <div class="card-body">
+                            @GenerateTable(Model)
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="submit" class="btn btn-primary">Save &amp; See the result <i data-feather="arrow-right-circle" class="wd-10 mg-l-5"></i></button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("form").on("change", "input[type='file']", function () {
+                $(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+            });
+        });
+    </script>
+}

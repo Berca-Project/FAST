@@ -1,0 +1,954 @@
+﻿@model Fast.Web.Models.MppModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+	<link href="~/Content/dashforge/assets/css/dashforge.dashboard.css" rel="stylesheet" />
+}
+
+@section Styles{
+	<style>
+		.marginBox {
+			margin: 5px 5px 5px 5px;
+		}
+	</style>
+}
+
+<div class="modal fade" id="modalUploadMpp" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			@using (Html.BeginForm("Upload", "Mpp", FormMethod.Post, new { encType = "multipart/form-data", @id = "UploadForm" }))
+			{
+				@Html.AntiForgeryToken()
+				<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+					<div class="media align-items-center">
+						<span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+						<div class="media-body mg-sm-l-20">
+							<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Upload</h4>
+							<p class="tx-13 tx-color-03 mg-b-0">@UIResources.MppDataManagement</p>
+						</div>
+					</div><!-- media -->
+				</div><!-- modal-header -->
+				<div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+					<div class="form-group ">
+						<div class="form-control-static">
+							<span class="btn btn-success fileinput-button btn-block">
+								@Html.TextBoxFor(x => x.PostedFilename, null, new { @type = "file", @accept = ".xls, .xlsx", @required = "required", @id = "customFile" })
+							</span>
+						</div>
+						<br />
+						<div class="progress" id="loadingbar" style="height: 30px;">
+							<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Please wait a few seconds...</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer pd-x-20 pd-y-15">
+					<button type="button" class="btn btn-white" data-dismiss="modal" id="btnCancel">@UIResources.Cancel</button>
+					<button type="button" class="btn btn-primary" id="btnSubmit" onclick="OnSubmit()">@UIResources.Upload</button>
+				</div>
+			}
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalDownloadMpp" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			@using (Html.BeginForm("GenerateExcel", "Mpp", FormMethod.Post, new { @class = "form-horizontal", @id = "idmodalDownloadMpp" }))
+			{
+				@Html.AntiForgeryToken()
+				<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+					<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</a>
+					<div class="media align-items-center">
+						<span class="tx-color-03 d-none d-sm-block"><i data-feather="download" class="wd-60 ht-60"></i></span>
+						<div class="media-body mg-sm-l-20">
+							<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.DownloadTemplate</h4>
+							<p class="tx-13 tx-color-03 mg-b-0">@UIResources.MppDataManagement</p>
+						</div>
+					</div><!-- media -->
+				</div><!-- modal-header -->
+				<div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.StartDate</label>
+						</div>
+						<div class="col-8">
+							@Html.TextBoxFor(x => x.StartDateCalendar, null, new { @class = "form-control", @id = "startDate", @required = "required", @autocomplete = "off" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.EndDate</label>
+						</div>
+						<div class="col-8">
+							@Html.TextBoxFor(x => x.EndDateCalendar, null, new { @class = "form-control", @id = "endDate", @required = "required", @autocomplete = "off" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.GroupType</label>
+						</div>
+						<div class="col-8">
+							@Html.DropDownListFor(x => x.GroupTypeID, (IEnumerable<SelectListItem>)ViewBag.GroupTypeList, new { @class = "form-control", @id = "ddlGroupType" })
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer pd-x-20 pd-y-15">
+					<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+					<button type="submit" class="btn btn-primary">@UIResources.Download</button>
+				</div>
+			}
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="content content-fixed bd-b">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="mg-b-5">@UIResources.MppList</h4>
+                <p class="mg-b-0 tx-color-03">@UIResources.MppDataManagement</p>
+            </div>
+            <div class="mg-t-20 mg-sm-t-0">
+                <div class="row">
+                    <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Status", "MPP")'">
+                        <i data-feather="layers" class="mg-r-5"></i> Show Status
+                    </button>
+                    @if (Model.Access.hasWrite)
+                    {
+                        <button id="btnUpload" class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalUploadMpp">
+                            <i data-feather="share" class="mg-r-5"></i> @UIResources.Upload
+                        </button>
+                        <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("DownloadTemplate", "Mpp")'">
+                            <i data-feather="download" class="mg-r-5"></i> @UIResources.Template
+                        </button>
+                    }
+                </div>
+            </div>
+        </div><!-- End content header -->
+        <br />
+        <div data-label="Filter" class="df-example demo-table dtMarginTop">
+            <div class="row">
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Country</label>
+                </div>
+                <div class="col-sm-2">
+                    @Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry1" })
+                </div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProdCenter</label>
+                </div>
+                <div class="col-sm-2">
+                    @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+                </div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Department</label>
+                </div>
+                <div class="col-sm-2">
+                    @Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment1" })
+                </div>
+                <div class="col-sm-1" style="visibility:hidden;">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.SubDepart</label>
+                </div>
+                <div class="col-sm-2" style="visibility:hidden;">
+                    @Html.DropDownListFor(x => x.LocationID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment1" })
+                </div>
+            </div><br />
+            <div class="row">
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Date</label>
+                </div>
+                <div class="col-md-2"><input class="form-control hasDatepicker" id="flDate" type="text" placeholder="dd-MMM-yy" /></div>
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-2">
+                    <button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">@UIResources.Search</button>
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-2">
+                    <button onclick="GenerateExcel()" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">Excel</button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-xs" id="idSPbox">
+            <div class="col-lg-6 mg-t-10">
+                <div class="card">
+                    <div class="card-header d-flex align-items-start justify-content-between">
+                        <h6 class="lh-5 mg-b-0">Secondary Processing</h6>
+                        <span class="tx-13 link-03" id="dateSP1"></span>
+                    </div><!-- card-header -->
+                    <div class="card-body" id="idSP1">
+
+                    </div><!-- card-body -->
+                    <div class="card-footer d-flex align-items-start justify-content-between">
+                        <h6 class="lh-5 mg-b-0" id="overallSP1"></h6>
+                        <h6 class="lh-5 mg-b-0" id="TotalMachine"></h6>
+                    </div><!-- card-header -->
+                </div><!-- card -->
+                <!-- row new -->
+
+                <!-- row new -->
+
+            </div><!-- col -->
+            <div class="col-lg-6 mg-t-10">
+                <div class="card">
+                    <div class="card-header d-sm-flex align-items-start justify-content-between">
+                        <h6 class="lh-5 mg-b-0">Secondary Processing</h6>
+                        <span class="tx-13 link-03" id="dateSP2"></span>
+                    </div><!-- card-header -->
+                    <div class="card-body" id="idSP2">
+
+                    </div><!-- card-body -->
+                    <div class="card-footer d-flex align-items-start justify-content-between">
+                        <h6 class="lh-5 mg-b-0" id="overallSP2"></h6>
+                        <h6 class="lh-5 mg-b-0" id="TotalMachine2"></h6>
+                    </div><!-- card-header -->
+                </div><!-- card -->
+                <!-- row new -->
+                
+                <!-- row new -->
+
+            </div><!-- col -->
+            @*
+            <div class="row row-xs" id="idPPbox">
+                <div class="col-lg-6 mg-t-10">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-start justify-content-between">
+                            <h6 class="lh-5 mg-b-0">Primary Processing</h6>
+                            <span class="tx-13 link-03" id="datePP1"></span>
+                        </div><!-- card-header -->
+                        <div class="card-body" id="idPP1">
+
+                        </div><!-- card-body -->
+                    </div><!-- card -->
+                </div><!-- col -->
+                <div class="col-lg-6 mg-t-10">
+                    <div class="card">
+                        <div class="card-header d-sm-flex align-items-start justify-content-between">
+                            <h6 class="lh-5 mg-b-0">Primary Processing</h6>
+                            <span class="tx-13 link-03" id="datePP2"></span>
+                        </div><!-- card-header -->
+                        <div class="card-body" id="idPP2">
+
+                        </div><!-- card-body -->
+                    </div><!-- card -->
+                </div><!-- col -->
+            </div>
+            *@
+        </div>
+
+
+
+
+    </div>
+</div>
+
+<div class="modal fade" id="modalRemoveMpp" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+		<div class="modal-content" id="RemoveDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+	<script type="text/javascript">
+
+		var pcID = 0;
+		var locationId = 0;
+		var locationType = 'country';
+
+		$('#btnUpload').on('click', function () {
+			if (@Model.SubDepID == @Model.DepID) {
+				$('#labelDepartment').hide();
+				$('#inputDepartment').hide();
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/MPP/GetSubDepartmentByDepartmentID",
+					data: { id: @Model.SubDepID },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartment').html(ddlTemp);
+					}
+				});
+			} else if (@Model.SubDepID != @Model.PcID && @Model.SubDepID != @Model.DepID) {
+				$('#labelDepartment').hide();
+				$('#inputDepartment').hide();
+				$('#labelSubDepartment').hide();
+				$('#inputSubDepartment').hide();
+			} else {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/MPP/GetDepartmentByProdCenterID",
+					data: { id: @Model.SubDepID },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartment').html(ddlTemp);
+						$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			}
+		});
+
+		$('#btnExport').on('click', function () {
+			if ($('#flDate').val() == '') {
+				alert('Please select the date first');
+			} else if ($('#ddlProdCenter1').val() == '0') {
+				alert('Please select the production center first');
+			}
+		});
+
+		function GenerateExcel() {
+			if ($('#flDate').val() == '') {
+				alert('Please select the date first');
+			} else if ($('#ddlProdCenter1').val() == '0') {
+				alert('Please select the production center first');
+			} else {
+				var notice = new PNotify({
+					title: "Generating Excel file",
+					text: "Please wait a few seconds....",
+					addclass: 'stack-bottomright',
+					width: "400px",
+					type: 'success',
+					stack: stack_bottomright,
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+
+				var dateFilter = $('#flDate').val();
+				var pcID = $('#ddlProdCenter1').val();
+
+				if ($('#ddlProdCenter1').val() == '0') {
+					locationId = $('#ddlCountry1').val();
+					locationType = 'country';
+				} else if ($('#ddlDepartment1').val() == '0') {
+					locationId = $('#ddlProdCenter1').val();
+					locationType = 'productioncenter';
+				} else if ($('#ddlSubDepartment1').val() == '0') {
+					locationId = $('#ddlDepartment1').val();
+					locationType = 'department';
+				} else {
+					locationId = $('#ddlSubDepartment1').val();
+					locationType = 'subdepartment';
+				}
+
+				location.href = '@Url.Action("GenerateExcel", "MPP")?dateFilter=' + dateFilter + '&locID=' + locationId + '&locType=' + locationType;
+			}
+        };
+
+		$('#btnSearch').on('click', function () {
+			if ($('#flDate').val() == '') {
+				alert('Please select the date first');
+			} else if ($('#ddlProdCenter1').val() == '0') {
+				alert('Please select the production center first');
+			} else {
+				var dateFilter = $('#flDate').val();
+				pcID = $('#ddlProdCenter1').val();
+
+				if ($('#ddlDepartment1').val() == '0') {
+					locationId = $('#ddlProdCenter1').val();
+					locationType = 'productioncenter';
+				} else {
+					locationId = $('#ddlDepartment1').val();
+					locationType = 'department';
+				}
+
+				$('#loading_overlay').removeClass('d-none');
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/MPP/GetAllMachineList",
+					data: { dateFilter, locId: locationId, locType: locationType, pcID },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						$('#loading_overlay').addClass('d-none');
+
+						$('#dateSP1').text(data.CurrentDate);
+						$('#dateSP2').text(data.NextDate);
+						$('#overallSP1').text(data.SelectedDateOverallPercentage);
+						$('#datePP1').text(data.CurrentDate);
+						$('#datePP2').text(data.NextDate);
+						$('#overallSP2').text(data.NextDateOverallPercentage);
+
+                        //shift 1
+						var blokSP = "<h6>" + data.SelectedDateShift1Percentage + "</h6><div class='row'>";
+						var blokPP = "<h6>SHIFT 1</h6><div class='row'>";
+						var blokSP2 = "<h6>" + data.NextDateShift1Percentage + "</h6><div class='row'>";
+						var blokPP2 = "<h6>SHIFT 1</h6><div class='row'>";
+
+						for (var i = 0; i < data.MachineList.length; i++) {
+							if (data.MachineList[i].IsSelectedDate) {
+								if (data.MachineList[i].IsSP) {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokSP = blokSP + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift1Zero) {
+										blokSP = blokSP + '<button type="button" class="btn btn-dark marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift1FullyAssigned) {
+										blokSP = blokSP + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokSP = blokSP + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									}
+								} else {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokPP = blokPP + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift1FullyAssigned) {
+										blokPP = blokPP + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokPP = blokPP + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									}
+								}
+							} else {
+								if (data.MachineList[i].IsSP) {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift1Zero) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-dark marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift1FullyAssigned) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									}
+								} else {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift1FullyAssigned) {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									}
+								}
+							}
+                        }
+
+						blokSP = blokSP + '</div>';
+						blokSP2 = blokSP2 + '</div>';
+						blokPP = blokPP + '</div>';
+                        blokPP2 = blokPP2 + '</div>';
+
+                        //shift 2
+						var blokSP = blokSP + "<h6>" + data.SelectedDateShift2Percentage + "</h6><div class='row'>";
+						var blokPP = blokPP + "<h6>SHIFT 2</h6><div class='row'>";
+						var blokSP2 = blokSP2 +  "<h6>" + data.NextDateShift2Percentage + "</h6><div class='row'>";
+						var blokPP2 = blokPP2 + "<h6>SHIFT 2</h6><div class='row'>";
+
+						for (var i = 0; i < data.MachineList.length; i++) {
+							if (data.MachineList[i].IsSelectedDate) {
+								if (data.MachineList[i].IsSP) {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokSP = blokSP + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift2Zero) {
+										blokSP = blokSP + '<button type="button" class="btn btn-dark marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift2FullyAssigned) {
+										blokSP = blokSP + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokSP = blokSP + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									}
+								} else {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokPP = blokPP + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift2FullyAssigned) {
+										blokPP = blokPP + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokPP = blokPP + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									}
+								}
+							} else {
+								if (data.MachineList[i].IsSP) {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift2Zero) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-dark marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift2FullyAssigned) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									}
+								} else {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift2FullyAssigned) {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',2)">' + data.MachineList[i].Code + '</button>';
+									}
+								}
+							}
+                        }
+
+						blokSP = blokSP + '</div>';
+						blokSP2 = blokSP2 + '</div>';
+						blokPP = blokPP + '</div>';
+                        blokPP2 = blokPP2 + '</div>';
+
+                        //shift 3
+						var blokSP = blokSP + "<h6>" + data.SelectedDateShift3Percentage + "</h6><div class='row'>";
+						var blokPP = blokPP + "<h6>SHIFT 3</h6><div class='row'>";
+						var blokSP2 = blokSP2 +  "<h6>" + data.NextDateShift3Percentage + "</h6><div class='row'>";
+						var blokPP2 = blokPP2 + "<h6>SHIFT 3</h6><div class='row'>";
+
+						for (var i = 0; i < data.MachineList.length; i++) {
+							if (data.MachineList[i].IsSelectedDate) {
+								if (data.MachineList[i].IsSP) {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokSP = blokSP + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift3Zero) {
+										blokSP = blokSP + '<button type="button" class="btn btn-dark marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift3FullyAssigned) {
+										blokSP = blokSP + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokSP = blokSP + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									}
+								} else {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokPP = blokPP + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift3FullyAssigned) {
+										blokPP = blokPP + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokPP = blokPP + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									}
+								}
+							} else {
+								if (data.MachineList[i].IsSP) {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift3Zero) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-dark marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',1)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift3FullyAssigned) {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokSP2 = blokSP2 + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									}
+								} else {
+									if (!data.MachineList[i].IsExistInWpp) {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-secondary marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else if (data.MachineList[i].IsShift3FullyAssigned) {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-success marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									} else {
+										blokPP2 = blokPP2 + '<button type="button" class="btn btn-danger marginBox" data-toggle="modal" data-target="#modalDetailMpp" onClick="Detail2(\'' + data.MachineList[i].Code + '\',3)">' + data.MachineList[i].Code + '</button>';
+									}
+								}
+							}
+                        }
+
+						blokSP = blokSP + '</div>';
+						blokSP2 = blokSP2 + '</div>';
+						blokPP = blokPP + '</div>';
+                        blokPP2 = blokPP2 + '</div>';
+
+						document.getElementById('idSP1').innerHTML = blokSP;
+						document.getElementById('idSP2').innerHTML = blokSP2;
+						document.getElementById('TotalMachine').innerHTML = data.CurrentDateMachineCount;
+						document.getElementById('TotalMachine2').innerHTML = data.NextDateMachineCount;
+						//document.getElementById('idPP1').innerHTML = blokPP;
+						//document.getElementById('idPP2').innerHTML = blokPP2;
+					}
+				});
+			}
+		});
+
+		$(document).ready(function () {
+			$('#loadingbar').hide();
+
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+			});
+
+			$('#mppdate').datepicker({
+		        format: 'd-M-yy',
+				changeMonth: true,
+				changeYear: true
+			});
+
+			$('#startDate').datepicker({
+				format: 'd-M-yy',
+				changeMonth: true,
+				changeYear: true
+			});
+
+			$('#endDate').datepicker({
+				format: 'd-M-yy',
+				changeMonth: true,
+				changeYear: true
+			});
+
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			var error = "@ViewBag.ErrorMessage";
+			var message = "@ViewBag.Message";
+
+			if (result != "") {
+				if (result == "True") {
+					if (message == "") {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.CreateSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: message,
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+				else {
+					if (error == "") {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.CreateFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: error,
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			}
+
+			$('#ddlCountry').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Wpp/GetProductionCenterByCountryID",
+					data: { id: $('#ddlCountry').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlProdCenter'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlProdCenter').html(ddlTemp);
+						$('#ddlDepartment').html("<select id='ddlDepartment'><option value='0'>- Please Select -</option></select>");
+						$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlProdCenter').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Wpp/GetDepartmentByProdCenterID",
+					data: { id: $('#ddlProdCenter').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartment').html(ddlTemp);
+						$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlDepartment').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Wpp/GetSubDepartmentByDepartmentID",
+					data: { id: $('#ddlDepartment').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartment').html(ddlTemp);
+					}
+				});
+			});
+		});
+
+        $('#ddlCountry1').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Mpp/GetProductionCenterByCountryID",
+					data: { id: $('#ddlCountry1').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlProdCenter1'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlProdCenter1').html(ddlTemp);
+						$('#ddlDepartment1').html("<select id='ddlDepartment1'><option value='0'>- Please Select -</option></select>");
+						$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+		$('#ddlProdCenter1').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Mpp/GetDepartmentByProdCenterID",
+					data: { id: $('#ddlProdCenter1').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartment1'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartment1').html(ddlTemp);
+						$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+		$('#ddlDepartment1').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Mpp/GetSubDepartmentByDepartmentID",
+					data: { id: $('#ddlDepartment1').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartment1'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartment1').html(ddlTemp);
+					}
+				});
+            });
+
+		function RenderActions(id) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/Mpp/Edit/" + id);
+        };
+
+        function AddUserModel(code) {
+			if ($('#ddlDepartment1').val() == '0') {
+				locationId = $('#ddlProdCenter1').val();
+				locationType = 'productioncenter';
+			} else {
+				locationId = $('#ddlDepartment1').val();
+				locationType = 'department';
+			}
+
+			$("#AddDialog").load(fastApp.BaseUrl + "/Mpp/AddUser?machineCode=" + code + "&date=" + $('#flDate').val() + "&locID=" + locationId + "&locType=" + locationType);
+        };
+
+        function RemoveUserModel(code) {
+            var locationId = 0;
+			if ($('#ddlDepartment1').val() == '0') {
+				locationId = $('#ddlProdCenter1').val();
+			} else if ($('#ddlSubDepartment1').val() == '0') {
+				locationId = $('#ddlDepartment1').val();
+			} else {
+				locationId = $('#ddlSubDepartment1').val();
+			}
+
+			$("#RemoveDialog").load(fastApp.BaseUrl + "/Mpp/RemoveUser?machineCode=" + code + "&date=" + $('#flDate').val() + "&locID=" + locationId);
+		};
+
+		function Detail(code,shift) {
+			var locationId = 0;
+			var locType = '';
+			if ($('#ddlDepartment1').val() == '0') {
+				locationId = $('#ddlProdCenter1').val();
+				locType = 'productioncenter';
+			} else if ($('#ddlSubDepartment1').val() == '0') {
+				locationId = $('#ddlDepartment1').val();
+				locType = 'department';
+			} else {
+				locationId = $('#ddlSubDepartment1').val();
+				locType = 'subdepartment';
+			}
+
+			var url = fastApp.BaseUrl + "/Mpp/Detail?machineCode=" + code + "&date=" + $('#flDate').val() + "&locID=" + locationId + "&locType=" + locType + "&Shift=" + shift;
+
+			window.open(url, '_blank');
+        };
+
+		function Detail2(code, shift) {
+			var locationId = 0;
+			var locType = '';
+			if ($('#ddlDepartment1').val() == '0') {
+				locationId = $('#ddlProdCenter1').val();
+				locType = 'productioncenter';
+			} else if ($('#ddlSubDepartment1').val() == '0') {
+				locationId = $('#ddlDepartment1').val();
+				locType = 'department';
+			} else {
+				locationId = $('#ddlSubDepartment1').val();
+				locType = 'subdepartment';
+			}
+
+			var url = fastApp.BaseUrl + "/Mpp/Detail?machineCode=" + code + "&date=" + $('#flDate').val() + "&locID=" + locationId + "&locType=" + locType + "&isNextDay=True" + "&Shift=" + shift;
+
+			window.open(url, '_blank');
+		};
+
+		function OnLeave(id) {
+			$("#LeaveDialog").load(fastApp.BaseUrl + "/Mpp/EditLeave/" + id);
+		};
+
+		var Delete = function (ID) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text("@UIResources.TheSelectedData"));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteUserMachineType(ID);
+			});
+		}
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function DeleteUserMachineType(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Mpp/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						location.reload();
+					}, 1000);
+				}
+			});
+		}
+
+		function OnSubmit() {
+			$('#loadingbar').show();
+			$("#btnSubmit").attr("disabled", true);
+			$("#btnCancel").attr("disabled", true);
+
+			document.getElementById('UploadForm').submit();
+			return (true);
+		}
+	</script>
+}
+

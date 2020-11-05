@@ -1,0 +1,709 @@
+﻿@model Fast.Web.Models.UserModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+}
+
+@section Styles{
+	<style>
+		.dataTables_scrollHead table, .dataTables_scrollBody table {
+			width: 2500px !important;
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.UserProfiles</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.UserManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+						<i data-feather="repeat" class="mg-r-5"></i> Load All
+					</button>
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "EmployeeAll")'">
+						<i data-feather="layers" class="mg-r-5"></i> PeopleSoft
+					</button>
+
+					@if (Model.Access.hasPrint)
+					{
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+					}
+
+					@if (Model.Access.hasWrite)
+					{
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddUser" onclick="CreateActions()">
+							<i data-feather="plus" class="mg-r-5"></i> @UIResources.NEWHMS
+						</button>
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddUserOS" onclick="CreateOSActions()">
+							<i data-feather="plus" class="mg-r-5"></i> @UIResources.NewOS
+						</button>
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalUploadGroupType" onclick="UpdateGroupType()">
+							<i data-feather="repeat" class="mg-r-5"></i> @UIResources.MassUpload
+						</button>
+						@*<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "UserRole")'">
+								<i data-feather="plus" class="mg-r-5"></i> Extra Role
+							</button>*@
+
+					}
+				</div>
+			</div>
+		</div><!-- End content header -->
+
+		<div data-label="Example" class="df-example demo-table dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="userTable">
+				<thead>
+					<tr class="headerTable">
+						<th>@UIResources.ID</th>
+						<th>@UIResources.Username</th>
+						<th>@UIResources.EmpID</th>
+						<th>@UIResources.FullName</th>
+						<th>@UIResources.Role</th>
+						<th>@UIResources.Location</th>
+						<th>@UIResources.Position</th>
+						<th>@UIResources.BU</th>
+						<th>@UIResources.Department</th>
+						<th>@UIResources.HmsOrg3</th>
+						<th>@UIResources.BaseTownCity</th>
+						<th>@UIResources.TownLocation</th>
+						<th>@UIResources.CostCenter</th>
+						<th>@UIResources.Canteen</th>
+						<th>@UIResources.GroupType</th>
+						<th>@UIResources.GroupName</th>
+						<th>@UIResources.Type</th>
+						<th>@UIResources.Act</th>
+						<th>@UIResources.SpvID</th>
+						<th>@UIResources.SpvName</th>
+						<th>@UIResources.Manager</th>
+						<th>@UIResources.IsAdmin</th>
+						<th>@UIResources.ModifiedDate</th>
+						<th>@UIResources.ModifiedBy</th>
+						<th>@UIResources.Action</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalDetailUser" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+		<div class="modal-content" id="OpenDetailDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalEditUser" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+		<div class="modal-content" id="OpenDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+		<div class="modal-content" id="CreateDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddUserOS" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+		<div class="modal-content" id="CreateOSDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalUploadGroupType" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+		<div class="modal-content" id="UpdateGtDialog">
+
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<style>
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function () {
+
+			$('#tbBirthDate').datepicker({
+				format: "dd/mm/yyyy",
+				changeMonth: true,
+				changeYear: true
+			});
+
+			var table = $('#userTable').dataTable({
+				"scrollX": true,
+				"autoWidth": true,
+				"processing": true,
+				"language": {
+					searchPlaceholder: "Ended by ENTER..",
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/User/GetAllByLocation",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [3],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [4],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [5],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [6],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [10],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [11],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [13],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [14],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [15],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [16],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [17],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [18],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [19],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [20],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [21],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [22],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [23],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [24],
+                        "searchable": false,
+                        "orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "UserName", "name": "UserName", "autoWidth": true },
+					{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "Employee.FullName", "name": "FullName", "autoWidth": true },
+					{ "data": "RoleName", "name": "RoleName", "autoWidth": true },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{ "data": "Employee.PositionDesc", "name": "PositionDesc", "autoWidth": true },
+					{ "data": "Employee.BusinessUnit", "name": "BusinessUnit", "autoWidth": true },
+					{ "data": "Employee.DepartmentDesc", "name": "DepartmentDesc", "autoWidth": true },
+					{ "data": "Employee.HMSOrg3", "name": "HMSOrg3", "autoWidth": true },
+					{ "data": "Employee.BaseTownCity", "name": "BaseTownCity", "autoWidth": true },
+					{ "data": "Employee.BaseTownLocation", "name": "BaseTownLocation", "autoWidth": true },
+					{ "data": "Employee.CostCenter", "name": "CostCenter", "autoWidth": true },
+					{ "data": "Canteen", "name": "Canteen", "autoWidth": true },
+					{ "data": "Employee.GroupType", "name": "GroupType", "autoWidth": true },
+					{ "data": "Employee.GroupName", "name": "GroupName", "autoWidth": true },
+					{ "data": "Employee.EmployeeType", "name": "EmployeeType", "autoWidth": true },
+					{
+						"data": "IsActive",
+						render: function (data, type, row) {
+							if (row['IsActive'])
+								return 'Y';
+							else
+								return 'N';
+						}
+					},
+					{ "data": "Employee.ReportToID1", "name": "SupervisorID", "autoWidth": true },
+					{ "data": "SupervisorName", "name": "SupervisorName", "autoWidth": true },
+					{ "data": "Employee.ReportToID2", "name": "ManagerID", "autoWidth": true },
+					{
+						"data": "IsAdmin",
+						render: function (data, type, row) {
+							if (row['IsAdmin'])
+								return 'Y';
+							else
+								return 'N';
+						}
+					},					
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "SupervisorName", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							if (@Model.Access.hasWriteStr) {
+								if (full['IsHasExtraRole']) {
+									return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditUser" title="Edit"><i class="fa fa-edit"></i></button>' +
+										'<button class="btn-menu btn-default" onclick="DetailActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalDetailUser" title="Detail"><i class="fa fa-user-circle"></i></button>';
+								} else {
+									return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditUser" title="Edit"><i class="fa fa-edit"></i></button>';
+								}
+							} else
+								return '-';
+						}
+					}
+				]
+			});
+
+			$('#userTable_filter input').unbind();
+		    $('#userTable_filter input').bind('keyup', function(e) {
+				if(e.keyCode == 13) {
+					table.fnFilter(this.value);
+				}
+			});
+		});
+
+        function RenderActions(id) {
+            $("#OpenDialog").load(fastApp.BaseUrl + "/User/Edit/" + id);
+        };
+
+		function DetailActions(id) {
+            $("#OpenDetailDialog").load(fastApp.BaseUrl + "/User/Details/" + id);
+		};
+
+        function CreateActions() {
+            $("#CreateDialog").load(fastApp.BaseUrl + "/User/Create");
+		};
+
+        function CreateOSActions() {
+            $("#CreateOSDialog").load(fastApp.BaseUrl + "/User/CreateOS");
+		};
+
+        function UpdateGroupType() {
+            $("#UpdateGtDialog").load(fastApp.BaseUrl + "/User/UpdateGroupType");
+		};
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "User")';
+		};
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+		var result = "@ViewBag.Result";
+		var error = "@ViewBag.ErrorMessage";
+		var message = "@ViewBag.Message";
+
+		if (result != "") {
+			if (result == "True") {
+				if (message == "") {
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: "@UIResources.UpdateSucceed",
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+					notice.get().click(function () {
+						notice.remove();
+					});
+				} else {
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: message,
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+			else {
+				if (error == "") {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: "@UIResources.UpdateFailed",
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		}
+
+		$('#loadAll').on('click', function () {
+			var table1 = $('#userTable').dataTable({
+				"scrollX": true,
+				"autoWidth": true,
+				"processing": true,
+				"language": {
+					searchPlaceholder: "Ended by ENTER..",
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/User/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [3],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [4],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [5],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [6],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [10],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [11],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [13],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [14],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [15],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [16],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [17],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [18],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [19],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [20],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [21],
+                        "searchable": true,
+                        "orderable": true
+					},
+					{
+						"targets": [22],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [23],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [24],
+                        "searchable": false,
+                        "orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "UserName", "name": "UserName", "autoWidth": true },
+					{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "Employee.FullName", "name": "FullName", "autoWidth": true },
+					{ "data": "RoleName", "name": "RoleName", "autoWidth": true },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{ "data": "Employee.PositionDesc", "name": "PositionDesc", "autoWidth": true },
+					{ "data": "Employee.BusinessUnit", "name": "BusinessUnit", "autoWidth": true },
+					{ "data": "Employee.DepartmentDesc", "name": "DepartmentDesc", "autoWidth": true },
+					{ "data": "Employee.HMSOrg3", "name": "HMSOrg3", "autoWidth": true },
+					{ "data": "Employee.BaseTownCity", "name": "BaseTownCity", "autoWidth": true },
+					{ "data": "Employee.BaseTownLocation", "name": "BaseTownLocation", "autoWidth": true },
+					{ "data": "Employee.CostCenter", "name": "CostCenter", "autoWidth": true },
+					{ "data": "Canteen", "name": "Canteen", "autoWidth": true },
+					{ "data": "Employee.GroupType", "name": "GroupType", "autoWidth": true },
+					{ "data": "Employee.GroupName", "name": "GroupName", "autoWidth": true },
+					{ "data": "Employee.EmployeeType", "name": "EmployeeType", "autoWidth": true },
+					{
+						"data": "IsActive",
+						render: function (data, type, row) {
+							if (row['IsActive'])
+								return 'Y';
+							else
+								return 'N';
+						}
+					},
+					{ "data": "Employee.ReportToID1", "name": "SupervisorID", "autoWidth": true },
+					{ "data": "SupervisorName", "name": "SupervisorName", "autoWidth": true },
+					{ "data": "Employee.ReportToID2", "name": "ManagerID", "autoWidth": true },
+					{
+						"data": "IsAdmin",
+						render: function (data, type, row) {
+							if (row['IsAdmin'])
+								return 'Y';
+							else
+								return 'N';
+						}
+					},
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "SupervisorName", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							if (@Model.Access.hasWriteStr) {
+								if (full['IsHasExtraRole']) {
+									return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditUser" title="Edit"><i class="fa fa-edit"></i></button> | ' +
+									       '<button class="btn-menu btn-default" onclick="DetailActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalDetailUser" title="Detail"><i class="fa fa-info"></i></button>';
+								} else {
+									return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditUser" title="Edit"><i class="fa fa-edit"></i></button>';
+								}
+							} else
+								return '-';
+						}
+					}
+				]
+			});
+
+			$('#userTable_filter input').unbind();
+		    $('#userTable_filter input').bind('keyup', function(e) {
+				if(e.keyCode == 13) {
+					table1.fnFilter(this.value);
+				}
+			});
+		});
+	</script>
+}
+

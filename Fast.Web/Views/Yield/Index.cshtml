@@ -1,0 +1,952 @@
+﻿@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Yield Governant</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Yield Governant</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <div data-toggle="modal" data-target="#modal-upload" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i> Upload Waste OV</div>
+                <div data-toggle="modal" data-target="#modal-set-target" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i>Set Target</div>
+                <div data-toggle="modal" data-target="#modal-input-mass" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i> Input Infeed Mass Loss</div>
+                <div id="extractData" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel" style="padding:0;"></i> Export Excel</div>
+                <div id="btnDashboard" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i> Set for Dashboard</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Prod. Center</label>
+                                <div class="col-9">
+                                    <select name="prodCenter" class="form-control">
+                                        @foreach (SelectListItem i in ViewBag.ProductionCenterList)
+                                        {
+                                            <option value="@(i.Value)">@i.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Yield</div>
+                    <div class="card-body">
+                        <ul id="line-tabs" class="nav nav-tabs">
+                            <li class="nav-item"><a class="nav-link active">Yield</a></li>
+                            <li class="nav-item"><a class="nav-link">Waste OV</a></li>
+                        </ul>
+
+                        <div id="lines" class="carousel" data-pause="true">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <div class="tableWrapper" style="max-height:400px">
+                                        <table class="table table-bordered table-hover table-striped" id="yield" style="white-space: nowrap;">
+                                        </table>
+                                    </div>
+                                </div> <!--YIELD DENTATION-->
+                                <div class="carousel-item">
+                                    <div class="tableWrapper" style="max-height:400px">
+                                        <table class="table table-bordered table-hover table-striped" id="wasteOv" style="white-space: nowrap;">
+                                        </table>
+                                    </div>
+                                </div> <!--WASTE OV-->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="modal-upload" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="min-width:50%">
+        <div class="modal-content">
+            @using (Html.BeginForm("Upload", "Yield", FormMethod.Post, new { enctype = "multipart/form-data", @id = "UploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Upload</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Upload Data Waste OV</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label tx-right">Type</label>
+                        <div class="col-6">
+                            <select name="Type" class="form-control">
+                                <option value="clove">Clove</option>
+                                <option value="white">White Line</option>
+                                <option value="kretek">Kretek Line</option>
+                            </select>
+                        </div>
+                        <div class="col-3" style="padding-left: 0px;">
+                            <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase" id="downloadTemplate" style="padding-left: 7px;padding-right: 7px;height: 100%;width: 100%;">
+                                <i data-feather="download" class="mg-r-5"></i> @UIResources.Template
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label tx-right">Week Range</label>
+                        <div class="col-9">
+                            <div class="input-group">
+                                <input type="week" class="form-control" name="WeekStart" required="required">
+                                <label>&nbsp; to &nbsp;</label>
+                                <input type="week" class="form-control" name="WeekEnd" required="required" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-control-static">
+                            <span class="btn btn-success fileinput-button btn-block">
+                                <input name="PostedFilename" required="required" type="file" accept=".xls, .xlsx" value="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modal-set-target" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="min-width:50%">
+        <div class="modal-content">
+            @using (Html.BeginForm("SetTarget", "Yield", FormMethod.Post, new { enctype = "multipart/form-data", @id = "SetTargetForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Input</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Set Data Target</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase" id="downloadTemplateTarget" style="padding-left: 7px;padding-right: 7px;height: 100%;width: 100%;">
+                                <i data-feather="download" class="mg-r-5"></i> @UIResources.Template
+                            </button>
+                        </div>
+                        <div class="col-9">
+                            <span class="btn btn-success fileinput-button btn-block">
+                                <input name="postedFilename" required="required" type="file" accept=".xls, .xlsx" value="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modal-input-mass" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="min-width:50%">
+        <div class="modal-content">
+            @using (Html.BeginForm("InputMass", "Yield", FormMethod.Post, new { enctype = "multipart/form-data", @id = "InputMassForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Input</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Input Data Mass Loss</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label tx-right">Type</label>
+                        <div class="col-9">
+                            <select name="type" class="form-control">
+                                <option value="clove">Clove</option>
+                                <option value="white">White Line</option>
+                                <option value="kretek">Kretek Line</option>
+                                <option value="diet">Diet</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label tx-right">Value</label>
+                        <div class="col-9">
+                            <input type="text" class="form-control number" name="value">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label tx-right">Week Range</label>
+                        <div class="col-9">
+                            <div class="input-group">
+                                <input type="week" class="form-control" name="weekStart" required="required">
+                                <label>&nbsp; to &nbsp;</label>
+                                <input type="week" class="form-control" name="weekEnd" required="required" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/amcharts/core.js"></script>
+    <script src="~/Content/dashforge/lib/amcharts/charts.js"></script>
+    <script src="~/Content/dashforge/lib/amcharts/themes/animated.js"></script>
+
+
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.number, .number-positive').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+        });
+        $('#downloadTemplate').on('click', function () {
+            let filename = '@Url.Action("DownloadTemplate", "Yield")';
+            switch ($('[name=Type]').val()) {
+                case "clove": filename += '?filename=TemplateYieldCloveOV'; break;
+                case "kretek": filename += '?filename=TemplateYieldKretekOV'; break;
+                case "white": filename += '?filename=TemplateYieldWhiteOV'; break;
+            }
+            location.href = filename;
+        });
+        $('#downloadTemplateTarget').on('click', function () {
+            location.href = '@Url.Action("DownloadTemplate", "Yield")?filename=TemplateYieldTarget';
+        });
+    </script> @*tabbel wrapper*@
+
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().toggleClass("active");
+                const index = $(this).index() + 1;
+                $("#lines .carousel-item.active").removeClass("active");
+                const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                $(carouselItem).toggleClass("active");
+                $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+                ieFix();
+            });
+        });
+    </script> @*tabbel wrapper*@
+
+    <!------------------------ ACT BTN SEARCH ------------------------------------>
+    <script>
+        function fixHeader() {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        }
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+        }
+        function checkSearchResult() {
+            let result = false;
+            for (let r in searchResult) {
+                result |= r.length > 0
+            }
+            return result;
+        }
+        function ieFix() {
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").not(".no-ie-fix").each(function () {
+                    $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom":"0" });
+                    $(this).find("table").css({ "margin-bottom": "32px" });
+                    $(this).css({ "overflow-y": "scroll" });
+                    const ths = $(this).find("thead tr.summary-body").find("th, td");
+                    $(this).find("tfoot tr.input td").each(function (i, td) {
+                        $(td).css({ "min-width": Math.floor($($(ths)[i]).outerWidth()), "position": "static" });
+                    });
+                    $(this).off('scroll', tableOnScroll).on('scroll', tableOnScroll);
+                });
+            }
+        }
+        function createChart(data) {
+            var chBar = document.getElementById(data.id);
+            if (chBar) {
+                return new Chart(chBar, {
+                    type: 'line',
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.vals,
+                            backgroundColor: '#007bff',
+					        borderColor: '#007bff',
+                            fill: false,
+                            borderWidth: 2,
+                        }],
+                    },
+                    options: {
+                        elements: {
+                            line: {
+                                tension: 0
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    display: false
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false,
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    display: false
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false,
+                                }   
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                });
+            }
+            return null;
+        }
+        const map = {
+            Clove: {
+                wastes: [
+                    {
+                        key: "WetYield",
+                        display: "Clove Wet Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryYield",
+                        display: "Clove Dry Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryWaste",
+                        display: "Dry Waste",
+                    },
+                    {
+                        key: "WetWaste",
+                        display: "Wet Waste",
+                    },
+                    {
+                        key: "DustWaste",
+                        display: "Dust Waste",
+                    },
+                    {
+                        key: "InfeedMassLoss",
+                        display: "Infeed Mass Loss",
+                    },
+                    {
+                        key: "UnaccountablePrimary",
+                        display: "Unaccountable Primary",
+                    },
+                ],
+            },
+            White: {
+                wastes: [
+                    {
+                        key: "WetYield",
+                        display: "White Wet Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryYield",
+                        display: "White Dry Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryWaste",
+                        display: "Dry Waste",
+                    },
+                    {
+                        key: "WetWaste",
+                        display: "Wet Waste",
+                    },
+                    {
+                        key: "DustWaste",
+                        display: "Dust Waste",
+                    },
+                    {
+                        key: "InfeedMassLoss",
+                        display: "Infeed Mass Loss",
+                    },
+                    {
+                        key: "UnaccountablePrimary",
+                        display: "Unaccountable Primary",
+                    },
+                ],
+            },
+            Kretek: {
+                wastes: [
+                    {
+                        key: "WetYield",
+                        display: "Kretek Wet Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryYield",
+                        display: "Kretek Dry Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryWaste",
+                        display: "Dry Waste",
+                    },
+                    {
+                        key: "WetWaste",
+                        display: "Wet Waste",
+                    },
+                    {
+                        key: "DustWaste",
+                        display: "Dust Waste",
+                    },
+                    {
+                        key: "InfeedMassLoss",
+                        display: "Infeed Mass Loss",
+                    },
+                    {
+                        key: "UnaccountablePrimary",
+                        display: "Unaccountable Primary",
+                    },
+                ],
+            },
+            Diet: {
+                wastes: [
+                    {
+                        key: "WetYield",
+                        display: "ET Wet Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryYield",
+                        display: "ET Dry Yield",
+                        generateTitle: function(){ return `<th style="font-weight:bold;">${this.display}</th><td>${this.target}%</td>`; },
+                        isGreen: function(val){ return val > this.target; },
+                    },
+                    {
+                        key: "DryWaste",
+                        display: "Dry Waste",
+                    },
+                    {
+                        key: "HeaviestWaste",
+                        display: "Heaviest Waste",
+                    },
+                    {
+                        key: "DustWaste",
+                        display: "Dust Waste",
+                    },
+                    {
+                        key: "HotDustWaste",
+                        display: "Hot Dust Waste",
+                    },
+                    {
+                        key: "InfeedMassLoss",
+                        display: "Infeed Mass Loss",
+                    },
+                    {
+                        key: "UnaccountablePrimary",
+                        display: "Unaccountable Primary",
+                    },
+                ],
+            },
+        };
+        let dashboardData = [];
+        let searchResult = [];
+        let chartList = [];
+        let chartInterval = null;
+        $(document).ready(function () {
+            $("#extractData").on("click", function () {
+                if (searchResult == null) {
+                    showError("Do search first!");
+                    return;
+                } else if (!checkSearchResult()) {
+                    showError("Empty data!");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ExtractExcel", "Yield")",
+                    data: JSON.stringify({
+                        data: JSON.stringify(searchResult),
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        window.location = "@Url.Action("DownloadExcel", "Yield")";
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            });
+            $("#btnDashboard").on("click", function () {
+                if (searchResult == null) {
+                    showError("Do search first!");
+                    return;
+                } else if (!checkSearchResult()) {
+                    showError("Empty data!");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SetDashboard", "Yield")",
+                    data: JSON.stringify({
+                        yield: JSON.stringify(dashboardData),
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            });
+            $("#btnSearch").on("click", function () {
+                $('#loading_overlay').removeClass('d-none');
+                const startDate = $("[name=start]").val();
+                if (startDate == "") {
+                    showError("Start Date can't be empty");
+                    return;
+                }
+                const endDate = $("[name=end]").val();
+                if (endDate == "") {
+                    showError("End Date can't be empty");
+                    return;
+                }
+                const ppMain = $("[name=prodCenter]").val();
+                if (ppMain == "") {
+                    showError("Production Center can't be empty");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetData", "Yield")",
+                    data: JSON.stringify({
+                        startDate: startDate,
+                        endDate: endDate,
+                        prodCenterID: ppMain,
+			        }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        console.log(result);
+                        t = result;
+                        try {
+                            let table = "";
+                            let headerTop = "";
+                            let headerBottom = "";
+                            let headerSet = false;
+                            searchResult = [["Yield Performance", "Target"]];
+                            headerTop += '<th rowspan="2">Yield Performance</th><th rowspan="2">Target</th>';
+                            let chartWeeks = [];
+                            for (var s in map) {
+                                if (Object.prototype.hasOwnProperty.call(map, s)) {
+                                    const target = result.TargetList[s];
+                                    for (let waste = 0; waste < map[s].wastes.length; waste++) {
+                                        const targetFloat = parseFloat(target[map[s].wastes[waste].key] || 0);
+                                        map[s].wastes[waste].target = targetFloat.toFixed(1);
+                                        map[s].wastes[waste].row = map[s].wastes[waste].generateTitle != undefined ?
+                                            map[s].wastes[waste].generateTitle() :
+                                            `<td>${map[s].wastes[waste].display}</td><td>${map[s].wastes[waste].target}%</td>`;
+                                        map[s].wastes[waste].exportData = [map[s].wastes[waste].display, map[s].wastes[waste].target];
+                                        map[s].wastes[waste].dashboardData = [0, 0, ppMain, s, map[s].wastes[waste].key, targetFloat, 0];
+                                        map[s].wastes[waste].vals = [];
+                                    }
+                                    const v = s + "YGList";
+                                    let countWeek = 0;
+                                    let lastYear = null;
+                                    for (let i = 0; i < result[v].length; i++) {
+                                        if (!headerSet) {
+                                            countWeek++;
+                                            console.log("i : " + i + ", count : " + countWeek);
+                                            let setYear = false;
+                                            if (lastYear == null) lastYear = result[v][i].Year;
+                                            else if (lastYear != result[v][i].Year) setYear = true;
+                                            if (i == result[v].length - 1) setYear = true;
+                                            if (setYear) {
+                                                console.log("Here1");
+                                                headerTop += `<th style="text-align:center" colspan="${countWeek}">${result[v][i == 0 ? 0 : i - 1].Year}</th>`;
+                                                countWeek = 0;
+                                                lastYear = result[v][i].Year;
+                                            }
+                                                console.log("Here2");
+                                            headerBottom += `<th>Week ${result[v][i].Week}</th>`;
+                                            searchResult[0].push(`${lastYear}, Week ${result[v][i].Week}`);
+                                            chartWeeks.push("Week " + result[v][i].Week);
+                                        }
+                                        for (let waste = 0; waste < map[s].wastes.length; waste++) {
+                                            const valFloat = (result[v][i].Items[map[s].wastes[waste].key] * 100);
+                                            const val = valFloat.toFixed(1);
+                                            const isGreen = map[s].wastes[waste].isGreen != undefined ?
+                                                map[s].wastes[waste].isGreen(val) :
+                                                val < map[s].wastes[waste].target;
+                                            map[s].wastes[waste].row += `<td><div style="display:flex;"><span style="background: ${isGreen ? 'green' : 'red'};width: 20px;height: 20px;display: block;border-radius: 10px;"></span><div style="padding-left: 5px;flex: 1;">${val}%</div></div></td>`;
+                                            map[s].wastes[waste].exportData.push(val + "%");
+                                            map[s].wastes[waste].dashboardData[0] = result[v][i].Year;
+                                            map[s].wastes[waste].dashboardData[1] = result[v][i].Week;
+                                            map[s].wastes[waste].dashboardData[6] = valFloat;
+                                            dashboardData.push(map[s].wastes[waste].dashboardData.slice(0));
+                                            map[s].wastes[waste].vals.push(val);
+                                        }
+                                    }
+                                    if (!headerSet) {
+                                        headerTop += `<th rowspan="2" style="width:420px">Chart</th>`;
+                                        headerSet = true;
+                                    }
+                                    for (let waste = 0; waste < map[s].wastes.length; waste++) {
+                                        map[s].wastes[waste].row += `<td><canvas style="width: 400px !important; height: 100px !important;" id="${s + map[s].wastes[waste].key}"></canvas></td>`;
+                                        chartList.push({
+                                            id: s + map[s].wastes[waste].key,
+                                            vals: map[s].wastes[waste].vals,
+                                            labels: chartWeeks,
+                                        });
+                                        table += `<tr>${map[s].wastes[waste].row}</tr>`;
+                                        searchResult.push(map[s].wastes[waste].exportData);
+                                    }
+                                }
+                            }
+                            $("#yield").html(`<thead class="thead-info"><tr>${headerTop}</tr><tr>${headerBottom}</tr></thead><tbody>${table}</tbody>`);
+                            chartInterval = setInterval(function () {
+                                createChart(chartList.shift());
+                                if (chartList.length == 0) clearInterval(chartInterval);
+                            }, 250);
+                            let ovTable = "";
+                            for (let i = 0; i < result.ovList.length; i++) {
+                                ovTable += `<tr><td>${result.ovList[i].Year}</td><td>${result.ovList[i].Week}</td><td>${result.ovList[i].Type}</td><td>${result.ovList[i].Waste}</td><td>${result.ovList[i].WasteType}</td><td>${result.ovList[i].Area}</td><td>${result.ovList[i].OvValue}</td></tr>`;
+                            }
+                            $("#wasteOv").html(`<thead class="thead-info"><tr><th>Year</th><th>Week</th><th>Type</th><th>Waste</th><th>WasteType</th><th>Area</th><th>OvValue</th></tr></thead><tbody>${ovTable}</tbody>`);
+                            fixHeader();
+                        } catch (e) {
+                            console.log(e);
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    error: function (jqXHR,textStatus,errorThrown) {
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                });
+            })
+        });
+    </script>
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+}

@@ -1,0 +1,2510 @@
+ï»¿@model Fast.Web.Models.LPH.LPHEditModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Approval Packer";
+    var selected = "";
+}
+
+@* chanif: tambah css untuk select2 *@
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+
+    <style>
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .fas {
+            cursor: pointer;
+        }
+
+        .input-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .input-img-card {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+        /* chanif: tolong tambahkan css dari sini sampai bawah untuk memperbaiki tampilan select2 */
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            display: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            font-size: 13px;
+            padding: 0 0 0 5px;
+        }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .select2-results__option[aria-selected=true] {
+            display: none;
+        }
+
+        #generalInfo label {
+            padding-right: 0;
+        }
+    </style>
+}
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">TDC Packer</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH TDC Packer</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#photo-modal" onclick="infoId(this)"><i data-feather="camera" class="wd-10 mg-r-5"></i> Photo</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- chanif: mending langsung kopi saja keseluruhan isi div di bawah ini, karena sepertinya sama semua isinya untuk semua LPH  -->
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="generalInfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" name="DateInfo" class="form-control information-datepicker mandatory" id="txtDateInfo" value="">
+                                </div>
+                                <label class="col-2 col-form-label tx-right pd-r-0-f">Week</label>
+                                <div class="col-2">
+                                    <input type="text" name="WeekNumber" class="form-control" disabled id="txtWeekNumber" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Machine *</label>
+                                <div class="col-4">
+                                    <select class="form-control select2 mandatory" name="MachInfo" id="machInfo">
+                                        <option value="">Select Machine</option>
+                                        @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                        {
+                                            <option value="@(machine.Code)">@(machine.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand *</label>
+                                <div class="col-9">
+                                    <select class="form-control select2 mandatory" name="BrandInfo" id="brandInfo">
+                                        <option value="">Select Brand</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.Brand)
+                                        {
+                                            <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Prodtech *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="ProdTech" id="prodTech" multiple disabled>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            @*<div class="form-group row">
+                                    <label class="col-3 col-form-label">Foreman</label>
+                                    <div class="col-8">
+                                        <select class="form-control select2" name="Foreman" id="foreman">
+                                            <option value="">Select Foreman</option>
+                                            @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Foremans)
+                                            {
+                                                <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>*@
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Mechanic *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="Mekanik" id="mekanik" disabled>
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Mechanics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Electrician *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="Electrician" id="elektrik" disabled>
+                                        <option value="">Select Electrician</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Electrics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="TeamLeader" id="teamLeader" disabled>
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">PO Number</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="PONumber">
+                                        <option value="">Select PO Number</option>
+                                        @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                        {
+                                            <option value="@(wpp.PONumber)">@(wpp.PONumber)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Shift / Group *</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control mandatory" name="Shift" id="shift" disabled value="">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    <select class="form-control select2 mandatory" name="Group" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.referenceGroup)
+                                        {
+                                            <option value="@(detail.Code)">@(detail.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Start / Stop *</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStart" name="Start" class="form-control input-time" value="">
+                                    </div>
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStop" name="Stop" class="form-control input-time" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="HandoverLogbook">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                        <button class="btn btn-xs pd-x-15 btn-white btn-uppercase" type="button" style="float:right; padding:1px 0px;" id="hideHandover"><i class="fas fa-eye-slash"></i> Hide</button>
+                    </div>
+
+                    @*<div class="card-body row multicollapse">
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">Stops</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of Stops
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" name="hlnoofstops" placeholder="0" id="hlnoofstops" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">MTBF</label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" name="hlmtbf" id="hlmtbf" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">Safety</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-7 col-form-label">
+                                    Safety trigger Level of risk
+                                </label>
+                                <div class="col-5">
+                                    <select class="form-control select2" name="hlsafetyTrigger" id="hlsafetyTrigger">
+                                        <option label="Choose one"></option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-7 col-form-label">Comment</label>
+                                <div class="col-5">
+                                    <textarea type="text" name="hlsafetyComment" id="hlsafetyComment" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">Quality</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-7 col-form-label">
+                                    Quality trigger Level of risk
+                                </label>
+                                <div class="col-5">
+                                    <select class="form-control select2" name="hlquality" id="hlquality">
+                                        <option label="Choose one"></option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-7 col-form-label">Comment</label>
+                                <div class="col-5">
+                                    <textarea type="text" name="hlqualityComment" id="hlqualityComment" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">Centerlines</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of Centerlines Checked
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" name="hlcenterlineschecked" id="hlcenterlineschecked" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of Centerlines Out of Limits
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" name="hlcenterlinesofl" id="hlcenterlinesofl" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Ensure CL Deviation Log Completed
+                                </label>
+                                <div class="col-3">*@
+                    @*<input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlensureCLDeviation" class="form-control">*@
+                    @*<select class="form-control select2" id="hlensureCLDeviation" name="hlensureCLDeviation">
+                                        <option value="NA">NA</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">CIL / Planned Stop   </label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of CIL's Completion %
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlcilCompletion" name="hlcilCompletion" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Planned Stop - Planned Duration
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlplannedDuration" name="hlplannedDuration" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Planned Stop Actual Duration
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlactualDuration" name="hlactualDuration" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">Defect handling</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of Defects Found
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlnumofDefectsFound" name="hlnumofDefectsFound" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of Defects Fixed
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlnumofDefectsFixed" name="hlnumofDefectsFixed" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Ensure  all defects found reported in DH Log
+                                </label>
+                                <div class="col-3">*@
+                    @*<input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlensureReportedDHL" class="form-control">*@
+                    @*<select class="form-control select2" id="hlensureReportedDHL" name="hlensureReportedDHL">
+                                        <option value="NA">NA</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">Breakdown Elimination</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Number of Breakdowns
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" name="hlnumofBreakdown" placeholder="0" id="hlnumofBreakdown" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Total Breakdown time
+                                </label>
+                                <div class="col-3">
+                                    <input type="number" onkeypress="validateNumber(event)" name="hltotBreakdown" placeholder="0" id="hltotBreakdown" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-9 col-form-label">
+                                    Ensure PM Card(s) completed for every BD
+                                </label>
+                                <div class="col-3">*@
+                    @*<input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlensurePMCard" class="form-control">*@
+                    @*<select class="form-control select2" name="hlensurePMCard" id="hlensurePMCard">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group row">
+                                    <label class="col col-form-label font-weight-bold">Quality</label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">
+                                        Quality Flags
+                                    </label>
+                                    <div class="col-2">
+                                        <select class="form-control select2" name="hlqualityFlags" id="hlqualityFlags">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" id="hlqualityFlagsAction" name="hlqualityFlagsAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">
+                                        Quality Incidents
+                                    </label>
+                                    <div class="col-2">
+                                        <select class="form-control select2" name="hlqualityIncidents" id="hlqualityIncidents">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" name="hlqualityIncidentsAction" id="hlqualityIncidentsAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">
+                                        Completition of VQI & CPQI selfinspection during the shift
+                                    </label>
+                                    <div class="col-2">
+                                        <select class="form-control select2" name="hlqualityCompletitionofVQI">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" name="hlqualityCompletitionofVQIAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group row">
+                                    <label class="col col-form-label font-weight-bold">&nbsp;</label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">
+                                        SPC physical parameters out of control limits and/or trends breaking the SPC rule
+                                    </label>
+                                    <div class="col-2">
+                                        <select class="form-control select2" name="hlqualitySPC">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" name="hlqualitySPCAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">
+                                        Incomplete documentation
+                                    </label>
+                                    <div class="col-2">
+                                        <select class="form-control select2" name="hlqualityIncompleteDoc">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" name="hlqualityIncompleteDocAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-6 col-form-label">
+                                        Higher RR
+                                    </label>
+                                    <div class="col-2">
+                                        <select class="form-control select2" name="hlqualityHigherRR">
+                                            <option value="NA">NA</option>
+                                            <option value="YES">YES</option>
+                                            <option value="NO">NO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" name="hlqualityHigherRRAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                    <div class="card-body multicollapse">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="min-width:120px;">Stops and Location</th>
+                                        <th style="min-width:100px;"># of Stops</th>
+                                        <th style="min-width:120px;">Initial Root Cause (Describe the issue) / Action Taken &amp; Impact</th>
+                                        <th style="min-width:120px;">Action Taken in your shift</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logbook">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="StopAndLocation"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="NOfStop"></td>
+                                        <td><input type="text" class="form-control" name="InitialCause"></td>
+                                        <td><input type="text" class="form-control" name="ActionTaken"></td>
+                                        <td class="tx-center"><i data-target="logbook" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="width:50%;">Action proposed for next shift</th>
+                                        <th style="min-width:90px;">Owner</th>
+                                        <th style="min-width:70px;">Start Time</th>
+                                        <th style="min-width:70px;">End Time</th>
+                                        <th style="min-width:60px;">Duration (Min)</th>
+                                        <th style="min-width:100px;">Status</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="action">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="NextAction"></td>
+                                        <td><input type="text" class="form-control" name="NextOwner"></td>
+                                        <td><input type="text" class="form-control date" name="NextStart" id="start" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control date" name="NextEnd" id="end" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control disabled" disabled value="0" name="NextDurasi" id="duration"></td>
+                                        <td>
+                                            <select class="form-control select2" name="Status">
+                                                <option label="Choose one"></option>
+                                                <option value="ONPROGRESS">ONPROGRESS</option>
+                                                <option value="DONE">DONE</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i data-target="action" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-6 mg-b-20">
+                <div class="card collect-component" id="ProductResult">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Product Result</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Box</label>
+                                <div class="col-4">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" name="ResultBox" id="resultBox" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">
+                                    Sisa WiP
+                                </label>
+                                <div class="col-4">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="sisaWIP" name="SisaWIP">
+                                </div>
+                                <label class="col-3 col-form-label">
+                                    Pouch
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="flex-1">
+
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">
+                                    Stock Awal Cut Filler
+                                </label>
+                                <div class="col-4">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="stockAwalCutFiller" name="StockAwalCutFiller">
+                                </div>
+                                <label class="col-2 col-form-label">
+                                    KG
+                                </label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">
+                                    Stock Akhir Cut Filler
+                                </label>
+                                <div class="col-4">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="stockAkhirCutFiller" name="StockAkhirCutFiller" value="">
+                                </div>
+                                <label class="col-2 col-form-label">
+                                    KG
+                                </label>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <br />
+                @*<div class="card collect-component" id="ProductResult">
+                        <div class="card-header bg-primary tx-white tx-center font-weight-bold">Label Cut Filler</div>
+                        <div class="card-body row">
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr class="tx-center">
+                                            <th style="min-width:120px;">Local Definition</th>
+                                            <th style="min-width:120px;">No.box</th>
+                                            <th style="min-width:120px;">Ops Tembakau</th>
+                                            <th style="min-width:100px;">Line</th>
+                                            <th style="min-width:120px;">Gross Weight</th>
+                                            <th style="min-width:120px;">Tgl Produksi</th>
+                                            <th style="min-width:120px;">Kode Blend</th>
+                                            <th style="min-width:100px;">Jam</th>
+                                            <th style="min-width:90px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="labelcutfiller">
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" name="CutFillerLocalDefinition" class="form-control"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerNobox"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerOpsTembakau"></td>
+                                            <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="CutFillerLine"></td>
+                                            <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="CutFillerGrossWeight"></td>
+                                            <td><input type="text" class="form-control datepicker" name="CutFillerTglProduksi"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerKodeBlend"></td>
+                                            <td><input type="text" class="form-control date" name="CutFillerJam"></td>
+                                            <td class="tx-center"><i data-target="labelcutfiller" class="fa fa-plus-circle add-to-table"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>*@
+            </div>
+
+            <div class="col-6 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam</div>
+                    <div class="card-body">
+                        @*<div class="form-group row">
+                                <div class="col" style="padding-top: 10px">
+                                    <center>
+                                        <img id="image_0" data-toggle="modal" data-target="#photo-modal" data-method="add" data-target-table="cbw" src="~/Content/dashforge/assets/img/upload-img-mini.png" class="rounded mx-auto d-block" alt="insert image" width="auto">
+                                    </center>
+                                </div>
+                            </div>*@
+                        <br />
+                        <div class="tableWrapper" style="max-height:200px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>File Name </th>
+                                        <th>Photo Description</th>
+                                        <th style="min-width:130px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cbw">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input" style="display:none;">
+                                        <td><input type="text" class="form-control" name="Filename"></td>
+                                        <td><input type="text" class="form-control" name="Remark"></td>
+                                        <td class="tx-center"><i data-target="cbw" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--CAPTURE BY WEBCAM-->
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Label Cut Filler</div>
+                    <div class="card-body">
+                        <div class="row" style="margin:0">
+                            <div class="col-2" style="padding: 0 10px 0 0">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Input Barcode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin:0">
+                                                    <input class="form-control col-9" id="scanner-receiveOpsTembakau" style="margin-bottom:10px;" data-table="receive-f-WHS" value="" />
+                                                    <div class="col-2" style="padding-top: 3px">
+                                                        <i data-target="receiveOpsTembakau" class="fa fa-plus-circle"></i>
+                                                    </div>
+                                                    <br />
+                                                    <br />
+                                                    <br />
+                                                    <br />
+                                                    <br />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-10" style="max-height: 210px">
+
+                                <table class="table table-bordered table-hover table-striped" id="dtCutfillerIncoming">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Local Definition</th>
+                                            <th>No Box</th>
+                                            <th>No Ops Tembakau</th>
+                                            <th>Line</th>
+                                            <th>Gross Weight</th>
+                                            <th>Tgl Produksi</th>
+                                            <th>Kode Blend</th>
+                                            <th>Jam</th>
+                                            <th style="min-width:90px;"></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="receiveOpsTembakau"></tbody>
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" name="CutFillerLocalDefinition"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerNobox"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerOpsTembakau"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerLine"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerGrossWeight"></td>
+                                            <td><input type="text" class="form-control datepicker" name="CutFillerTglProduksi"></td>
+                                            <td><input type="text" class="form-control" name="CutFillerKodeBlend"></td>
+                                            <td><input type="text" class="form-control date" name="CutFillerJam"></td>
+                                            <td class="tx-center"><i data-target="receiveOpsTembakau" class="fa fa-plus-circle add-to-table"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="col-6 mg-b-20">
+                    <div class="card collect-component" id="DataAfkir">
+                        <div class="card-header bg-primary tx-white tx-center font-weight-bold">Data Afkir</div>
+                        <div class="card-body d-flex">
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">
+                                        Pouch
+                                    </label>
+                                    <div class="col-4">
+                                        <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="pouch" name="Pouch" value="">
+                                    </div>
+                                    <label class="col-3 col-form-label">
+                                        KG
+                                    </label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">
+                                        Plastik
+                                    </label>
+                                    <div class="col-4">
+                                        <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="plastik" name="Plastik" value="">
+                                    </div>
+                                    <label class="col-3 col-form-label">
+                                        KG
+                                    </label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">
+                                        Dust
+                                    </label>
+                                    <div class="col-4">
+                                        <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="dust" name="Dust" value="">
+                                    </div>
+                                    <label class="col-3 col-form-label">
+                                        KG
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">
+                                        Sapon
+                                    </label>
+                                    <div class="col-4">
+                                        <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="sapon" name="Sapon" value="">
+                                    </div>
+                                    <label class="col-3 col-form-label">
+                                        KG
+                                    </label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">
+                                        Lain-Lain
+                                    </label>
+                                    <div class="col-4">
+                                        <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="other" name="Other" value="">
+                                    </div>
+                                    <label class="col-3 col-form-label">
+                                        KG
+                                    </label>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-5">
+                                        <input type="text" class="form-control" id="afkirOther" value="Core">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="afkirOtherValue" name="AfkirOtherValue" value="">
+                                    </div>
+                                    <label class="col-3 col-form-label">
+                                        KG
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="LapPemakaianMaterial">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">LAPORAN PEMAKAIAN MATERIAL</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Description</label>
+                                <label class="col-1 col-form-label">UoM</label>
+                                <label class="col-2 col-form-label">Item Code</label>
+                                <label class="col-2 col-form-label">Batch</label>
+                                <label class="col-2 col-form-label">Pemakaian</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Cut Filler</label>
+                                <label class="col-1 col-form-label">KG</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="cutfillerCode" name="CutfillerCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="cutFillerBatch" name="CutFillerBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="cutFillerUsed" name="CutFillerUsed" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Pouch</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="pounchCode" name="PounchCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="pouchBatch" name="PouchBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="pouchUsed" name="PouchUsed" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Ziplock</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="ziplockCode" name="ZiplockCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="ziplockBatch" name="ZiplockBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="ziplockUsed" name="ZiplockUsed">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Sticker</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="stickerCode" name="StickerCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="stickerBatch" name="StickerBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="stickerUsed" name="StickerUsed">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">OPP Pouch</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="oppPouchCode" name="OppPouchCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="oppPouchBatch" name="OppPouchBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="oppPouchUsed" name="OppPouchUsed">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Description</label>
+                                <label class="col-1 col-form-label">UoM</label>
+                                <label class="col-2 col-form-label">Item Code</label>
+                                <label class="col-2 col-form-label">Batch</label>
+                                <label class="col-2 col-form-label">Pemakaian</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">OPP Bundle</label>
+                                <label class="col-1 col-form-label">KG</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="oppBundleCode" name="OppBundleCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="oppBundleBatch" name="OppBundleBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="oppBundleUsed" name="OppBundleUsed">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">End Label Slof</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="endSlofCode" name="EndSlofCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="endSlofBatch" name="EndSlofBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="endSlofUsed" name="EndSlofUsed" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Label Box</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="lblBoxCode" name="LblBoxCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="lblBoxBatch" name="LblBoxBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="lblBoxUsed" name="LblBoxUsed">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Shipping Case</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="shippingCaseCode" name="ShippingCaseCode" value="" />
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="shippingCaseBatch" name="ShippingCaseBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="shippingCaseUsed" name="ShippingCaseUsed" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-1 col-form-label">&nbsp;</label>
+                                <label class="col-3 col-form-label">Case Tape</label>
+                                <label class="col-1 col-form-label">PC</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="caseTapeCode" name="CaseTapeCode" value="">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="caseTapeBatch" name="CaseTapeBatch">
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="0" id="caseTapeUsed" name="CaseTapeUsed">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--LAPORAN PEMAKAIAN MATERIAL-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Hasil Timbang Per Box</div>
+                    <div class="card-body" style="padding:10px">
+                        <div class="row" style="margin:0">
+                            <div class="col-2" style="padding: 0 10px 0 0">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th class="tx-center"><label class="tx-center" style="margin:0px;"> Weight</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row form-group" style="margin-left: 0; margin-right: 0;margin-top:8px;">
+                                                    <div class="col-9 tx-center" style="margin-right:0px;">
+                                                        <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control tx-center" style="font-size:24px;height:35px;" id="weightCrr">
+
+                                                        @*<label class="tx-center font-weight-bold" style="font-size:32px;margin-right:0px;">19.55 Kg</label>*@
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <label class="tx-center font-weight-bold" style="font-size:24px;margin-left:-10px;">Kg</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-3 tx-center">
+                                                        <label class="tx-center">&nbsp;</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <button type="button" class="phase-show btn btn-sm btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-modal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tableWrapper col-10">
+                                <table class="table table-bordered table-hover table-striped " id="dtCigarette">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>No</th>
+                                            <th style="width: 15%">Kode CBL</th>
+                                            <th>Weight (Kg)</th>
+                                            <th>Time</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr class="summary-body">
+                                            <td></td>
+                                            <td></td>
+                                            <td>0</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timbangperbox"></tbody>
+                                    <tfoot>
+                                        <tr class="input" style="display:none;">
+                                            <td><input type="text" class="form-control" name="nobox"></td>
+                                            <td><input type="text" class="form-control" name="kodecbl"></td>
+                                            <td><input type="text" class="form-control" name="WeightVal"></td>
+                                            <td><input type="text" class="form-control" name="TimeVal"></td>
+                                            <td class="tx-center"><i data-target="timbangperbox" class="fa fa-plus-circle add-to-table"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped" id="dtApproval">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    @*<th>Approver</th>*@
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- APPROVAL SEGMENT-->
+            <div class="col-12 mg-b-20 ">
+                <div class="d-none d-md-block float-right">
+                    <button id="btnApprove" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="check" class="wd-10 mg-r-5"></i> Approve</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" data-toggle="modal" data-target="#comment-modal"><i data-feather="slash" class="wd-10 mg-r-5"></i> Revise</button>
+                </div>
+            </div>
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="comment-modal" role="dialog">
+    <div class="modal-dialog" style="max-width:50%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="detail-header" style="font-size:1rem;font-weight:bold;">Comment</div>
+                <hr>
+                <textarea type="text" id="comment_value" class="form-control" style="height:75px"></textarea>
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-primary mg-l-5" style="float:right" id="btnReject">Revise</button>
+                    <button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade wizard-modal" id="scan-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <h5>Scan</h5>
+                            <hr />
+                            <center>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="focus here to add scan"><br>
+                                    <table class="table table-bordered table-hover table-striped">
+                                        <thead class="thead-info">
+                                            <tr>
+                                                <th>Scan Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>DOA1VC WLS PJ 129314300038130819130014481398</td>
+                                            </tr>
+                                            <tr>
+                                                <td>DOA1VC WLS PJ 129311300028140819130014481398</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="btn btn-xs btn-primary next" style="float:right">Add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade wizard-modal" id="phase-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div class="stepper row">
+                    <div class="stepper-step col active">
+                        <a class="btn stepper-btn">1</a>
+                        <p><small>No</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">2</a>
+                        <p><small>Kode CBL</small></p>
+                    </div>
+                </div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>No</h5>
+                            <hr />
+                            <center>
+                                <input type="text" class="form-control col-2" id="nobox">
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Kode CBL</h5>
+                            <hr />
+                            <center>
+                                <input type="text" class="form-control" id="kodecbl">
+                            </center>
+                        </div>
+                    </div>
+                    <br />
+                    <div>
+                        @*<button type="button" onclick="javascript:wizardButtonSetSelection(this)" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Add</button>*@
+                        <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNext" class="btn btn-xs btn-primary next" style="float:right;">Next</button>
+                    </div>
+                </div>
+
+                <hr>
+                <div style="min-height:30px">
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade wizard-modal" id="phase-sapon-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div class="stepper row">
+                    <div class="stepper-step col active">
+                        <a class="btn stepper-btn">1</a>
+                        <p><small>No</small></p>
+                    </div>
+                    <div class="stepper-step col">
+                        <a class="btn stepper-btn">2</a>
+                        <p><small>Kode CBL</small></p>
+                    </div>
+                </div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>No</h5>
+                            <hr />
+                            <center>
+                                <input type="text" class="form-control" id="snobox">
+                            </center>
+                            <div>
+                                @*<button type="button" onclick="javascript:wizardButtonSetSelection(this)" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Add</button>*@
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="btn btn-xs btn-primary next" style="float:right;">Next</button>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Kode CBL</h5>
+                            <hr />
+                            <center>
+                                <input type="text" class="form-control" id="skodecbl">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div style="min-height:30px">
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog" style="min-width:90%;height:auto;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                @*<h5><label>Take picture for Filter</label></h5>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <center>
+                                <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                            </center>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <center>
+                                <video autoplay="true" width="160" height="120" id="videoElement"> </video><br />
+                                <button id="snapHat">Capture Image </button><br />
+                            </center>
+                        </div>
+                        <div class="col-md-6">
+                            <center>
+                                <canvas id="snapshot"></canvas><br />
+                                <p id="demo"></p>*@
+
+                @*<button id="capture" hidden>Read PDF417</button>*@  @*don't remove *@
+                @*<button id="capture3" hidden>OCR ID </button>*@  @*don't remove*@
+                @*<button id="saveText" hidden>Save Text + Image </button>*@   @*don't remove *@
+                @*</center>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div>
+                        <button type="button" onclick="javascript:wizardButtonSetSelection(this)" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Add</button>
+                    </div>*@
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Take For</h5>
+                            <hr />
+                            <center>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">Pouch</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">Ziplock</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">Sticker</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">OPP Pouch</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">OPP Bundle</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">End Label Slof</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" class="wizard-button btn btn-primary">Label Box (CBL)</button>
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5><label id="title">Take picture for Filter</label></h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <video autoplay="true" width="500" height="300" id="videoElement"> </video><br />
+                                        <button id="snapHat">Capture Image </button><br />
+                                    </center>
+                                </div>
+                                <div class="col-md-6">
+                                    <center>
+                                        <canvas id="snapshot" style="max-width: 500px;max-height: 300px !important"></canvas><br />
+                                        <p id="demo"></p>
+
+                                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div>
+                        @*<button type="button" onclick="javascript:wizardButtonSetSelection(this)" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Add</button>*@
+                        <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Next</button>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade wizard-modal" id="photo-preview" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+                <center>
+                    <img id="photo-preview-image" style="width: 75%;margin-bottom: 20px;" /><br />
+                    <p id="photo-preview-name"></p>
+                </center>
+            </div>
+        </div>
+    </div>
+</div> <!--MODAL-->
+
+
+
+
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+@section Scripts{
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Scripts/webcam_help/main.js"></script>
+    <script src="~/Scripts/webcam_help/MRZ_417_230119.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script type="text/javascript">
+        'use strict'
+          $('#btnHistory').on('click', function (e) {
+		     location.href = '@Url.Action("Index", "History")';
+          });
+        $('.datepicker').datepicker({
+                format: 'd-M-yy',
+                //language: 'id-id'
+		});
+        $('.information-datepicker').toArray().forEach(function (field) {
+            $(field).datepicker({
+                todayHighlight: true,
+                format: 'D, dd-M-yy',
+                startDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+                //maxDate: 2,
+                //minDate: -2,
+            });
+        });
+
+    </script>
+
+    <script>
+
+
+        $(function () {
+            'use strict'
+
+            /******************** PREFILLED ******************/
+
+            var model = JSON.parse($("#jsonModel").attr("data-json"));
+            console.log(model);
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                const parent = tn[0];
+                tn.shift();
+                const child = tn.join("-");
+                const val = model.CompoVal[i].Value.Value;
+                let node = $("#" + parent + " " + type + "[name=" + child + "]");
+                var temp_val = decodeURIComponent(val ? val : "");
+                $(node).val(temp_val);
+                if (child == 'Group' && type == 'INPUT' && parent == 'generalInfo') {
+                    node = $("#" + parent + " " + "SELECT" + "[name=" + child + "]");
+                    $(node).val(temp_val);
+                }
+                if ($(node).hasClass("select2")) {
+                    if (temp_val.indexOf('___') !== -1) {
+                        temp_val = temp_val.split('___');
+                        $(node).val(temp_val);
+                    }
+                    $(node).trigger('change');
+                }
+                if ($(node).data('datepicker')) {
+					var date = temp_val.substr(5, 9).split("-");
+					var months = moment.monthsShort();
+					date[1]=months.indexOf(date[1])+1;
+					if(date[1]<10){
+						date[1]='0'+date[1];
+					}                        
+					temp_val = '20'+date[2]+'-'+date[1]+'-'+date[0];
+                    $(node).datepicker('setDate', new Date(temp_val)).datepicker('fill');
+                }
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        const val = model.Extras[i].Value;
+                        data[model.Extras[i].FieldName] = decodeURIComponent(val ? val : "");
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                    }
+                }
+                configAle[table].data.push(data);
+            }
+            for (let prop in configAle) {
+                configAle[prop].data.reverse();
+                $("#" + prop).html(generateTable(configAle[prop].data, prop));
+                countSummary(prop);
+                ieFix();
+            }
+            basicFunction();
+        });
+        function basicFunction() {
+
+            /*  chanif: $('.select2').start diganti jadi $('.select2').select2 */
+            $('.select2').select2({
+                allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+                placeholder: 'Choose one or more',
+                searchInputPlaceholder: 'Search options'
+            });
+
+
+            $(document).find('.input-time').each(function () {
+                var cleave = new Cleave($(this), {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            })
+        }
+        function ieFix() {
+            //if (navigator.userAgent.search("Edge") >= 0) {
+            //    $(".tableWrapper:has(tfoot)").each(function () {
+            //        $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+            //        $(this).find("table").css({ "margin-bottom": "32px" });
+            //        $(this).css({ "overflow-y": "scroll" });
+            //        const ths = $(this).find("thead tr:first-child th");
+            //        $(this).find("tfoot td").each(function (i) {
+            //            $(this).css({ "min-width": $($(ths)[i]).width() + 20, "position": "static" });
+            //        });
+            //    });
+            //}
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            $(`#${targetTable} ~ tfoot tr.input td`).children("input, select").each(function () {
+                const name = $(this).prop("name");
+                r += `<td data-name="${name}">${data[name]}</td>`;
+            });
+
+            let useEdit = true;
+            let useDelete = true;
+            let additionalButtons = "";
+            if (configAle[targetTable].rowConfig !== undefined) {
+                if (configAle[targetTable].rowConfig.withEdit !== undefined)
+                    useEdit = configAle[targetTable].rowConfig.withEdit;
+                if (configAle[targetTable].rowConfig.withDelete !== undefined)
+                    useDelete = configAle[targetTable].rowConfig.withDelete;
+                if (configAle[targetTable].rowConfig.additionalButtons != undefined)
+                    additionalButtons = configAle[targetTable].rowConfig.additionalButtons(data);
+            }
+            r += `<td class="tx-center">`;
+            r += additionalButtons;
+            if (useEdit) r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            if (useDelete) r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const table = $(button).parents("table");
+            if (!$(table).data("edited")) {
+                $(table).data("edited", true);
+
+                const tds = $(button).parents("tr").children('td');
+                const inputTr = $(table).find('tr.input');
+                const inputTds = $(inputTr).children('td');
+                const tdsCount = $(tds).length;
+
+                $(tds).each(function (i, e) {
+                    const el = $(inputTds[i]).children()[0];
+                    if (i != tdsCount - 1) {
+                        const html = $(e).html();
+                        const newInput = $(el).clone();
+                        if (!$(el).hasClass("disabled"))
+                            $(newInput).prop("disabled", false);
+
+                        $(el).prop("disabled", true);
+                        $(newInput).val(html);
+                        $(e).html(newInput);
+                    } else {
+                        $(el).off("click");
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:normalData(this)");
+                        $(edit).removeClass("fa-edit");
+                        $(edit).addClass("fa-save");
+                    }
+                });
+            }
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            ieFix();
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    var ev = $._data(el, 'events');
+                    if (!(ev && ev.click))
+                        $(el).on("click", addToTable);
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target, data) {
+            $(target).html(generateTable(data, target));
+            countSummary(target);
+        }
+
+        function getTimbangan() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+            $.ajax({
+                url: url,
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: "callback",
+                success: function (data) {
+                    $('#weightCrr').val(data.Weight);
+                },
+                error: function (httpReq, status, exception) {
+                    console.log("timbangan not found");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            setInterval(getTimbangan, 1000);
+
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $(".add-to-table").on("click", addToTable);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        function addToTable(button) {
+            const targetTable = $(this).data("target");
+            const tds = $(this).parents("tr").children("td");
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(tds).each(function (tdIndex, td) {
+                const input = $(td).children();
+                if (input.attr("name") != undefined) {
+                    const name = input.attr("name");
+                    const val = input.val();
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            if ((input[0].nodeName.toLowerCase() === 'select')) {
+                                $(input[0]).siblings(".select2-container").css('border', '1px solid red');
+                                $(input[0]).siblings(".select2-container").css('border-radius', '0.25rem');
+                                $(input[0]).on('select2:select', function (e) {
+                                    $(input[0]).siblings(".select2-container").css('border', 'none');
+                                    $(input[0]).siblings(".select2-container").css('border-radius', '0');
+                                });
+                            } else if (input[0].value === "") {
+                                input[0].style.borderColor = "red";
+                                $(input[0]).on('click', function (e) {
+                                    input[0].style.borderColor = "rgb(192, 204, 218)";
+                                });
+                            }
+                            return false;
+                        }
+                    }
+                    if (input[0].type.toLowerCase() == "number") {
+                        var myRegexp = /^00+$/g;
+                        var match = myRegexp.exec(val);
+                        if (match != null) {
+                            alert("Please input a valid number");
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+            $(tds).each(function (i, td) {
+                const node = $(td).children();
+                $(node).val("");
+                if ($(node).hasClass("select2"))
+                    $(node).trigger('change');
+            });
+
+            if (configAle[targetTable].onAdd != undefined) {
+                if (configAle[targetTable].onAdd(newdata)) {
+                    return;
+                }
+            }
+            configAle[targetTable].data.push(newdata);
+            $("#" + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+            countSummary(targetTable);
+            ieFix();
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const summaryTds = $('#' + targetTable).parents('table').find('.summary-body').children();
+                $('#' + targetTable).parents('table').find('.input td').each(function (i, td) {
+                    const name = $(td).children().attr("name");
+                    if (rowData.hasOwnProperty(name))
+                        $(summaryTds[i]).html(rowData[name]);
+                });
+            }
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const table = $(button).parents("table");
+                releaseDisabledInput(table);
+                if (configAle[targetTable].onDelete != undefined) {
+                    if (configAle[targetTable].onDelete(id)) {
+                        return;
+                    }
+                }
+                deleteFromArray(id, configAle[targetTable].data);
+                $('#' + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                const table = $(button).parents("table");
+
+                if (configAle[targetTable].onSave != undefined) {
+                    if (configAle[targetTable].onSave(id)) {
+                        return;
+                    }
+                }
+                const index = findInArray(id, configAle[targetTable].data);
+                let shouldReturn = false;
+                var newdata = {
+                    id: uuidv4()
+                };
+                $(tds).each(function (tdIndex, e) {
+                    if (tdIndex != tdsCount - 1) {
+                        const name = $(e).data("name");
+                        const val = $($(e).children()[0]).val();
+                        if (configAle[targetTable].onValidate != undefined) {
+                            if (configAle[targetTable].onValidate(name, val)) {
+                                shouldReturn = true;
+                                return false;
+                            }
+                        }
+                        newdata[name] = val;
+                    } else {
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:editData(this)");
+                        $(edit).removeClass("fa-save");
+                        $(edit).addClass("fa-edit");
+                    }
+                });
+                if (shouldReturn) return;
+
+                configAle[targetTable].data[index] = newdata;
+                const row = generateRow(configAle[targetTable].data[index], targetTable);
+                $(button).parents("tr").html(row);
+
+                releaseDisabledInput(table);
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function collectAllData() {
+            let collectorArray = [];
+            for (var tableId in configAle) {
+                let tableColumnType = {};
+                $(`#${tableId} ~ tfoot tr.input td input`).each(function () {
+                    tableColumnType[$(this).prop("name")] = $(this).prop("type");
+                });
+                const data = configAle[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    if (configAle[tableId].onCollectDataRow != undefined) {
+                        data[i] = configAle[tableId].onCollectDataRow(data[i]);
+                    }
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let newInsertData = {
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: data[i][prop],
+                                ValueType: tableColumnType[prop] == "number" ? "Numeric" : "NonNumeric",
+                                RowNumber: i
+                            };
+                            if (configAle[tableId].onCollectDataSingle != undefined) {
+                                newInsertData = configAle[tableId].onCollectDataSingle(newInsertData);
+                            }
+                            collectorArray.push(newInsertData);
+                        }
+                    }
+                }
+            }
+            console.log(collectorArray);
+            return collectorArray;
+        }
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input, select, textarea').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+
+                    var tem_value = $(e).val();
+                    if (Array.isArray(tem_value)) {
+                        tem_value = tem_value.join('___');
+                    }
+
+                    values.push({
+                        Value: tem_value,
+                        ValueType: $(e).attr('type') == "number" ? "Numeric" : "NonNumeric",
+                    });
+                });
+            });
+
+            return [components, values];
+        }
+        function countDuration(start, end, duration) {
+            var end = $('#' + end).val();
+            var start = $('#' + start).val();
+
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                if (startdate > enddate) {
+                    enddate = new Date(enddate);
+                    enddate.setDate(enddate.getDate() + 1);
+                }
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                if (diffMinutes == NaN) {
+                    $('#' + duration).val(0);
+                } else {
+                    $('#' + duration).val(diffMinutes);
+                }
+            }
+        };</script>
+    <script>
+        /*
+             * name = id dari tbody;
+             * data = array untuk menyimpan data;
+             * countSummary = dipanggil saat menghitung summary, return object dengan property sesuai dengan name pada `tfoot tr.input`;
+             * onAdd(newData) = dipanggil sebelum menambah data, return boolean apakah harus ditambahkan atau tidak;
+             * onDelete(idOfDeletedObject) = dipanggil sebelum menghapus data, return boolean apakah harus dihapus atau tidak;
+             * onSave(idOfUpdatedObject) = dipanggil sebelum mengubah data, return boolean apakah harus diubah atau tidak;
+             * onValidate(nameOfInput, valueOfInput) = validasi nilai saat tambah dan save, return boolean apakah harus diterus atau tidak;
+             *
+             * rowConfig = config untuk generate baris tabel;
+             * - withEdit = menampilkan edit, default true;
+             * - withDelete = menampilkan delete, default true;
+             * - additionalButtons(data) = fungsi untuk yang akan mengembalikan button tambahan untuk tiap baris, return element html dalam string;
+             */
+
+        var bandrolData = [];
+        var logbookData = [];
+        var actionData = [];
+        var cbwData = [];
+        var timbangperboxData = [];
+        //var labelcutfillerData = [];
+        var receiveOpsTembakauData = [];
+        const configAle = {
+            bandroltake: {
+                data: bandrolData,
+                countSummary: function () {
+                    let rowData = {};
+                    let weight = 0;
+                    for (var i = 0; i < bandrolData.length; i++) {
+                        weight += parseInt(bandrolData[i].weight);
+                    }
+                    rowData.weight = weight + " pcs";
+                    return rowData;
+                },
+            },
+            logbook: {
+                data: logbookData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+
+                },
+            },
+            //labelcutfiller: {
+            //    data: labelcutfillerData,
+            //    onValidate(name, val) {
+            //        if (val == "") {
+            //            alert("Value can't be empty");
+            //            return true;
+            //        }
+            //        return false;
+            //    },
+            //    onAdd: function (newData) {
+            //        console.log(newData);
+            //    },
+            //},
+            action: {
+                data: actionData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                countSummary: function () {
+                    let rowData = {};
+                    let NextDurasi = 0;
+                    for (var i = 0; i < actionData.length; i++) {
+                        NextDurasi += parseInt(actionData[i].NextDurasi);
+                    }
+                    rowData.NextDurasi = NextDurasi;
+                    return rowData;
+                },
+                onAdd: function (newData) {
+
+                },
+            },
+            timbangperbox: {
+                data: timbangperboxData,
+                countSummary: function () {
+                    let rowData = {
+                        WeightVal: 0.0,
+                    };
+                    for (var i = 0; i < timbangperboxData.length; i++) {
+                        rowData.WeightVal += Number.parseFloat(timbangperboxData[i].WeightVal);
+                    }
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+
+            },
+            cbw: {
+                data: cbwData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onDelete(id) {
+                    for (let j = 0; j < cbwData.length; j++) {
+                        if (cbwData[j].id == id) {
+                            for (let i = 0; i < imgContent.length; i++) {
+                                if (imgContent[i].name == cbwData[j].Filename) {
+                                    imgContent.splice(i, 1);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                },
+                onCollectDataSingle(data) {
+                    if (data.FieldName == "Filename") {
+                        data.ValueType = "ImageURL/" + data.Value + "/" + "Old";
+                        for (let i = 0; i < imgContent.length; i++) {
+                            if (imgContent[i].name == data.Value) {
+                                data.ValueType = "ImageURL/" + data.Value + "/" + "New";
+                                data.Value = imgContent[i].data;
+                                break;
+                            }
+                        }
+                    }
+                    return data;
+                },
+                rowConfig: {
+                    withEdit: false,
+                    additionalButtons(data) {
+                        return `
+                                                            <i data-toggle="modal" data-target="#photo-preview" onclick="javascript:setPreview('${data.Filename}')" class="fa fa-image"></i>
+                                                            <i data-toggle="modal" data-target="#photo-modal" onclick="javascript:setEditName('${data.Filename}')" class="fa fa-camera"></i>
+                                                                                `;
+                    }
+                },
+            },
+            receiveOpsTembakau: {
+                data: receiveOpsTembakauData,
+                countSummary: function () {
+                    let rowData = {
+                        CutFillerGrossWeight: 0,
+                        CutFillerLine: 0,
+                    };
+                    for (var i = 0; i < receiveOpsTembakauData.length; i++) {
+                        rowData.CutFillerGrossWeight += parseInt(receiveOpsTembakauData[i].CutFillerGrossWeight);
+                        rowData.CutFillerLine += parseInt(receiveOpsTembakauData[i].CutFillerLine);
+                    }
+                    return rowData;
+                },
+            },
+        }
+        $('#scanner-receiveOpsTembakau').keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                const val = $(this).val();
+                var CutFillerNobox = val.substring(21, 26);
+                var CutFillerOpsTembakau = val.substring(11, 21);
+                var CutFillerLine = val.substring(33, 37) / 100;
+                var CutFillerGrossWeight = val.substring(37, 41) / 100;
+                var CutFillerTglProduksi = val.substring(26, 32);
+                var CutFillerKodeBlend = val.substring(0, 5);
+
+                if (isNaN(CutFillerLine) || isNaN(CutFillerGrossWeight)) {
+                    alert("Invalid barcode!");
+                    return;
+                }
+                const tdm = moment(CutFillerTglProduksi, "DDMMYY");
+                if (!tdm.isValid()) {
+                    alert("Invalid barcode!!");
+                    return;
+                }
+                var td = tdm.format("DD-MMM-YY");
+                //Code	WLS Los Number	Batch No	Box No	Date	Net Weight	Gross Weight
+                $('#receiveOpsTembakau ~ tfoot tr.input input[name="CutFillerNobox"]').val(CutFillerNobox);
+                $('#receiveOpsTembakau ~ tfoot tr.input input[name="CutFillerOpsTembakau"]').val(CutFillerOpsTembakau);
+                $('#receiveOpsTembakau ~ tfoot tr.input input[name="CutFillerLine"]').val(CutFillerLine);
+                $('#receiveOpsTembakau ~ tfoot tr.input input[name="CutFillerGrossWeight"]').val(CutFillerGrossWeight);
+                $('#receiveOpsTembakau ~ tfoot tr.input input[name="CutFillerTglProduksi"]').val(td);
+                $('#receiveOpsTembakau ~ tfoot tr.input input[name="CutFillerKodeBlend"]').val(CutFillerKodeBlend);
+                //$('.add-to-table[data-target="receiveOpsTembakau"]').click();
+                $(this).val("");
+            }
+        });
+
+    </script>
+    <script>
+
+
+        var collectorComponent = [];
+        var collectorValue = [];
+
+		  $('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "TDCPacker")",
+                  data: JSON.stringify({
+                      LPHID: @(Model.LPH.ID),
+                      machine: $('#machInfo').val()
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "TDCPacker"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No previous submissions found",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+            })
+        function checkMandatory() {
+                var mandatory = $(".mandatory");
+                const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                ¥„z1ûË÷+|fô‹Z«·Øh©5µŠ=p5ÿVªŸ|e4€»™¨¤Š%æê°Â¤Ç¢î`_e`ü)–,¿ÄíANÈılÅšËjyµŒS8×±ÿû’`Ğ -/ÜÓ)2ØRç‹º`Ã]x«uL%aW–î¨ólÂÁòrÇ¼"Œ[ºËjí44îgˆUÅm+Æ?Cäˆµ –$X÷#!äàHu_Rî˜AÚûĞ¤¶È’
+Õ_èÔá!YÜŸ9%ü]œ½Ğ¨=ó÷fv¶/­S‘ÔEĞkg}8(ñ4AS¥ÄdÄ€É%VÒ‚Ö ĞE¤Qbı0Àÿ`«¦6®ÛTÌ¨©I$İğj”ÎÓ¦ÔM³D‰‡z*|mkÕ‰	@ÂŠ¢ÕeË&‹ £¶¥ïJÅ:ŞdÂÒ>Æ"Úÿ¾²Ä£´Cÿ¾÷rw—‚…!Jœ[ĞÅÏŠJ?ÿI÷´§ò¥7›’¹d´Œd¢J$—»%ªÕ3ÀSC
+‹=:ı·=?/q}ßâ·óïˆÇr«<n¯½H—?ÜµÓ]æ} Õ,hñì‘ŠŸªÅÙ­Õ´ä¿Ó,ÃKKpçõ€¶EXIQ i
+Å¯©8˜‚×îÍQ[S
+œ´ó˜…!6N˜…ğøE£CÆ„… ÿû’`Õ€G1]S)BØW+š`Å[pµqL$ËA_®´ólb3fŸE8ƒ70?îß:’x•§!æiñ#n¡a#Í›CÏãj‡©­®(q	]Ñ$şlıÊúV¬’Ñ(”LµéÎRCÆX‹AğOßfEE“1°ø¢,}ŒHPâíE1AÈKTø_¹¬á3š­®-…@¤Ì S˜1J{s§ğw8²¢$€A1ñ#œ)X}û'¦4‘d¡ú:QZ$@4¬	Çb—Í1QªÈ³xº§æj5$‰RXã‹@ÙåB°,pHmJ›Æ¥H”Øs³i˜å›†{;˜±·|ÜM6S<¹D›W-Ô¨ÁaĞ,™¥1w­ÃŞšïY”1Ü7§Ós^§h‰TI É[rñÈå;Â‡2¶ÄKN&Éõ¡¨öåÙ»^šJ¥2æFpj´#‰kÎ+¨ ëB¡èÿ)•+˜2âŠŠ¼KÇƒ È’t¶§%³n*¢_ Üê«d şk¬¤Š%âIB""$8\(Jå‰ËŠ Gÿû`Ö€G/\S)BØbgš`Ã[ËsM%az—îhól»Ûù­‚=i²‚×)öç‡(®šÉ¤ĞaÁÓëÔ#ïów~ïÔÇş^™2ê2ft¦8x]Ì>H±Y3ÆÒái”÷„˜É×}T®…îK¨%@”’ov]Âœ*TæÛ¨L(ı‰’«7ÿó¦ÅZÚ&oç¾äìK³œ")¹ÅEê“ñ½ÉÈŠC?Ë*~òY<ã¼"oÓ™¿ø3M²Çj Å{IzHµ—¤k’†UUII$eªXhàæCd®«Ée¾W¨zßFäXñ™ğÀÈÑ³·ÙyJM b“T¤uå;Ç‰‚j pˆ8ƒ"•”ÂÌê$aÔ!EèR¸ºªÊ,ÈKEPüÇ=Ú»w6éc{^ŸéteGOíÿô·;
+nâeZ•I)$¥€æ§l>W(•-]w48¡7uÓGO«fIŠùŸ§ŸÃëöûçE"œ§)ì‹‘™ä#ô9nÚLFéc®ï™¨Û*m®o±uéd‘ª[ØÙ4ÿgÔ»<3 ÿä”’nOªP°s\ÿû’`Ë€8.İÓ)2ØXˆš<Ã\ásyL0­‘f®¯hó	²µEå2é<¦Ê«^Õÿ‹0>‹Êk¸ñúˆ¨• TµR¢#!VP04ó|Ã^òõÉL@#_z:BQ9Z&mñÑ‚Cv%¤Á­í®¨ë^¿V#UºU$šs¤Thd".ş­|]Ä'xîV8
+Ze%°ù6X£-«Ö­÷%½_íËÂ“ıÚõ/tõ×hßı9œ¹ÖdûMÏ®ÂŞìWe‘Åÿş]>Ö’DƒpÂ: ”Á'EŒ`¦ÜÙ­ˆØ†Ó‡ë2ÚjUBa)æ“¨SÈã”ŒŸqôæø§‹7®4Ö…¼†¯?q”³É!ËÉŞVTó¸û'Ø
+Œj^–
+$TpëÑ¬É$.¶èr
+e¨BD”H/Ü¾+29º›´H²ˆ‘7µŸ?wWj
+„S2qÂ–ëgÈğ)›„MŒ‘ÂÅˆ!déÁr çŞHuPõéas@%”f™	R·O@M"!I‘$Îú¸ À©làà%ÿÎ§5¯Ù#±qÿû’`Æ  ,^;2ÔS${º<ÆJL¤»yG±+aU”/4Ä,\i£h³ˆö|¦‡—‘3ø”Xq®:ŠTd•ĞæE©K\n›D		‰¤šJş—ìÕ0÷´¸ì0‹è8„^-v¶]ş$Oç<<
+-FI’Az­´¤_†öCš%â!"­2íX½çk©«*ÅŠq6¡EÁ¼¸9ˆÑŸHE'aË8á#VL‡%¢ w…Øä"U¶>jyçÿñcüZ™Ur’$è"84ßƒdÏâîŠÔ—wÑ~®§Z4 `øˆ±*)0uN*¸”Rd†Rm^(4’O%E¬ûPŸ&Ö;¬ôª{m¶..Cl2#00Àp"‹¬‚£Â•W½_ÿZÌà€§o—)–b(’P =FT<-k³ŠRü¡Â¯Xö¹{Sš"„Q[,HÑ‡o´;¯zrğ¹Ì9óôÅ“ÉGA´*C…-´Ø¥ÓĞ‰_ÈwZšE’º ºj­$‰zÅ»
+àgØÀmg9tı\}íIÿû’`Î /7^k	BØUåÛ½0c[ˆ©wL%+aeîôö!$òË6¥:£ÄôPÎ›fÇ1(‚d(‰DäÃlvH–p›8F±¥JO@Ø4’¶N8u©ræÏ„DïCçi]'TWƒoÕ%F±-Â6ŞU—êô&™4ÒM"§I ”PLzJ¦ìšEíMÛÇ/¤ÌLÒ¡Èˆ…ıTE‡+‘®ï4ÑwmB²Z`bÈU¢hëv›+QvI XLŸÜpçù¶y
+V¿şII$êDMî30“Î!µZ¡³mt±¡Bşì‡Ğ=Pô©kóQûÿgï2­°ª	ÃC‘ª%:^Ä2\§AÆÀˆïRÒ#+6ö”Ã¹Õ¥
+oß‡êcªMnb»Ö¾ÿŸŸÿKÿÿëÿÿÿÿüíú¥Ÿ˜Æ ’I*uÖV"©-Àñø6GjÇº}ÆÜöÑ]š[½çÚUvnaÑvíD¼»oş¼Ô»%±ç-şúLÉÍı²N`•U‚V×s•·ªDïÿĞ™w ÿi©$‘ùI˜eA¢rV‰M©
+²¦JÛ/¯;ÿû’`Ì I/ŞSBØTe›í0Â[Ñoxç¥‘KnƒjcŞ‘-|¢“Øè›ïI³‚x¨º”Ñ	„[Ê »22UÚÎåÿJŸmFË y<øç@"áæq=&f.pØáôYúL¤š«¸ãèzÿ—øª´*©$’nääpfaibbªÿ®¼œïXŠûR|ºw5\Ñal5BëˆÌâZK‘ëÂw°®`¶ºU¬Q^‘3ÿ™Keõj^q7bo§Ö k”Æ¹¢¿Ê=.ï‰É)‘ .ªBK¨CÄ4.Û´Ö¢¤bå8 Ù.<…<›!@`1<l™–‚í˜`v4œÈœ‰X²½´É‰e4¥šJ«ƒ]D‡ò£Q†%ùô€ÂÂÃb)"pi:IÜ¶-~$yéÔÿrÙZ—+¿#% I$ A}0éS³`ñaÃ«_÷2©Ò~½cÖYéGÃGë{8úitØ£Kñ~ë[ıõé¢7V‡•»ßßMúàD$ùÇCè“hHD &\•’–(6^ÿ_ÿû’`Ë€u(ŞSJX\h{ê=#\üÃw§¥+a‹™îôÃlBÅÊºüPevY$’Mİ$œçO˜l×*ö(aj(û×üÉäX±ÀE ‹67?ô„˜ĞÒIsFfõÛ¢²µåŠ‹é‰vj7I„‚2ÁÒ'ÉpÚÄî«Hh+ÖºÓ_ş¹*×¢©i¤’M9vR……Äƒí×ŞÄ®A:ÿÉ¡5ñ	‡Å½®	Sfåk·Ò·Ké{o¯ŒŞü#?¯µXtÛŸ–aÚVù]˜¯:Áô×Ü’/zÁf¿4.ö6ÏS.¯ã®MvËM"‘ ¿“°T)‘8À¬#§ŸÚ¤§óºvP«qP#´Fd£ìm4oVT*= >¼¨†½Êha3HÚf’Â1½EL›Ü{4ëQV’í}_Í~325æ´ò‹Ööú¡(àW–H‚/ômJJD€»zJûBêQeWÅ5 g—SoN
+¬%©ª²n±ƒEn&87s=Yã](ø­Ì¥"ª–ÍpB‚™¸³”S#bdõTqNŠßú†)jYD{Sÿû’`»€Ş)_Ñì2ÔY¦<
+=ZïyL%ag—ï(ñlèº9˜”‰é$õº HY5É¯MuV•ïœèú·aÅ´fÕKğFÓ§ƒ(pƒ=pq8>fÙñèm÷k£v6u¡ EdHÈhñĞm‚f¡%©CãöÒsÆ}ªM
+#zJeˆˆ@¤Ht¢´#­ç4#±W¯ä$Ùg¤½ı~/pUñÛáÑ´É`øà	˜ FªËInÅAMËˆeSÂ	2~v&x¸uYsÑ¬QzÿÚúE;ş¯şII$â˜iaÊ
+¤€…ª^V2zÕ|ıs²±…±»ú'—†-V×¤Fö¡pcÃôsËµ Ò¨ £ú"ô“áIÉ>ª¢ÔÖ[>±Æ”°D!Pğ”5j.Ö´¡š’Õ^
+‡èş}ô;r(eˆX”‰{+ êĞrDºe”'ÿçf#.œ‘æ'YO¸”7Kc‰Q¢ì<@ÍaÎÃÔÊÆduQ##²šC""HW*Şˆ©E.Å*{ínÊÌÎ 5k®8”ÈNz%œ<€ Arÿû’`¾€-^S	2ØTE;Í<Ã[Ğ¿xç±+Q¡¯(ÃtUfT’RIÆñœ%@j!y†Ê]¾;-i9lmäröi ½8’ô©ŒÙ¡ÕÚ5¢­rô2ÿäÑöã˜*8n.aÈI˜¦bs)œ‚î0•IQ ß¶úôÓÍ
+ÔªI)$ìı%ÑƒêOĞ™K›v5û[5­ìÔGršÒ]Š›cˆêwd}n';0ÇI™BŒ*	x´F¡GG9èI)¡^½M?oé²xSn>oHÛ¶š’H¢_6P€—€U²h	¹gnÄ=?T _d§Ij·­GxŒ¸0u#¿&¤oË19gÏŞ?ºîş|÷ZCÑ*Ú(TçâMº”bJ%*ĞuÒ‡ÕÔ`ÚTÿæZK·¡é)%ZI‘DŸ®°?„vR ûé#+È¤½4y-y4~Mïí:ßÊ»Ò±èÇ»­(„3!…’ò°»ÜB9EPÊ‡c3)ÆbhéuÿVÏŒÑUcºŸüËD‹¹@ª\Z¿ÿ¨†I¬G&‘ƒÿû’`¾ 	2ŞÑæBÔRe+ê0ÅZ‹ğË{G¥af¡ïtÃtŠ¢Y„å~iË£Ÿeø±o@Y¢$Öª…²³¢ü±„Æ4>.û0ÂÆE[
+7qŒK5„;:jáo›Ikø3Ç7ó+Å}Ç1\~2\#_Ii£"Oîª<Œ$C˜øUC¦L!fÓ|lıœİÀeŒ,„M
+ŒÔâ=±’HP6iŞühºØÜ¤#¨ ¥‰©‹êT%A¥xˆvoYT_¸§HìÌªaGfgø{îWÿ’JI(T€~à„¬Å&…¼Ôlfy…M |]U¦|;ÄbÏ¸°^«»S5‘gw+ß/;Œ8¨k¯êeŞM–ÆLã¥’sÆKÜ²(U%ú
+~Ì§
+½HLTn¢>,e^åÿÏ¥v«İº†¨u¦”S§×cáix2™#®òûl>4 Òh¡ÕêH›gö¢-G!F¨sÈˆ=ÎE;$hUÌ¤2Ó8ƒ¢±ÅJ¤İêÇ¥î‹ZÑŞ®¾±Góè¦)ZªÿìŒ,ôê—¾qãÎ½ùÿû’`Æ€CİKBà](Ü<È]LXÉxç¼ËQZ$ï$ô´ù‰FT®j)6ÃÊ•ÁeK*5£Cb![÷a“˜‘YK³µµ¹¶¥‚äE¸öbÑ•c„Å‘ƒª*	A=8YJ½|¶ÑäuI‘Ò»È—ÃÏ×é¤Uä_Ûc €ØÊâÃae„™#èpÌâmx'ËÇÎ	ï®ù¹=šdí^ô\W'‡S&âY8­í(£SòqûwŞßÂ^µEëk“hùòûø$FÒéªšUE–ªªÉKĞ,Iz¯ê¼k°=ß™³Ú>¼˜òÍõÑîG*à+×,°-d4’¤ã×'+|NÁ7NQß5ÑÈ„ÿş°ìV½l,ÙÁG»\_µâ AJ¥œ‘ıY'kzgÜÒ)§£·ø/cZÅ¶—z”½õ)½×­5¥½˜¹›vçfÿ¡N¹Ø®™#ò¬yœ`Ñ]è€‚â«â6uo›ÿt8r›¸ˆ0D#È…[C_ÖTr ¶Y©©@1.
+(„€·²@š BªRË6óÄÿ‹¨qPY=ÿû’`É .IÜË+`Z‰;¨0fmdµs,<ËA[¢. ötHÒ]¹›/iìº™&³WXTØ,Ö$LY–‰ıÈ•‹YKKÁ»»óY^SO™–/HtXá†Y´weI{Ô÷>}V	Ù^«jeNTR™…¢~ØY4cŞRÑLÖ ‰HR|‘f¾J+¸P ÌPÔ]ğû¦`®{ØÅÕèS˜¡«¦"1–Ì¡\¡˜Sb­Ğë(°Ü77OÒÍMJØP_Éâ–
+ÔÒ}Pæ&Ê²pú%‰¹5YW¨(,8M;mFUG,ƒjV%84Ï'Z5Ô¹Úìİ…	ëhaª„½=uÿ¬sw×Í],OÜÜwñóßÿ©3u]gö’i¬@|†&#Á—¢®tB)Sp_RmX—ª pÃîkš˜æ©JvGïqkœÕF”X ¤GCÇFÏG˜A§bËİõ¯Y•#8t]ªÊÌêaïcVûúK1è[ı ºk­©E`?—#ÊÁÕİx—5Ï²TÖ¥,ÿû’`Î€ò-]K/JØYhk¹%#]q'u,%¡$¯(´´>¬:Kçåû7uâO-ƒ”Ã ¹$ä»dáÚrU¯ót—,ÔæZÄÜÎ‡°©@¹ÓOØ+Ù$s$<úk·(
+PÆšI$‰Zv¨cÑ=jXZGÆ‡CdÉØ QÃ²–X»Gd‰¿yûmûeòM–¬wK{çòİïdå†²·\MQ±âF'š€²8¹-[} é•Î/gJûnî­•ÑuKÖN&qYJÙ¬eÒ¬©qFj‰Ò„åqmTÃçê².!mÊ®[„Ÿ‡ör>«X–¬Ø<"4qfS\U‘2;Eb,pê3QâN5ª‰/3H…fìÆïtíõş€l±H³
+)YE,ÊB’ÇğzmcT7³^GU‚•a\ÃÕD‡[H³¸Ù§ÌñÍ+-Höb‚Î có¢{0€}YQCª0ŒI©‘İdıWêj=äô}*ÓØ‚Ã€¦›Äc@¥>àòÀ:Ê Ü»”1N)u©†ës:N<3b°ÿû’`Î Ï,İËBØY%‹Í1[µ'w,<­¡o%.°ô´Ù	Nç™×Å™½çl×Åo33)EuÑI&å;eEh´NÏM•NtkoİÖˆÌìèÊ5HlåRÕŒ bĞÒS0Ò²a˜ç'×ğ—xÓœF÷9dF/ç“‡)v÷ÿfI˜Á™Ì~Ä °uF Æÿ#ò(eö/38™Ws‹¡FÿoIğl•ê›1÷<®g˜\ŒfQjª%@AVœ­g¼¨Pù|÷ÍÛiŞË€8å3]ïéL€åÈW(ñˆpÒÈù°,âÏ‘)¹Z–kò3Ë‚\«mÜÆt]è¼H€Áv>bïjÒİÆ—ÔC*¤›ißİdâ‡âè«bšŠw_â†6óà¡ÿR„§utˆÇ£/é7´ô®˜L>¤2¡ˆ¹Ñqã‘ET£"w ™G¦Wb#Ür5?‹úœyHézö¹=ƒ„g…ƒ°fU—Ğ‰¼â&QS’¬RŒÒS·Ú}¼q'ƒ…Q‡¬*Y¯à–Ú’ğÿû’`Ò€GIÜC+hU)K©<Ãmà½o,°ËAz%/0Ä•´i–½#lÄÖÒ‡›;y¬µn]?*Ë¯©šÉîÎPMÎ-ß	Föı(xBx8æ¦@P©EN)Èª:Dèút]Uô¤?dµû´±AE+c[ÜÉé.‡®^;6‘ÿš9HÎîœ-Ì´+›˜û·,áÀÅ&ìŠé@hÇ;†À-C+ÏC¢i‘çÜk3º‘Ú%Ù¹6&pS›fT¤“möÆ:"ß›àßE‡(Od‘øGUÖµcz0?ŒÜ¾³zÈêŸL°¬2k¨©G
+‡ãæô¨1‹8=LB«‹ŸŠ¨Şèª`è*—qF…aÑ:R>³¤}L+`I@"Bßü,H+S–xb¨ºÀ’&Ü¬h;“ÈÂÑ)
+7Gú8ìÅYù¢‘õâAjÙ†{‘’¦
+4Q£ˆ·HuÊ}°¯CdÂ„#@ú\I‚À‚c[‡¡œ`ÙâíiRD+ğ»ß^wvU˜’IZTñ2‡DêÚDT˜Í¤¬Îq*¡’Õÿû’`Ó€1ÜCJØZÉKˆ=‚mMô×qL=AyîhÄlxI$³ìº>YwÔæUÄ…³ jz‰5âMOÆÎÆpıì;ÂêV­æG*r€¨YÅå€ Y²Ä‘I‰«K}vÎc=ˆ™[Ò+dp)B¤¢’Nù7ƒùæ4õµ˜Ø¿ì
+‘d¤h±ûÎ»–VkiÂ¸Ğ¿¸øŸ¾¾øbãÏZËG:ç:]\4ã!Æ	‰çTª¤—¹<à˜Ù@±MÒ,|£…OÒym¦Lm´›(§Ş(ÂÚ"BœIJ°f³İŞìã"®ÿwRÃTb¾š‚âö=ÛİjlyœÀ³$vDƒkÉ‘šu¿~Wì~‹4ëº–`ù·9Æ.¦ÛF¤üJk=¥**M	ıŠÙ#%·ˆ˜©EÛn_(†…â¾­«oÜÙ‹†Fi²Î¹,<³İJmJe;1®($)˜ˆ†3œ`‰ÈªkÂvâi§*¶,ÊM]«OÒ¼«e{º¸ÆÚÑH±¬íßIf²áÕı fE˜’@ÚÉœäÿû’`Í -'ÜÓ/JX]Æ+º<ÈZŒt»y¬<Ëa™¡®´ö•pärG%4Ù#†²ê\- šÍ+>àÊxfŒƒÈØ(cîˆ ÖrÃ\´šÃ\±Ì—ÏüÙLPö˜[EE…ôxÇK!)¨
+÷°b¬à°{Ü ÿ{”é*Ü$m>˜”‰)ÿ F-š±²B$†Á¾ÀsÏêŸÏÚqŸø§
+Âx P åQÃÍ›Ü‘q£zÌªÕÖ*.îqİ Å¯Ó·=Ô¯şI$¤æ-b4;¹ vYy/Êqnï{¿F€¢MGçaKı¦{ˆ—İZ8Ww®¾¾Íkõc§rbkÈŠ¨h©ñ„J’>Ø$Æ¨ÁAäØ\Uåã»cq áÁU¡ï×ñ=T?Õ~“i'>ğæ!"õÌA'üÜ”@i£$éÈı£‘¸.]ëO‹¹|{9ËÅ†jq"nŒr‚¨c€§Ç,]3l“~*â­Ì¸@ J­¾OoİË€T’’IáF´à¥]˜¬ZŠ{Û¿V+Ô©kFce
+
+˜ÿû’`Å  %]S2XLƒÊ=fI4vì=‰T/¨Ä™$Ÿ©ŞÅ«æ¨÷Õíñ‹n n¼l:§6½IÜ†cL-Œ”G¾»÷lòı´İgÍiÍÅ’Š-–¡ëqlsPöºšõ:†j­åĞi	8ZM4›(§”T‚„5€™:MıİšmÚêìµ©ŞÓ¹¸S°"Å §´¡
+wÙÛİWUßGSÁ`†Ñ[î—>Æ¬T‚]2ôÂ*iëz¯ÛZÉÊ (J)$ğ Ò+B"?îô‘_×µêü7l$‚Ô*›¶J«úóN4Ù-ŸêÁA¥*Ø0Û…iJˆVœ“›2Qß×ÃRjÏW9ÛÅP h<ÀJ–,*ÑTˆ©†›	?Ô–ôßÅNèjÛÚjjUÈÕ<Õ©¥r(£cÄˆlÓ›UÆ'ZóK©rÏ¾µA42@Rû¢T•öXß%=[ESzf°³ªy¿ÿ!ğÆ²Ô·cÕW~»nuîÿå$“w´˜ ±#Ø¿KMK\rÀœÆ´*>ŒCWP pÉ4"šŸmÒ3:ÿû’`Ğ [3ÜS/2ĞSÅ«İ%"[d±qL1+A:š/$õm¦/Pƒ Ó–#²œ:DXw{u·;ZÊËA½ÃÁQN>©mŒiûŠö¾âG(a‹ 
+,6'ækÓ{×Íõ'Cü»QJH¤Š%öLú6UhQ¾Æê	…¯œo¤dQ§kFvå²gznÑèâx“Ñ×3Õt5‰Z-ˆt1*“y  :€_H1$´©
+uŠ2á–¯+…úzK£í35MM1H’BÄˆRB°X˜cŠâZ€û'¡Ó[2ÉmğB+Ó=åÈ„š—'ªÕœ»·‚¥äŠ¸²R,I»vïwúôÿæÿÕ3«¾¬?ºWx­±z^& îz‚ápø8*‡©¬YEõ?{$ĞGq9Ú’q«0”+,ÊI ‚µ†’í^‚NµmÒE}¶Ùi¿ÆEÙÆLø”d j«cpœ‡H4\Û<Qj5•$¸ºPÑõ@J™*&<ŒM  ŠƒÈC„‚ãŞè •îú//ZÎ^»o¤j¦¨AîHÁÊ]ÿû’`Ò€E4\»BĞZE[Í=%[¨½uGáëazn¨÷$¬¶@”™KÚæÖ=Kõ¤
+Ï“DÖ r8åyÎúˆ)I©^Ì ¨ÌfûVÖé¢Š™b0¸yfd–ıíuÁ·‹:¥±®°ñíÿ^SÍåš™j(¢ŠŸÒ	À–¨G&9ØDÚu¸xÆŞ`¡Å„ŸnQi/iŒ>0“U€{¼K@úí¦Äh=¥ˆˆ‘Tuq=éw|†¼ÿıãÜvo÷™$şüo×|ÿÔùUmßß·é…ER’I8 –¾“@Š ¹Ÿ‘—B¹’-ÅqÃ‘ÎD‰5‡ÑbM¦µF©õê[DğĞ‰eâz/jĞkFÓ†oeëØü³\ì¾÷ÿOä4~B+—0 
+bw©•ØèâtÖû1fİş¥•UJI$éóøüs<QBh `9²]û!†èŞœGã²“ı{´Û]÷v‚Oš‡šxc	¨&Qç0hX‘EÚ•HÖ§6Ïb<û¯ÿ¥gEÉ
+\„KáÒ ÿå$’NÄ•H‹é &ãN8,…$—/ZAßÿû’`Æ Ú]ÑøJH]‚«Ê1æ9LX©sL=‹A_/hô™"xç§M‡XÙaë+îŞZ—ê5:¸V³ì[­.µN«ìsóNºœuüb>£´Õt‡ÖLL.MÆ­,:¦.ÖµŒ§XLàŠ‚{Ÿ†Úˆ¢RD¤HK:4™‚Ãàú!‡êJ@ÄŞÅsšˆ¥ÅDigP„´çÊà…L†<Ñ¸ÈÓÍô_¬\«â.$`]„+T¡S:Ë¥2Ÿ
+2–É5CÑş[ãÎH!¨§ÿ’RI8¦X½rÀ»1Ä•u.H3MrÈÜ§£û.]9Vë¸‘c°Sj<¹¢yd+ywO°ñ’äL¢¾Òq¥]˜A$Òôö½_ùì2òÒÔµæZ”©ä‹Š„Â1Ä¨Ö‘`AÇœş‰58ÊóßÅÆ…f@[*$q‘ƒ=^k¦¡º¡û½À”så$ÓØU•Í¢EŞñÒ,ĞÛ*8ı¨HWŞùÏrøıÖŸ²¾×•ŸE»âi†Î³šuLr-‹ê¦ QëúMPì@¼SâàeÄ”RsÌ0Î ÿû’`Ë :(Ş9ïbTY„ëÍ1ƒKĞ¿vç½+Qt—n¨÷¡lÀK9è7@á%‚-!÷ "!µ+Dó;
+øI%OÎíG8TÍxO8)5îyÙbZ§°Û¥m´“ÃÉRmb@V,j,â—!ß~îNæ£j÷ÀOòöì[êKuD’OQ{ÁÈÛÉcÂØË<UızojÙ 3s)şËk«t\,ƒÀlQ`Y`yË(mK0SÅ8–+²ëÀ9úï±DÏ&”VŞôÔ2Ù·Sß($’TÀÁ?ÅVCU¶%-¢C×¾³¿”y¾]0Ô°›”ÜÕK½Ë:üÍƒkàĞW'	F“n,{®bûˆd["[{êÓ)Ïc¤û5“:5’Ş3¬Ù–ôÕ×5[>†#6M6æñj²3’I½R‡?uÓE“³ŸÈ”á0ü¡tg	”p×+b»Šş¢”Ê‚ˆC­İrnõ9<§{*‘R¼·S×EtÛfÿ›øbŞsGB˜ÓÉ±ËoÈ€fU”’HŞ& 3MZq„î¸#	ÿû’`Ã€!\¹ïJ@TBËÊ1ë9±rçákQO¯¨Å‰r`Äº§é_ÊMSÃÂ‚Û÷³œçwrÎÎ5†Pğ.iAş“,£ÕDBwskK<5«¹Ø±sMcEi aéGCO7~é«I<[”Ô¿Ü«İõ°¡0¤ŠH¤‰%ì¼Òdãk…æ*¦ª9éƒ|nbõ‰HJQÃèÁE9_ı…>ŸP"lÉĞaúÇ!ê ZeıbĞüè«¼aò7èyÂ{‘Kê¢´ÊI%%~Õ8(ãÃˆ·Ë§©”ei_HlX°ËÈ,÷ç²¹J|ş5çšÛ‘ÆŠ#¼B	L:ØuÒÍ\Î»-ißQÅ[§ŒŠª\8,ğ¸0àIóò%.ôb¬KÛØÅ½F]Q-:ûezI"J~§ë9è–¼8qHÄû¬|Kó˜¢:ÛµVXf±‚f™:W#:£c^¨ø©†L˜;uk«±lS	¹±‰¸T„{õ§”[ÕWWõ UU”¤’IåÛŞKIûP™!ë- hGáîAÖUÿû’`É %)]QøBØTã[Í=æIø·pì=AO/(÷$L€‡«Ñn¯•İÕ±_,ïp°è=0 ¹â¨¢ rbQÙ¬–•ÓÊ6r£LõR“Ê±ñÎ˜,H£Ú·±ÌNÈÍ¾‹bı™Wˆ¥TpÜD®YY’I$åŒ]•áÄ$…DÂœ+%wãÇ` µ(¥iËy4j~¼5òŒ6›ËÃTx° µ ê@‰®äŞ¿¸ÊÓÚÔZÅ†=!€à¨ÃJ|3¹a’P
+E$ ™^€/†½Ò` #/§C«k.£÷¥»FO‡RÅ×M8—m‹?Êµx!'Õâ“Å†x@·KÏêÓK‰cç^™ğ)¹«¼â55¬nò_ûôúİ­«{>jiã†E±ZõõŞe¾¥‘EA$Êa±\d4eßL#h˜X”¥·ÛE‡1§—šßÑë“Cº–¬uÅr{ö;Ÿ¸»•~g»^ªôÕz®9½¯æ"%ÆµÏ)¬-Ú„$æä}êƒ{Øú@ÿå’N6åÌC4_—®9 «WSĞ9I¸ÿû’`Í T-ŞQøBÔPKê=†H@ÑoL=ëAg.hõ¡lA	~U}pµ¼ÅSE¾sB¥ˆ<I­û•æµºïÉfÖÅ«ñ‰ã^ôƒóó&¼º&`À 'Š²#t²ÀT­Ñ±wQX£ı·½ÿ\¨‚ ’RNàĞˆ‡¡!&ş$uŠKœĞ&h S K'EKû˜ºÒ/ ‚oÏ ÇK3Swİ×è¨Ê¶²»!
+‰f¶ÆoõTML¿K3û5™lšßoïÅÍ¬ï=úUA~§!‘„ÓOê Ny•İšÃº#z½NÔŒ7¾YíˆólÂrºÌµ‰HL›–<9³Ê(3ÎDIÈÈØĞLÊV8Î"@e’ÊŒ§A,•G´#«r"XÈŠŒWÑúv×vlŸõNı4õ_&ÒIß/" äˆhQŠË6ã¾|Ü,º¢Æí	ïÇÈ¾ˆiQñ?Û¢@zj€N—’•íXËe	0¥Â"V+S*¸%‹%œsöô•^€¦•¨”Ixf@F†äÇLåÁc˜@›:$§ÿû`Ì€*]¹ïzÔVªëº1¢l¥[sL<M¡HohÅ™$Lå3ERş²‘l†Y_µˆf¶$«Jb+ªJ²^åî;Rª¤¢d£ÉÔŞ'5#Ş[*†8¸ÊwK©ìk‰ÿ9^_W¡ä*D¢ZD¢HW•Hg ÄØİ3 |:Œ2}Î~9)#o§Y‰ãÓÚ&fEQL†3Õ„`‡¾vnÊÑwŞVĞ~ä¼ÃVêiüŞ6-EâÍÄïı÷¢Õú’ $’S“	:­âQ¸Í"$£LN½/„gÈŒd&(la‚xA^JÈè¡¨4ÂæŒÜ›«‚rpÀjB˜è$åIW4E!3Ì¨ub˜Äti•Q·_VÖw#jìèz²[Ğ´Õµò¶´§ø?õ	D¤A$g³ª‡ŸÎ"¢dhŸëŠØ=VãÁ‰
+lšÓ_§qµ“°ì"ú®=ô¡”İÙ–©U«½‘Ô©FTG3²«)^ìÌ"×bız#}Ùv~ß£­Şıfÿşş€eUT¤›syôİøÍØö¾WÛfN"Ñ€,X°ò¶”pnr&ÿû’`Î 2&]SJXSK½1â[ıqpì$M‘e«î´õ‰´—êáù¬,ú³ÈÜ	Ê‰Q¸’ãq”¢™% —V(%8¨š˜Ô¤b·æ*Y€A TÇ´UDæØ’93¸tšSÄz¶~ßêAP’JRÛ"à³EÅi<MóŠ"ê&É‹ımZÍr‘¬"Î£ªPwŒIJŠ¡NP@ˆÁ¹ÙJÔM%€–^XqıqŒhdqó–«4‡Hº¶)šŞ²TIE&ğzŞ;M¯i‹ÑU‰Ìz;Xşs´Çøİ>œ›™íÁZ¯bm‹”„M3qŸ€x€Ò)L»ñt™¯qÅ«ÛsôŞÛÜØJk-‰XãÁ#Ì.ÁSÖy5ºN’¬/ÙÄ(
+’’NP§IªÄıX>‚^ZÖË­á
+?ó!¤Ó—ÙåNoÙªJJÖïÿ}æ´ø3hƒgÙbJçécÉmw×D–®ÍDºú¥“§¯V¢oÿ‚`ÿä”’Nå Èyş3BBˆğ.x‚Æ&…Ê… ‹B©"/Ä‚™vBQ˜kÿû’`Ï€((ÜSJPQƒKz=ãH¼­mL=+AD¥­èö	°êºµ©`ùƒ°ø±RhÒ[Hæ±c[œÅ÷zÇÓ’&†Ò$Ák;nO«ÿş•˜”J.yPØjSM	W‰
+­9Ü ëË¾Cà4Í¨€m*IÙC¢ÕwŒQÈÈpg»¢wIjÌõ]BZ]æ0Ã²ğê	
+–˜R@êkÅÄÒè`
+ ÚŞµIÿÿER­D¤Q3­¶pv–$$zM‡Û|#$*ÉW25¤/ùpµ¡ç
+¶G©SJíĞ„JÉõ•µPaÒÁ[p|ÿeIfNåpØ[u{¯Q®–MÓƒİß,³«ë25÷ÖÓKm¹L8¬HUKQ(”Tş2Â8™æÌØ£C^Ëo\¢¬ªÓ”gz"a¸¿º¡‹¡ùÇDf©æ…Í9cB!`8 Bé¾ÒØ´±Tº˜ÔèsNTÄWªÎî–%ÚØ ³Z¨”Š.fU %@Tn©pä“Èßß€t„“²€T45¢”…“êG	ğy}“ÚYşÒ‹ÿû’`×€ğ/\¹éBÔ\¥ëš=[ˆ½qL1+aZ®hô¡$åLõ”	§z£Òn£ş^N£á†NPõ™ãiJWJ<ó×‡ÓP¨¢dÒd
+4rìsáî
+~Çj—KPçT2ª©)$œ¿nÍ‚Æ h&ÙÉP¤bÉeâNZ³â¡³R©aùÖ!Ú;„+@bÍ¼"p ˆT<ı÷¯¡‘ìu¹¤+P’Ë<×ô[ĞÌª©%ÍuAVÈŒ“ÅëŠPÆmÇ™a2Š£QÚ}\cÇJ»Ä„á%\ÁŸöÒr<¬¾‘(‡Ğ_jó/>¹´¤Ÿ7päìëNAÉÄIÊúº<’M¸µIkšùFß±İş†Ê^÷ë¯ÿ’’IË•ÂˆNÇG:ÚÁÛ= ŠfË+·,?»¥.ó?¾I²İŠ"í—¶cÓ2~Ñßíês÷¬í÷÷Ô÷ÚvÛ/b ûêH\Ş¨#.ëóp˜ªø”Š%åg,@PTJØ½Wâ„I·¨É|Y¤´U0$/$­ZnJEÄ‡eÜµ®4XXÿû’`×€g/\SJØQª="H½mL1kaO—n\ô™jšÎ—¤8ác–5Ã÷ÍØË?·v‹—¡]<0ú†Ú‰`Ö:ë…'r,%J™ñ\?Õõ·×~’i'|À?Ü´	Ô™Ğ…p‚©ú‘ø£:Ë-švjŒUL`kseoİB/68sl©SKÈéxœa°xŒVXŞH”Q4Î9¡ßRå°P¢ñ^+8QT!RIÍÙè\ÌaˆÊÿP93ÀçB6t¶ŸØÒ´æ•ãTØ6fb>¨qGa÷&ˆmëÁ±ıß}y§ÁYtÂÔ£|T@
+AsˆZEË-(dÚ[lÛRÃò¤Xå©şÊksÂ‰µdZ\˜”’N|q Üì9»•±ôÅ/1N\ÏšOi³È;Ñ“A§´ïu.clhÎÉZ¯üK^¹/Ù¼;xnõ[Ù-İûvëæM #5ª¶ŠıõK3÷“¹Ú˜¤’*i)s„šlÊÖlÒ1©ûäpŠµyÉ2è‘t$çó:0<£gğãkÿû’`Ù )-ÛÓBØY¤{š1(KH‡kL=‰l.(Å™lGŠ)Œ¨–ô‘}B5)±½‡î¡²ÃÕ}ÕS8ù¹DĞà‘P™’ˆ¶g!}¼™`Üf´U¦ŠÖú;n¥ifRJ(§ğ{@*[NfCzÉ‡'âÛ£­Õ „d˜sl\ó”/.Ü(¾8Ì1ÒØW™Ğa ç ³¼ıŸ<êÅóş›‹›0ºYh=¾'a×ÅäÚÕHÏıö•M59MwOU¤‘ENø¬`È—¦V«Ú%Œ~’«{ü ¡9Å9pîšõ:ĞlQ	ÓË‰Ô<±­á`ì;Î¼N˜<¤g{Æ·ÂÅT{ ç—(h<L‘ae*MAı:}ÆŞÆ¥¤Ê®_Ô°¨©%$œ¸=C‘Ü!¾Ê3›ûüJtŒù#£”&1%K½D™ú¶4Ã{ÄÈôÂI‚(èõ 2¢áæxê/S’2²˜Ñ‡R–ÜºÏAè¦Ué©š"%›yßõ€AĞÅéœ£TMmr(†"Ó
+µcÇæCc>èŒUÂË¦–(Íÿû’`Ö ..ÜSZØW¦;Š=c[PµqL=aL®hÄ•"p]Ã„œoWbê,¤§oërÛ[vWÙõôÿU†Mj¥xœAí(cÚjÔ7"şæØ]¹š=Yzò¢ü<{‰jÊÜÖûÚl¶©YiR¢R)'1qa‘yw ¥*¥¸^ß¢Á¡H"’L¡éƒúZ±U5{'·é{û’»CYNİõı{m‹İÈv¬õÙˆÉîR,jO;ŒöÅ}OUgND:í‹+£^ÿØ!Kß{êG } ,;¬¨²ºRVvji`ÏJ'ÁD¢ngŠ¢«Óôx £7$e…ë¨Ñ!O»ãM®{‡XÕ¨ğD¾ô!ö¡Jr(üÎmÓîÖë2½ÿ®Ä$ì0ûÇôå³v.<cccêíÒë¹É>¸oP˜Š_õ7dÔ’E½DR0ÈÇÆ‡şfà¯ŞiÊôF?¶ }´9è½Ïxşñ³$í«é_şò_(Ï
+ÌÛNq55ó¥Û¹íe•ÎÛi”ÿ+ÎSóşt¿¼ÿÿ÷jUU$“n	ÔÑ
+›ÔÈ“¸=Fbÿû’`×€¾NÜK3jgªš1mLxñq<Ë¡O,.è“´Ë¢,8ÚÉ•Ë
+…GÔ©äÒ‚:&& …E` €rf8izu.ç6d‡gøTHRªÕ”a|9-Q†Ë¤Q›ñvPUDø“ÖÂ³ßf§}›$’Snú$ÜXÅuòAÍÏBNêÍÆs‘œò\6uÓ^#»~]2†§ÏóÿHãÌ e¬Ø¤X†) $í[Ö‹†VŒb<b`›)…éO÷|ÿÿùnöÿõ¹ÿúıé‰TRM9› Œ©e<¢|ÀòÃÛšbÀó!8ÌHJlxfåÌÆP/Ú5÷"Òš'-8&£›¶•p¬}ˆNaS„ˆÛ †GÍdQŞ±sş	°¤¬ƒ›&Os—GreÔ@ûp#ÊjíÊıœ£›b«UJK“%$Ûzâ+ Œ'Círğ à:Ã‹'BĞ!bS˜ëëx÷°ÚceÁé•±îöëf³o¸@¬k?É–ìed¯sózĞY@!‘„àì€±vŞ(>rsû¢1Îÿû’`Ë 84\SBÒ`Å«Š<ÃZN\ÇsL1+Aœnœñ™hÂ/Ù¿“fDUªê-%X	Šíb7 ã—•ûNÈÄGl›J3×Ch_Å§G5YjºXww0(qÆ	œj`‡H¨òN—>uZŞgTØŠ)5 bXÚ übFÜ&P¡Ô‰0éBCO„Nô²ê>_z¨–’$Ü°íÁ4ÃDrÇÃ†ŞK9âkæWÆÎF»ù\]´”®«õ§‹P(atQ#„ÇT0º¸¡ãÅÆˆ£”`˜|îêSy%0‹ ˆÒK‰ª¹˜ˆt©'v•JvÕhgK¿Sª·w°ÕérI$•.CQ 3®<‰ˆHœ:ÖåÒF<»–!rV³Q{2CG›Œø»ØØRÊäQÕšpÍE(‡íEZ‘kÙíäØh´¼¶~åU,É¨ &†¦£Pú*|<­k¿«Ëü3RE¦‘%"AU<v§êÓh“Ö{³½^ºòD¤EÛØïù{F:úª¾f”t<Pø0z$*ã© !A4óÍC*]´L”ÿû’`¼€H2İK2Ğj*ËÚ=%m±xì=+Q}¡ï´ô•t%ämjÕm´e1İ…ÑÜñ„+-YO£,PŸú E…$’Jf¤ØAĞeŒ\Êt¨°¾W§¬§axñÉ,fòşë8Ëj	•æ˜‰JO–b:œ\R‡aí^î£Nån’F)O¨È$Q&BAÅ)¤ØI'Ô0ë]c”ä£Ş{³wèÜ(–WçÓÖ]E"’E$‰Wì9“Â‚Ğğa|ÜùsNä]Œ™yg'vra­¡YLæ·Çßâ=âëÙòû³ÿ–ƒØ’ Ï‡fÑi›{Î†ËÆÖ­A®†§E·Ÿ<©ë×*s^¯È<„>¿”¦U•$›Nöä,’‚Õt(Àd)¤1ª_¦«•šBbåvAÙ¨ïòõ\ªa33‰èÁÅÂS-©JÎ.£å'(Ô‹¡â#5UPHå§yÓ&¨"' !@¨$tıĞX6»ÒÄ’¦€S%ÿÚªêgª¢IID€´#øÉ9×™"08mh9oijJUjƒs»[WíèHæHÖ=õ³s4ªÛ•çÿû’`±€?)]Ñï2Ğ_&+í1†[±yGáAt•/tÅ™l=ë5<5B[>&Î‹¼†@Il«Â¡Øí"Ju¨'Ÿû.†ÁEKæ=l ¨”IH¤’J_ í4ƒ…>c¼çP…Ñ?û³VUÜ É0“ïÁk±,?>]¹vh„tS ×µ“I‘ÃD{¶™¢Ûz¸õi§¸¢v8Œ¥í"yÚl:}J‘Qöé¡ŸıèSÜ>¨#!)$Ó½X†6#WG[Q3ª™ãd®TpXo‡T4¶¦'¬0PÌÙµ…;«iÑÖúùYŸvö¾ıgıò"é¾OêxDµÛßÇ“
+ÕZj$™T7ùŸ¦’I%	 ²(ò1SeÎQv`†II1 S5aÚœ ,°­k*»¯$İ8Ü,ƒÅRH!60ÑÓ}ğƒ¢R`|QÄË:gy¸Ì]Ê‘{áLºÎ]®!wÿ­ÄÚ‡ktï¯eURI%'	Ëòr¨âÒaÊ×x—yÃâ²•<÷õËw×°{"%,*X64ç9õ<$©ğûˆùÕZI§lHûŸ2ÿû’`ª ô&ŞéøBPWEëß=Z€‘y§Å	aR
+/¨Ç˜âqeTä)yå~hjIİ‹ê@¦•”¤I×æ8›y¤ÔuÀÖœâmŞğ1Hk;ŸoZ·íÙXNT¹Q¼´©í
+î <…ğõíæÔİ3ÿµi¿lÒŸÔ`A+XecÓ¶õ¥‡„ıOÈÆŸi—û²ÇS=WE$Q7cgbª¸'C!™Q*A®/Z›"^Xcf¿6ÖññuFóæ×ô¶ó{Æd¹hK-{tBÙ¥U¡j®$œ÷§ïİREİzV¯zïãä¿ô%ì,¥=µa I$—#°pQªQ)`:ŸVWéØˆËxŠLg‚—Â’pİ[s§³âTm†FSÃ~‘âfÅX¼x:Õ¬’Ï©Á2/½_[§Ñ¾ÎÔü¶Ê“oÿMA$“H¤‰&kˆÀú©ÂÉ9Ñ*dûm0”›7TÑó¯x|v¾pYÑ‘È™ÁbˆÁ-d¥O‡¤Ä	ˆ®
+Ñ]Ûõ1Ñ áÚSbk(´éGÁƒm4ÊÍ ÿä’JB`î§ÿû’`µ€)^QïzØW‰+ê=âm
+Ğmtì=)No´Ç$rÌgÅYŒ#jã=M“­zŠb¤dDk’·›)Ux;¹VÔCNéÓ£SŠà<A	ÖtÿOÙ­Üı«%¼ÉE,SÄC‡ ×àw)j™²ÿüIÿ×¢+H(’ËBD%½uÃO­A<2ED5©BlhVXãÔİŸ®Ëyü×\\k8Ó„:$=fŸŠ¨ù¦h‰K‰Ék±‰£^âh~ºOÔb‡*æİqke1Ì™ÿô4«lQ ‚ö³|”‹¡uB×XU9Ûd–u–Û­iFL%|¹–®7°Ú<±ÀÄş	D²ãÅqzG¤.ç4Ğ2×2*0h<^i#'EÏ¿?ìúÅªÈRÄbN@œ02’ˆ : xÕP€FÅPjJmÕõ”¸ºÔY7xùŞ§\jí°”HUX:g‡ÁDf¦§RÕ˜¹ôt‹ÌK=Õš&g-¤y˜SÒ*6l&¢VYtH0â]–v)ª ÕU•$“näÊHĞfÁ¨Rÿû’`Ã ç)]»2ÔYEÛº1¨[qwGáé!|—®è—•l8s/Ã>|´Î§îF` q[=j=ß§­Ì³mrB(óq*ƒTO®Ê-„}ÂoË÷÷!w›^Ó—(Zağ¤VgB’·¢„Ó»[.¹:,¶áMÑGz!(¢£i6Q3@9Åp¼*êPı{ê÷¨ÀHså­¿}
+¸¬ìyô…Ôî£Ë{H$S
+‡pà‰OA@³Jfk3ÓU[¡D-ÙˆÙ{ÌÏEG¹»–“
+å¨NÅXÅ9®è±­¸¦è§­
+ª²’’I9SPu1>Hõ2´–zœË0Îµ)KÓ~ l'1©/Çº«RÖS5³IğğE–
+³’1;´İ·kj±ê8ışªõ™`‘c©£ÎKé$,hÆÜ‚İSw+SUUòR=¿5E‰@Y‘™0&VJ© °òÎ¶1¼5ÚRICÛæ5gõÜ7«?Üß)ìVÃ¡ÑçPHäséĞŒd{µÎ´Q7s˜êGB^£ùİŞõœŠ…W¨ö\j 6­T—:ÿû’`Ç :(İQøJPc'Ûİ1å]°§yGá+Q¥ n´ÌtM-R± â<şŒÑz P „’IJù#¾"+Qlª¹Íxá-Á¿yZ4;§’õËK s ¸háyÚF\ÑIì\™‰ÄåPê.…IAp€¢Ç‚(ÂáĞuIÉ­¦úä—µËÚı0Æ·˜Š{ÂQ7¨ùF“VBLUPIpˆS*BÒA‘¢¼éƒ=+–iÂèïhÿ³µw;*šTšd A)5éŞ<¶OißÆw½¼rÄâ‚ °t\
+–™+b\ƒÆIŠC­sŸ¦‹hD ¾úêÏÚ¦“%eVÔ”@%ìZğÈ›«E¢yš¬@Ñhõ÷|ëÒGé7†¬jMêT)fUs[%¶”‹*iy f[å½<x£$éC»Ü›¶Ô8š^Ê:ãí0rA«`ågœ¢ÀVÕF³d± b)&’IKÿÕám]«Ink._*¤gñä”FİCpÃ¬BØ¥‰%£'ÃT1§©ÎÆß›»-opU/	ZHÑƒ¡kT–o´Òÿû’`¹ FÜSJ@_Eª1†KwLa)!~ït÷™$ÅÔxÊç÷¿qè[÷M2mb‹TÂF³ˆåˆ ÿä’RN[V’³gÅV¥K	cÍÈ¼¤31b®8#qfK’M°´ dÙ$R6‹KmŞ”\”PHfæ¨$æ€â®x÷±§I6ã´E*b–ïÖ÷Qã1u²ÖĞ”öV¼İÒI$”ü.¸Ú KR?
+Ù“æ-CÄ\Ò’ÛıU32°ÑÕ¡íÂ”ò&&šôèx,4¶uëet"*óq¶¨QW/pB.qÄxÍ£È³z'ëöeè’I*uƒ4¸}“'ò‡@ÖHhø–.¡ï
+EÈ°¬6A‘²K~†í×I_~¾Óf4”tpªŞÒƒÓì:©ƒÆ¹¶•§d}%±Ü[Y¼ìã)=ºí¶ql,HH½5QILúÚsJÀÑ×X^0I'™¤Ñt6ÎÇŸŸÒgk½ü[F¿™ØÖªîıóÅ·ïtÇ,l ¸áæ‹—”)nKŒ§ì(XJ#F9,ŞUŞÿû’`±€ß^;2DW$ëê-ãK|myL<É!`oh”™,R·6*VT”RNRQ¹¯Y‡"ƒ« µï8P·ˆ‘´Æ5£@»ªZY‚ú°ë*¢ï]`¬dg®.	¼ *„Gg+jd½¶ù3w­k‘PË3m=qºJ<®Z/\ ü«))úHàıxtEeÃ¦ó«J×bkÒVÆÍúÈ,ßpO
+İë£¶wu7•Oéï+îùëí"q"¤4õ¯¹ÓŒP)hÁøêVàê”ó‘b,5IH9ñ~R™k¢I §Í… ª¼cÈ	r@"ç£¯¤NjQyúg´‡–kvŞÆCƒìd—"Ñf)¥aàbQó#l¬@+ Ñ5U™¿;R¼­HS.´¤İÊZ3ÚÍè©Èªmõ>-.²²ªI$œ«&Ápy¡Y…ªZ©0úßŠ¡¥s«LdYŒÉjéã”RgíÚùv-XfÂcT’îQS§E&šº=Î,%1K×Z,<z£z*v©½O‹RVU•$’—xfCIÙÿû’`½ ×ŞÓBDZå;Ê=f[${wGá	!Xo¨•™*‘uğ–Âï7HóSÁı÷P 5ñ©º;=c3QD › YrçbË³ÚÏ×zJ”5Ğ*.DT‚8å—#SÇPëå›Ck*÷<'KJ[gclË¶ÕÔ´#)%
+Ò·¼Š´£CA÷ÔzÇlÁvèóWëÕ5 š¬|Íí¢ÎûW%Ír“·Æ}øİ¥Ÿ?c©Á€0~öé¥)·¶Uw±%ÜéÕË~ÆK¶ÊQª«))$›§ÁnÑ5e˜'D/2˜½Vú­Ç»r§lC:–R$‹Zœ¶ Ç™{JU@–r"{ â…DÀ¡°ñ«µ$ÿNgc\ˆi!#˜ŠxªrhÿJº§ÕÄÊª²’JI;	W‡BÚ,Gò¹ìf¨(vÒhˆ (Ñ&I–>­+™¢JÙS2ìåÌËr+…ÌÌû4KÖ†¥ª<z²,k¶¦áéÚaŸÀÒ®©ğ7 Œ²RiI%<àF
+†ÔT¡2‚(ÿû’`Å€÷İS2@Z;º=æ[0ƒyGå	gï(Èj ì.Ó¤³*ƒsbRTËº%î-@¾ökŞÔ¡™®pó­™&Øˆ÷ˆÁâî9k­Ñ,_;­	õSz‰7í•ÿú„¢ ’H/U#ä=T»#XÛ}áz¶f¥xÜw½ñ˜«ƒì*ÊtÛ.`ÜÅŒ$kÀ0xU`Qw4\Q©£qVá2îÓ.î,2±á9VœÛ/.¬Òº4¥$›»Ğ/Z¼Ô©¦PGJñI¯èè ´¶ØĞ?9/n®0ëà/»öƒ‹¨¡U((l\8a²Ñ¼/TËÇ/oWW#ÀFF,T |ÍM¦)‰‘ÇVÊÜ¸¦-·NÄ¤A{ô¨›qfénŠI"”¯aÍ„ IHÔ¡½¹d|Eú'âìí«¿Ş&xá÷jkéğ‡:Â‡ÁšË‘³F¦o«¯6	ƒ`s/{—B’­G ¤“İ³#¿ÅZÄ b @Rwø!=F1 ¡gJ‹]+m˜õÄ¼\7#ÿû’`Ê ÚİëJHZck­=ãIÜ§sL½AeîèÇlƒ'xdğ¬{dˆÕı Dœğ£Ÿf9qœ­=yPhHóˆ(y©>•¢Õ …“Š$Ÿ±E-=G¾%—ptF¦M¢¨ …†s%Hfe’I»–„à"ºB*ºä(Ñ ÷E¶/}O­êMb˜ü€êF¡('ÒòøJiù–G‘Ú[yê2i¦”X!&ğ›ï¾ÍX ¥ú%´–(ä¢·ôI³*ÌI -ÕWG Å-¿Ç1j=9 –+±ğ+)¤0#PÔŠÜPA`|yğ…úcAZÂ-©®¦Jiƒµ‡
+RxÙuÛ}	K©|ÂŞ÷zKµ«ÿ†–z ØÙ“/r¾<eUR’I9~RGJ4Ñ&l´6\•ÔÎ"8üD&”ê{Z—òØ)L.¬-î$g	F)Êv[šû?uë*®…;+]Í7ûëüÈ†7Iä¹ceœ‹|œ§¨¢I	öÂª*]-ÄàŒƒåfæRîÃÏiH!‚fc¾[q“¹Y]ÿû’`Î ÜS/B@Vå;ª1ã[”qsL½)!W ¯(ô‰r‚é"…­zÿîW{yŸËsvíı#
+‹…Í¬4`AÚß¢½é{u
+‘SÂ;ïñ™}ö‹×Ö&U””ŠìĞÿ¾ŒAe@Ë	)’Óp‡üÚĞ1¼AÊÅép§Î‹GÈNîTM”]4,›ÌZ¿cµtúõSË¹ßl~@åx¢“ı;º˜"s²#}Ö¿ö§U˜’‰%ëÀ€Uò?8²ÿT×•©^'q.!ÂG‡òËr¯èP\ÈBÏM~O)¦ƒI¥|òªªÛƒ+3ŒĞŒÓC‚ã#JG$¢N9Ğ;”­kRÜò¥h^õøÊu6ô—Z^Ö=
+êµ‘D½vI”öTS¦^qéÖ–v4²ĞóiKf9ºû×¿À	rŠfôLf\bf'q•xÆÿ«„Ù¯â¹[ ø¦Ùo§¯úêRéA™KùÍ $”»8‹Ñ?[€µ€·U¨”I*èm4ÌµKóY='ü(í¸îí´ıèÉ9_²:túÉ|Z³}=ÿû’`Ö€%\ÓOJX[[š=é[¬…sL½)!s®©†!l§‚–Vê#ê]VÏ~<ö~oñ^>F»÷”9à”İ—SE)ÃÓ3Ò$§8£ÓÏD2òÊzŞQyUR’I)rı^jB'`•-qºsµ‹«˜è^E•¯¨sÕFÛû4Ñ×$‰¦‰Ë>ôËÍcƒ¢àP~AB¶‚±Sc€ªb%?½_½M&VÎÅõRä¹Méfeé‰
+e;¤‚‚ñ„ºá7ò¹İ<´V[•ê dÖUÍ^ª˜»‚I6y:%G«6 Y„8B€ÒÏ|ñj—‹7éE‚ÆˆZA ±èT²—-ËtbLT§°éGqÍ²ø¸N7Ñ<–>:J_\FS‰"ÒI$ÊßyŞå¯˜%!a9øÆ¦‘7fİç€\Ÿ	ñŞ©–İçV»=·£«ó"^dùTd=Nmö20è¢ä`h 1ÜcëPÛÓW¡Ëö—ÍrÔW[Ğ¶U¨”ŠvŠ€Á/ƒ+~q…=Ï\S4Šä¦«±0?Í#€qZ¶ôÓorøğöÒ<‹ÿû’`Õ€*İS/2ØUCëÊ=†H\‰sL=)aX.õ…lÈ"a¦CÕŒhZqğ\Ú­?uë'VÜ-}ôP¸Æ]mé+d~„hsÇŠ®9†æ“§(õ¸¯(9ÚÖº)"‰Ÿv`vú	–’SÕß/pMÛ·À]‹^öô?ÏÎ¼;İ‰)
+cd"HHÔ)«‡¬l4pÓ}DJzÂ^ñï"÷xâ7†9_Ì›ÓK~Æõ#­zdâeZ‰(^ªÁ—½‘À/*¥’ÇşJØÓ–Ë<Œ_†
+zB7rë;{¦Çµ«df7
+¼k/l¯bÓMh+~ª=Ô[}|3şÃÇ‡w´nô½
+zcÉ×d½C¤|ïØÊy'ê4*«)I$¿ç"EøÙ]Z*¾!÷xXÄ…}MÔËÍïRFş¸†‰1ı¯%Ğ¦&rkB·ıöU9”ßıwÇß(‡$·'JÑJıângÿğšOŠSÜÿš½&’*væ0&L‘“0rá¶jİãòh`óS<1`rå'0jèÚ“™_Uÿû’`×€:/ÜÓBØ]Fªaè[l½qL<ËaV•nè÷™jT¥>”¶y^Òn½ßÉûÜé— ¿÷!™‹ „E	éKQTì^Q*QÉcUæ¶ràBæ.íH*Xv¤Ú1$Úm¦òŸÇğ»µ‡£V°ÈßÍZ<ß²`(Ü"ÚH³¥<¨Œ‡îÑRlü!VŞŸ7ò¼İv6j'He¨©lj%4_V¼íWÙJ(4kÌèÿÿü»òäUR­I$H/©ÚêsÖ³&a/¹Tµ#$ª@öÒ#:ÂÄ7JgÅÀ´ZSËğ*Ú‰ÍiÔ;}1ÇÏu.)›ëT‰Z¹¶½?ú¶¿Ä “ÉÊŞ÷¨êŠœ‹Ö#º½9µ*·÷ÑŸëy›¨¤Š$}py3% T^ÉM% O ä¬(.P7ÉÂŸ¾\„e<pÓNe8ôHæß‰Ng¿¨w}b.ª¾"òOKıç•şj¬’ĞDi‹¥›sÒ·ÿı…57œfQ`ºu¬¤‰özğ–¬eNŠ]7$›	t‘ñ™¢Ã2Ó›šD}?TY ıÖÿû’`×€d-]SJØX&Û½=([ÌŸuL1éai›nèÄ!lıÛ¬ì.#ˆ@Õ,TG¸±"û¹éd·ÂÜV­RŞé/î3@œTDO^ªà&œ¡€—MN»û•é¿3(Rs"’)"‰t:^?\y¹‚K¤~D¼¶V.#XvršÊúL9İí¬ÈÛÆˆÍ¥OôöJÑÈfk„u8·öt‘«èy	NÅŸL”tW*õßá[ÿĞAs¶Ã
+zY©$AzV
+#À-%Bšr{Ï¾ğ¹
+Ì¢fq	zxOW ,„}%’ÅâµéM£ € •I<FJÓ=%#¶ªeÑNïŠº³¼ïº|s«32Ô—f—Ò´-¶\È×(S¯mYŸğVQÿ²©eZ‰(’^Ú¸-lJÂ†uëÄ¤¾@ 9a:­]uËlÿÒšä`%‘èJ,ó#«QG?^/}
+VuÔ„FF­ÁÀ|ºÕH¢—¸ô0*ªâö°ãÃÆ›¿QÈ«¯X¦i$’nø
+hŠF8©œ‘)‘Øp…ÎYûZ©íUTQ0B[£Øÿû`Ó€',İÓBØW)[Í1mĞ»uL1kah•.èöl`½lz;ë4]í}»«Wre{4ÆÛ.oäTéÊÒ9€ â( Bäœ`ñv“t®ÛÔiÎ8ÇÉ‰,UM4ŠM$Š)Ò˜ùa–Äò¡±š¿£ôŸ÷%\¼,Æ
+ìªÌ¡“‹*yÙÊ„8qíÕ³ĞšVFzÖã	‡ œªÇ!.fÀ3^‘5AÆ“iÉBíÃ/5zI@ÇÓ·ÕåÉ$’œÒ+-0å—møYÒ±ååö¹§ò\XaNëQ®ÒPdNPŠ&@	%$¼ä{E-Ùà²[TKÖª8ú ^<ØŠ:lÍÚY?D‚µ4z(%yòótÿ;°úz†èµh”I\ˆü†—ˆÅå%S%ö~ Ì³i%G\ŠÛ6}8Õ2@"ÃS+œ…A}IV}n³U]]=nŠ¨/ci'nÖkE|˜Ê	9^+1ìÚÆ·C(ÿä’RNİNF,E/hÑK&İh)œç$_G®a²_;Kÿû’`Ó€E%\ÓbPaE+Í1%[“tì1	Q\nèÄ•l™(PÑ#–âˆÄ!Ä«‡F¢öG%óVPÕC«J €ƒ3sh2%U§ I3÷k·ÿå¾£¹QTE‰$µ¸’ÂAÛ¨HºA<¯H ³¡r®€‚)Êpa ÂŠ:¡l“‘Œíb–3#Íes²+½jC³£!'vª¸©át°‰Æ-9Q§y7)Vêso³ªA”A¤’Mº*>’°s(ÛÆ,Ÿ¶qi•Z©ÅÍ7Ìº-"’%ù¢Ã{¢ itÉ F…–“>xJ.Õ.šoq­KÖ¾2Òäêf”'h=áˆRùKsFêı{Û²q7Ì?«FÜ6Óm4§„FÇ``!ŠdËe	ë5´ÄC½R-‘âm¨S˜öÎ7‡¦VÇCbë,Ö;ôN‡¹™¯ãQ3Hœ»ò|¤s¼Œ`’Ø°¹AjÉd€õR…kæ*‚‰k2Íe@UVX¤’J\	°§RñJ:LÍ„Õä)é}Ë˜ªYÆD$ñ‹u«ÿû’`Ò ä.]»*ÔZF;ª1%[,ÏsL=I”š/tÆ!l»À5v?ŞFYX›:SÓ(†Viàº}ùr×L^6u%1gÆ³¦ñ½ãÖÔßÿê6ÂU¡FÜ!¯8—Ê»òùs[@µ¤‘EÃ¢‘d3&›Kï œ ±úâƒ\D}Ìb"9¸åR”éÉ¿½ù/İüæş;å3»noìı´¨¬^•¥Ä”)kĞd!`2Ÿ¨,ÿı³ªj½I~¶PU’I6è¡L„·Óø·S©öÓÕ?‚/½(UÈ<¤Ch_„&D
+˜Bhˆ.8É\œŠvâbµ¶æû¾t6~ù¸¿¸Ñ§:«±Ó¨²ğH˜H+k™¬`ÁêZ*™—nôŠ²ÌI ‚ô‹ƒRp­RÂâ¤¡ìƒ"(
+±:H¹#IÆ!HÆ€¡ÑãÕ•DI¨×Wi\îÙ…Ì$†·JQ?|øK“*Xu#Xä‰D«mMımm›ULı`¿Z­&Š&xàI@ˆ.0ÍgrÌ‰¶¨T÷r]}M	…®Âÿû’`Ò K3ŞQïzÔ^&Ê1&[ÔÁsL0ËAi®¨Ä•l`‹cÌG‰(tJÏ«ŸaÂ“™$~iê¸áÏ^gšŸy¹ÛvúGÔeEQú1ãÉ(]Dg”'(Ûe¿ÿè4*(D¤İş’Ä¡á+º„«š£Hÿ[Æ¡xK›jHò¾Ä&¯–xÑµ·¦ÿÀ/Ô“¿¤œ)ó5 äÍ/gåBH†hDf|‡P!ïÿ±Ÿ"üA1İ ç:š}LÊ=Wm5Õ2äÒ+- ğ·8	Tù‰xl“mMÿU<Xf‘lÿ†¥[l&åàŠ_ºyµUˆQX÷ìÛlZ3o´}ëãâù­3ŸĞ>w]ÅóÆÄÈXÜ†VWïn›öùíãº‡®ßğw4±$’
+°±KÁÍ'¬Q³‹\»Êê)lˆ5!0*Ôb?’,«UÓ(¥š3c«©öz*Hç,jƒ)šºr©ÌÇ3YWUg£İ§¡¤Sí£Ö£SÿÀ¨)ût Ğä’I.Áo.]Ú*vÈàÈ¿Ú¯KöÄë†õQÿû’`Ğ€ÿ/ŞQïZØ^ˆËš1ã\P¡w,=éi!n¨Ä•tˆ°‹U0'
+ç8p¢²âÌxnW¸j™TE´*K‰g$ˆğ#!MÇí,Á•VÕ£I»¥ûİo¶¿êËdı?ìKÿŸ¢rÃ: *‘)‰$½ƒëb*!0mhŠœsÒ$ó1[j4‚ÜH³‘Õ ÅCèXtêèaq5SäâŸnF^‚u¢hÔEzÒ( ­`7 Ñƒ$NBŠ* O‘~Ÿdˆâ¡ÖĞªª±I$“µ`GpIlV‰L‚åŞ‡æaTÖÒ34áÆ®¬7Ï2t,lß ÈK”ÑjcEp¢Ì¼Ñ‚›šÛ½hQR\­"›Í¿{mÏæôZ<:t,.ñË„sÜº®g²wşŞÜ=e$›M´’¸Ó‰ZÜÛl“—»7-ùrÊ0Švšÿ;á0€óˆBuâC5êNfµHê~éÕêåãÒ È–Æ6¯{ ­Ÿº÷Üïvdñ”š¥C§ê®Y¬¤Š%ûk6Ä†J?¿,:-åFLN#0µÆÿû’`Î€XÜ»d^åë½0Å[àµwL=‹Q`˜ïtô•l97,&ÅÅ9*-6»Hø­š…Ğ„€ñb‚œQ@àlUƒ˜'ri
+3’fX~‡mIğÈ@¡-ö[ª ŞˆhÎSH/Ø5^‰§®ï’›Î¤£wıïïÿğ9Öà¿.ïü-Æ~jwL«Q(¢KÏÇ:"á©Î“…õ	˜†ªWkœldd•— vœ	o¤å«|MÆxk)à€ó`]C_övÜÜJa'+:™y¹¶İfºÅ#SâÇ;ÁlÄ c)şIÏ]f*Kş­ıî’ÎïÁşÍ”µsÆÿnÚ¯I¤ŠœõvˆÇ±Ö#D£Àt¬;D¬9<í˜º •Ëè+ÍJõij`LgfÎURÒA0ù:
+ˆe—ºs!UœÉŸ«3k_Ó™ÚÎqu–I´OÉ&±Š¤cØ¤Â%_©,–˜{Z†×G)TórITí§VSÆcølOHj£¬S>òìÊé‚âµ¡Ùe˜dWĞbÅÑ'M$xÁê—ô¿o,ò²a96Á¦¼Óÿû’`Í ï3ÜÓBÚke+š=†[MÔ­wG±ka‹•®èôlÖñQÍ\\(xè¨«IwLÉË%¯akRÚèŞPºÕh¢‰&iA 6À²™-‡ÊvUäîyôÎ#hlª§ÌuÖ	 …"q¹ŒÖÎÍw:ğûïÎvê¯üMvéá‹ÊUc…Æ¬T *¤Òå§{Ş‘ì„kKÕE„ıj¬•I$¼Â2©a5Ò¹$†×Éd…yX12dy>”RÎ]4P,cXsQC°£†ŸÁç„@+CÖä›>äMŠ
+š±ŞøcÚËß·KmBJ(”I*qÂFÄ–\ pø¼bx>NIS$k·öÛ€^Å¬š97¾ıOïÜßÊ÷Ûês€Ã˜'¶01$Qˆ:DÚê#5WµÃ“TÊ_L¡ÀúÕ,uXÂ	1Páj…Z8ÅGQD"’nöacCî0Ä1XÑŒr²S™×#Hÿ•ã¬QcÌåÔK|2;NÖ±ãD`"£‹nÿû’`®€*]S	2ØZBëª1&I¬ou¬¥‰!gn(ó Àñ11"IoLj'ôÛ,å\³ÖHNXL…Ñª·- e•T’JNTz]f¥‘®H)OÀRÒdIBJÍ4°(ÛÆ•»u«ôàšU…3£Ş'º»…^:áS¬TO¼“É-âİK35g7•iô<ö½Õ"›ÒêŞ!õ4İÌ	 •<7ŠÁlS1çÊòFœˆ”2Ì1wsB¡€şht©)õIe½ÇwXF£vQ¥ÌØ‘eaMˆzPâ°ä|¸°¹¶¼êSL¢BSJYğ ’IN¤(JI nx5mU–
+¼y’Œ0&ºÕVË†T †M.“Ó|¢q¥F¤i@ Q×ù6íàı*•¤PPË+ v@‹F…Åê.š…c£èø“âVOUA$^ŠmBzv«lÙl9Ç(Ã½0_ÙÉk_cTûÏdŠÔ?Ä?iÀsŒû>ÿ›mí{uKs]jÃ+*1´¼/h”oVà«ÿTE-«±íoHª!TI&eÜÿû’`¯€Ù]Ó	2DNã{º<ÃIP‰pì$ÉQH’®hó,jºÓà¼ê^ÄÑNvbÊ£1]•˜–Ê¢Z8ƒ­Æ.ë^ºn4ãÌM$±²™ñ´Ş$›(qP²ÃwE*a-´²Î¾ÑÎIãJú'RqF0Q>Š^¹ıÈ¥ÚÒAÂRD¤QS«ôAàFË×¼É‚JYe¶ahøÙĞ8Ô³ĞÛ«ĞêÖı²Õk¹ÛË‰²º^ÁaE, 2’¥K9ê3çr2‹&ÙêîÉ½g 4£íc
+îÖ«Y•AD’§n@RML€­&2ı—¦^æÈ²eÚÌˆJ+‹*J±ú„ı"ŸœKAU&ÔB+1ïZ…An¬ypá@ëÀrÀ',€r0Šè´­Ñ‰_7ØwQ³D®EÊ‰4vÖíë%‰EIE_ó<å$"4Æñv¦ºC8±öÌèY¨ÍŒÈ¿Œ¸Üº˜¡ó˜0ì%:s@‡šÉóAD	.rˆV7u…]wÖ(µ(äfsär„Ëı ¾U¨”‰.d¥HSh,8BQ«ÿû’`Ã 
+ \S2HYD+­<ÈI0qL¥)!Uîtó!$¹·õzãÄN³Á™üLÕbDKFo†%\¥‰Ûä¶Ş’o=E‘Õ\ñ½F6y«í9‡¤ÉP,f.¢Ou’w>…
+Ø{ ´Dxî•—(ıNq}	$"(¢’H»Ó h”Gb=Óô¥±Ä‘Î²Sì}0Û	Pæû–0u`ó Û!ÈWÈº“[gfEuS¡Óf¿ZĞ‡ÚÒaĞÂ^Æ,8…\4‘ªB"¯k2%â›ªª•©TÔt0 œ¦9ˆNÚšr1$»´œßë€!H5RÑº~…+´¦ÒLm!‘é§;ù“ÿ×PÅnzIÂŒÑÊÛE.JÒÓ pÂÂ•¹¬ÑïòšyU%$“—(u™‡DqM¦‰ˆÑ;r“ø,VùÀâ§Í½Zï¿±õË"‹‹¼:À-¡uÇPi´ãçıM]È‘÷•Zµb‹®õ »¨”Š.uSyƒ>ÉvJ ºuz‘“5Ğ±sÁk[^2‰âó;{ŞGE7±ÿû’`É 3'ÜSLZX\¥Ë=%[
+È…y,%)1#né„™"õ£†ĞóÔgns"\ílhçš@™@ùÀxÑ­é%[ÜÃ¼kEPOŠÎ§Q$ö#['bÎ­ÎY¦™•‰H¢¯Í‹´Rg¦ò–[™›“iöBÉ¹ÉÉ7p iF–mÊÃ’ªa;è$Å=¦˜w°Ò@B4&¦é"4ÀÒ%¸˜Šå,B6mÚ±Aá\Ï ËÅÿï±tÂ«H$º8İpa5ˆŠ¶æb·QÁ±_§xªÆ—’1Ìg+®ÁÂ·¸ŠÕ¨ŞÒUÄÛU—Ö#¸€a@p0²â¦äØ}k<…¼XZ‚-bØ»•Úœéó,jŠ]†)¨3¾ªåš¾f)"’
+ò1P‚%ÂŠØk-?×œ\‹x\´¡`I AÃ¬ôC¹eÙTçFš®jîç#Ö0±tÅ…Ô²—+ÙÖğ²‹ã.±…È)Ïµˆ)ÒØ$’JN«(Y#Àï\!{£´K)ñJt*ä%Îü^õGş›¨ŠOÿû’`Ö€,!ÜS,ZH[ã‹Ša)I|qoL=‰!z›.hô•l@`a,œıDÍ…ØNN÷ò ¤gãóæSâ«‹M1tL$
+´]"À››ëLjšõm§²)?ÄÑ²¬¢¤¤’réL2f¾‹»tiŸ@Üÿì“·“¥æò2_½ËgxŠDDƒ£G%ÑãÙ~YRsfR±¯")Õåºkß½)¬±eáÁDDğ”Âs·ÅÀ ‰³­MpÁ¥Z‰D·ƒcÅ…€*‹§‚‹ãµ,¹ZPÛ¸LÇ+<(&32–!W$““‹Ü9¶Ã„Ñ|À•5-!ëYš®~†1Ìë³nD"õÙR†*:v¿M}ÜÒ½Ì¶­µT¢iä{úşg£ebR(©¬s“:£şO«µœb‹ÃÕ¾Ìğ°1oÎ×Ø°`ôq<AŞqQe9V!1E{Û–Œ”G«ÜhÀ"Â 7¡ÅÎeË¡K4|ş¸¹ÿI?9÷â¬ºZ­$ŠNø-w!°iU®Ó{oãù&6‚ˆ4(uI¡0*uPdÓ+®J¿{ÿû’`Ó€ı&[»,JT]ç»ª<Å\Œ‰YqL<M©`˜.hô•lËÕ´i÷c=®[ò^ÛD²Ô¬dR;¨ïàÎıÅŒ1¯†4h)—g¦ãÑ^qühâJ¤‚Q$‚ú#ƒÀ4à"$—IÏrd-nY˜Øa?:i°‚6†Q-"Y0ñû
+;‚Ë¦µ&èuB	i~ÔowKXú)·¥YÖnİ{:2öT¥µÕ‘òzŸæa/£–euX’I*wÕ$î„–oß…š‰¼·×cØ¡i:4òf®£¤©Ò5>t–	gäÄ(l&y_6‡¾å’sáíöÆŞ¤Ù¯Q—¬½¢äŠŠ…º¹µœ ~àwŠÂkGéOˆ¹çi›(YVUb’I9`Ä6ÜìbIˆUù|ŠŸLÕÛkÜù`çgq÷È˜)©!C®e…\YÍËcü7Ö>ÿùÿ9®¡zpU©:³ìñCzëMÚ^ÉÄz-	b„ÅóùN kä’Inûx¡ONûÅåV~éúÅœ Y]E){ ¢V¿`;*¤P”ÿû’`Õ€ÔİS	bH]ŠÛ1"mXŸoL1iaoî¨ö%*’ÅÌ,RFK‰ÅÊ‡ºì•H®oë»ŒÅ{VPjX¨}Dßêt´¸A@‚Î;R~·ÿ#Iı–Ğ‘Q0J¢J{HI¶0ØÌmCĞ`’ïÓœ¹Q =$L5¾®ŒƒVsS(|Hìk|S#$R—,¡v„BÏ(Èp2. ¼£K…ä	¡ÜmIRõË¢‘µ±nşK@£ ¤’IN\{ÀyÇLQNÅg¦‘‘ª¡†ëyÈ`N ƒ±W8Ğw‚à»†ÉVÊœ·Ñ·pçÄÎrúÙ…ŠÏ©À‹ˆ›*D(T9F2ß®§²ÄjIj·?ò	§³XFRÑ(Ié,T¥ÈÉE&^0Æs$Ã÷"Õ*»±µËŠ”;¥ŞFf2åó²<¥[Y¦§+*Ôi"$’’:ZÚ_kÒ¢ÊÈ‘BÂOwÈß8%´˜kGĞæä’INA) T0ÖÀ`äı%ª8oãçP®R_
+•:¦]ê¡µ|ü\)))Â÷ÈEÿû’`Õ ÷'Ü;BT[ÃË<ÈI€‡qL%éaîtôl éXk­D7wl×eÔücHO¾Sè¢^5	¼^¸à›È}°Ş£ÏŸŸ.´-`	$¤ç¹Ìª9Èjì÷™ˆâMîn­‘¢¤‚=W†i ²Ê.hEY„Æ¥‡½Y´jÒcêu²¬ï|;T¡¢ã-Qƒb
+68>\È[ın +¦æ]ÕJàªI$”ÉîpHJ™yVó$yÃdïz
+G3EA;I0 ºÈùBp1 £f’<,I5­"¡5–[rÑñ¦fG2>è´ŞY“ë fÅ)K(¹ËòŸÃ(atÒÇ±+†2÷bŸU@”«$ J@ †È æ4Ğ¤¥û4¢™‚fš£==må¹-*îâÀ F$¸¢!$ò"¶ò2â”Í_Ÿš¯Â5Ÿÿ3¨Gİ Ş×pËÜ6£—ê¯©+ˆƒCú«úU™6ÛnñLÜ6ğ™@aÁL¦ÆE-äMG¼H0HõTš5Õ«k¶KÀ†¼¥Äî•[Gÿû’`Ø€-Ü»*ÔZeËz<ÅZp›qL¤ÉAŠ¡®t“t2B²`UÑ@xL>Á«¢ƒèN„ÕæëBœe|#ıó¥U_Ä=Û½ÓzMüs_×57Ó.Ï.£»ÓV¯ŸH©DÆÒI‰$Z¡	@cÏ©rÉ9‚Üyú‘Ò¿“)8+6ÎòÒF<šâlÒSÇ¿Y„ş³oî_Û¾Şş^ú~ÿï¾Œq`p:°‰QxI,1¨3ÿır4O™’ôÔ*JI'º ,Å2M‡®bnjÜYMÔk[¡ÏYkG¸µ–¦ˆßyy­iûÃ‘6U³MtöÒœsİ’~ºİwõ$©‡”ìz¬]z©ÔcÃJ8Ò(T5Kç´¨¤e­$J@€õ*Á©Ë+X$¤€‰™ãl°ä¢Ø‚%Äº••/#•l•¸.¯ß]ñ$¶ĞÜ ºF†ËkŒ¬ñ£L„Å&yx²¿QÍÉW¦Èª^Q–6u@©d”¤’JçL Uè^¸	ÓŒ>x®‹NxfYjó{amViÿû’`× …B]SBà`†‹½0Æ[Ô«uL=+A^ï4Ä™$½Ö/H£cÉ&DöZ¥BxK².Ô˜·¹î˜/½¼õº˜h«
+0ÙqciUK¹u5;ÌUùRòÍ¿èxHî)İÖô¨i4’H¢^”€±èJP
+s.Ö9Ğ¸–”^8ïıGkñ±¥½NîlFÌP×eî¾<ïqo1ı7÷pÛûVöì÷˜ÖÙ¾xo9Ÿ¡¥XÂi½.|è£éÈOÕ²}DTÆ%úÓrÓ1%ÉØZc ‹ÎÁ¡×v–9[¥„ÄzáI× úy‰3/nmGlBÆ§m¥÷ŠÌ;H:4‚^Ãv€ƒg„$r¸W˜„‰wêu™ª„æÚ×vø9NëÇ=/°{ĞYú>UŞ¦·iA$^Éàn$Çw]Ë¯n£Ö¥³\Ø³hI3ºâ?æşš«(©ªFÊ	1¢Û5P®–ìß«#Ä(ãBà2h6%&eJPáF¥(sØj”­#^åt¯ @=ô^şcDLÿä’JRÔ$hj´iÛ¥Eá0õH*ÿû’`Ò &ÜÓ2PdÇKÍ1†[ÕuL<K¡u–.©‡•l#tágİ$buTÊ«Ã\§ ¾—ÒjD¼)/åÜ-Iy¡á¨sU½kTM^^ôíîèJ¦²²}ú/ºÿÿS/êÉ»oFÿıÿÿY™RRI9`ã¤…jáPã3µÆÚòÀ¥{«Ü^?‡ÔÊN?Á+C h!ø­¹Qb	)çÄ‰IÄÉ†½_6ºä[+-%‡EÊºÔŸ¿RŞÈkOŠpÕÔ­H¤I.Ã@C'(à¢Ah“iıaw"0÷oTÃSPæj…y$Ó*±ƒˆ|¤j29¹V´ä¼$²Âw¤Œ ß)ÇÿZùÉ×Ğîo
+Ü';[‘`¢†?&=mzmŒ¾ÅŸmïK´;\ÌŠEö\T@[mÊ54ÈvÌéWÎicÀ:©.?adBç¸:ù·•e½¯³ğX>#Iò¦£¨i©–¬aê#ÑKÈ%5ŠEË¹ù˜¤Úïg³ş*ëä’RN½dÇz‹Qmİ¢‡gôíû­(#)=Ûhzê}¢“OdS2ÿû’`Ë şdİ»fRä;Ú=cHŒ°¹sL<ËaWî¨ô¡$ÑÅ6[„PHÃG4³¶¡ëë#ªõîëóíjöaªÜŒ‚ÌÆ¿.t‹ÓK–õ¥-ªÕ¹;µ§Igr\‹]MD¤I3vbàHò2©9Õƒè$Œ‚™´ÉØ.½Ü7ãÎËœßÛ¿n-}8»É½ó®QĞ¤¨Æ ƒ	Şh¹•,˜.Bc_ M\^¦ÛÎĞ‰õÖìg»¥RRM»ó-¨$ ûÇ•]®ô¶r9F©+ÈµŠC#Nåúğüõj˜Àn-z»•óo:ğ‡Œ’0äÃi#ih||ÕËj¤…¬Ï»î¯aI^20\Œœ‚†¤ŒŠO®—šC;å–ëÓÔbÚÿü›RÌÉ$›rÈg….ÊszĞÜæ#èÎ½;¼1?s×mFë¨×Ô’Ö÷©"L>j8Æ…¢RU¦'ÿ>¦y-NçDÄ–šAÆ¨ÃZéñ²Ë{¢½»SUyw¬ş*í&Ò.xğíÔB€ P)Îšşİzq­fìzt"QÙµW½Î3ö¥=Ÿÿû’`Ó %0\»BÔU$+ª=&I<©mLá+AX—/(÷j=M2™=^©#œqã*R¶•-;ló"##
+„N$’lÑt§°È¤^±!â·)OAÄ(Y½}[şŸĞ×«±)$TÑ›K‘ÀS„˜ê»æØj]Æm×Ø
+Èù÷ÍïšÒÁÿ7*±¡ÓÍUr>·ñß4ÈıækUBˆzÀŞ(l³Â‰}¡„‘bï&¥Ïf^ÎĞí[l;ı¿KÌ­D’HSŞHğ«Aã3ğhsÍ,Iâ¦€µöf)èªÓJbì_lR¬Ct‹Áí¹ÅL–]Ğà€ÎÎXÇè£cú¯ÄÚœ¥O¥¦1†T/ÖÇ®åBRGF!®^.Ï§Ë=a¯ÿ,^UQI$Tùç2D…iB“ıóf$1<^4ëŸ$=fmæƒváx-Ü»M‰Ò=nÿ­P”&ñ` ¶<U®BÃgşŸ(¢Ë·0[H|û(™æbÜT$@„”’ok@Àå
+øXvKZ%œV˜­g)t¶€eu,İŒe’U(§.!4®ÿû’`Õ G"]SbX[Äûš=æK¨qLá	aK‘n¨÷,}ËqMä2µñZÉ_+#}'Ák]×­H<`^.?&i¯rAÕ`iL¢·ß]¯±hµEFI$’I3æ	ÖàJ<újQ¼q©_é~=¡|Ç‹H‡Ë·³°ÃvI|?#,v›¶•¤ã‹‡VğÂË[^»X°©ØUÁ¡gH=rŒğóƒE«ˆß¸×7ÏQÈ´ÌA$€üE÷¢ xC;¸:í¹#ÆÒá	•Î(T£m¸(~Õ&˜¥bT –bY?¹dĞtX³	:Gv'Fä¹c¢ñÃ›¸ÙÈ_„”úÓïîæ<¦v‘•úıßóßÖÁUJ¤’I"ĞüNƒô\ Ú™Q2I’2@~I;ÎTÁÿ
+¼k¶vİ	ÊmO8›Pò,†efWAj+fUaæO~ŒK³³¡ÌÖS‘é²	IÿYoAY÷´ïÿ÷!Mû«òä’’BÉZqp€ä	&¥İWç	Íßf0]34RİÁr$"íL‘xñ›'–Gİÿû’`Õ€
+"ÛS8bPYã»=æIámL=au¡mè÷•t±ÁßSÂÕWkLĞkyYÔ˜Bƒšiˆæ}V×v3!˜K²¼¨“ı«[x­Ÿ{ÿÿÿÿÂåŸ‰`EiYJi¹æùfª9TºíQ”dv8ß:×ã÷Ë®Çö{:P¹«ËëÀ3„ÃâaçC‡Ê=ÏA~E*ô:äqÊ†z¡ë¦ódIÇEc¿FjÔ®ë¨y³¯zş€ÉKéb©UU%$“’mÁ5Ó B³‹8º¥+j9a­ßË‚Kmæ¨ºEôrİˆÔêKµÎ¿m0L˜Û!S}¦1OëÁµRqMà„B=Î,áç0Ğà]H¥
+G	£Ó¯c‘Ğî¥õ}³5ªI$½c”]ÎePšG³;äi`È3µ(•õú,XÑgq¢ ô­[‡®Aû»bF²£ÊÖÒ££EÙ9Òğ›S-ehla.]«è[îî ªl Z¿XiY˜”I\°FÔ_b+Èq‰¿_òVOÊwˆf‚Y:M{@~’Ûcƒ{‚Ûÿû’`Ö DXÛ»d\ÈKz=e\Ä‹sL½)QIî(ô•$µóƒ—£ÏìP;ÏŒ-K¹’•éMîê\\»VÿË¢[Eöñğ)Il¼ÉÄ"ûÊø}úà€b¯Í,äÑKT¥$QNø†Ø"6Ş™bkŒ›ê± c~åÖüÊş-W2¯MİvÜ÷i\t¤]Á›ÕGÅ‹İÌÿd7ØŠ.!SˆY¬yÍrâ¨a8 ƒàw,œüùF6§|§8´˜A(*ªÕAq=LSŒHuÕ2cŠQ)¸–WÕ(ÜKºfeWA™ÅK<6çÎbG?;Zº,Æ6RuJ:€|Ê4x"%œaÍ)¼Ğ F‰vÉƒ’j­ck¢/øRp¸ÔæÏ›Û„elMÛx>§åZ&b)¤Ri$4éŒ:ÖñÚuÁå&MŒlÇ~Ö>zªÓZwïe¤Ë^tú0rXd¡kÍ=ÑåÒ)¢[ÿ;Æ¶d[mşÄ©/4’Hãj'·EŸ\Ç¯ÛoÓ2$ÿúju¿¤ ¤’INDI·Í/ÿû’`Ö u3ÜSBØ[‹ª-#]dõo-=+‰"o4Å™tGG ×€#øÌ¬©¬½FÌ5’†šèHd£š. – ¤ÍjğÀhm+)&ÊŠîJŸm¢”ìñ9¶ŸÙVe)u,VâùaÏUåâ/kô¶·Ê”™Q$‰H¢Gç`LWÊ`2L+Oå©åS»±Ğ×­Jy8‡0nË#	~„(‰‹-!±&88<Âˆ“	†™>¡p1õÓÎRÌÿô±×C•õRI$—cÅ¹él‡ ª2:“³×è,bÃSŒ
+kòv¼Ú*¼¤ßÚC62@‰•òÉ-ØÂ‘2…QD8a•œÀŸF¨ÆMr1ÎïEœ´»=.ÆÖ•]5öÿİj¨õÿø:ÄMÄá*‰l’R$‘æ°w@%	±éÖ–ÛV=Ì5«»¼ùÿ ù’“p²2—‚%5t¯0Ç5}\b&*,¸ ”TsœR&‹„M–Q™ĞÛTñÿÿ P4<şĞ’INÍƒX
+1f¡Èqà‡Şj4¨âÿû`Ä€2];	2ÔSëİ$ÃIiYtì$M‘d”o4Ä,ŠOWÌºJëF‚X%1äyb§™”j–LØzYö<«´9ƒİ#€ØE¡rAD‚ã”°drÀN)ÇTĞÀ«WJùR§nşªN&,MY;Øm"³LÊRI&/€„Z©Vh·"çš„ÁÅÃ”Á£ñLÇWÕÈã½[,KÜ 3cóÌÃ2…3ÁëZjpØ™I7¤O³Å÷":l7Ãéı×åI)çÿŠñêµ÷t¼PI$©lÀ Q (!%ægPä‡'$,>	‚¦Ÿš‰èjwÿÛ¢-Ô|Ÿ\1toMGGEú]O¹ùmjèıbôµ¬”õí‡ÈéMs#˜âI£hx‡õ6áøº^qÉ	7QD’‘D-a$
+ã²Í*"GM¯iuU÷æÇï|±n@º¶>HP›zÅMN:œ	à3E¤{š›ˆÙOfŒ( (# ãG¡gÒ‡ÿ&—wŸÕä€`T”’oxàgĞÉ®7y™TwSòZ$ÿû’`Ê 9!Ü»	BD[›Ú=\‹¼©rì$ËQmîôÄl¸‡ÆÂï†rV-!Àå¤]oRíâ–]J(ì'¬©—zV—»’ÉiGcªåé÷³Ü•×…fùÜwøOÛ3*' †‰N¬xúXEÉ1¹–şüIv}+~•®¥I$’FÁìh+ˆDÑ-„d—Ñx²ŞÔŞÚ‡â$dşSlv»¯ê1ÿßßsô7LÚgXçŠ‰ÇìÕãk£½p™!¡´´K[XE±ÀbŸÿ®ó!)röım*ª’I Ï*"D[CÆ}ßÇf1Cz‘ˆL+5€ìv´d<Û¤S\Ÿ³¥K¸†–È"Ğ¸Hb’Y]¼q"Åë&ªÌÊUx)Ó&YHúš•° ¢%Bn3¶ãÌ³å5¼èYb·±°Ô]2eŠD¢R(¡üĞV>&`B,—Åc`Ö)ø¨z,B•È¹Ä$qwb+u(åy¤ÎEc£ìŠw1DKKl$ª1§:âÁv1HXöÿıG½Â„º5 ¥u

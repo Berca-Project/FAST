@@ -1,0 +1,479 @@
+﻿@model Fast.Web.Models.LPH.LPHModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+    var selected = "";
+}
+
+
+@****** ***** ***** ***** ***** Copy ***** ***** ***** ***** ******@
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            position: absolute;
+            right: 0;
+        }
+
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 25px;
+            border-radius: 0.25rem;
+        }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+                font-size: 13px;
+                padding: 0 0 0 5px;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                line-height: 16px;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+                line-height: 15px;
+            }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 0;
+            padding: 0;
+            line-height: 23px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+    </style>
+}
+@****** ***** ***** ***** ***** /Copy/ ***** ***** ***** ***** ******@
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Delegation
+                        </li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">
+                    LPH Delegation 
+                </h4>
+            </div>
+            @*<div class="d-none d-md-block">
+               <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>*@
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="DelegationSecondary">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Delegation Secondary</div>
+                    <div class="card-body d-flex">
+                        <div class="col-5">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Old Supervisor</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="OldTeamLeader">
+
+                                        @if (ViewBag.isSuperadmin)
+                                        {
+                                            foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.LeadersLPHSPNotSubmited)
+                                            {
+
+                                                <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                            }
+                                        }
+                                        else if (ViewBag.isSupervisor)
+                                        {
+                                            <option value="@(ViewBag.EmpIDMe)">[@(ViewBag.EmpIDMe)] @ViewBag.EmpNameMe</option>
+                                        }
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">New Supervisor</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="TeamLeader">
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                           
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group row">
+                                <div class="col-12" >
+                                    <center><button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="delegateSecondary" onclick="">Submit</button></center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="DelegationPrimary">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Delegation Primary</div>
+                    <div class="card-body d-flex">
+                        <div class="col-5">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Old Supervisor</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="PPOldTeamLeader">
+
+                                        @if (ViewBag.isSuperadmin)
+                                        {
+                                            foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.LeadersLPHPPNotSubmited)
+                                            {
+
+                                                <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                            }
+                                        }else if (ViewBag.isSupervisor) {
+                                            <option value="@(ViewBag.EmpIDMe)">[@(ViewBag.EmpIDMe)] @ViewBag.EmpNameMe</option>
+                                        }
+                                        
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">New Supervisor</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="PPTeamLeader">
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.LeadersPP)
+                                        {
+                                           
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group row">
+                                <div class="col-12" >
+                                    <center><button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="delegatePrimary" onclick="">Submit</button></center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+
+    @****** ***** ***** ***** ***** Copy ***** ***** ***** ***** ******@
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+
+        <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+        <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+        <script>
+           
+             $('.select2').each(function (i, e) {
+                const param = {
+                    allowClear: true,
+                    placeholder: 'Choose one',
+                    searchInputPlaceholder: 'Search options'
+                };
+                $(e).select2(param);
+             });
+            
+            $("#delegateSecondary").on("click", function () {
+                if (confirm("Are you sure?")) {
+                    $('#loading_overlay').removeClass('d-none');
+
+                    var oldSPV = $("[name=OldTeamLeader]").val();
+                    if (oldSPV == "") {
+                        showError("Field can't be empty");
+                        return;
+                    }
+                    var newSPV = $("[name=TeamLeader]").val();
+                    if (newSPV == "") {
+                        showError("Field can't be empty");
+                        return;
+                    }
+                    $.ajax({
+                        type: "post",
+                        url: fastApp.BaseUrl + "/Delegation/DelegateLPHSP",
+                        data: {
+                            OldSPV: oldSPV,
+                            NewSPV: newSPV
+                        },
+                        datatype: "json",
+                        traditional: true,
+                        success: function (result) {
+                            console.log(result);
+                            if (result.Status == "True") {
+                                var notice = new PNotify({
+                                    title: "@UIResources.UpdateSucceed",
+                                    text: "Delegation Success",
+                                    width: "400px",
+                                    type: 'success',
+                                    addclass: 'stack-bottomright',
+                                    delay: 2000
+                                });
+
+                                notice.get().click(function () {
+                                    notice.remove();
+                                });
+                            } else {
+                                var notice = new PNotify({
+                                    title: "@UIResources.ErrorMessage",
+                                    text: "Delegation Failed",
+                                    width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+                                    delay: 2000
+                                });
+
+                                notice.get().click(function () {
+                                    notice.remove();
+                                });
+                            }
+                        },
+                        complete: function () {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                    });
+                }
+            });
+            $("#delegatePrimary").on("click", function () {
+                if (confirm("Are you sure?")) {
+                    $('#loading_overlay').removeClass('d-none');
+
+                    var oldSPV = $("[name=PPOldTeamLeader]").val();
+                    if (oldSPV == "") {
+                        showError("Field can't be empty");
+                        return;
+                    }
+                    var newSPV = $("[name=PPTeamLeader]").val();
+                    if (newSPV == "") {
+                        showError("Field can't be empty");
+                        return;
+                    }
+                    $.ajax({
+                        type: "post",
+                        url: fastApp.BaseUrl + "/Delegation/DelegateLPHPP",
+                        data: {
+                            OldSPV: oldSPV,
+                            NewSPV: newSPV
+                        },
+                        datatype: "json",
+                        traditional: true,
+                        success: function (result) {
+                            console.log(result);
+                            if (result.Status == "True") {
+                                var notice = new PNotify({
+                                    title: "@UIResources.UpdateSucceed",
+                                    text: "Delegation Success",
+                                    width: "400px",
+                                    type: 'success',
+                                    addclass: 'stack-bottomright',
+                                    delay: 2000
+                                });
+
+                                notice.get().click(function () {
+                                    notice.remove();
+                                });
+                            } else {
+                                var notice = new PNotify({
+                                    title: "@UIResources.ErrorMessage",
+                                    text: "Delegation Failed",
+                                    width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+                                    delay: 2000
+                                });
+
+                                notice.get().click(function () {
+                                    notice.remove();
+                                });
+                            }
+                        },
+                        complete: function () {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                    });
+                }
+            });
+    </script>
+}
+
+
+

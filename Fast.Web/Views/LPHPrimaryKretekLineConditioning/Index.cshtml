@@ -1,0 +1,3700 @@
+﻿@model Fast.Web.Models.LPH.PP.PPLPHEditModel
+@using Newtonsoft.Json;
+
+@using Fast.Web.Resources;
+@{
+	ViewBag.Title = "Index";
+	var selected = "";
+}
+
+@section CSS_lib{
+	<link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+	<style>
+		.select2-container--default .select2-selection--single .select2-selection__clear {
+			position: absolute;
+			right: 0;
+		}
+
+		.flex-input {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		.flex-break {
+			flex-basis: 100%;
+			height: 0;
+		}
+
+		.tableWrapper {
+			position: relative;
+			overflow: auto;
+			max-height: 150px;
+			transform: translateZ(0);
+		}
+
+			.tableWrapper table {
+				border-collapse: separate;
+				width: 100%;
+				border: none;
+			}
+
+			.tableWrapper thead th, .tableWrapper thead td {
+				position: -webkit-sticky;
+				position: sticky;
+				background: #066fcb;
+				z-index: 100;
+			}
+
+			.tableWrapper tbody td {
+				word-break:break-all;
+			}
+
+			.tableWrapper table tfoot td {
+				position: -webkit-sticky;
+				position: sticky;
+				bottom: 0;
+				z-index: 100;
+				overflow: hidden;
+			}
+
+			.tableWrapper .input td {
+				background: white;
+			}
+
+			.tableWrapper .summary-body td, .tableWrapper .summary-body th {
+				font-weight: bold;
+				background-color: #d8eafe;
+				color: #000;
+			}
+
+			.tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+				padding: unset;
+				border: 0;
+			}
+
+		.fa, .fas {
+			padding: 5px;
+			cursor: pointer;
+		}
+
+		.nav-link {
+			cursor: pointer;
+		}
+
+		.modal-body {
+			position: relative;
+			margin-top: 10px;
+		}
+
+			.modal-body .close {
+				padding: 5px;
+				position: absolute;
+				top: -5px;
+				right: 5px;
+				font-size: 15px;
+				color: black;
+				z-index: 1000;
+			}
+
+		.stepper {
+			position: relative;
+		}
+
+			.stepper:before {
+				top: 15px;
+				bottom: 0;
+				position: absolute;
+				content: " ";
+				width: 100%;
+				height: 1px;
+				background: #f1f1f1;
+				z-index: 0;
+			}
+
+		.stepper-step {
+			text-align: center;
+			position: relative;
+		}
+
+			.stepper-step.active .stepper-btn {
+				background: #37b6fa;
+				color: white;
+				font-weight: 500;
+				border: 0
+			}
+
+		.stepper-btn {
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			padding: 6px 0;
+			font-size: 12px;
+			line-height: 1.428571429;
+			border-radius: 15px;
+			background: #e6e6e6;
+			color: #9c9c9c;
+		}
+
+		.wizard-button {
+			margin: 5px;
+		}
+
+			.wizard-button.active {
+				filter: brightness(0.75);
+			}
+
+		.select2-container--default .select2-selection--single {
+			height: 25px;
+		}
+
+			.select2-container--default .select2-selection--single .select2-selection__arrow {
+				display: none;
+			}
+
+			.select2-container--default .select2-selection--single .select2-selection__rendered {
+				font-size: 13px;
+				padding: 5px;
+			}
+
+		.select2-search--dropdown {
+			padding: 1px;
+		}
+
+		.select2-container--default .select2-search--dropdown .select2-search__field {
+			padding: 3px 5px;
+		}
+
+		.select2-results {
+			font-size: 13px;
+		}
+
+		.select2-results__option {
+			padding: 3px;
+		}
+
+		.select2-container--default .select2-selection--multiple {
+			min-height: 25px;
+			border-radius: 0.25rem;
+		}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+				font-size: 13px;
+				padding: 0 0 0 5px;
+			}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__choice {
+				line-height: 16px;
+			}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+				line-height: 15px;
+			}
+
+		.select2-container--default .select2-search--inline .select2-search__field {
+			margin-top: 0;
+			padding: 0;
+			line-height: 23px;
+		}
+
+		table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+			background-color: transparent
+		}
+	</style>
+}
+
+
+<div class="content content-fixed lph-form">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+			<div>
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb breadcrumb-style1 mg-b-10">
+						<li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+						<li class="breadcrumb-item active" aria-current="page">DCCC KR & RJ </li>
+					</ol>
+				</nav>
+				<h4 class="mg-b-0 tx-spacing--1">DCCC KR & RJ <span class='tx-success'>@(Model.ViewType == "submitted_prev" ? "(Previous Shift)" : "")</span></h4>
+			</div>
+			<div class="d-none d-md-block">
+				<button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+				<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+				@if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+				{
+					@: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+				}
+				<button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+				<button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+				<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 mg-b-20">
+				<div class="card collect-component" id="Information">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+					<div class="card-body d-flex">
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Date*</label>
+								<div class="col-8">
+									<!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+									<input type="text" class="form-control information-datepicker mandatory" value="@(Model.Header == null?"":Model.Header.Date.ToString("ddd, dd-MMM-yy"))" name="Date">
+								</div>
+							</div>
+						</div>
+						<div class="divider-text divider-vertical"></div>
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Shift*</label>
+								<div class="col-3">
+									<input type="text" class="form-control number mandatory" value="@(Model.Header == null?1:Model.Header.Shift)" name="Shift">
+								</div>
+								<label class="col-3 col-form-label tx-right">Week*</label>
+								<div class="col-2">
+									<input type="text" class="form-control number mandatory" value="@(Model.Header == null?1:Model.Header.Week)" name="Week">
+								</div>
+							</div>
+						</div>
+						<div class="divider-text divider-vertical"></div>
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-3 col-form-label" style="padding-right:0px;">Prodtech*</label>
+								<div class="col-8">
+									<select class="form-control select2 mandatory" name="Prodtech" multiple @(Model.ViewType == "approval" ? "disabled" : "")>
+										@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+										{
+											selected = "";
+											if (Model.Header != null)
+											{
+												if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+												{
+													if (employee.EmployeeID == Model.Header.ProdTech)
+													{
+														selected = "selected";
+													}
+												}
+												else
+												{
+													if (employee.EmployeeID == ViewBag.AccountEmployeeID)
+													{
+														selected = "selected";
+													}
+												}
+											}
+
+											<option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+										}
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="divider-text divider-vertical"></div>
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-4 col-form-label">Supervisor*</label>
+								<div class="col-8">
+									<select class="form-control select2 mandatory" name="TeamLeader" @(Model.ViewType == "approval" ? "disabled" : "")>
+										@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+										{
+											selected = "";
+											if (Model.Header != null)
+											{
+												if (Model.Header.TeamLeader != null && Model.Header.TeamLeader.Trim() != "")
+												{
+													if (employee.EmployeeID == Model.Header.TeamLeader)
+													{
+														selected = "selected";
+													}
+												}
+												else
+												{
+													if (employee.EmployeeID == ViewBag.AccountSpvEmployeeID)
+													{
+														selected = "selected";
+													}
+												}
+											}
+
+											<option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+										}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!--INFORMATION-->
+
+			<div class="col-12 mg-b-20">
+				<div class="card">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Conditioning Krosok</div>
+					<div class="card-body">
+						<div class="flex-input input-wrapper">
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Batch No. <span style="color:#f00;">*</span></label>
+											<div class="col-6">
+												<input type="text" class="form-control" value="" name="krosokBatchNo" required data-content="Batch harus di isi!">
+												<label class="col-form-label" style="font-size:8px;"><span style="color:#f00;">*Required</span></label>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label"></label>
+											<div class="col-6 mg-b-10">
+												<button class="btn btn-sm pd-x-15 btn-primary get-pss-data-krosok" id="get-pss-data" data-target-table="krosok" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Blend</label>
+											<div class="col-6">
+												<input type="text" class="form-control" name="krosokBlend">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">SAP Batch</label>
+											<div class="col-6">
+												<input type="text" class="form-control number" name="krosokSapBatch">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Silo Preblend</label>
+											<div class="col-6">
+												<input type="text" class="form-control number" name="krosokSiloPreblend">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Silo Total Blend</label>
+											<div class="col-6">
+												<input type="text" class="form-control number" name="krosokSiloTotalBlend">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-12 col-form-label"><b>Conditioning Krosok</b></label>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Start</label>
+											<div class="col-5">
+												<input type="text" class="form-control time" name="krosokStart">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Stop</label>
+											<div class="col-5">
+												<input type="text" class="form-control time" name="krosokStop">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Tob Wet</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTotalTobWet">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Tob Dry</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTotalTobDry">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-6 col-form-label">&nbsp;</label>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label" style="padding-right:0">Cylinder Air Temp Avg 1</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokCylinderAirTempAvg1">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label" style="padding-right:0">Cylinder Air Temp Avg 2</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokCylinderAirTempAvg2">
+											</div>
+										</div>
+
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Tob Temp Avg 1</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTobTempAvg1">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Tob Temp Avg 2</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTobTempAvg2">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Water 1</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTotalWater1">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Water 2</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTotalWater2">
+											</div>
+										</div>
+
+										<div class="form-group row">
+											<label class="col-6 col-form-label">MC Exit OV</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokMcExitOv">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-12 col-form-label"><b>Casing Krosok</b></label>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Casing App Rate</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokCasingAppRate">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Totalizer</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="krosokTotalizer">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label" style="padding-right:0px"></label>
+											<div class="col-5">
+												<div class="button-area">
+													<button class="btn btn-sm btn-primary" onClick="javascript:addToTable(this)" data-target-table="krosok" style="padding: 0.391rem 0.5rem;">Add To Table</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br />
+						<div class="tableWrapper" style="max-height:280px">
+							<table class="table table-bordered table-hover table-striped ">
+								<thead class="thead-info">
+									<tr>
+										<th rowspan="2" style="min-width:90px">Batch No</th>
+										<th rowspan="2" style="min-width:90px">SAP Batch</th>
+										<th rowspan="2">Blend</th>
+										<th rowspan="2" style="min-width:110px">Silo Preblend</th>
+										<th rowspan="2" style="min-width:110px">Silo Total Blend</th>
+										<th colspan="3" class="tx-center">Conditioning Krosok</th>
+										<th colspan="2" class="tx-center">Casing Krosok</th>
+										<th rowspan="2">Action</th>
+									</tr>
+									<tr>
+										<th>Start</th>
+										<th>Stop</th>
+										<th>Duration</th>
+										<th style="min-width:130px">Casing App Rate</th>
+										<th style="min-width:90px">Totalizer</th>
+									</tr>
+									<tr class="summary-body">
+										<td data-name="krosokBatchNo"></td>
+										<td data-name="krosokSapBatch"></td>
+										<td data-name="krosokBlend"></td>
+										<td data-name="krosokSiloPreblend"></td>
+										<td data-name="krosokSiloTotalBlend"></td>
+										<td data-name="krosokStart"></td>
+										<td data-name="krosokStop"></td>
+										<td data-name="krosokDuration">0 Min</td>
+										<td data-name="krosokCasingAppRate"></td>
+										<td data-name="krosokTotalizer"></td>
+										<td data-name="Action"></td>
+									</tr>
+								</thead>
+								<tbody id="krosok"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div> <!-- CONDITIONING KROSOK -->
+
+			<div class="col-12 mg-b-20">
+				<div class="card">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Conditioning Rajangan</div>
+					<div class="card-body">
+						<div class="flex-input input-wrapper">
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Batch No. <span style="color:#f00;">*</span></label>
+											<div class="col-5">
+												<input type="text" class="form-control" value="" name="rajanganBatchNo" required data-content="Batch harus di isi!">
+												<label class="col-form-label" style="font-size:8px;"><span style="color:#f00;">*Required</span></label>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label"></label>
+											<div class="col-5 mg-b-10">
+												<button class="btn btn-sm pd-x-15 btn-primary get-pss-data-rajangan" id="get-pss-data" data-target-table="rajangan" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Blend</label>
+											<div class="col-5">
+												<input type="text" class="form-control" name="rajanganBlend">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">SAP Batch</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganSapBatch">
+											</div>
+										</div>
+
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Silo Total Blend</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganSiloTotalBlend">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-12 col-form-label"><b>Conditioning Rajangan</b></label>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Start</label>
+											<div class="col-5">
+												<input type="text" class="form-control time" name="rajanganStart">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Stop</label>
+											<div class="col-5">
+												<input type="text" class="form-control time" name="rajanganStop">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Tob Wet</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTotalTobWet">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Tob Dry</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTotalTobDry">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">MC Exit OV</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganMcExitOv">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-6 col-form-label">&nbsp;</label>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label" style="padding-right:0">Cylinder Air Temp Avg 1</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganCylinderAirTempAvg1">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label" style="padding-right:0">Cylinder Air Temp Avg 2</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganCylinderAirTempAvg2">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Tob Temp Avg 1</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTobTempAvg1">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Tob Temp Avg 2</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTobTempAvg2">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Water 1</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTotalWater1">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Total Water 2</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTotalWater2">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div class="mg-b-20" style="flex:1">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="form-group row">
+											<label class="col-12 col-form-label"><b>Casing Rajangan</b></label>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Casing App Rate</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganCasingAppRate">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label">Totalizer</label>
+											<div class="col-5">
+												<input type="text" class="form-control number" name="rajanganTotalizer">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="col-6 col-form-label" style="padding-right:0px"></label>
+											<div class="col-5">
+												<div class="button-area">
+													<button class="btn btn-sm btn-primary" onClick="javascript:addToTable(this)" data-target-table="rajangan" style="padding: 0.391rem 0.5rem;">Add To Table</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br />
+						<div class="tableWrapper" style="max-height:280px">
+							<table class="table table-bordered table-hover table-striped ">
+								<thead class="thead-info">
+									<tr>
+										<th rowspan="2" style="min-width:90px">Batch No</th>
+										<th rowspan="2" style="min-width:90px">SAP Batch</th>
+										<th rowspan="2">Blend</th>
+										<th rowspan="2" style="min-width:110px">Silo Total Blend</th>
+										<th colspan="3" class="tx-center">Conditioning Rajangan</th>
+										<th colspan="2" class="tx-center">Casing Rajangan</th>
+										<th rowspan="2">Action</th>
+									</tr>
+									<tr>
+										<th>Start</th>
+										<th>Stop</th>
+										<th>Duration</th>
+
+										<th style="min-width:130px">Casing App Rate</th>
+										<th style="min-width:90px">Totalizer</th>
+									</tr>
+									<tr class="summary-body">
+										<td data-name="rajanganBatchNo"></td>
+										<td data-name="rajanganSapBatch"></td>
+										<td data-name="rajanganBlend"></td>
+										<td data-name="rajanganSiloTotalBlend"></td>
+										<td data-name="rajanganStart"></td>
+										<td data-name="rajanganStop"></td>
+										<td data-name="rajanganDuration">0 Min</td>
+										<td data-name="rajanganCasingAppRate"></td>
+										<td data-name="rajanganTotalizer"></td>
+										<td data-name="Action"></td>
+									</tr>
+								</thead>
+								<tbody id="rajangan"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div> <!-- CONDITIONING RAJANGAN -->
+
+			<div class="col-12 mg-b-20">
+				<div class="card">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+					<div class="card-body" style="padding:10px">
+
+						<div style="display:none" class="collect-component" id="SelectedWasteWrapper">
+							<input type="checkbox" name="ManualSelected">
+						</div>
+						<ul id="line-tabs" class="nav nav-tabs" style="margin-bottom:10px;">
+							<li class="nav-item">
+								<a class="nav-link active" id="wastetapauto">Auto</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="wastetapmanual">Manual</a>
+							</li>
+						</ul>
+						<div class="row" style="margin:0" id="wasteAuto">
+							<div class="col-3" style="padding: 0 10px 0 0">
+								<table class="table table-bordered table-hover table-striped" style="min-height:150px;">
+									<thead class="thead-info">
+										<tr>
+											<th class="tx-center"><label class="tx-center" style="margin:0px;"> Weight</label></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>
+												<div class="row form-group" style="margin-left: 0; margin-right: 0">
+													<div class="col-12 tx-center" style="margin-right:0px;">
+														<label class="tx-center font-weight-bold" style="font-size:32px;margin-right:0px;"><span id="WasteWeight">0</span> Kg</label>
+													</div>
+												</div>
+												<div class="row form-group">
+													<div class="col-3 tx-center">
+														<label class="tx-center">&nbsp;</label>
+													</div>
+													<div class="col-6">
+														<button type="button" class="phase-show btn btn-lg btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-waste-modal">Add</button>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="tableWrapper col-9" style="max-height:240px;">
+								<table class="table table-bordered table-hover table-striped ">
+									<thead class="thead-info">
+										<tr>
+											<th>Area</th>
+											<th>Waste</th>
+											<th>Waste Type</th>
+											<th>Weight</th>
+											<th>Remarks</th>
+											<th></th>
+										</tr>
+										<tr class="summary-body">
+											<td></td>
+											<td></td>
+											<td></td>
+											<td>0</td>
+											<td></td>
+											<td></td>
+										</tr>
+									</thead>
+									<tbody id="waste">
+									</tbody>
+									<tfoot>
+										<tr class="input input-wrapper" style="display:none;">
+											<td><input type="text" class="form-control disabled" disabled name="Area"></td>
+											<td><input type="text" class="form-control disabled" disabled name="Waste"></td>
+											<td><input type="text" class="form-control disabled" disabled name="WasteType"></td>
+											<td><input type="text" class="form-control number" name="Weight"></td>
+											<td><input type="text" class="form-control" name="Remarks"></td>
+											<td class="tx-center"><i data-target-table="waste" class="fa fa-plus-circle" onClick="javascript:addToTable(this)"></i></td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+
+
+						@*<div class="row" style="margin:0" id="wasteManual">
+								<div class="tableWrapper col-12" style="max-height:240px;">
+									<table class="table table-bordered table-hover table-striped ">
+										<thead class="thead-info">
+											<tr>
+												<th>Area</th>
+												<th>Waste</th>
+												<th>Waste Type</th>
+												<th>Weight</th>
+												<th>Remarks</th>
+												<th></th>
+											</tr>
+											<tr class="summary-body">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td>0</td>
+												<td></td>
+												<td></td>
+											</tr>
+										</thead>
+										<tbody id="wasteBodyManual">
+										</tbody>
+										<tfoot>
+											<tr class="input input-wrapper" style="display:none;">
+												<td><input type="text" class="form-control disabled" disabled name="Area"></td>
+												<td><input type="text" class="form-control disabled" disabled name="Waste"></td>
+												<td><input type="text" class="form-control disabled" disabled name="WasteType"></td>
+												<td><input type="text" class="form-control number" name="Weight"></td>
+												<td><input type="text" class="form-control" name="Remarks"></td>
+												<td class="tx-center"><i data-target-table="wasteBodyManual" class="fa fa-plus-circle" onClick="javascript:addToTable(this)"></i></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>*@
+						<div class="row" style="margin:0" id="wasteManual">
+							<div class="tableWrapper col-12" style="max-height:240px;">
+								<table class="table table-bordered table-hover table-striped ">
+									<thead class="thead-info">
+										<tr>
+											<th>Area</th>
+											<th>Waste</th>
+											<th>Waste Type</th>
+											<th>Frequency</th>
+											<th>Weight</th>
+											<th style="min-width:150px;">Remarks</th>
+											<th style="min-width:80px;"></th>
+										</tr>
+										<tr class="summary-body">
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td>0</td>
+											<td></td>
+											<td></td>
+										</tr>
+									</thead>
+									<tbody id="wasteBodyManual">
+									</tbody>
+									<tfoot>
+										<tr class="input input-wrapper">
+											<td><input type="text" class="form-control" name="Area"></td>
+											<td><input type="text" class="form-control" name="Waste"></td>
+											<td><input type="text" class="form-control" name="WasteType"></td>
+											<td><input type="text" class="form-control" name="Frequency"></td>
+											<td><input type="text" class="form-control number" name="Weight"></td>
+											<td><input type="text" class="form-control" name="Remarks"></td>
+											<td class="tx-center"><i data-target-table="wasteBodyManual" class="fa fa-plus-circle" onClick="javascript:addToTable(this)"></i></td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!-- WASTE -->
+
+
+			<div class="col-12 mg-b-20">
+				<div class="card">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">
+						Handover Logbook
+					</div>
+
+					<div class="card-body">
+						@*<div class="flex-input collect-component" id="HandoverLogbook">
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">Safety</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											Level resiko Safety trigger
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="H" name="Lrst" />&nbsp;H</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="M" name="Lrst" />&nbsp;M</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="L" name="Lrst" checked />&nbsp;L</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlsafetyComment" class="form-control" placeholder="Comments"></textarea>
+										</div>
+									</div>
+
+								</div>
+								<div class="divider-text divider-vertical"></div>
+								<div class="mg-b-10" style="flex:1">
+
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">Quality</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											Level resiko Quality trigger
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="H" name="Lrqt" />&nbsp;H</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="M" name="Lrqt" />&nbsp;M</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="L" name="Lrqt" checked />&nbsp;L</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlqualityComment" class="form-control" placeholder="Comments"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="flex-break"></div>
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">Centerlines</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Jumlah Centerline yang out of limit
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="Hlcenterlineschecked">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Pastikan CL deviation log lengkap
+										</label>
+										<div class="col-3">
+											<input type="text" name="Hlcenterlinesofl" class="form-control">
+										</div>
+									</div>
+								</div>
+								<div class="divider-text divider-vertical"></div>
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">CIL / Planned Stop   </label>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Jumlah CIL yang pending
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="Hlcenterlineschecked">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Planned Stop - Durasi Terplanning
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="Hlcenterlinesofl">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Planned Stop - Durasi Aktual
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="HlensureCLDeviation">
+										</div>
+									</div>
+								</div>
+								<div class="divider-text divider-vertical"></div>
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">Defect handling</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Jumlah Defect yang ditemukan
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="HlnumofDefectsFound">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Jumlah Defect yang diperbaiki
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="HlnumofDefectsFixed">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Pastikan semua defect yang ditemukan di dokumentasikan di DH Log
+										</label>
+										<div class="col-3">
+											<input type="text" name="HlensureReportedDHL" class="form-control">
+										</div>
+									</div>
+								</div>
+								<div class="divider-text divider-vertical"></div>
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">Breakdown Elimination</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Jumlah Breakdowns
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="HlnumofBreakdown">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Total Durasi Breakdown
+										</label>
+										<div class="col-3">
+											<input type="text" class="form-control number" name="HltotBreakdown">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-9 col-form-label">
+											Pastikan PM Card(s) lengkap untuk setiap BD
+										</label>
+										<div class="col-3">
+											<input type="text" name="HlensurePMCard" class="form-control">
+										</div>
+									</div>
+								</div>
+								<div class="flex-break"></div>
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">Incidents</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											1. NTRM
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="Yes" name="Ntrm" />&nbsp;Yes</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="No" name="Ntrm" />&nbsp;No</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="N/A" name="Ntrm" checked />&nbsp;N/A</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlntrmComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											2. Spesification materials yang salah (Casing, Tobacco, Flavor, etc)
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="Yes" name="Spesification" />&nbsp;Yes</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="No" name="Spesification" />&nbsp;No</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="N/A" name="Spesification" checked />&nbsp;N/A</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlspecificationComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="divider-text divider-vertical"></div>
+								<div class="mg-b-10" style="flex:1">
+									<div class="form-group row">
+										<label class="col col-form-label font-weight-bold">&nbsp;</label>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											3. Batch on inspect/hold di PriMat
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="Yes" name="BatchOn" />&nbsp;Yes</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="No" name="BatchOn" />&nbsp;No</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="N/A" name="BatchOn" checked />&nbsp;N/A</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlbatchOnComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											4. Ada batch dengan OV out of spec
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="Yes" name="BatchOV" />&nbsp;Yes</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="No" name="BatchOV" />&nbsp;No</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="N/A" name="BatchOV" checked />&nbsp;N/A</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlbatchOvComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-4 col-form-label">
+											5. Ada batch dengan functional issue ditemukan di Secondary process
+										</label>
+										<div class="col-4 d-flex">
+											<div class="flex-1">
+												<label><input type="radio" value="Yes" name="BatchFunc" />&nbsp;Yes</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="No" name="BatchFunc" />&nbsp;No</label>
+											</div>
+											<div class="flex-1">
+												<label><input type="radio" value="N/A" name="BatchFunc" checked />&nbsp;N/A</label>
+											</div>
+										</div>
+										<div class="col-4">
+											<textarea type="text" name="HlbatchFuncComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr />*@
+						<div class="flex-input">
+							<div style="flex:1;margin-bottom:20px;">
+								<div class="tableWrapper" style="max-height: 210px;">
+									<table class="table table-bordered table-hover table-striped">
+										<thead class="thead-info">
+											<tr class="tx-center">
+												<th style="min-width:120px;">Proses (Blend)</th>
+												<th style="min-width:120px;">Target Produksi (Ops)</th>
+												<th style="min-width:120px;">Produksi Aktual (Ops)</th>
+												<th style="min-width:120px;">Informasi Changeover</th>
+												<th width="80px">Action</th>
+											</tr>
+											<tr class="summary-body hidden">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+										</thead>
+										<tbody id="logbook1">
+										</tbody>
+										<tfoot>
+											<tr class="input input-wrapper">
+												<td><input type="text" class="form-control" name="Process"></td>
+												<td><input type="text" class="form-control number" name="TargetProduksi"></td>
+												<td><input type="text" class="form-control number" name="ProduksiAktual"></td>
+												<td><input type="text" class="form-control" name="InformasiChangeover"></td>
+												<td class="tx-center"><i data-target-table="logbook1" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div style="flex:1;margin-bottom:20px;">
+								<div class="tableWrapper" style="max-height: 210px;flex:1">
+									<table class="table table-bordered table-hover table-striped">
+										<thead class="thead-info">
+											<tr class="tx-center">
+												<th style="min-width:200px;max-width:200px;">Losses</th>
+												<th>Initial Root Cause (Deskripsikan issue yang terjadi) / Action yang diambil &amp; hasil</th>
+												<th width="80px">Action</th>
+											</tr>
+											<tr class="summary-body hidden">
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+										</thead>
+										<tbody id="logbook2">
+										</tbody>
+										<tfoot>
+											<tr class="input input-wrapper">
+												<td><input type="text" class="form-control" name="Losses"></td>
+												<td><input type="text" class="form-control" name="InitialCause"></td>
+												<td class="tx-center"><i data-target-table="logbook2" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>
+							<div class="flex-break"></div>
+							<div style="flex:1;margin-bottom:20px;">
+								<div class="tableWrapper" style="max-height: 210px;flex:1">
+									<table class="table table-bordered table-hover table-striped">
+										<thead class="thead-info">
+											<tr class="tx-center">
+												<th colspan="3">Action yang dilakukan di shift berjalan</th>
+												<th rowspan="2" width="80px">Action</th>
+											</tr>
+											<tr class="tx-center">
+												<th>Action Taken</th>
+												<th style="min-width:50px;max-width:50px;">Owner</th>
+												<th style="min-width:40px;max-width:40px;">Status</th>
+											</tr>
+											<tr class="summary-body hidden">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+										</thead>
+										<tbody id="thisAction">
+										</tbody>
+										<tfoot>
+											<tr class="input input-wrapper">
+												<td><input type="text" class="form-control" name="ThisAction"></td>
+												<td>
+													@*<input type="text" class="form-control" name="ThisOwner">*@
+													<select class="form-control select2" name="ThisOwner">
+														<option value="">Select Owner</option>
+														@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+														{
+															selected = "";
+															if (Model.Header != null)
+															{
+																if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+																{
+																	if (employee.EmployeeID == Model.Header.ProdTech)
+																	{
+																		selected = "selected";
+																	}
+																}
+															}
+
+															<option value="[@(employee.EmployeeID)] @employee.FullName" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+														}
+													</select>
+												</td>
+												<td>
+													@*<input type="text" class="form-control" name="ThisStatus">*@
+													<select class="form-control select2" name="ThisStatus">
+														<option value="">Select Status</option>
+														<option value="ONPROGRESS">ONPROGRESS</option>
+														<option value="DONE">DONE</option>
+													</select>
+												</td>
+												<td class="tx-center"><i data-target-table="thisAction" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>
+							<div class="divider-text divider-vertical"></div>
+							<div style="flex:1;margin-bottom:20px;">
+								<div class="tableWrapper" style="max-height: 210px;flex:1">
+									<table class="table table-bordered table-hover table-striped">
+										<thead class="thead-info">
+											<tr class="tx-center">
+												<th colspan="3" style="min-width:300px;">Action yang dipropose untuk shift selanjutnya</th>
+												<th rowspan="2" width="80px">Action</th>
+											</tr>
+											<tr class="tx-center">
+												<th>Action Taken</th>
+												<th style="min-width:50px;max-width:50px;">Owner</th>
+												<th style="min-width:40px;max-width:40px;">Start Time</th>
+											</tr>
+											<tr class="summary-body hidden">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+										</thead>
+										<tbody id="nextAction">
+										</tbody>
+										<tfoot>
+											<tr class="input input-wrapper">
+												<td><input type="text" class="form-control" name="NextAction"></td>
+												<td>
+													@*<input type="text" class="form-control" name="NextOwner">*@
+													<select class="form-control select2" name="NextOwner">
+														<option value="">Select Owner</option>
+														@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+														{
+															selected = "";
+															if (Model.Header != null)
+															{
+																if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+																{
+																	if (employee.EmployeeID == Model.Header.ProdTech)
+																	{
+																		selected = "selected";
+																	}
+																}
+															}
+
+															<option value="[@(employee.EmployeeID)] @employee.FullName" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+														}
+													</select>
+												</td>
+												<td><input type="text" class="form-control time" name="NextStartTime"></td>
+												<td class="tx-center"><i data-target-table="nextAction" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!-- HANDOVER LOGBOOK -->
+
+
+			<div class="col-12 mg-b-20 d-none" id="approvalSegment">
+				<div class="card">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+					<div class="card-body">
+						<table class="table table-bordered table-hover table-striped" id="dtApproval">
+							<thead class="thead-info">
+								<tr>
+									<th>Name</th>
+									<th>Role</th>
+									<th>Actions</th>
+									@*<th>Approver</th>*@
+									<th style="width:15%;">Date &amp; Time</th>
+									<th style="width:40%;">Comment</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div> <!--APPROVAL SEGMENT-->
+
+			<div class="col-12 mg-b-20 d-none" id="approvalForm">
+				<div class="d-none d-md-block float-right">
+					<button id="btnApprove" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="check" class="wd-10 mg-r-5"></i> Approve</button>
+					<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" data-toggle="modal" data-target="#comment-modal"><i data-feather="slash" class="wd-10 mg-r-5"></i> Revise</button>
+				</div>
+			</div>
+
+		</div><!-- row -->
+	</div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="comment-modal" role="dialog">
+	<div class="modal-dialog" style="max-width:50%;">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="detail-header" style="font-size:1rem;font-weight:bold;">Comment</div>
+				<hr>
+				<textarea type="text" id="comment_value" class="form-control" style="height:75px"></textarea>
+				<hr>
+				<div style="min-height:30px">
+					<button type="button" class="btn btn-xs btn-primary mg-l-5" style="float:right" id="btnReject">Revise</button>
+					<button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade wizard-modal" id="phase-waste-modal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+				<div class="stepper row">
+					<div class="stepper-step col active">
+						<a class="btn stepper-btn">1</a>
+						<p><small>Waste</small></p>
+					</div>
+					<div class="stepper-step col">
+						<a class="btn stepper-btn">2</a>
+						<p><small>Kind</small></p>
+					</div>
+					<div class="stepper-step col">
+						<a class="btn stepper-btn">3</a>
+						<p><small>Remark</small></p>
+					</div>
+				</div>
+
+				<div id="carousel" class="carousel slide" data-pause="true">
+					<div class="carousel-inner">
+						<div class="carousel-item active">
+							<h5>Waste</h5>
+							<hr />
+							<center class="waste">
+							</center>
+						</div>
+
+						<div class="carousel-item">
+							<h5>Kind</h5>
+							<hr />
+							<center class="kind">
+							</center>
+						</div>
+
+						<div class="carousel-item">
+							<h5>Remarks</h5>
+							<hr />
+							<input type="text" class="form-control" name="WasteRemark">
+						</div>
+					</div>
+				</div>
+
+				<hr>
+				<div style="min-height:30px">
+					<button type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+					<button type="button" class="btn btn-xs btn-primary next" style="float:right;display:none;">Add</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+@****** ***** ***** ***** ***** Copy ***** ***** ***** ***** ******@
+<div class="modal fade" id="detail-modal" role="dialog">
+	<div class="modal-dialog" style="max-width:90%;">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="detail-header" style="font-size:2rem;font-weight:bold;"></div>
+				<hr>
+				<div class="detail-body lph-form" style="min-width:unset !important;"></div>
+				<hr>
+				<div style="min-height:30px">
+					<button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@****** ***** ***** ***** ***** /Copy/ ***** ***** ***** ***** ******@
+
+@* chanif: untuk selin index, rubah model ke variabel js untuk prefilling *@
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+
+@section Scripts{
+	<script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+	<script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+	<script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+	<script>
+        @*
+            v2.6.5
+            - generateTable
+                - add asc desc configuration
+            v2.6.4
+            - toInt()
+                - handle convert if string isNaN
+            - pushUnique()
+				- push only unique item
+            - ieFix()
+				- turn this to specific element
+                - change width() to outerWidth()
+            v2.6.3
+            - ieFix()
+                - remove . on hasClass checker
+            - configInput()
+                - select2 add param allowClear: true
+            - turnToPreviewPage()
+                - turn to preview mode
+            v2.6.2
+            - cancelEdit(button)
+                - clear subtable inputs
+            - configInput()
+                - datepicker today date, set `todayHighlight: true`
+            - setPreview()
+                - onPreview remove all placeholder
+            - countDuration(start, end)
+                - prevent NaN
+            - ieFix()
+                - add spaces on no-ie-fix
+            v2.6.1
+            - setPreview()
+                - manual set display to flex
+            v2.6
+            - toFloat()
+                - handle convert if string isNaN
+            - fulfillTime()
+                - complete time formating
+            - countDuration(start, end)
+                - no negative duration value
+            - configInput()
+                - prevent insert "." only or "-." only
+            - setValue()
+                - add specific algorithm for radio and checkbox
+        *@
+        const TableMode = {
+            NORMAL: 'normal',
+            SPREAD: 'spread'
+        }
+        Array.prototype.absorb = function (d) { this.push.apply(this, d); };
+        Array.prototype.truncate = function () { this.length = 0; };
+        Array.prototype.pushUnique = function (d) { if (this.indexOf(d) === -1) this.push(d); };
+        const $tmpDiv = $('<div/>');
+        function htmlEncode(value){
+	        return $tmpDiv.text(value).html();
+        }
+        function htmlDecode(value){
+	        return $tmpDiv.html(value).text();
+        }
+        function deepCloneObject(d) {
+            return Object.assign({}, d);
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+        function getValue(e) {
+            let val = $(e).val();
+            if ($(e).prop("type") == "checkbox")
+                val = $(e).prop("checked");
+            if (Array.isArray(val))
+                val = val.join('___');
+            return htmlEncode(val);
+        }
+        function setValue(node, val) {
+            const type = $(node).prop("type");
+            if (type == "radio") {
+                $(node).filter(function(){ return $(this).val() == val }).prop("checked", true)
+            } else if (type == "checkbox") {
+                $(node).prop('checked', val == "true");
+            } else {
+                $(node).val(val);
+            }
+            if ($(node).hasClass("select2"))
+                $(node).trigger('change');
+        }
+        function fulfillTime(a) {
+            switch (a.length) {
+                //case 0: return "00:00";
+                case 1: return a + "0:00";
+                case 3: return a + "00";
+                case 4: return a + "0";
+            }
+            return a;
+        }
+        function toFloat(a) {
+            return parseFloat((a == null || a == "" || isNaN(a)) ? 0 : a);
+        }
+        function toInt(a) {
+            return parseInt((a == null || a == "" || isNaN(a)) ? 0 : a);
+        }
+        function isEmptyOrSpaces(str) {
+            return str === null || str.match(/^ *$/) !== null;
+        }
+        function countDuration(start, end) {
+            try {
+                end = fulfillTime(end).split(':');
+                start = fulfillTime(start).split(':');
+                if (start[1] == undefined || end[1] == undefined) return 0;
+                var d = new Date();
+                var startDate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var endDate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+                if (startDate > endDate)
+                    endDate = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, end[0], end[1]);
+                var diffTime = endDate - startDate;
+                return Math.ceil(diffTime / 60000);
+            } catch (err) {
+                console.log(err);
+            }
+            return 0;
+        }
+        function configInput() {
+            $('.select2').each(function (i, e) {
+                const param = {
+                    allowClear: true,
+                    placeholder: 'Choose one',
+                    searchInputPlaceholder: 'Search options'
+                };
+                if ($(e).attr("multiple") == "multiple") {
+                    param.placeholder = 'Choose one or more';
+                    param.allowClear = false;
+                }
+                $(e).select2(param);
+            });
+            $('.time').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "00:00");
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+                $(field).blur(function () {
+                    $(this).val(fulfillTime($(this).val()));
+                });
+            });
+            $('.number, .number-positive').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+            $('.datepicker').toArray().forEach(function (field) {
+                //$(field).attr("placeholder", "01-Jan-19");
+                $(field).datepicker({
+                    todayHighlight: true,
+                    format: 'dd-M-yy',
+                    language: 'id-ID'
+                });
+            });
+            $('.information-datepicker').toArray().forEach(function (field) {
+                $(field).datepicker({
+                    todayHighlight: true,
+                    format: 'D, dd-M-yy',
+                    maxDate: 2,
+                    minDate: -2
+                });
+            });
+            $(".input-wrapper [required]").focus(function () {
+                showRequiredField(this);
+            });
+            $(".input-wrapper [required]").blur(function () {
+                hideRequiredField(this);
+            });
+        }
+        @****** ***** ***** ***** ***** Table ***** ***** ***** ***** ******@
+        function ieFix() {
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").each(function () {
+                    $(this).find("table").prop("cellspacing", "1");
+                    if (!$(this).hasClass("no-ie-fix")) {
+                        $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom":"0" });
+                        $(this).find("table").css({ "margin-bottom": "32px" });
+                        $(this).css({ "overflow-y": "scroll" });
+                        const ths = $(this).find("thead tr.summary-body").find("th, td");
+                        $(this).find("tfoot tr.input td").each(function (i, td) {
+                            $(td).css({ "min-width": Math.floor($($(ths)[i]).outerWidth()), "position": "static" });
+                        });
+                    }
+                });
+            }
+        }
+        function findInArray(id, arr) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i].id == id) return i;
+            }
+            return -1;
+        }
+        function deleteFromArray(id, arr) {
+            arr.splice(findInArray(id, arr), 1);
+            return arr;
+        }
+        function setPreview(button) {
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const index = findInArray(id, configAle[targetTable].data);
+                const data = configAle[targetTable].data[index];
+                let inputWrapper = $("#" + targetTable).closest(".tableWrapper").siblings(".input-wrapper").clone();
+                $(inputWrapper).css("display","flex");
+                const header = $(button).closest(".card-body").siblings(".card-header").text();
+                const modal = $("#detail-modal");
+
+                $(inputWrapper).find("input, select, textarea").each(function (i, input) {
+                    if ($(input).prop("nodeName") == "SELECT") {
+                        $(input).parent().html(`<input value="${data[$(input).prop("name")]}" disabled class="form-control"/>`);
+                    } else {
+                        setValue($(input), data[$(input).prop("name")]);
+                        $(input).prop("disabled", true);
+                        $(input).prop("placeholder", "");
+                    }
+                });
+                $(inputWrapper).find(".tableWrapper tbody").each(function (i, tbody) {
+                    const subtable = $(tbody).prop("id");
+                    $(tbody).html(generateTable(data[subtable], subtable));
+                    console.log(subtable);
+                    if (configAle[subtable].countSummary != undefined) {
+                        configAle[subtable].data.absorb(configAle[targetTable].data[index][subtable]);
+                        const rowData = configAle[subtable].countSummary();
+                        configAle[subtable].data.truncate();
+                        const table = $(tbody).closest('table');
+                        const summaryTds = $(table).find('.summary-body').children();
+                        $(table).find('.input td').each(function (i, td) {
+                            const name = $(td).children().attr("name");
+                            if (rowData.hasOwnProperty(name))
+                                $(summaryTds[i]).html(rowData[name]);
+                        });
+                    }
+                });
+                $(inputWrapper).find(`#get-pss-data, .button-area, .tableWrapper tr.input`).remove();
+                $(inputWrapper).find(".tableWrapper tr").each(function () {
+                    $(this).children().last().remove();
+                });
+                if (configAle[targetTable].onPreview != undefined) {
+                    inputWrapper = configAle[targetTable].onPreview(data, inputWrapper);
+                }
+                $(modal).find(".detail-body").html(inputWrapper);
+                $(modal).find(".detail-header").html(`${header} Detail`);
+                $(modal).modal("show");
+            }
+        }
+        function generateRow(data, targetTable) {
+            let r = "";
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                $(`#${targetTable}`).siblings("thead").find("tr.summary-body").find("td, th").each(function () {
+                    const name = $(this).data("name");
+                    if (name != "Action") r += `<td>${data[name]}</td>`;
+                });
+            } else {
+                $(`#${targetTable}`).siblings("tfoot").find("tr.input").find("input, select, textarea").each(function () {
+                    const name = $(this).prop("name");
+                    r += `<td>${data[name]}</td>`;
+                });
+            }
+
+            r += `<td class="tx-center">`;
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                r += `<i onClick="javascript:setPreview(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fas fa-eye"></i>`;
+            }
+            r += `<i onClick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit"></i>`;
+            r += `<i onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-trash"></i>`;
+            r += `</td >`;
+
+            if (configAle[targetTable].onGenRow != undefined) {
+                r = configAle[targetTable].onGenRow(r);
+                if (r == null) return "";
+            }
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            if (configAle[targetTable].isDesc) for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            } else for (var i = 0; i < arr.length; i++) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function editData(button) {
+            const targetTable = $(button).data("target-table");
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                const id = $(button).data("id");
+                if (configAle[targetTable].onEdit != undefined) {
+                    if (configAle[targetTable].onEdit(id)) {
+                        return;
+                    }
+                }
+                $(table).data("edited", true);
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    const index = findInArray(id, configAle[targetTable].data);
+                    const data = configAle[targetTable].data[index];
+                    const inputWrapper = $(button).closest(".tableWrapper").siblings(".input-wrapper");
+                    const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                    const notInputs = $(tableWrapper).find("input, select, textarea");
+                    const allInputs = $(inputWrapper).find("input, select, textarea");
+                    $(allInputs).not($(notInputs)).each(function (i, input) {
+                        setValue($(input), data[$(input).prop("name")]);
+                    });
+                    $(tableWrapper).find("tbody").each(function (i, tbody) {
+                        const subtable = $(tbody).prop("id");
+                        configAle[subtable].data.absorb(data[subtable]);
+                        startupSetup(subtable);
+                    });
+                    $(inputWrapper).find("#get-pss-data").hide();
+                    let newbuttons = "";
+                    newbuttons += `<button class="btn btn-lg pd-x-15 btn-primary cancel" onClick="javascript:cancelEdit(this)" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Cancel</button>&nbsp;`;
+                    newbuttons += `<button class="btn btn-lg pd-x-15 btn-primary save" onClick="javascript:normalData(this)" data-id="${id}" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Save</button>`;
+                    $(inputWrapper).find(".button-area").html(newbuttons);
+                } else {
+                    const tds = $(button).closest("tr").children('td');
+                    const inputTr = $(table).find('tr.input');
+                    const inputTds = $(inputTr).children('td');
+                    const tdsCount = $(tds).length;
+
+                    $(button).closest("tr").addClass("input-wrapper");
+                    $(tds).each(function (i, e) {
+                        const el = $(inputTds[i]).children()[0];
+                        if (i != tdsCount - 1) {
+                            const html = $(e).text();
+                            const newInput = $(el).clone();
+                            if (!$(el).hasClass("disabled"))
+                                $(newInput).prop("disabled", false);
+
+                            $(el).prop("disabled", true);
+                            setValue(newInput, html);
+                            $(e).html(newInput);
+                        } else {
+                            $(el).attr("onClick", "");
+                            $(e).find(".fa.fa-edit").hide();
+                            $(e).find(".fa.fa-trash").hide();
+                            $(e).append(`<i onClick="javascript:normalData(this)" data-id="${id}" data-target-table="${targetTable}" class="fa fa-save save"></i>`);
+                            $(e).append(`<i onClick="javascript:revertEdit(this)" data-id="${id}" data-target-table="${targetTable}" class="fa fa-times cancel"></i>`);
+                        }
+                    });
+                    configInput();
+                    ieFix();
+                }
+            }
+        }
+        function revertEdit(button) {
+            const targetTable = $(button).data("target-table");
+            if (configAle[targetTable].onCancel != undefined) {
+                if (configAle[targetTable].onCancel()) {
+                    return;
+                }
+            }
+            releaseDisabledInput($(button).closest("table"));
+            startupSetup(targetTable);
+        }
+        function cancelEdit(button) {
+            const targetTable = $(button).data("target-table");
+            if (configAle[targetTable].onCancel != undefined) {
+                if (configAle[targetTable].onCancel()) {
+                    return;
+                }
+            }
+            const inputWrapper = $(button).closest(".input-wrapper");
+            const tableWrapper = $(inputWrapper).find(".tableWrapper");
+            const allInputs = $(inputWrapper).find("input, select, textarea");
+            $(button).closest(".button-area").html(`<button class="btn btn-lg pd-x-15 btn-primary" onClick="javascript:addToTable(this)" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Add To Table</button>`);
+            $(allInputs).each(function () { setValue(this, "") });
+            $(inputWrapper).siblings(".tableWrapper").find("table").data("edited", false);
+            $(inputWrapper).find("#get-pss-data").show();
+            $(tableWrapper).find("table").each(function (i, table) {
+                releaseDisabledInput(table);
+                const subtable = $(table).find("tbody").prop("id");
+                configAle[subtable].data.truncate();
+                startupSetup(subtable);
+            });
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    if($(el).attr("onClick") == "")
+                        $(el).attr("onClick", "javascript:addToTable(this)");
+                }
+            });
+        }
+        function startupSetup(target) {
+            const table = generateTable(configAle[target].data, target);
+            $("#" + target).html(table);
+            countSummary(target);
+            ieFix();
+        }
+        function showRequiredField(input) {
+            $(input).data("toggle", "popover");
+            $(input).data("placement", "top");
+            $(input).css("box-shadow", "0px 0px 7.5px red");
+            if ($(input).data("content") == undefined) {
+                $(input).data("content", "Value can't be null!");
+            }
+            $(input).popover("show");
+        }
+        function hideRequiredField(input) {
+            $(input).css("box-shadow", "");
+            $(input).popover("hide");
+        }
+        function addToTable(button) {
+            const targetTable = $(button).data("target-table");
+            const inputWrapper = $(button).closest(".input-wrapper");
+            const tableWrapper = $(inputWrapper).find(".tableWrapper");
+            const notInputs = $(tableWrapper).find("input, select, textarea");
+            const allInputs = $(inputWrapper).find("input, select, textarea");
+            const inputs = $(allInputs).not($(notInputs));
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(inputs).each(function (tdIndex, input) {
+                if ($(input).prop("required") && isEmptyOrSpaces($(input).val())) {
+                    showRequiredField(input);
+                    setTimeout(function () { $(input).popover("hide"); }, 10000);
+                    shouldReturn = true;
+                    return false;
+                }
+                if ($(input).attr("name") != undefined) {
+                    const name = $(input).attr("name");
+                    const val = getValue(input);
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+
+            if (configAle[targetTable].onAdd != undefined) {
+                newdata = configAle[targetTable].onAdd(newdata);
+                if (newdata == null) return;
+            }
+            $(inputs).each(function (i, input) { setValue($(input), "") });
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                $(tableWrapper).find("tbody").each(function (i, tbody) {
+                    const tableName = $(tbody).prop("id");
+                    newdata[tableName] = configAle[tableName].data.slice();
+                    configAle[tableName].data.truncate();
+                    startupSetup(tableName);
+                });
+                cancelEdit(button);
+            }
+
+            configAle[targetTable].data.push(newdata);
+            startupSetup(targetTable);
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const table = $('#' + targetTable).closest('table');
+                const summaryTds = $(table).find('.summary-body').children();
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    $(summaryTds).each(function (i, td) {
+                        const name = $(td).data("name");
+                        if (rowData.hasOwnProperty(name))
+                            $(summaryTds[i]).html(rowData[name]);
+                    });
+                } else {
+                    $(table).find('.input td').each(function (i, td) {
+                        const name = $(td).children().attr("name");
+                        if (rowData.hasOwnProperty(name))
+                            $(summaryTds[i]).html(rowData[name]);
+                    });
+                }
+            }
+        }
+        function deleteData(button) {
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                if (confirm("Are you sure?")) {
+                    const id = $(button).data("id");
+                    const targetTable = $(button).data("target-table");
+                    releaseDisabledInput(table);
+                    if (configAle[targetTable].onDelete != undefined) {
+                        if (configAle[targetTable].onDelete(id)) {
+                            return;
+                        }
+                    }
+                    deleteFromArray(id, configAle[targetTable].data);
+                    startupSetup(targetTable);
+                }
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const cardBody = $(button).closest(".card-body");
+                const table = $(cardBody).find(`table:has(tbody#${targetTable})`);
+                const index = findInArray(id, configAle[targetTable].data);
+
+                var newdata = {
+                    id: uuidv4()
+                };
+                let shouldReturn = false;
+                const inputWrapper = $(button).closest(".input-wrapper");
+                const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                const notInputs = $(tableWrapper).find("input, select, textarea");
+                const allInputs = $(inputWrapper).find("input, select, textarea");
+                $(allInputs).not($(notInputs)).each(function () {
+                    if ($(this).prop("required") && isEmptyOrSpaces($(this).val())) {
+                        showRequiredField(this);
+                        setTimeout(function () { $(this).popover("hide"); }, 10000);
+                        shouldReturn = true;
+                        return false;
+                    }
+                    const name = $(this).prop("name");
+                    const val = getValue(this);
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                });
+
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    $(tableWrapper).find("tbody").each(function (i, tbody) {
+                        const tableName = $(tbody).prop("id");
+                        newdata[tableName] = configAle[tableName].data.slice();
+                        configAle[tableName].data.truncate();
+                        startupSetup(tableName);
+                    });;
+                    cancelEdit(button);
+                }
+
+                if (shouldReturn) return;
+
+                if (configAle[targetTable].onSave != undefined) {
+                    newdata = configAle[targetTable].onSave(newdata);
+                    if (newdata == null) return;
+                }
+
+                configAle[targetTable].data[index] = newdata;
+
+                if (configAle[targetTable].mode == undefined ||
+                    configAle[targetTable].mode == TableMode.NORMAL) {
+                    releaseDisabledInput(table);
+                }
+
+                startupSetup(targetTable);
+            }
+        }
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input[type=text], input[type=number], select, textarea, input[type=radio]:checked, input[type=checkbox]').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+
+
+                    let type = "NonNumeric";
+                    if ($(e).is(".number, .number-positive")) type = "Numeric";
+                    values.push({
+                        Value: getValue(e),
+                        ValueType: type,
+                    });
+                });
+            });
+            return [components, values];
+        }
+        function collectAllData(config) {
+            let collectorArray = [];
+            for (var tableId in config) {
+                let tableColumnType = {};
+                let inputs = $(`#${tableId} ~ tfoot tr.input`).find("input, select, textarea");
+                if (configAle[tableId].mode != undefined &&
+                    configAle[tableId].mode == TableMode.SPREAD) {
+                    const inputWrapper = $(`#${tableId}`).parents(".tableWrapper").siblings(".input-wrapper");
+                    const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                    const notInputs = $(tableWrapper).find("input, select, textarea");
+                    const allInputs = $(inputWrapper).find("input, select, textarea");
+                    inputs = $(allInputs).not($(notInputs));
+                }
+                $(inputs).each(function () {
+                    tableColumnType[$(this).prop("name")] =
+                        $(this).is(".number, .number-positive") ? "number" : "text";
+                });
+                const data = config[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    if (config[tableId].onCollectDataRow != undefined) {
+                        data[i] = config[tableId].onCollectDataRow(data[i]);
+                    }
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let type = "NonNumeric";
+                            if (tableColumnType[prop] == "number") type = "Numeric";
+                            let val = data[i][prop];
+                            if (val instanceof Object) val = JSON.stringify(val);
+                            let newInsertData = {
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: val,
+                                ValueType: type,
+                                RowNumber: i
+                            };
+                            if (config[tableId].onCollectDataSingle != undefined) {
+                                newInsertData = config[tableId].onCollectDataSingle(newInsertData);
+                            }
+                            collectorArray.push(newInsertData);
+                        }
+                    }
+                }
+            }
+            return collectorArray;
+        }
+        function notEmptyValidation(name, val) {
+            if (val == "") {
+                alert("Value can't be empty");
+                return true;
+            }
+            return false;
+        }
+        function turnToPreviewPage() {
+            $('.collect-component').find("input, select, textarea").prop("disabled", true);
+            for (var tableId in configAle) {
+                const table = $(`#${tableId}`).parents("table");
+                if (configAle[tableId].mode != undefined &&
+                    configAle[tableId].mode == TableMode.SPREAD) {
+                    $(table).parents(".tableWrapper").siblings().hide();
+                    $(table).find("tbody").find(".fa-edit, .fa-trash").hide();
+                } else {
+                    $(table).find("tr.input").hide();
+                    $(table).find("thead").find("tr:first-child, tr:last-child").find("th:last-child, td:last-child").hide();
+                    $(table).find("tbody").find("td:last-child").hide();
+                }
+            }
+            $("#line-tabs").hide();
+            if (!$("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                $("#wasteAuto").find("div:first-child").hide();
+                $("#wasteAuto").find(".tableWrapper").removeClass("col-9").addClass("col-12");
+            }
+        }
+        function placeData(model, handleImageFunction) {
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                let val = model.CompoVal[i].Value.Value;
+                val = decodeURIComponent(val ? val : "");
+                if (type == "ImageURL") {
+                    handleImageFunction(val);
+                } else {
+                    const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                    const parent = tn[0];
+                    tn.shift();
+                    const child = tn.join("-");
+                    const node = $("#" + parent + " " + type + "[name=" + child + "]");
+                    if ($(node).hasClass("select2")) {
+                        if ($(node).attr("multiple") == "multiple")
+                            val = val.split('___');
+                        setValue(node, val);
+                        $(node).trigger('change');
+                    } else setValue(node, val);
+                }
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        const val = model.Extras[i].Value;
+                        data[model.Extras[i].FieldName] = decodeURIComponent(val ? val : "");
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                    }
+                }
+                if (configAle[table].onPlaceData != undefined) {
+                    data = configAle[table].onPlaceData(data);
+                    if (data == null) continue;
+                }
+                configAle[table].data.push(data);
+            }
+            if ($("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                configAle.wasteBodyManual.data.truncate();
+                configAle.wasteBodyManual.data.absorb(configAle.waste.data);
+                configAle.waste.data.truncate();
+                $('#wastetapauto').removeClass("active");
+                $('#wastetapmanual').addClass("active");
+                $('#wasteAuto').css({ 'display': 'none' });
+                $('#wasteManual').css({ 'display': '' });
+            }
+            for (let targetTable in configAle) {
+                configAle[targetTable].data.reverse();
+                startupSetup(targetTable);
+            }
+        }
+        $(document).ready(function () {
+            ieFix();
+            configInput();
+            $(window).on('resize', ieFix);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        });
+        @****** ***** ***** ***** ***** /Table/ ***** ***** ***** ***** ******@
+
+        @****** ***** ***** ***** ***** Wizard ***** ***** ***** ***** ******@
+        function wizardButtonSetSelection(button) {
+            selected = $(button).text();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).closest(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        $(document).ready(function () {
+            $(".wizard-modal .next").click(function () {
+                wizardButtonNext(this);
+            });
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).closest(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        @****** ***** ***** ***** ***** /Wizard/ ***** ***** ***** ***** ******@
+
+        @****** ***** ***** ***** *****  Timbangan  ***** ***** ***** ***** ******@
+        function getTimbangan() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+            $.ajax({
+                url: url,
+                dataType :"jsonp",
+                jsonp: false,
+                jsonpCallback: "callback",
+                success : function(data){
+                    $('#WasteWeight').text(toFloat(data.Weight));
+                },
+                error : function(httpReq,status,exception){
+                    console.log("Timbangan not found");
+                }
+            });
+        }
+        @****** ***** ***** ***** ***** /Timbangan/ ***** ***** ***** ***** ******@
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			setInterval(getTimbangan, 1000);
+		});
+	</script>
+	<script>
+        var krosokData = [];
+        var rajanganData = [];
+
+        var logbook1Data = [];
+        var logbook2Data = [];
+        var thisActionData = [];
+        var nextActionData = [];
+        var wasteData = [];
+        //West
+        var wasteBodyManualWestData = [
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Sapon",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Vacuum",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Cylinder Cleaning",
+                WasteType: "Wet Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Casing",
+                WasteType: "Solution",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Sapon",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Vacuum",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Heaviest",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Cylinder Cleaning",
+                WasteType: "Wet Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Casing",
+                WasteType: "Solution",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+        ];
+
+        //East
+        var wasteBodyManualEastData = [
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Cylinder Cleaning",
+                WasteType: "Wet Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Sapon",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Vacuum",
+                WasteType: "Dust",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Krosok",
+                Waste: "Casing Loss",
+                WasteType: "Inventory Adjustment",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Cylinder Cleaning",
+                WasteType: "Wet Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Sapon",
+                WasteType: "Dry Waste",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Vacuum",
+                WasteType: "Dust",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+            {
+                id: uuidv4(),
+                Area: "DCCC Rajangan",
+                Waste: "Casing Loss",
+                WasteType: "Inventory Adjustment",
+                Frequency: "Shiftly",
+                Weight: "0",
+                Remarks: "-",
+            },
+        ];
+        var wasteBodyManualData = @(ViewBag.isWest)? wasteBodyManualWestData : wasteBodyManualEastData;
+
+        const configAle = {
+            krosok: {
+                data: krosokData,
+                mode: TableMode.SPREAD,
+                onSave(newData) {
+                    $("[name=krosokBatchNo]").prop("disabled", false);
+                    newData.krosokDuration = countDuration(newData.krosokStart, newData.krosokStop);
+                    return newData;
+                },
+                onCancel() {
+                    $("[name=krosokBatchNo]").prop("disabled", false);
+                },
+                onEdit() {
+                    $("[name=krosokBatchNo]").prop("disabled", true);
+                },
+                onAdd(newData) {
+                    newData.krosokDuration = countDuration(newData.krosokStart, newData.krosokStop);
+                    for (let i = 0; i < krosokData.length; i++) {
+                        if (krosokData[i].krosokBatchNo == newData.krosokBatchNo) {
+                            if (confirm("Batch sudah ada, replace data?")) {
+                                krosokData[i] = newData;
+                                cancelEdit($(".get-pss-data-krosok"));
+                                startupSetup("krosok");
+                            }
+                            return null;
+                        }
+                    }
+                    return newData;
+                },
+
+                countSummary: function () {
+                    let rowData = {
+                        krosokDuration: 0
+                    };
+                    for (var i = 0; i < krosokData.length; i++) {
+                        rowData.krosokDuration += parseFloat(krosokData[i].krosokDuration);
+                    }
+                    rowData.krosokDuration = rowData.krosokDuration.toFixed(2);
+                    return rowData;
+                },
+            },
+
+
+            rajangan: {
+                data: rajanganData,
+                mode: TableMode.SPREAD,
+                onCancel() {
+                    $("[name=rajanganBatchNo]").prop("disabled", false);
+                },
+                onEdit() {
+                    $("[name=rajanganBatchNo]").prop("disabled", true);
+                },
+                onSave(newData) {
+                    $("[name=rajanganBatchNo]").prop("disabled", false);
+                    newData.rajanganDuration = countDuration(newData.rajanganStart, newData.rajanganStop);
+                    return newData;
+                },
+                onAdd(newData) {
+                    newData.rajanganDuration = countDuration(newData.rajanganStart, newData.rajanganStop);
+                    for (let i = 0; i < rajanganData.length; i++) {
+                        if (rajanganData[i].rajanganBatchNo == newData.rajanganBatchNo) {
+                            if (confirm("Batch sudah ada, replace data?")) {
+                                rajanganData[i] = newData;
+                                cancelEdit($(".get-pss-data-rajangan"));
+                                startupSetup("rajangan");
+                            }
+                            return null;
+                        }
+                    }
+                    return newData;
+                },
+
+                countSummary: function () {
+                    let rowData = {
+                        rajanganDuration: 0
+                    };
+                    for (var i = 0; i < rajanganData.length; i++) {
+                        rowData.rajanganDuration += parseFloat(rajanganData[i].rajanganDuration);
+                    }
+                    rowData.rajanganDuration = rowData.rajanganDuration.toFixed(2);
+                    return rowData;
+                },
+            },
+
+
+            wasteBodyManual: {
+                data: wasteBodyManualData,
+                onValidate: notEmptyValidation,
+                countSummary: function () {
+                    let rowData = {
+                        Weight: 0
+                    };
+                    for (var i = 0; i < wasteBodyManualData.length; i++) {
+                        rowData.Weight += parseFloat(wasteBodyManualData[i].Weight);
+                    }
+                    rowData.Weight = rowData.Weight.toFixed(2);
+                    return rowData;
+                },
+                //onGenRow(row) {
+                //    let r = "";
+                //    $(row).each(function (i, e) {
+                //        $(e).find(".fa.fa-trash").remove();
+                //        r += $(e).prop("outerHTML");
+                //    });
+                //    return r;
+                //},
+            },
+            waste: {
+                data: wasteData,
+                onValidate: notEmptyValidation,
+                countSummary: function () {
+                    let rowData = {
+                        Weight: 0
+                    };
+                    for (var i = 0; i < wasteData.length; i++) {
+                        rowData.Weight += parseFloat(wasteData[i].Weight);
+                    }
+                    rowData.Weight = rowData.Weight.toFixed(2);
+                    return rowData;
+                },
+            },
+
+            logbook1: {
+                data: logbook1Data,
+                onValidate: notEmptyValidation,
+            },
+            logbook2: {
+                data: logbook2Data,
+                onValidate: notEmptyValidation,
+            },
+            thisAction: {
+                data: thisActionData,
+                onValidate: notEmptyValidation,
+            },
+            nextAction: {
+                data: nextActionData,
+                onValidate: notEmptyValidation,
+            },
+        }
+	</script>
+	<script>
+		$(document).ready(function () {
+
+			startupSetup("wasteBodyManual");
+			$('#wasteManual').css({ 'display': 'none' });
+			$("#wastetapauto").click(function () {
+				$("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked", false);
+				$('#wastetapmanual').removeClass("active");
+				$('#wastetapauto').addClass("active");
+				$('#wasteAuto').css({ 'display': '' });
+				$('#wasteManual').css({ 'display': 'none' });
+
+				$('.tableWrapper thead tr').each(function () {
+					const top = $(this).position().top;
+					$(this).children().css({ "top": top });
+				});
+			});
+			$("#wastetapmanual").click(function () {
+				$("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked", true);
+				$('#wastetapauto').removeClass("active");
+				$('#wastetapmanual').addClass("active");
+				$('#wasteAuto').css({ 'display': 'none' });
+				$('#wasteManual').css({ 'display': '' });
+
+				$('.tableWrapper thead tr').each(function () {
+					const top = $(this).position().top;
+					$(this).children().css({ "top": top });
+				});
+			});
+		});
+	</script>
+
+	<script>
+        // chanif: buat variabel LPHID untuk simpan ID, sebagai acuan untuk autosave & prev. timerID buat simpan variabel timer (biar bisa di-stop ketika submit)
+        var LPHID = 0;
+         @if (Model.ViewType != "index")
+         {
+             @: LPHID = @(Model.LPH.ID);
+         }
+        var timerID;
+        var isSaveManual = 0;
+
+         // chanif: simpan tak masukkan fungsi sendiri, efisiensi coding
+        function saveLPH(URL, isSubmit, comment, successMsg, errorMsg) {
+            // chanif: aku gak paham gunanya apa
+            let config = Object.assign({}, configAle);
+            if ($("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                config.waste = config.wasteBodyManual;
+            }
+            delete config.wasteBodyManual;
+            console.log(config);
+
+            // chanif: autosave mati ketika submit
+            console.log("simpan . . .");
+            if (isSubmit == 1)
+                clearInterval(timerID);
+
+            const extras = collectAllData(config);
+            const comVal = collectAllComponent();
+            const components = comVal[0];
+            const values = comVal[1];
+
+            /*
+            console.log("components");
+            console.log(components);
+            console.log("values");
+            console.log(values);
+            console.log("extras");
+            console.log(extras);
+            */
+
+			var datajson = JSON.stringify({
+				id: LPHID,
+				isSubmit: isSubmit,
+				comment: comment,
+				detailsExtras: extras,
+				detailComponent: components,
+				detailValue: values
+			});
+
+            // chanif: simpan data. bedakan URL untuk tiap fungsi
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: datajson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                     if (isSaveManual == 1) {
+                        isSaveManual = 0;
+                            $('#loading_overlay').addClass('d-none');
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: successMsg,
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright'
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+                    } else if (isSubmit == 1) {
+
+
+                            $('#loading_overlay').addClass('d-none');
+
+					        if (result.Status == 'True') {
+						        var notice = new PNotify({
+							        title: "@UIResources.Confirmation",
+							        text: successMsg,
+							        width: "400px",
+							        type: 'success',
+							        addclass: 'stack-bottomright'
+						        });
+
+						        notice.get().click(function () {
+							        notice.remove();
+                                });
+
+                                //Redirect
+                                if (URL == "@Url.Action("Edit", "LPHPrimaryKretekLineConditioning")") {
+                                    window.location.href = "@(Url.Action("Index", "HistoryPrimary"))";
+                                } else if (URL == "@Url.Action("Approval", "LPHPrimaryKretekLineConditioning")") {
+                                    window.location.href = "@(Url.Action("Index", "ApprovalPrimary"))";
+                                } else if (URL == "@Url.Action("Rejected", "LPHPrimaryKretekLineConditioning")") {
+                                    window.location.href = "@(Url.Action("Index", "ApprovalPrimary"))";
+                                } else {
+                                    location.reload();
+                                }
+					        }
+					        else {
+						        var notice = new PNotify({
+							        title: "@UIResources.ErrorMessage",
+							        text: errorMsg,
+							        width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+							        hide: false,
+							        buttons: {
+								        sticker: false
+							        }
+						        });
+
+						        notice.get().click(function () {
+								    notice.remove();
+							    });
+						    }
+                      } else {
+                          if (result.Status == 'True') {
+                              if (typeof result.LPHID === 'undefined') {
+                                  console.log("edit done");
+                                  $('#loading_overlay').addClass('d-none');
+	                                var notice = new PNotify({
+	                                    title: "@UIResources.Confirmation",
+	                                    text: "@UIResources.EditSucceed",
+	                                    width: "400px",
+	                                    type: 'success',
+	                                    addclass: 'stack-bottomright'
+	                                });
+	                                setTimeout(function(){
+	                                    notice.remove();
+	                                }, 3000);
+                              } else {
+                                  console.log("create done");
+                                  $('#btnSave').removeClass('d-none');
+                                  $('#btnReset').removeClass('d-none');
+                                  LPHID = result.LPHID;
+                                  console.log(LPHID);
+                              }
+                          }
+                          else {
+
+                                // chanif: tetap munculkan error kalau gagal save ketika autosave
+                                var notice = new PNotify({
+	                                title: "@UIResources.ErrorMessage",
+	                                text: errorMsg,
+	                                width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+	                                hide: false,
+	                                buttons: {
+		                                sticker: false
+	                                }
+                                });
+
+                                notice.get().click(function () {
+	                                notice.remove();
+                                });
+	                      }
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            @if (Model.ViewType == "index"){
+                //Default on Manual
+                @: $('#wastetapmanual').click();
+            } else if (Model.ViewType == "index_restore"){
+                @: $('#btnSave').removeClass('d-none');
+                @: $('#btnReset').removeClass('d-none');
+            } else if (Model.ViewType == "edit"){
+                @: $('#approvalSegment').removeClass('d-none');
+                @: $('#btnSave').removeClass('d-none');
+            } else if (Model.ViewType == "approval"){
+                @: $('#approvalSegment').removeClass('d-none');
+                @: $('#approvalForm').removeClass('d-none');
+            } else {
+                @: $('#approvalSegment').removeClass('d-none');
+                @: $('#btnHistory').addClass('d-none');
+                @: $('#goPrev').addClass('d-none');
+
+                @*@: //chanif: matikan semua input
+                @: $(document).find('input,select,textarea').each(function(){
+                @:     $(this).attr('disabled', 'disabled');
+                @: });
+
+                @: //chanif: matikan semua button tambah/edit/delete. delay 1 detik nunggu load semua
+                @: setTimeout(function (){
+                @:     $(document).find('i,span').each(function(){
+                @:         $(this).prop("onclick", null).off("click");
+                @:     });
+                @: }, 1000);
+
+                @: //chanif: jangan munculkan modal ketika button di-klik
+                @: $(document).find('button').each(function(){
+                @:     $(this).attr("data-toggle", null);
+                @:     $(this).attr("data-target", null);
+                @: });*@
+            }
+
+
+            function checkMandatory() {
+                var mandatory = $(".mandatory");
+                //const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                            $(e.target).siblings(".select2-container").css('border', 'none');
+                            $(e.target).siblings(".select2-container").css('border-radius', '0');
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    } else if ($(mandatory[i])[0].value === "") {
+                        $(mandatory[i])[0].style.borderColor = "red";
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('click', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+
+                        status = false;
+                    }
+                }
+                return status;
+            }
+            $("#btnSave").click(function () {
+                if (checkMandatory()) {
+                    $('#loading_overlay').removeClass('d-none');
+                    saveLPH("@Url.Action("Edit", "LPHPrimaryKretekLineConditioning")", 1, "", "@UIResources.CreateSucceed", "@UIResources.CreateFailed");
+                }else {
+                    var notice = new PNotify({
+						    title: "Warning",
+						    text: "Submit failed, input field with red border can't be empty",
+						    width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+						    hide: false,
+						    buttons: {
+							    sticker: false
+						    }
+                    });
+                    setTimeout(function(){
+                            notice.remove();
+                    }, 8000);
+                }
+            });
+
+            $("#btnSave2").click(function () {
+                $('#loading_overlay').removeClass('d-none');
+                isSaveManual = 1;
+                saveLPH("@Url.Action("Edit", "LPHPrimaryKretekLineConditioning")", 0, "", "Data Saved Successfully!", "@UIResources.CreateFailed");
+            });
+            $('#btnReset').click(function () {
+                var redirect = confirm("All unsubmitted changes will be lost. Do you really want to reset?");
+                if (redirect) {
+                    DeleteLPH(LPHID);
+                }
+            });
+            function DeleteLPH(Id) {
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    url: fastApp.BaseUrl + '/HistoryPrimary/Delete?lphid=' + Id,
+                    type: 'POST',
+                    success: function (result) {
+                        if (result.Status) {
+                            var notice = new PNotify({
+                            title: "@UIResources.Confirmation",
+                            text: 'Reset LPH Successfully',
+                            width: "400px",
+                            type: 'success',
+                            addclass: 'stack-bottomright'
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                        else {
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "@UIResources.DeleteFailed",
+                                width: "400px",
+                                type: 'error',
+                                hide: false,
+                                addclass: 'stack-bottomright',
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    complete: function (data) {
+                        $('#loading_overlay').addClass('d-none');
+                        setTimeout(function () {
+                            window.location.href = "@(Url.Action("Index", "LPHPrimaryKretekLineConditioning"))";
+                        }, 1000);
+                    }
+                });
+            }
+            $('#btnHistory').on('click', function (e) {
+                location.href = '@Url.Action("Index", "HistoryPrimary")';
+            });
+
+            $('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "LPHPrimaryKretekLineConditioning")",
+                  data: JSON.stringify({
+                      LPHID: LPHID,
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "LPHPrimaryKretekLineConditioning"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No submission in the previous shift",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+                  }
+                });
+            })
+
+
+            $('#btnReject').click(function (e) {
+                $("#comment-modal").modal("hide");
+                var comment = $('#comment_value').val();
+                $('#loading_overlay').removeClass('d-none');
+                saveLPH("@Url.Action("Rejected", "LPHPrimaryKretekLineConditioning")", 1, comment, "@UIResources.RejectSucceed", "@UIResources.ApprovalFailed");
+            });
+
+            $('#btnApprove').click(function () {
+                var comment = "";
+                $('#loading_overlay').removeClass('d-none');
+                saveLPH("@Url.Action("Approval", "LPHPrimaryKretekLineConditioning")", 1, comment, "@UIResources.ApprovalSucceed", "@UIResources.ApprovalFailed");
+            });
+        });
+
+	</script>
+
+	@* chanif: jika index kasih autosave. selain index, kasih prefiling *@
+	@if (Model.ViewType == "index")
+	{
+		<script>
+            $(document).ready(function () {
+
+                // chanif: ketika page sudah selesai load, langsung simpan
+                $(window).load(function()
+                {
+                    saveLPH("@Url.Action("Create", "LPHPrimaryKretekLineConditioning")", 0, "", "", "");
+
+                    // chanif: lalu autosave tiap 3 menit
+                    setInterval(function () {
+                        $('#loading_overlay').removeClass('d-none');
+                        saveLPH("@Url.Action("Edit", "LPHPrimaryKretekLineConditioning")", 0, "", "", "");
+                    }, 10 * 60 * 1000);
+                });
+            });
+		</script>
+	}
+	else
+	{
+		if (Model.ViewType == "index_restore" || Model.ViewType == "edit")
+		{
+			<script>
+                $(document).ready(function () {
+                    $(window).load(function()
+                    {
+                        // chanif: autosave tiap 3 menit
+                        setInterval(function () {
+                            $('#loading_overlay').removeClass('d-none');
+                            saveLPH("@Url.Action("Edit", "LPHPrimaryKretekLineConditioning")", 0, "", "", "");
+                        }, 10 * 60 * 1000);
+                    });
+                });
+			</script>
+		}
+
+		<script>
+			/******************** PREFILLED ******************/
+
+			$(document).ready(function () {
+
+				var model = JSON.parse($("#jsonModel").attr("data-json"));
+
+				placeData(model);
+			});
+
+			/****************** END PREFILLED ****************/
+		</script>
+	}
+
+
+	@if (Model.ViewType == "submitted" || Model.ViewType == "submitted_prev")
+	{
+		<script>
+			$(document).ready(function () {
+				turnToPreviewPage();
+			});
+		</script>
+	}
+
+	@* chanif: munculkan approval selain di index & edit *@
+	@if (Model.ViewType != "index" && Model.ViewType != "index_restore")
+	{
+		<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+		<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+		<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+		<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+		<script>
+			$(document).ready(function () {
+				$('#dtApproval').dataTable({
+					"autoWidth": false,
+					"processing": true,
+					"serverSide": true,
+					"info": false,
+					"filter": false,
+					"bLengthChange": false,
+					"orderMulti": false,
+					"pageLength": 10,
+					"destroy": true,
+					"order": [[3, "asc"]],
+					"ajax": {
+						"url": fastApp.BaseUrl + '/LPHPrimaryKretekLineConditioning/GetApproverList?lphid=' + LPHID,
+						"type": "POST",
+						"datatype": "json"
+					},
+
+					"columnDefs":
+						[{
+							"targets": [0],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [1],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [2],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [3],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [4],
+							"searchable": true,
+							"orderable": true
+						},
+							//{
+							//    "targets": [5],
+							//    "searchable": true,
+							//    "orderable": true
+							//},
+
+						],
+
+					"columns": [
+
+						{ "data": "User", "name": "User", "title": "Name", "autoWidth": false },
+						{ "data": "Role", "name": "Role", "title": "Role", "autoWidth": false },
+						{ "data": "Status", "name": "Status", "title": "Status", "autoWidth": false },
+						//{ "data": "Approver", "name": "Approver", "title": "Approver", "autoWidth": false },
+						{
+							"data": "ModifiedDate",
+							render: function (data, type, row) {
+								if (data)
+									return moment(data).format("DD-MMM-YY HH:mm");
+								else
+									return '';
+							}
+						},
+						{ "data": "Notes", "name": "Notes", "title": "Comment", "autoWidth": false }
+					],
+					"fnRowCallback": function (nRow, data, iDisplayIndex, iDisplayIndexFull) {
+						$('td', nRow).css('background-color', data['Color']);
+						$('#dtApproval_paginate')[0].style.display = "none";
+					}
+				});
+			});
+		</script>
+	}
+
+
+	<script>
+
+        const krosokPssData = {
+            krosokBlend: "V0N5A",
+            krosokSapBatch: "1325505",
+            krosokSiloPreblend: "250010",
+            krosokSiloTotalBlend: "300025",
+            krosokStart: "06:10",
+            krosokStop: "07:10",
+            krosokDuration: "60 Mnt",
+            krosokTotalTobWet: "3771.00",
+            krosokTotalTobDry: "3291.22",
+            krosokCylinderAirTempAvg1: "66.76",
+            krosokCylinderAirTempAvg2: "0.00",
+            krosokTobTempAvg1: "65.80",
+            krosokTobTempAvg2: "65.80",
+            krosokTotalWater1: "78.00",
+            krosokTotalWater2: "78.00",
+            krosokMcExitOv: "21.50",
+            krosokCasingAppRate: "0.22",
+            krosokTotalizer: "720.70",
+        };
+        const rajanganPssData = {
+            rajanganBlend: "V0N5A",
+            rajanganSapBatch: "819103108",
+            //rajanganSiloPreblend: "No HPS",
+            rajanganSiloTotalBlend: "300025",
+            rajanganStart: "06:10",
+            rajanganStop: "07:27",
+            rajanganDuration: "77 Mnt",
+            rajanganTotalTobWet: "4717.00",
+            rajanganTotalTobDry: "4116.86",
+            rajanganCylinderAirTempAvg1: "64.83",
+            rajanganCylinderAirTempAvg2: "0.00",
+            rajanganTobTempAvg1: "66.00",
+            rajanganTobTempAvg2: "66.00",
+            rajanganTotalWater1: "286.00",
+            rajanganTotalWater2: "0.00",
+            rajanganMcExitOv: "21.50",
+            rajanganCasingAppRate: "0.22",
+            rajanganTotalizer: "901.90",
+        };
+
+
+
+        const wasteOpt = [
+            {
+                category: "DCC Krosok",
+                child: [
+                    {
+                        waste: "Cylinder Cleaning",
+                        type: "Wet Waste",
+                    },
+                    {
+                        waste: "Sapon",
+                        type: "Dry Waste",
+                    },
+                    {
+                        waste: "Vacuum",
+                        type: "Dust",
+                    },
+                    {
+                        waste: "Casing Loss",
+                        type: "Inventory Adjustment",
+                    },
+                ]
+            },
+            {
+                category: "DCC Rajangan",
+                child: [
+                    {
+                        waste: "Cylinder Cleaning",
+                        type: "Wet Waste",
+                    },
+                    {
+                        waste: "Sapon",
+                        type: "Dry Waste",
+                    },
+                    {
+                        waste: "Casing Loss",
+                        type: "Inventory Adjustment",
+                    },
+                    {
+                        waste: "Vacuum",
+                        type: "Dust",
+                    },
+                ]
+            },
+        ];
+
+        var wasteNewData;
+
+        var selected;
+        $(document).ready(function () {
+
+            $('#phase-waste-modal').on('show.bs.modal', function (e) {
+                let opts = [];
+                for (var i = 0; i < wasteOpt.length; i++) {
+                    opts.push(wasteOpt[i].category);
+                    console.log(wasteOpt[i].category);
+                }
+                console.log(generateWizardButton(opts));
+                $(this).find(".waste").html(generateWizardButton(opts));
+            });
+            $('#phase-waste-modal').on('next', function (e, i, info) {
+                if (!selected && i != 2) {
+                    info.shouldReturn = true;
+                    return;
+                }
+
+                const tr = $("#waste ~ tfoot tr.input");
+
+
+                switch (i) {
+                    case 0:
+
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            if (wasteOpt[i].category == selected) {
+                                wasteNewData = wasteOpt[i];
+                                let opts = [];
+                                for (var j = 0; j < wasteOpt[i].child.length; j++) {
+                                    opts.push(wasteOpt[i].child[j].waste);
+                                }
+                                $(this).find(".kind").html(generateWizardButton(opts));
+                            }
+                        }
+                        selected = null;
+                        break;
+                    case 1:
+
+                        //info.shouldHide = true;
+
+                        for (var j = 0; j < wasteNewData.child.length; j++) {
+                            if (wasteNewData.child[j].waste == selected) {
+                                $(tr).find("[name=Area]").val(wasteNewData.category);
+                                $(tr).find("[name=Waste]").val(wasteNewData.child[j].waste);
+                                $(tr).find("[name=WasteType]").val(wasteNewData.child[j].type);
+                            }
+                        }
+
+                        $(tr).find("[name=Weight]").val($('#WasteWeight').text());
+                        $(this).find(".next").show();
+                        //$(tr).find(".fa.fa-plus-circle").click();
+                        break;
+                    case 2:
+                        const remarks = $("[name=WasteRemark]").val();
+                        if (remarks == "") info.shouldReturn = true;
+                        else {
+                            info.shouldHide = true;
+                            $(tr).find("[name=Remarks]").val(remarks);
+                            $(tr).find(".fa.fa-plus-circle").click();
+                        }
+                        selected = null;
+                        break;
+                }
+            });
+            $('#phase-waste-modal').on('hide', function (e) {
+                wasteNewData = {};
+                selected = null;
+            });
+        });
+
+        $(document).ready(function () {
+            $('.get-pss-data-krosok').click(function () {
+
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("getPSSData", "LPHPrimaryKretekLineConditioning")",
+                    data: JSON.stringify({
+                        BatchID: $('[name=krosokBatchNo]').val()
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        $('#loading_overlay').addClass('d-none');
+                        if (result.Status == 'True') {
+                            var model = JSON.parse(result.Data);
+                            if (model.length > 0) {
+                                var BatchID = $('[name=krosokBatchNo]').val();
+                                cancelEdit($(".get-pss-data-krosok"));
+                                $('[name=krosokBatchNo]').val(BatchID);
+                                var tobWetWest = 0;
+                                var tobDryWest = 0;
+                                for (var i = 0; i < model.length; i++) {
+                                    //Krosok ST Infeed KR
+                                    if (model[i].EventType.trim() == 'ST IKR E' || model[i].EventType.trim() == 'ST Infeed KR') {
+                                        var str = model[i].EventDateTimeLocal;
+                                        const milliseconds = str.substring(str.lastIndexOf("(") + 1, str.lastIndexOf(")"));
+                                        const time = moment(parseInt(milliseconds)).format("HH:mm");
+                                        $('[name=krosokStart]').val(time);
+                                    }
+                                    if (model[i].EventType.trim() == 'END IKR P' || model[i].EventType.trim() == 'END Infeed KR') {
+                                        var str = model[i].EventDateTimeLocal;
+                                        const milliseconds = str.substring(str.lastIndexOf("(") + 1, str.lastIndexOf(")"));
+                                        const time = moment(parseInt(milliseconds)).format("HH:mm");
+                                        $('[name=krosokStop]').val(time);
+                                    }
+                                    switch (model[i].DataName) {
+                                        case "Blend Code":
+                                        case "BLEND":
+                                            $('[name=krosokBlend]').val(model[i].Value);
+                                            break;
+                                        case "SAP Solution Krosok Batch id 1 Str":
+                                        //case "ParamValue":
+                                            $('[name=krosokSapBatch]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_KR_PBSiloLoadSel":
+                                        case "Silo Destionation":
+                                            $('[name=krosokSiloPreblend]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_KR_TBSiloLoadSel":
+                                        case "Tob Totalizer in Silo":
+                                            $('[name=krosokSiloTotalBlend]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_WB200045BTotWetTob":
+                                            tobWetWest = model[i].Value;
+                                            break;
+                                        case "END_IKR_WB200045BTotDryTob":
+                                            tobDryWest = model[i].Value;
+                                            break;
+                                        case "END_IRJ_WB100045BTotWetTob":
+                                        case "Krosok FC Tob Qty Totalizer":
+                                            $('[name=krosokTotalTobWet]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_WB100045BTotDryTob":
+                                        case "V4-KRS-DCC-FC-ExitOV-DryReal":
+                                            $('[name=krosokTotalTobDry]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_DCC_2_60AirTempAvg201":
+                                        case "V4-KRS-DCC-FC-AirTemp-Avg":
+                                            $('[name=krosokCylinderAirTempAvg1]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_DCC_2_60AirTempAvg202":
+                                            $('[name=krosokCylinderAirTempAvg2]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_DCC_2_60TobTempAvg201":
+                                        case "V4-KRS-DCC-FC-TobTemp-Avg":
+                                            $('[name=krosokTobTempAvg1]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_DCC_2_60TotalWtr201":
+                                        case "V4-KRS-DCC-FC-Water-QtyReal":
+                                            $('[name=krosokTotalWater1]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_MM250128Avg101":
+                                        case "V4-KRS-DCC-FC-ExitOV-Avg":
+                                            $('[name=krosokMcExitOv]').val(model[i].Value);
+                                            break;
+                                        case "END_CsgKR_BSApplRate":
+                                        case "V4-KRS-DCC-BC-AppRatPV-Avg":
+                                            $('[name=krosokCasingAppRate]').val(model[i].Value);
+                                            break;
+                                        case "END_CsgKR_Cyl250070TotCasing":
+                                        case "V4-KRS-DCC-BC-Solution-QtyReal":
+                                            $('[name=krosokTotalizer]').val(model[i].Value);
+                                            break;
+                                    };
+
+                                    if (@(ViewBag.isWest) && $('[name=krosokBlend]').val() == 'V0Q3W') {
+                                        $('[name=krosokTotalTobWet]').val(tobWetWest);
+                                        $('[name=krosokTotalTobDry]').val(tobDryWest);
+                                    }
+                                }
+                            } else {
+                                var notice = new PNotify({
+                                    title: "@UIResources.ErrorMessage",
+                                    text: "Batch Tidak Ditemukan",
+                                    width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+                                    hide: false,
+                                    buttons: {
+                                        sticker: false
+                                    }
+                                });
+
+                                setTimeout(function(){
+                                    notice.remove();
+                                }, 3000);
+                                notice.get().click(function () {
+                                    notice.remove();
+                                });
+                            }
+                        }
+                        else {
+
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "Batch Tidak Ditemukan",
+                                width: "400px",
+                                type: 'error',
+                                addclass: 'stack-bottomright',
+                                hide: false,
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            setTimeout(function(){
+                	            notice.remove();
+                	        }, 3000);
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                    },
+                    error: function (result) {
+
+                        var notice = new PNotify({
+                            title: "@UIResources.ErrorMessage",
+                            text: "Batch Tidak Ditemukan",
+                            width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+                            hide: false,
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        setTimeout(function(){
+            	            notice.remove();
+            	        }, 3000);
+
+                        notice.get().click(function () {
+                            notice.remove();
+                        });
+                    }
+                });
+                //for (var prop in krosokPssData) {
+                //    if (Object.prototype.hasOwnProperty.call(krosokPssData, prop)) {
+                //        $("[name=" + prop + "]").val(krosokPssData[prop]);
+                //    }
+                //}
+            });
+
+            $('.get-pss-data-rajangan').click(function () {
+
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("getPSSDataRajangan", "LPHPrimaryKretekLineConditioning")",
+                    data: JSON.stringify({
+                        BatchID: $('[name=rajanganBatchNo]').val()
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        $('#loading_overlay').addClass('d-none');
+                        if (result.Status == 'True') {
+                            var model = JSON.parse(result.Data);
+                            if (model.length > 0) {
+                                var BatchID = $('[name=rajanganBatchNo]').val();
+                                cancelEdit($(".get-pss-data-rajangan"));
+                                 $('[name=rajanganBatchNo]').val(BatchID);
+                                for (var i = 0; i < model.length; i++) {
+                                    //Krosok
+                                    if (model[i].EventType.trim() == 'ST IRJ E' || model[i].EventType.trim() == 'ST Infeed RJ') {
+                                        var str = model[i].EventDateTimeLocal;
+                                        const milliseconds = str.substring(str.lastIndexOf("(") + 1, str.lastIndexOf(")"));
+                                        const time = moment(parseInt(milliseconds)).format("HH:mm");
+                                        $('[name=rajanganStart]').val(time);
+                                    }
+                                    if (model[i].EventType.trim() == 'END IRJ E' || model[i].EventType.trim() == 'END Infeed RJ') {
+                                        var str = model[i].EventDateTimeLocal;
+                                        const milliseconds = str.substring(str.lastIndexOf("(") + 1, str.lastIndexOf(")"));
+                                        const time = moment(parseInt(milliseconds)).format("HH:mm");
+                                        $('[name=rajanganStop]').val(time);
+                                    }
+                                    switch (model[i].DataName) {
+                                        case "Blend Code":
+                                        case "BLEND":
+                                            $('[name=rajanganBlend]').val(model[i].Value);
+                                            break;
+                                        case "SAP Solution Krosok Batch id 1 Str":
+                                        //case "ParamValue":
+                                            $('[name=rajanganSapBatch]').val(model[i].Value);
+                                            break;
+                                        case "END_IKR_KR_TBSiloLoadSel":
+                                        case "TobTotalizerInSilo":
+                                            $('[name=rajanganSiloTotalBlend]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_WB100045BTotWetTob":
+                                        case "01. Rajangan Total Actual Weight":
+                                            $('[name=rajanganTotalTobWet]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_WB100045BTotDryTob":
+                                        case "BS-WB-Dry-Real":
+                                            $('[name=rajanganTotalTobDry]').val(model[i].Value);
+                                            break;
+                                        case "DCC_1_60AirTempAvg101":
+                                        case "V4-RAJ-DCC-RJ-AirTemp-Avg":
+                                            $('[name=rajanganCylinderAirTempAvg1]').val(model[i].Value);
+                                            break;
+                                        case "DCC_1_60AirTempAvg102":
+                                            $('[name=rajanganCylinderAirTempAvg2]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_MM100080XTobTempAvg101":
+                                        case "V4-RAJ-DCC-RJ-TobTemp-Avg":
+                                            $('[name=rajanganTobTempAvg1]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_MM100080XTobTempAvg102":
+                                            $('[name=rajanganTobTempAvg2]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_DCC_1_60TotalWtr101":
+                                        case "V4-RAJ-DCC-RJ-Water-QtyReal":
+                                            $('[name=rajanganTotalWater1]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_DCC_1_60TotalWtr102":
+                                            $('[name=rajanganTotalWater2]').val(model[i].Value);
+                                            break;
+                                        case "END_IRJ_MM250128Avg101":
+                                        case "V4-RAJ-DCC-RJ-ExitOV-Avg":
+                                            $('[name=rajanganMcExitOv]').val(model[i].Value);
+                                            break;
+                                        case "END_CsgRJ_BSApplRate":
+                                        case "V4-RAJ-BS-AppRatPV-Avg":
+                                            $('[name=rajanganCasingAppRate]').val(model[i].Value);
+                                            break;
+                                        case "END_CsgRJ_Cyl150070TotCasing":
+                                        case "V4-RAJ-BS-Solution-QtyReal":
+                                            $('[name=rajanganTotalizer]').val(model[i].Value);
+                                            break;
+                                    };
+                                }
+                            } else {
+                                var notice = new PNotify({
+                                    title: "@UIResources.ErrorMessage",
+                                    text: "Batch Tidak Ditemukan",
+                                    width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+                                    hide: false,
+                                    buttons: {
+                                        sticker: false
+                                    }
+                                });
+
+                                setTimeout(function(){
+                                    notice.remove();
+                                }, 3000);
+                                notice.get().click(function () {
+                                    notice.remove();
+                                });
+                            }
+                        }
+                        else {
+
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "Batch Tidak Ditemukan",
+                                width: "400px",
+                                type: 'error',
+                                addclass: 'stack-bottomright',
+                                hide: false,
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            setTimeout(function(){
+                	            notice.remove();
+                	        }, 3000);
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                    },
+                    error: function (result) {
+
+                        var notice = new PNotify({
+                            title: "@UIResources.ErrorMessage",
+                            text: "Batch Tidak Ditemukan",
+                            width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+                            hide: false,
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        setTimeout(function(){
+            	            notice.remove();
+            	        }, 3000);
+
+                        notice.get().click(function () {
+                            notice.remove();
+                        });
+                    }
+                });
+                //for (var prop in krosokPssData) {
+                //    if (Object.prototype.hasOwnProperty.call(krosokPssData, prop)) {
+                //        $("[name=" + prop + "]").val(krosokPssData[prop]);
+                //    }
+                //}
+            });
+        });
+
+          $('#btnHistory').on('click', function (e) {
+		    location.href = '@Url.Action("Index", "HistoryPrimary")';
+          });
+	</script>
+}
+
+

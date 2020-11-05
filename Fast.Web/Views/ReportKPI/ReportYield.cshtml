@@ -1,0 +1,238 @@
+﻿@model Fast.Web.Models.Report.ReportWeeklyYieldModel
+@using Fast.Web.Resources;
+@{ 
+    var start = 0;
+    if (ViewBag.showall == 1)
+    {
+
+    } else
+    {
+        if (Model.Header.Count() > 4)
+        {
+            start = Model.Header.Count() - 5;
+        }
+    }
+
+}
+
+<style>
+    .table thead th {
+        vertical-align: middle;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        display: none !important;
+    }
+</style>
+
+<div class="card-header">
+    <div class="row pd-r-10-f">
+        <div class="col-sm-3 form-group">
+            <label class="d-block">Production Center</label>
+            <select class="form-control select2" id="PC" name="PC">
+                <option value="">All Production Center</option>
+                <option value="PB" @(ViewBag.PC == "PB" ? "selected" : "")>PB - SIS Sukorejo</option>
+                <option value="PJ" @(ViewBag.PC == "PJ" ? "selected" : "")>PJ - Sampoerna Sukorejo</option>
+                <option value="PK" @(ViewBag.PC == "PK" ? "selected" : "")>PK - Sampoerna Karawang</option>
+                <option value="PI" @(ViewBag.PC == "PI" ? "selected" : "")>PI - PMID Karawang</option>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group d-none">
+            <label class="d-block">Year</label>
+            <input class="form-control" name="year" id="year" type="number" value="@(ViewBag.year)">
+        </div>
+        <div class="col-sm-2 form-group d-none">
+            <label class="d-block">Start Week</label>
+            <input class="form-control" name="week" id="week" type="number" value="@(ViewBag.week)">
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">List</label>
+            <select class="form-control select2" id="showall" name="showall">
+                <option value="0">Show Last 4 Weeks</option>
+                <option value="1" @(ViewBag.showall == 1 ? "selected" : "")>Show All Data</option>
+            </select>
+        </div>
+
+        <div class="col-sm-2 mg-t-30"><button onclick="refresh()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-search mg-r-10"></i> Search</button></div>
+        <div class="col-sm-2 offset-3 mg-t-30" id="buttonexcel"></div>
+
+    </div>
+</div>
+<div class="card-body">
+    <table class="table table-bordered" id="reportYield">
+        <thead class="thead-primary font-weight-bold">
+            <tr>
+                <th>Description</th>
+                @for (int i = start; i < Model.Header.Count(); i++)
+                {
+                    <th>@Model.Header[i]</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="background-color:cornflowerblue; color:white; font-weight:bold">Wet | Yield Loss Tree</td>
+                @for (int i = start; i < Model.Header.Count(); i++)
+                {
+                    <td style="background-color:cornflowerblue;"></td>
+                }
+            </tr>
+            <tr>
+                <td>Sec Spec Wet Yield</td>
+                @for (int i = start; i < Model.SecSpecWetYield.Count(); i++)
+                {
+                    <th>@Model.SecSpecWetYield[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>Sec Actual Wet Yield</td>
+                @for (int i = start; i < Model.SecActualWetYield.Count(); i++)
+                {
+                    <th>@Model.SecActualWetYield[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; FloorSwept</td>
+                @for (int i = start; i < Model.FloorSweptWet.Count(); i++)
+                {
+                    <th>@Model.FloorSweptWet[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; DustHalus</td>
+                @for (int i = start; i < Model.DustHalusWet.Count(); i++)
+                {
+                    <th>@Model.DustHalusWet[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; RippingLoss</td>
+                @for (int i = start; i < Model.RippingLossWet.Count(); i++)
+                {
+                    <th>@Model.RippingLossWet[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; Unaccountable</td>
+                @for (int i = start; i < Model.UnaccountableWet.Count(); i++)
+                {
+                    <th>@Model.UnaccountableWet[i]</th>
+                }
+            </tr>
+
+            <tr>
+                <td style="background-color:cornflowerblue; color:white; font-weight:bold">Dry | Yield Loss Tree</td>
+                @for (int i = start; i < Model.Header.Count(); i++)
+                {
+                    <td style="background-color:cornflowerblue;"></td>
+                }
+            </tr>
+            <tr>
+                <td>Sec Actual Dry Yield</td>
+                @for (int i = start; i < Model.SecActualDryYield.Count(); i++)
+                {
+                    <th>@Model.SecActualDryYield[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; FloorSwept</td>
+                @for (int i = start; i < Model.FloorSweptDry.Count(); i++)
+                {
+                    <th>@Model.FloorSweptDry[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; DustHalus</td>
+                @for (int i = start; i < Model.DustHalusDry.Count(); i++)
+                {
+                    <th>@Model.DustHalusDry[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; RippingLoss</td>
+                @for (int i = start; i < Model.RippingLossDry.Count(); i++)
+                {
+                    <th>@Model.RippingLossDry[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp; Unaccountable</td>
+                @for (int i = start; i < Model.UnaccountableDry.Count(); i++)
+                {
+                    <th>@Model.UnaccountableDry[i]</th>
+                }
+            </tr>
+
+            <tr>
+                <td style="background-color:cornflowerblue; color:white; font-weight:bold"></td>
+                @for (int i = start; i < Model.Header.Count(); i++)
+                {
+                    <td style="background-color:cornflowerblue;"></td>
+                }
+            </tr>
+            <tr>
+                <td>MC Cutfiller</td>
+                @for (int i = start; i < Model.MCCutfiller.Count(); i++)
+                {
+                    <th>@Model.MCCutfiller[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>Pack OV</td>
+                @for (int i = start; i < Model.PackOV.Count(); i++)
+                {
+                    <th>@Model.PackOV[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>Weight | ATW</td>
+                @for (int i = start; i < Model.WeightATW.Count(); i++)
+                {
+                    <th>@Model.WeightATW[i]</th>
+                }
+            </tr>
+            <tr>
+                <td>Weight | C2 Weight</td>
+                @for (int i = start; i < Model.WeightC2Weight.Count(); i++)
+                {
+                    <th>@Model.WeightC2Weight[i]</th>
+                }
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function refresh() {
+        $('#loading_overlay').removeClass('d-none');
+        $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/ReportYield?year=" + $('#year').val() + "&week=" + $('#week').val()+ "&showall=" + $('#showall').val() + "&PC=" + $('#PC').val(), function () {
+            $('#loading_overlay').addClass('d-none');
+        });
+    }
+
+    var table = $('#reportYield').dataTable({
+        order: [],
+        ordering: false,
+        searching: false,
+        paging: false,
+        lengthChange: false,
+        language: {
+            searchPlaceholder: 'Search...',
+            sSearch: '',
+            lengthMenu: '_MENU_ items/page',
+        }
+    });
+
+    var button = new $.fn.dataTable.Buttons(table, {
+	    buttons: [
+		    {
+			    "text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+				"extend": 'excel',
+				"className": 'btn pd-x-15 btn-outline-success btn-uppercase btn-block',
+				"title": 'Report Yield',
+				"extension": '.xlsx',
+				"titleAttr": 'EXCEL',
+		    }
+	    ]
+    }).container().appendTo($('#buttonexcel'));
+</script>

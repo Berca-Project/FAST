@@ -1,0 +1,183 @@
+﻿@model Fast.Web.Models.WppModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+}
+
+@section Styles{
+	<style>
+		.dataTables_scrollHead table, .dataTables_scrollBody table {
+			width: 2000px !important;
+		}
+
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">MPP Dashboard</h4>
+				<p class="mg-b-0 tx-color-03">MPP Summary Management</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+						<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+					</button>					
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "MPP")'">
+						<i data-feather="arrow-left-circle" class="mg-r-5"></i> @UIResources.Back
+					</button>
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<br />
+
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+			<div class="row">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.StartDate</label>
+				</div>
+				<div class="col-md-2"><input class="form-control hasDatepicker" id="startDate" type="text" placeholder="dd-MMM-yy" /></div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.EndDate</label>
+				</div>
+				<div class="col-md-2"><input class="form-control hasDatepicker" id="endDate" type="text" placeholder="dd-MMM-yy" /></div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-2">
+					<button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">Search</button>
+				</div>
+			</div>
+		</div>
+
+		<div data-label="MPP Data" class="df-example demo-table dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="dashboardTable">
+				<thead>
+					<tr>
+						<th>@UIResources.Date</th>
+						<th>@UIResources.JobTitle</th>
+						<th>@UIResources.Total</th>
+						<th>@UIResources.Assigned</th>
+						<th>@UIResources.Idle</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script type="text/javascript">
+
+        $('#btnSearch').on('click', function () {
+			var startDateFilter = $('#startDate').val();
+			var endDateFilter = $('#endDate').val();
+
+			$('#dashboardTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"language": {
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"destroy": true,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/MPP/GetMPPSummary",
+					"data": { startDateParam: startDateFilter, endDateParam: endDateFilter },
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [3],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [4],
+						"searchable": false,
+						"orderable": false
+					}
+					],
+
+				"columns": [
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					},
+					{ "data": "JobTitle", "name": "JobTitle", "autoWidth": true },
+					{ "data": "Total", "name": "Total", "autoWidth": true },
+					{ "data": "Assigned", "name": "Assigned", "autoWidth": true },
+					{ "data": "Idle", "name": "Idle", "autoWidth": true }
+				]
+			});
+        });
+
+        $(document).ready(function () {
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+            });
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("GenerateExcelDashboard", "MPP")?startDateParam=' +  $('#startDate').val() + '&endDateParam=' + $('#endDate').val();
+		};
+
+	</script>
+}

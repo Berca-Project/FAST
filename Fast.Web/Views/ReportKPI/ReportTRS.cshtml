@@ -1,0 +1,367 @@
+﻿@model Fast.Web.Models.Report.ReportTRSModel
+@using Fast.Web.Resources;
+
+@{ 
+    int counter = 0;
+    List<dynamic> makers = new List<dynamic>();
+    List<double> total = new List<double>();
+    string[] alphabet = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
+    string[] color = { "#0bd0c4", "#0bc0d0", "#0badd0", "#0b96d0", "#0b71d0", "#0b43d0", "#190bd0", "#680bd0", "#880bd0", "#b60bd0", "#d00bce", "#d00b9f", "#d00b6c", "#d00b27", "#d0390b", "#d0760b", "#d08d0b", "#d0b20b", "#d0c40b", "#c9d00b", "#b2d00b", "#88d00b", "#22d00b", "#0bd096", "#0bd0b6" };
+    var monthly = new List<List<double>>();
+
+}
+
+<style>
+    .table thead th{
+        vertical-align:middle;
+    }
+
+    .dataTables_wrapper .dataTables_info{
+        display:none !important;
+    }
+</style>
+
+<div class="card-header">
+    <div class="row pd-r-10-f">
+        <div class="col-sm-3 form-group">
+            <label class="d-block">Production Center</label>
+            <select class="form-control select2" id="PC" name="PC">
+                <option value="PJ" @(ViewBag.PC == "PJ" ? "selected" : "")>PJ - Sampoerna Sukorejo</option>
+                <option value="PB" @(ViewBag.PC == "PB" ? "selected" : "")>PB - SIS Sukorejo</option>
+                <option value="PK" @(ViewBag.PC == "PK" ? "selected" : "")>PK - Sampoerna Karawang</option>
+                <option value="PI" @(ViewBag.PC == "PI" ? "selected" : "")>PI - PMID Karawang</option>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Start Date</label>
+            <input class="form-control hasDatepicker" name="dateFrom" id="dateFrom" type="text" value="@(ViewBag.dateFrom)">
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">End Date</label>
+            <input class="form-control hasDatepicker" name="dateTo" id="dateTo" type="text" value="@(ViewBag.dateTo)">
+        </div>
+
+        <div class="col-sm-2 mg-t-30"><button onclick="refresh()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-search mg-r-10"></i> Search</button></div>
+        <div class="col-sm-2 offset-1 mg-t-30"><button onclick="downloadXls()" class="btn pd-x-15 btn-success btn-uppercase btn-block"><i class="fa fa-file-excel mg-r-10"></i> Excel</button></div>
+
+    </div>
+</div>
+<div class="card-body">
+    @if (Model.content != null && Model.content.Count() > 0)
+    {
+        makers = Model.content.Select(x => x.Maker).Distinct().OrderBy(x => x).ToList();
+        var hariawal = DateTime.Parse(ViewBag.dateTo).AddDays(-6);
+
+        <h5 class="mg-b-15">Weekly</h5>
+        <table class="table table-bordered" id="reportTRSMonth">
+            <thead class="thead-primary font-weight-bold">
+                <tr>
+                    <th>Maker</th>
+                    @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo; i++)
+                    {
+                        <th>W@(i)</th>
+                    }
+                    <th>AVG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var maker in makers)
+                {
+                    counter = 0;
+                    double jumlah = 0;
+                    var bulanan = new List<double>();
+
+                    <tr>
+                        <td>@maker</td>
+                        @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo; i++)
+                        {
+                            double sumweek = 0;
+                            var markerweek = Model.content.Where(x => x.Week == i && x.Maker == maker).Select(x => x.Recovery).ToList();
+                            if (markerweek != null && markerweek.Count() > 0)
+                            {
+                                try
+                                {
+                                    foreach (var lala in markerweek)
+                                    {
+                                        sumweek += lala;
+                                    }
+                                }
+                                catch (Exception x)
+                                {
+
+                                }
+
+                            }
+
+                            <th>@(Math.Round(sumweek, 2))</th>
+                            bulanan.Add(Math.Round(sumweek, 2));
+
+                            jumlah += sumweek;
+                            counter++;
+                        }
+                        <td>@(jumlah > 0 ? Math.Round(jumlah / counter, 2) : 0)</td>
+                    </tr>
+
+                    bulanan.Add(jumlah > 0 ? Math.Round(jumlah / counter, 2) : 0);
+                    monthly.Add(bulanan);
+                }
+
+                <tr>
+                    <td>Grand Total</td>
+                    @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo; i++)
+                    {
+                        double sumweek = 0;
+                        for (int j = 0; j < makers.Count(); j++)
+                        {
+                            sumweek += monthly[j][i - ViewBag.weekFrom];
+                        }
+
+                        var aver = sumweek / makers.Count();
+
+                        <td>@(Math.Round(aver, 2))</td>
+
+                        total.Add(Math.Round(aver, 2));
+                    }
+                    <td>@(Math.Round(total.Average(x => x), 2))</td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <h5 class="mg-b-15 mg-t-40">TRS Recovery Rate</h5>
+        <div data-label="Example" class="pd-25">
+            <div id="morrisBar" class="ht-300"></div>
+        </div><!-- df-example -->
+
+        <h5 class="mg-b-15 mg-t-40">Weekly Trend</h5>
+        <div data-label="Example" class="pd-25">
+            <div id="morrisLine" class="ht-300"></div>
+        </div><!-- df-example -->
+
+        <h5 class="mg-b-15 mg-t-50">Daily (Last 7 Days)</h5>
+        <table class="table table-bordered" id="reportTRSDay">
+            <thead class="thead-primary font-weight-bold">
+                <tr>
+                    <th>Maker</th>
+                    @foreach (var maker in makers)
+                    {
+                        <th>@maker</th>
+                    }
+                    <!-- <th>AVG</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < 7; i++)
+                {
+                    counter = 0;
+                    double jumlah = 0;
+                    DateTime sekarang = hariawal.AddDays(i);
+
+                    <tr>
+                        <td>@(sekarang.ToString("dddd, dd-MMM-yy"))</td>
+                        @foreach (var maker in makers)
+                        {
+                            double sumweek = 0;
+                            try
+                            {
+                                var markerweek = Model.content.Where(x => DateTime.Parse(x.Date) == sekarang && x.Maker == maker).Select(x => x.Recovery).ToList();
+                                if (markerweek != null && markerweek.Count() > 0)
+                                {
+                                    foreach (var lala in markerweek)
+                                    {
+                                        sumweek += lala;
+                                    }
+                                }
+                            }
+                            catch (Exception x)
+                            {
+
+                            }
+
+                            <th>@(Math.Round(sumweek, 2))</th>
+
+                            jumlah += sumweek;
+                            counter++;
+                        }
+                        <!-- <td>@(jumlah > 0 ? Math.Round(jumlah / counter, 2) : 0)</td> -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <h5 class="mg-b-15 mg-t-50">Raw Data</h5>
+    <table class="table table-bordered" id="reportTRS">
+        <thead class="thead-primary font-weight-bold">
+            <tr>
+                <th>LPHID</th>
+                <th width="90px">Date</th>
+                <th>Maker</th>
+                <th>Shift</th>
+                <th>Time</th>
+                <th>Speed</th>
+                <th>CTW</th>
+                <th>Sample</th>
+                <th>Sampling Time</th>
+                <th>Recovery</th>
+                <th width="100px">Remark</th>
+                <th width="150px">TRS Recovery Rate by Maker (%)</th>
+                <th width="150px">TRS Recovery Rate by Shift (%)</th>
+                <th width="150px">TRS Recovery Rate by Date (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.content != null && Model.content.Count() > 0)
+            {
+                foreach (var data in Model.content)
+                {
+                    <tr>
+                        <td>@data.LPHID</td>
+                        <td>@data.Date</td>
+                        <td>@data.Maker</td>
+                        <td>@data.Shift</td>
+                        <td>@data.Time</td>
+                        <td>@data.Speed</td>
+                        <td>@data.CTW</td>
+                        <td>@data.Sample</td>
+                        <td>@data.Sampling_time</td>
+                        <td>@data.Recovery</td>
+                        <td>@data.Remark</td>
+                        <td>@data.TRSRecoveryMaker</td>
+                        <td>@data.TRSRecoveryShift</td>
+                        <td>@data.TRSRecoveryDate</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10">No Data</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function refresh() {
+        $('#loading_overlay').removeClass('d-none');
+        $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/ReportTRS?dateFrom=" + $('#dateFrom').val() + "&dateTo=" + $('#dateTo').val()+ "&PC=" + $('#PC').val(), function () {
+            $('#loading_overlay').addClass('d-none');
+        });
+    }
+
+    function downloadXls() {
+        window.open(fastApp.BaseUrl + "/ReportKPI/DownloadXlsTRS?dateFrom=" + $('#dateFrom').val() + "&dateTo=" + $('#dateTo').val()+ "&PC=" + $('#PC').val(), '_blank');
+    }
+
+    $('.hasDatepicker').datepicker({
+        format: 'd-M-yy'
+    });
+
+
+    var morrisData2 = [
+        @{ counter = 0; }
+        @foreach(var maker in makers)
+        {
+            try
+            {
+                @:{
+                @:  y: '@(maker)',
+                for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo+1; i++)
+                {
+                    @:@(alphabet[i-ViewBag.weekFrom]): @(monthly[counter][i-ViewBag.weekFrom]),
+                }
+                @:},
+
+                counter++;
+            } catch(Exception e)
+            {
+
+            }
+
+        }
+    ];
+
+    new Morris.Bar({
+        element: 'morrisBar',
+        data: morrisData2,
+        xkey: 'y',
+        ykeys: [
+            @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo+1; i++)
+            {
+                @:'@(alphabet[i-ViewBag.weekFrom])',
+            }
+        ],
+        labels: [
+            @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo; i++)
+            {
+                @:'W@(i)',
+            }
+            'AVG'
+        ],
+        barColors: [
+            @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo+1; i++)
+            {
+                @:'@(color[i-ViewBag.weekFrom])',
+            }
+        ],
+        gridLineColor: '#e5e9f2',
+        gridStrokeWidth: 1,
+        gridTextSize: 11,
+        hideHover: 'auto',
+        resize: true
+    });
+
+    new Morris.Line({
+        element: 'morrisLine',
+        data: [
+            @for (var i = ViewBag.weekFrom; i <= ViewBag.weekTo; i++)
+            {
+                @:{ y: 'W@(i)', a: @(total[i-ViewBag.weekFrom]) },
+            }
+        ],
+        xkey: 'y',
+        ykeys: ['a'],
+        labels: ['Average Recovery Rate'],
+        lineColors: ['#560bd0'],
+        lineWidth: 1,
+        parseTime: false,
+        ymax: 'auto 16',
+        gridLineColor: '#e5e9f2',
+        gridStrokeWidth: 1,
+        gridTextSize: 11,
+        hideHover: 'auto',
+        resize: true
+     });
+
+
+    /*
+    var table = $('#reportTRS').dataTable({
+        scrollX: true,
+        order: [],
+        ordering: false,
+        searching: false,
+        paging: false,
+        lengthChange: false,
+        language: {
+            searchPlaceholder: 'Search...',
+            sSearch: '',
+            lengthMenu: '_MENU_ items/page',
+        }
+    });
+
+    var button = new $.fn.dataTable.Buttons(table, {
+	    buttons: [
+		    {
+			    "text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+				"extend": 'excel',
+				"className": 'btn pd-x-15 btn-outline-success btn-uppercase btn-block',
+				"title": 'Report TRS Rate',
+				"extension": '.xlsx',
+				"titleAttr": 'EXCEL',
+		    }
+	    ]
+    }).container().appendTo($('#buttonexcel'));
+    */
+</script>

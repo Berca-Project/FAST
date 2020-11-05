@@ -1,0 +1,312 @@
+﻿@model Fast.Web.Models.MenuTreeModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/styles.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/jquery.treegrid.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/default.min.css" />	
+}
+
+@section Styles{
+	<style>
+		.checkbox-fast {
+			margin-top: 35px;
+		}
+
+		.custom-control-input2 {
+			z-index: -1;
+			opacity: 0;
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.MenuList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.MenuManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					@if (Model.Access.hasPrint)
+					{
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+						<div id="buttonprint" class="dtButton"></div>
+					}
+					@if (Model.Access.hasWrite)
+					{
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddMenu">
+							<i data-feather="plus" class="mg-r-5"></i> @UIResources.NEW
+						</button>
+					}
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="TreeViewNode" class="df-example demo-table dtMarginTop">
+			<table class="tree table-bordered">
+				<thead>
+					<tr class="headerTree">
+						<td>@UIResources.Menu</td>
+						<td>@UIResources.DisplayOrder</td>
+						<td>@UIResources.PageController</td>
+						@if (Model.Access.hasWrite)
+						{
+							<td>@UIResources.PageAction</td>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var parent in Model.Parents)
+					{
+						<tr class="treegrid-@parent.ID">
+							<td>@parent.Name</td>
+							<td>@parent.DisplayOrder </td>
+							<td>@parent.PageController - @parent.PageAction</td>
+							@if (Model.Access.hasWrite)
+							{
+								<td>
+									<button class="btn-menu btn-default" onclick="EditActions(@parent.ID)" data-toggle="modal" data-target="#modalEditMenu" title="Edit"><i class="fa fa-edit"></i></button>
+									<button class="btn-menu btn-default" onclick="DeleteActions(@parent.ID)" data-toggle="modal" data-target="#modalDeleteMenu" title="Delete"><i class="fa fa-trash-alt"></i></button>
+								</td>
+							}
+						</tr>
+						foreach (var child in parent.Children)
+						{
+							<tr class="treegrid-@child.ID  treegrid-parent-@parent.ID">
+								<td>@child.Name</td>
+								<td>@parent.DisplayOrder . @child.DisplayOrder </td>
+								<td>@child.PageController - @child.PageAction</td>
+								@if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditActions(@child.ID)" data-toggle="modal" data-target="#modalEditMenu" title="Edit"><i class="fa fa-edit"></i></button>
+										<button class="btn-menu btn-default" onclick="DeleteActions(@child.ID)" data-toggle="modal" data-target="#modalDeleteMenu" title="Delete"><i class="fa fa-trash-alt"></i></button>
+									</td>
+								}
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditMenu" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content" id="EditDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalDeleteMenu" tabindex="-2" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content" id="DeleteDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddMenu" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			@using (Html.BeginForm("Create", "Menu", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+			{
+				@Html.AntiForgeryToken()
+				<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+					<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</a>
+					<div class="media align-items-center">
+						<span class="tx-color-03 d-none d-sm-block"><i data-feather="menu" class="wd-60 ht-60"></i></span>
+						<div class="media-body mg-sm-l-20">
+							<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewMenu</h4>
+							<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+						</div>
+					</div><!-- media -->
+				</div><!-- modal-header -->
+				<div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+					<div class="row row-sm mg-b-10">
+						<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+							<div class="col-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Name <span style="color:red">*</span></label>
+							</div>
+							<div class="col-7">
+								@Html.TextBoxFor(x => x.Name, null, new { @class = "form-control", @id = "tbName", @required = "required" })
+							</div>
+						</div>
+						<div class="row col-6">
+							<div class="col-sm-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageController </label>
+							</div>
+							<div class="col-7">
+								@Html.TextBoxFor(x => x.PageController, null, new { @class = "form-control", @id = "tbPageController" })
+							</div>
+						</div>
+					</div>
+
+					<div class="row row-sm mg-b-10">
+						<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+							<div class="col-sm-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageAction </label>
+							</div>
+							<div class="col-7">
+								@Html.TextBoxFor(x => x.PageAction, null, new { @class = "form-control", @id = "tbPageAction" })
+							</div>
+						</div>
+						<div class="row col-6">
+							<div class="col-sm-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageSlug </label>
+							</div>
+							<div class="col-7">
+								@Html.TextBoxFor(x => x.PageSlug, null, new { @class = "form-control", @id = "tbslug" })
+							</div>
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="row col-6" style="margin-right:10px;margin-left:10px;">
+							<div class="col-sm-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.PageIcon</label>
+							</div>
+							<div class="col-7">
+								@Html.DropDownListFor(x => x.PageIcon, (IEnumerable<SelectListItem>)ViewBag.IconList, new { @class = "form-control", @id = "ddlIcon" })
+							</div>
+						</div>
+						<div class="row col-6">
+							<div class="col-sm-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.DisplayOrder</label>
+							</div>
+							<div class="col-7">
+								@Html.TextBoxFor(x => x.DisplayOrder, null, new { @class = "form-control", @id = "tbDisplayOrder", @type = "number" })
+							</div>
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="row col-sm-6" style="margin-top:-25px;margin-right:10px;margin-left:10px;">
+							<div class="form-group col-6" id="divParent">
+								@Html.CheckBoxFor(x => x.IsParent, new { @class = "checkbox-fast", @id = "cbIsParent" })
+								<label class="form-check-label" for="cbIsParent">@UIResources.IsParentMenu</label>
+							</div>
+							<div class="form-group col-6" id="divTopMenu">
+								@Html.CheckBoxFor(x => x.IsTopMenu, new { @class = "checkbox-fast", @id = "cbIsTopMenu" })
+								<label class="form-check-label" for="cbIsTopMenu">@UIResources.IsTopMenu</label>
+							</div>
+						</div>
+						<div class="row col-sm-6" id="divParentMenu">
+							<div class="col-sm-4">
+								<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ParentMenu</label>
+							</div>
+							<div class="col-7">
+								@Html.DropDownListFor(p => p.ParentID, (IEnumerable<SelectListItem>)ViewBag.ParentMenuList, new { @class = "form-control", @id = "ddlParentMenu" })
+							</div>
+						</div>
+					</div>
+				</div><!-- modal-body -->
+				<div class="modal-footer pd-x-20 pd-y-15">
+					<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+					<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+				</div>
+			}
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<script src="~/Content/theme/lib/jquery-treegrid/js/jquery.treegrid.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('.tree').treegrid();
+
+			$("#cbIsParent").click(function (e) {
+				if ($("#cbIsParent").is(':checked')) {
+					$("#cbIsTopMenu").attr("disabled", true);
+					$("#divParentMenu").hide();
+				} else {
+					$("#cbIsTopMenu").removeAttr("disabled", true);
+					$("#divParentMenu").show();
+				}
+			});
+
+			$("#cbIsTopMenu").click(function (e) {
+				if ($("#cbIsTopMenu").is(':checked')) {
+					$("#divParentMenu").hide();
+					$("#cbIsParent").attr("disabled", true);
+				} else {
+					$("#divParentMenu").show();
+					$("#cbIsParent").removeAttr("disabled");
+				}
+			});
+
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			if (result != "") {
+				if (result == "True") {
+					var message = "@ViewBag.Message";
+
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: message,
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var error = "@ViewBag.ErrorMessage";
+
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		});		
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "Menu")';
+		};
+
+		function EditActions(id) {
+			$("#EditDialog").load(fastApp.BaseUrl + "/Menu/Edit/" + id);
+		};
+
+		function DeleteActions(id) {
+			$("#DeleteDialog").load(fastApp.BaseUrl + "/Menu/Delete/" + id);
+		};
+	</script>
+}
+

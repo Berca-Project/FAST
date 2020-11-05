@@ -1,0 +1,1431 @@
+﻿@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+}
+@section Styles{
+    <style>
+        .dataTables_scrollHead table, .dataTables_scrollBody table {
+            width: 2500px !important;
+        }
+
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Harian Bandrol</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Harian Bandrol</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="buttonexcel" class="btn dtButton pd-x-0"></button>
+                <button id="buttonexcelOther" class="btn dtButton pd-x-0"></button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group d-flex">
+                                <label class="col-2" style="flex:1">Date</label>
+                                <div style="flex:3">
+                                    <div class="input-group col-12">
+                                        <input type="week" class="form-control" name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="week" class="form-control" name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        @*<div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Country</label>
+                                    <div class="col-6">
+                                        <select class="form-control select2" name="country">
+                                            <option label="Select Country"></option>
+                                            <option value="id">ID - Indonesia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Lph Status</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" name="status">
+                                        <option value="Submitted">Submitted</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Submitted-Approved">Submitted and Approved</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" data-mock-width="150px" name="prodCenter">
+                                        @foreach (SelectListItem i in ViewBag.ProductionCenterList)
+                                        {
+                                            <option value="@(i.Value)">@i.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand</label>
+                                <div class="col-9">
+                                    <select class="form-control select2" data-mock-width="310px" name="brand">
+                                        <option label="Select Brand"></option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.Brand)
+                                        {
+                                            <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20 report">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Laporan Harian Bandrol</div>
+                    <div class="card-body row">
+
+                        <div class="tableWrapper d-none" style="min-height:300px;" id="PMIDTable">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:50px;" rowspan="2">Week</th>
+                                        <th style="min-width:80px;" rowspan="2">Day</th>
+                                        <th style="min-width:110px;" rowspan="2">Date</th>
+                                        <th style="min-width:50px;" rowspan="2">Shift</th>
+                                        <th style="min-width:50px;" rowspan="2">Group</th>
+                                        <th style="min-width:50px;" rowspan="2">Machine</th>
+                                        <th style="min-width:120px;" rowspan="2">FA Code</th>
+                                        <th colspan="8">Opening</th>
+                                        <th colspan="16">Closing</th>
+                                        <th colspan="8">Others</th>
+                                    </tr>
+                                    <tr>
+                                        @*<td style="min-width:50px;">Week</td>
+                                            <td style="min-width:80px;">Day</td>
+                                            <td style="min-width:110px;">Date</td>
+                                            <td style="min-width:50px;">Shift</td>
+                                            <td style="min-width:50px;">Group</td>
+                                            <td style="min-width:50px;">Machine</td>
+                                            <td style="min-width:120px;">FA Code</td>*@
+                                        <td style="min-width:90px;">T/S Request</td>
+                                        <td style="min-width:90px;">WIP from Manual Tax Stamp</td>
+                                        <td style="min-width:90px;">Stock Awal</td>
+                                        <td style="min-width:90px;">Pack on Machine</td>
+                                        <td style="min-width:110px;">Pack on Sampling Cabinet</td>
+                                        <td style="min-width:90px;">Pack Out of Machine</td>
+                                        <td style="min-width:90px;">WIP from Other Machine</td>
+                                        <td style="min-width:130px;">Total Opening</td>
+                                        <td style="min-width:90px;">Case (w TS)</td>
+                                        <td style="min-width:110px;">Case (wo TS)</td>
+                                        <td style="min-width:90px;">Tax Stamp Return</td>
+                                        <td style="min-width:90px;">Sisa Akhir Bandrol</td>
+                                        <td style="min-width:150px;">Pack on Sampling Cabinet</td>
+                                        <td style="min-width:90px;">Pack on Machine</td>
+                                        <td style="min-width:90px;">Pack Out of Machine</td>
+                                        <td style="min-width:90px;">Claimable Pack</td>
+                                        <td style="min-width:90px;">IPC Counted</td>
+                                        <td style="min-width:90px;">IPC Other (Unacounted)</td>
+                                        <td style="min-width:90px;">QA Sample w Stamp</td>
+                                        <td style="min-width:90px;">QA Sample w/o Stamp</td>
+                                        <td style="min-width:90px;">WIP to Other Machine</td>
+                                        <td style="min-width:90px;">Total Closing</td>
+                                        <td style="min-width:90px;">Missing</td>
+                                        <td style="min-width:90px;">%</td>
+                                        <td style="min-width:90px;">Usage</td>
+                                        <td style="min-width:90px;">Plus Minus Bandrol</td>
+                                        <td style="min-width:90px;">Standart Usage</td>
+                                        <td style="min-width:90px;">Dom/Exp</td>
+                                        <td style="min-width:90px;">Tax Stamp Code</td>
+                                        <td style="min-width:90px;">PR/PU</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="pemakaianbandrolPMID" class="tx-center">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tableWrapper d-none" style="min-height:300px;" id="OtherTable">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:80px;">Day</th>
+                                        <th style="min-width:100px;">Date</th>
+                                        <th style="min-width:30px;">Shift</th>
+                                        <th style="min-width:100px;">Brand</th>
+                                        <th style="min-width:40px;">Machine</th>
+                                        <th style="min-width:100px;">Sisa awal week</th>
+                                        <th style="min-width:100px;">Hasil Box</th>
+                                        <th style="min-width:100px;">Hasil Counter</th>
+                                        <th style="min-width:100px;">Hasil Produksi</th>
+                                        <th style="min-width:100px;">Stock Awal</th>
+                                        <th style="min-width:100px;">Rework from Machine</th>
+                                        <th style="min-width:100px;">Receive from Rework</th>
+                                        <th style="min-width:100px;">Stock Akhir</th>
+                                        <th style="min-width:100px;">Terima Bandrol</th>
+                                        <th style="min-width:100px;">Pakai</th>
+                                        <th style="min-width:100px;">BS /Afkir</th>
+                                        <th style="min-width:100px;">Sample QA</th>
+                                        <th style="min-width:100px;">IPC</th>
+                                        <th style="min-width:100px;">Sisa Akhir Bandrol</th>
+                                        <th style="min-width:100px;">Bandrol Hilang</th>
+                                        <th style="min-width:100px;">% Bandrol Hilang</th>
+                                        <th style="min-width:100px;">Rework TB+</th>
+                                        <th style="min-width:100px;">Bandrol Lepas</th>
+                                        <th style="min-width:100px;">Claimable</th>
+                                        <th style="min-width:100px;">LPH vs Rework</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pemakaianbandrol" class="tx-center">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--Pemakaian Bandrol-->
+
+            <div class="col-12 mg-b-20 report">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Laporan Harian Bandrol <span id="brand_label"></span></div>
+                    <div class="card-body row">
+                        <div class="col-12 row" id="collapseExamplemesin" style="display:none;">
+
+                            <div class="col-12">
+                                <ul id="line-tabs" class="nav nav-tabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link active">Weekly</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link">Daily</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link">Shiftly</a>
+                                    </li>
+                                </ul>
+
+                                <div id="lines" class="carousel" data-pause="true">
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <div class="row">
+                                                <div class="content col-12">
+                                                    <label style="font-weight:bold;">Weekly</label>
+                                                    <hr style="margin:0 0 10px 0;" />
+                                                    <canvas id="chp51" height="100px"></canvas>
+                                                </div>
+                                            </div>
+                                        </div> <!-- Weekly -->
+
+                                        <div class="carousel-item">
+                                            <div class="row">
+                                                <div class="content col-12">
+                                                    <label style="font-weight:bold;">Daily</label>
+                                                    <hr style="margin:0 0 10px 0;" />
+                                                    <canvas id="chp57" height="100px"></canvas>
+                                                </div>
+                                            </div>
+                                        </div> <!-- Weekly -->
+
+                                        <div class="carousel-item col-12">
+                                            <div class="row ">
+                                                <div class="content col">
+                                                    <label style="font-weight:bold;">Shiftly 1</label>
+                                                    <hr style="margin:0 0 10px 0;" />
+                                                    <canvas id="chShift1" height="100px"></canvas>
+                                                    <br />
+                                                    <label style="font-weight:bold;">Shiftly 2</label>
+                                                    <hr style="margin:0 0 10px 0;" />
+                                                    <canvas id="chShift2" height="100px"></canvas>
+                                                    <br />
+                                                    <label style="font-weight:bold;">Shiftly 3</label>
+                                                    <hr style="margin:0 0 10px 0;" />
+                                                    <canvas id="chShift3" height="100px"></canvas>
+                                                </div>
+                                            </div>
+                                        </div> <!-- Weekly -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 tx-center">
+                            <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHidemesin" style="margin: auto 0 15px 0;">Show Chart</button>
+                        </div>
+
+                        <div class="tableWrapper" style="min-height:525px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr id="datebawah">
+                                    </tr>
+                                    <tr id="daybawah">
+                                    </tr>
+                                    <tr id="shiftbawah">
+                                    </tr>
+                                </thead>
+                                <tbody id="mesin" class="tx-center">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--mesin-->
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/exportaction.js"></script>
+
+    <!------------------------ STICKY ------------------------------------>
+    @*<script>
+            $(document).ready(function () {
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+            });
+        </script>*@
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().toggleClass("active");
+                const index = $(this).index() + 1;
+                $("#lines .carousel-item.active").removeClass("active");
+                const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                $(carouselItem).toggleClass("active");
+                $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+            });
+        });
+    </script> @*tabel wrapper*@
+    <script>
+        $("#btnShowHide").click(function () {
+            var x = document.getElementById("collapseExample");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+    </script> @*hide button*@
+    <script>
+        $("#btnShowHidemesin").click(function () {
+            var x = document.getElementById("collapseExamplemesin");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+    </script> @*hide button*@
+
+    <!------------------------ SELECT 2 ---------------------------------->
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.select2[data-mock-width]').on("select2:open", function () {
+                $(".select2-dropdown.select2-dropdown--below").css("min-width", $(this).data("mock-width"));
+            });
+        });
+    </script>
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        var PMIDTable;
+        var OtherTable;
+        var HeaderPMID = ["Week", "Day", "Date", "Shift", "Group", "Machine", "FA Code", "T/S Request", "WIP from Manual Tax Stamp",
+            "Stock Awal", "Pack on Machine", "Pack on Sampling Cabinet", "Pack Out of Machine", "WIP from Other Machine", "Total Opening",
+            "Case (w TS)", "Case (wo TS)", "Tax Stamp Return", "Sisa Akhir Bandrol", "Pack on Sampling Cabinet", "Pack on Machine",
+            "Pack Out of Machine", "Claimable Pack", "IPC Counted", "IPC Other (Unacounted)", "QA Sample w Stamp", "QA Sample w/o Stamp",
+            "WIP to Other Machine", "Total Closing", "Missing", "%", "Usage", "Plus Minus Bandrol", "Standart Usage", "Dom/Exp", "Tax Stamp Code",
+            "PR/PU"];
+
+        var HeaderOther = ["Day", "Date", "Shift", "Brand", "Machine", "Sisa awal week", "Hasil Box", "Hasil Counter", "Hasil Produksi", "Stock Awal",
+            "Rework from Machine", "Receive from Rework", "Stock Akhir", "Terima Bandrol", "Pakai", "BS /Afkir", "Sample QA", "IPC",
+            "Sisa Akhir Bandrol", "Bandrol Hilang", "% Bandrol Hilang", "Rework TB+", "Bandrol Lepas", "Claimable", "LPH vs Rework"];
+        
+
+        $(document).ready(function () {
+            $('.report').addClass("d-none");
+            PMIDTable = $('#PMIDTable table').DataTable();
+            OtherTable = $('#OtherTable table').DataTable();
+            $('#buttonexcelOther').hide();
+            $('#buttonexcel').hide();
+
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                //format: 'D, dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+            $('#buttonexcel1').html("");
+            var buttons1 = new $.fn.dataTable.Buttons(PMIDTable, {
+                buttons: [
+                    {
+                        "text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+                        "extend": 'excel',
+                        "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                        "title": 'Report Tax Stamp PMID',
+                        "exportOptions": {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36],
+                            format: {
+                                header: function (data, columnIdx) {
+                                    return HeaderPMID[columnIdx];
+                                }
+                            }
+                        },
+                        "extension": '.xlsx'
+                    }
+                ]
+            }).container().appendTo($('#buttonexcel'));
+            var buttons2 = new $.fn.dataTable.Buttons(OtherTable, {
+                buttons: [
+                    {
+                        "text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+                        "extend": 'excel',
+                        "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                        "title": 'Report Tax Stamp',
+                        "exportOptions": {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+                            format: {
+                                header: function (data, columnIdx) {
+                                    return HeaderOther[columnIdx];
+                                }
+                            }
+                        },
+                        "extension": '.xlsx'
+                    }
+                ]
+            }).container().appendTo($('#buttonexcelOther'));
+        });
+
+
+        //get brand
+        $("[name=prodCenter]").on('change', function () {
+            $('[name="brand"]').html('');
+            const prodCenterID = $("[name=prodCenter]").val();
+            $('#loading_overlay').addClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetBrand", "ReportPemakaianBandrol")",
+                data: JSON.stringify({
+				    prodCenterID: prodCenterID,
+                }),
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    console.log(result);
+                    if (result.Status == true) {
+                        for (let i = 0; i < result.brand.length; i++) {
+                            $('[name="brand"]').append('<option label="Select Brand"></option>');
+                            if (result.brand[i].Code != null && result.brand[i].Description != null) {
+                                $('[name="brand"]').append('<option value="' + result.brand[i].Code + '">['+ result.brand[i].Code + "] " + result.brand[i].Description + '</option>');
+                            }
+                        }
+                    } else {
+                            $('[name="brand"]').append('<option label="Select Brand"></option>');
+                    }
+
+                }
+            });
+        });
+
+        $('#btnSearch').on('click', function () {
+            const startDate = $("[name=weekStart]").val();
+            if (startDate == "") {
+                showError("Date can't be empty");
+                return;
+            }
+            const endDate = $("[name=weekEnd]").val();
+            if (endDate == "") {
+                showError("Date can't be empty");
+                return;
+            }
+
+            const status = $("[name=status]").val();
+            if (status == null) {
+                showError("Lph Status can't be empty");
+                return;
+            }
+            const prodcenter = $("[name=prodCenter]").val();
+            var prodData = [];
+            if (prodcenter == "0") {
+                prodData["PB"] = [];
+                prodData["PI"] = [];
+                prodData["PJ"] = [];
+                prodData["PK"] = [];
+                prodData["PB"]["dates"] = [];
+                prodData["PI"]["dates"] = [];
+                prodData["PJ"]["dates"] = [];
+                prodData["PK"]["dates"] = [];
+            }
+            else if (prodcenter == "6") {
+                prodData["PB"] = [];
+                prodData["PB"]["dates"] = [];
+            }
+            else if (prodcenter == "5") {
+                prodData["PI"] = [];
+                prodData["PI"]["dates"] = [];
+            }
+            else if (prodcenter == "3") {
+                prodData["PJ"] = [];
+                prodData["PJ"]["dates"] = [];
+            }
+            else if (prodcenter == "4") {
+                prodData["PK"] = [];
+                prodData["PK"]["dates"] = [];
+            }
+            prodData["ID"] = [];
+            prodData["ID"]["dates"] = [];
+
+            const brand = $("[name=brand]").val();
+            //if (brand == null) {
+            //    showError("Brand can't be empty");
+            //    return;
+            //}
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetBandrolUsage", "ReportPemakaianBandrol")",
+                data: JSON.stringify({
+                    status: status,
+                    startDate: startDate,
+                    endDate: endDate,
+                    prodcenter: prodcenter,
+                    brand: brand,
+			    }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    //console.log(result);
+
+                    var dateBawah = '<th rowspan="3" style="min-width:120px;">Production Center</th><th rowspan="3" style="min-width:120px;">Machine</th><th rowspan="3" style="min-width:120px;">Target</th>';
+                    var dayBawah = "";
+                    var shiftBawah = "";
+
+                    var dates = getDates(result.startDate, result.endDate);
+
+                    $("#datebawah th").remove();
+                    $("#daybawah th").remove();
+                    $("#shiftbawah th").remove();
+                    $("#mesin").html("");
+                    //$("#mesin th").remove();
+                    $("#brand_label").html(result.Brand);
+
+                    var newMachine = [];
+                    for (var i = 0; i < result.machineBawah.length; i++) {
+                        newMachine[i] = [];
+                        newMachine[i]["m"] = result.machineBawah[i];
+                        newMachine[i]["pack"] = [];
+                    }
+
+                    var week = [];
+
+                    for (var i = 0; i < dates["dates"].length; i++) {
+                        dateBawah += '<th colspan="4">' + dates["dates"][i] + '</th>';
+                        dayBawah += '<th colspan="4">' + dates["day"][i] + '</th>';
+                        shiftBawah += '<th style="min-width:90px;">1</th><th style="min-width:90px;">2</th><th style="min-width:90px;">3</th><th style="min-width:90px;">Total</th>';
+
+                        for (var j = 0; j < newMachine.length; j++) {
+                            newMachine[j]["pack"][dates["dates"][i]] = [0, 0, 0];
+                        }
+
+                        for (var key in prodData) {
+                            prodData[key]["dates"][dates["dates"][i]] = [0, 0, 0];
+                        }
+
+                        if (week[parseInt(i / 7)] == null) {
+                            week[parseInt(i / 7)] = "Week " + parseInt(i / 7);
+                        }
+                    }
+                    //console.log(week);
+                    dateBawah += '<th rowspan="3">Total Weeks</th>';
+                    $("#datebawah").append(dateBawah);
+                    $("#daybawah").append(dayBawah);
+                    $("#shiftbawah").append(shiftBawah);
+                    //$("#mesin").empty();
+                    prodData["ID"]["target"] = result.targetID;
+                    for (var i = 0; i < result.Bawah.length; i++) {
+                        for (var j = 0; j < newMachine.length; j++) {
+                            if (newMachine[j]["m"] == result.Bawah[i].Machine) {
+                                newMachine[j]["pack"][result.Bawah[i].Tanggal][parseInt(result.Bawah[i].Shift) - 1] = parseInt(result.Bawah[i].Pack);
+                                newMachine[j]["target"] = result.Bawah[i].Target;
+                                prodData[result.Bawah[i].Location]["target"] = result.Bawah[i].Target;
+                                prodData[result.Bawah[i].Location]["dates"][result.Bawah[i].Tanggal][parseInt(result.Bawah[i].Shift) - 1] += parseInt(result.Bawah[i].Pack);
+                                prodData["ID"]["dates"][result.Bawah[i].Tanggal][parseInt(result.Bawah[i].Shift) - 1] += parseInt(result.Bawah[i].Pack);
+                                j = newMachine.length;
+                            }
+                        }
+                    }
+
+                    if (prodcenter == "0") {
+                        for (var i = 0; i < result.referenceDetailModels.length; i++) {
+                            if (typeof prodData[result.referenceDetailModels[i].Code] !== 'undefined' && prodData[result.referenceDetailModels[i].Code] !== null) {
+                                prodData[result.referenceDetailModels[i].Code]["target"] = result.referenceDetailModels[i].Description;
+                            }
+                        }
+                    }
+                    var dataChart = [];
+                    for (var i = 0; i < newMachine.length; i++) {
+                        var totalWeek = 0;
+                        dataChart[result.machineBawah[i]] = [0, 1, 2, 3, 4];
+                        dataChart[result.machineBawah[i]][0] = [];
+                        dataChart[result.machineBawah[i]][1] = [];
+                        dataChart[result.machineBawah[i]][2] = [];
+                        dataChart[result.machineBawah[i]][3] = [];
+                        dataChart[result.machineBawah[i]][4] = [];
+                        var str = "<tr><td style='min-width:50px'>" + result.machineLocationBawah[i] + "</td><td style='min-width:50px'>" + result.machineBawah[i] + "</td><td style='min-width:50px'>" + newMachine[i]["target"] + "</td>";
+                        for (var j = 0; j < dates["dates"].length; j++) {
+                            var total = 0;
+                            dataChart[result.machineBawah[i]][3][j] = 0;
+                            if (dataChart[result.machineBawah[i]][4][parseInt(j / 7)] == null) {
+                                dataChart[result.machineBawah[i]][4][parseInt(j / 7)] = 0;
+                            }
+                            for (var k = 0; k < 3; k++) {
+                                str += '<td style=min-width:50px>' + newMachine[i]["pack"][dates["dates"][j]][k] + '</td>';
+                                total += newMachine[i]["pack"][dates["dates"][j]][k];
+                                dataChart[result.machineBawah[i]][k][j] = newMachine[i]["pack"][dates["dates"][j]][k];
+                                dataChart[result.machineBawah[i]][3][j] += newMachine[i]["pack"][dates["dates"][j]][k];
+                                dataChart[result.machineBawah[i]][4][parseInt(j / 7)] += newMachine[i]["pack"][dates["dates"][j]][k];
+                            }
+                            str += '<td style=min-width:50px>' + total + '</td>';
+                            totalWeek += total;
+                        }
+
+                        str += '<td style=min-width:50px>' + totalWeek + '</td></tr>';
+                        $("#mesin").append(str);
+                    }
+                    //console.log(dataChart);
+                    for (var key in prodData) {
+                        var totalWeek = 0;
+                        var str = "<tr><td style='min-width:50px'>" + key + "</td><td style='min-width:50px'>All</td><td style='min-width:50px'>" + prodData[key]["target"] + "</td>";
+                        for (var j = 0; j < dates["dates"].length; j++) {
+                            var total = 0;
+                            for (var k = 0; k < 3; k++) {
+                                str += '<td style=min-width:50px>' + prodData[key]["dates"][dates["dates"][j]][k] + '</td>';
+                                total += prodData[key]["dates"][dates["dates"][j]][k];
+                            }
+                            str += '<td style=min-width:50px>' + total + '</td>';
+                            totalWeek += total;
+                        }
+                        str += '<td style=min-width:50px>' + totalWeek + '</td></tr>';
+                        $("#mesin").prepend(str);
+                    }
+
+                    //bagian CHART
+                    var colors = ['#007bff', '#5bd276', '#c3e6cb', '#dc3545', '#6c757d', '#4682B4', '#00CED1', '#98FB98', '#ADFF2F', '#DDA0DD',
+                        '#ffebee', '#fce4ec', '#f3e5f5', '#ede7f6', '#e8eaf6', '#e3f2fd', '#e1f5fe', '#e0f7fa', '#e0f2f1', '#e8f5e9',
+                        '#f1f8e9', '#f9fbe7', '#fffde7', '#fff8e1', '#fff3e0', '#fbe9e7', '#efebe9', '#ffcdd2', '#f8bbd0', '#e1bee7',
+                        '#d1c4e9', '#c5cae9', '#bbdefb', '#b3e5fc', '#b2ebf2', '#b2dfdb', '#c8e6c9', '#dcedc8', '#f0f4c3', '#fff9c4',
+                        '#ffecb3', '#ffe0b2', '#ffccbc', '#d7ccc8', '#ef9a9a', '#f48fb1', '#ce93d8', '#b39ddb', '#9fa8da', '#90caf9',
+                        '#81d4fa', '#80deea', '#80cbc4', '#a5d6a7', '#c5e1a5', '#e6ee9c', '#fff59d', '#ffe082', '#ffcc80'];
+
+                    $('#chp57').replaceWith($('<canvas id="chp57" height="320px"></canvas>'));
+                    $('#chp51').replaceWith($('<canvas id="chp51" height="320px"></canvas>'));
+                    $('#chShift3').replaceWith($('<canvas id="chShift3" height="320px"></canvas>'));
+                    $('#chShift2').replaceWith($('<canvas id="chShift2" height="320px"></canvas>'));
+                    $('#chShift1').replaceWith($('<canvas id="chShift1" height="320px"></canvas>'));
+                    var chBarDaily = document.getElementById("chp57");
+                    var chBarWeekly = document.getElementById("chp51");
+                    var chBar2 = document.getElementById("chShift3");
+                    var chBar1 = document.getElementById("chShift2");
+                    var chBar0 = document.getElementById("chShift1");
+
+                    var chartData2 = {
+                        labels: dates["dates"],
+                        datasets: []
+                    };
+                    var chartData1 = {
+                        labels: dates["dates"],
+                        datasets: []
+                    };
+                    var chartData0 = {
+                        labels: dates["dates"],
+                        datasets: []
+                    };
+                    var chartDataDaily = {
+                        labels: dates["dates"],
+                        datasets: []
+                    };
+                    var chartDataWeekly = {
+                        labels: week,
+                        datasets: []
+                    };
+
+                    var counter = 0;
+                    for (var key in dataChart) {
+                        chartData2.datasets.push({
+                            label: key,
+                            data: dataChart[key][2],
+                            backgroundColor: colors[parseInt(counter % colors.length)]
+                        });
+                        chartData1.datasets.push({
+                            label: key,
+                            data: dataChart[key][1],
+                            backgroundColor: colors[parseInt(counter % colors.length)]
+                        });
+                        chartData0.datasets.push({
+                            label: key,
+                            data: dataChart[key][0],
+                            backgroundColor: colors[parseInt(counter % colors.length)]
+                        });
+                        chartDataDaily.datasets.push({
+                            label: key,
+                            data: dataChart[key][3],
+                            backgroundColor: colors[parseInt(counter % colors.length)]
+                        });
+                        chartDataWeekly.datasets.push({
+                            label: key,
+                            data: dataChart[key][4],
+                            backgroundColor: colors[parseInt(counter % colors.length)]
+                        });
+                        counter++;
+                    }
+
+                    if (chBar2) {
+                        new Chart(chBar2, {
+                            type: 'bar',
+                            data: chartData2,
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        barPercentage: 0.9,
+                                        categoryPercentage: 0.5
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: false
+                                        }
+                                    }]
+                                },
+                                legend: {
+                                    display: false
+                                },
+                                animation: {
+                                    onComplete: function () {
+                                        var chartInstance = this.chart;
+                                        var ctx = chartInstance.ctx;
+                                        //console.log(chartInstance);
+                                        ctx.textAlign = "center";
+                                        ctx.fillStyle = "#000000";
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "middle";
+                                        ctx.font = "normal 100 10px"; //font style, font weight, font size, font face
+                                        Chart.helpers.each(this.data.datasets.forEach(function (dataset, i) {
+                                            var meta = chartInstance.controller.getDatasetMeta(i);
+                                            Chart.helpers.each(meta.data.forEach(function (bar, index) {
+                                                //console.log(bar);
+                                                ctx.save();
+                                                ctx.translate(bar._model.x, bar._model.y + ((bar._model.base - bar._model.y) / 2));
+                                                ctx.rotate(Math.PI / 2);
+                                                //ctx.fillText(bar._model.datasetLabel, 0, 0);
+                                                ctx.restore();
+                                            }), this)
+                                        }), this);
+                                    }
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y-axis-0',
+                                        value: 20,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target : 20'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    }
+                    if (chBar1) {
+                        new Chart(chBar1, {
+                            type: 'bar',
+                            data: chartData1,
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        barPercentage: 0.9,
+                                        categoryPercentage: 0.5
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: false
+                                        }
+                                    }]
+                                },
+                                legend: {
+                                    display: false
+                                },
+                                animation: {
+                                    onComplete: function () {
+                                        var chartInstance = this.chart;
+                                        var ctx = chartInstance.ctx;
+                                        //console.log(chartInstance);
+                                        ctx.textAlign = "center";
+                                        ctx.fillStyle = "#000000";
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "middle";
+                                        ctx.font = "normal 100 10px"; //font style, font weight, font size, font face
+                                        Chart.helpers.each(this.data.datasets.forEach(function (dataset, i) {
+                                            var meta = chartInstance.controller.getDatasetMeta(i);
+                                            Chart.helpers.each(meta.data.forEach(function (bar, index) {
+                                                //console.log(bar);
+                                                ctx.save();
+                                                ctx.translate(bar._model.x, bar._model.y + ((bar._model.base - bar._model.y) / 2));
+                                                ctx.rotate(Math.PI / 2);
+                                                //ctx.fillText(bar._model.datasetLabel, 0, 0);
+                                                ctx.restore();
+                                            }), this)
+                                        }), this);
+                                    }
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y-axis-0',
+                                        value: 20,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target : 20'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    }
+                    if (chBar0) {
+                        new Chart(chBar0, {
+                            type: 'bar',
+                            data: chartData0,
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        barPercentage: 0.9,
+                                        categoryPercentage: 0.5
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: false
+                                        }
+                                    }]
+                                },
+                                legend: {
+                                    display: false
+                                },
+                                animation: {
+                                    onComplete: function () {
+                                        var chartInstance = this.chart;
+                                        var ctx = chartInstance.ctx;
+                                        //console.log(chartInstance);
+                                        ctx.textAlign = "center";
+                                        ctx.fillStyle = "#000000";
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "middle";
+                                        ctx.font = "normal 100 10px"; //font style, font weight, font size, font face
+                                        Chart.helpers.each(this.data.datasets.forEach(function (dataset, i) {
+                                            var meta = chartInstance.controller.getDatasetMeta(i);
+                                            Chart.helpers.each(meta.data.forEach(function (bar, index) {
+                                                //console.log(bar);
+                                                ctx.save();
+                                                ctx.translate(bar._model.x, bar._model.y + ((bar._model.base - bar._model.y) / 2));
+                                                ctx.rotate(Math.PI / 2);
+                                                //ctx.fillText(bar._model.datasetLabel, 0, 0);
+                                                ctx.restore();
+                                            }), this)
+                                        }), this);
+                                    }
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y-axis-0',
+                                        value: 20,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target : 20'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    }
+                    if (chBarDaily) {
+                        new Chart(chBarDaily, {
+                            type: 'bar',
+                            data: chartDataDaily,
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        barPercentage: 0.9,
+                                        categoryPercentage: 0.5
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: false
+                                        }
+                                    }]
+                                },
+                                legend: {
+                                    display: false
+                                },
+                                animation: {
+                                    onComplete: function () {
+                                        var chartInstance = this.chart;
+                                        var ctx = chartInstance.ctx;
+                                        //console.log(chartInstance);
+                                        ctx.fillStyle = "#000000";
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "middle";
+                                        ctx.font = "normal 100 10px"; //font style, font weight, font size, font face
+                                        Chart.helpers.each(this.data.datasets.forEach(function (dataset, i) {
+                                            var meta = chartInstance.controller.getDatasetMeta(i);
+                                            Chart.helpers.each(meta.data.forEach(function (bar, index) {
+                                                //console.log(bar);
+                                                ctx.save();
+                                                ctx.translate(bar._model.x, bar._model.y + ((bar._model.base - bar._model.y) / 2));
+                                                ctx.rotate(Math.PI / 2);
+                                                //ctx.fillText(bar._model.datasetLabel, 0, 0);
+                                                ctx.restore();
+                                            }), this)
+                                        }), this);
+                                    }
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y-axis-0',
+                                        value: 20,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target : 20'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    }
+                    if (chBarWeekly) {
+                        chart51 = new Chart(chBarWeekly, {
+                            type: 'bar',
+                            data: chartDataWeekly,
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        barPercentage: 0.9,
+                                        categoryPercentage: 0.5
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: false
+                                        }
+                                    }]
+                                },
+                                legend: {
+                                    display: false
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y-axis-0',
+                                        value: 20,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderWidth: 1,
+                                        label: {
+                                            enabled: true,
+                                            content: 'Target : 20'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    }
+
+                    $('#PMIDTable').addClass("d-none");
+                    $('#OtherTable').addClass("d-none");
+                    if (prodcenter == "5") {
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("GetReportPMID", "ReportPemakaianBandrol")",
+                            data: JSON.stringify({
+                                status: status,
+                                startDate: startDate,
+                                endDate: endDate,
+                                prodcenter: prodcenter,
+                                brand: brand,
+                            }),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (result) {
+                                console.log(result);
+
+                                var dataAtas = result.Atas;
+                                $("#pemakaianbandrolPMID td").remove();
+                                $("#pemakaianbandrol td").remove();
+
+                                    PMIDTable.clear().draw();
+                                    OtherTable.clear().draw();
+
+                                    for (var i = 0; i < result.Atas.length; i++) {
+                                        PMIDTable.row.add([
+                                            result.Atas[i]["Week"],
+                                            result.Atas[i]["Hari"],
+                                            result.Atas[i]["Tanggal"],
+                                            result.Atas[i]["Shift"],
+                                            result.Atas[i]["Group"],
+                                            result.Atas[i]["Machine"],
+                                            result.Atas[i]["Brand"],
+                                            result.Atas[i]["OpeningPack"],
+                                            result.Atas[i]["WIPManual"],
+                                            result.Atas[i]["StockAwal"],
+                                            result.Atas[i]["packOnMachine"],
+                                            result.Atas[i]["PackOnSamplingCabinet"],
+                                            result.Atas[i]["PackOutofMachine"],
+                                            result.Atas[i]["WIPfromOtherMachine"],
+                                            result.Atas[i]["TotalOpening"],
+                                            result.Atas[i]["CasewithTS"],
+                                            result.Atas[i]["CasewithOTS"],
+                                            result.Atas[i]["TaxStampReturn"],
+                                            result.Atas[i]["SisaAkhirBandrol"],
+                                            result.Atas[i]["PackOnSamplingCabinetClosing"],
+                                            result.Atas[i]["packOnMachineClosing"],
+                                            result.Atas[i]["PackOutofMachineClosing"],
+                                            result.Atas[i]["ClaimablePack"],
+                                            result.Atas[i]["IPCCounted"],
+                                            result.Atas[i]["IPCOther"],
+                                            result.Atas[i]["QASamplewStamp"],
+                                            result.Atas[i]["QASampleWOStamp"],
+                                            result.Atas[i]["WIPtoOtherMachine"],
+                                            result.Atas[i]["TotalClosing"],
+                                            result.Atas[i]["TotalLoss"],
+                                            parseFloat(result.Atas[i]["PercentLoss"]).toFixed(2),
+                                            result.Atas[i]["Usage"],
+                                            result.Atas[i]["plusminusbandrol"],
+                                            "",
+                                            "",
+                                            result.Atas[i]["TSCode"], ""]).draw(true);
+                                    }
+                                    $('#buttonexcelOther').hide();
+                                    $('#buttonexcel').show();
+                                $('#PMIDTable').removeClass("d-none");
+
+                                $('#loading_overlay').addClass('d-none');
+
+                            }
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("GetReportOther", "ReportPemakaianBandrol")",
+                            data: JSON.stringify({
+                                status: status,
+                                startDate: startDate,
+                                endDate: endDate,
+                                prodcenter: prodcenter,
+                                brand: brand,
+			                }),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (result) {
+                                console.log(result);
+
+                                if (result.fromOther) {
+                                    var dataAtas = result.Atas;
+                                    $("#pemakaianbandrolPMID td").remove();
+                                    $("#pemakaianbandrol td").remove();
+
+                                    PMIDTable.clear().draw();
+                                    OtherTable.clear().draw();
+
+                                    for (var i = 0; i < result.Atas.length; i++) {
+                                        PMIDTable.row.add([
+                                            result.Atas[i]["Week"],
+                                            result.Atas[i]["Hari"],
+                                            result.Atas[i]["Tanggal"],
+                                            result.Atas[i]["Shift"],
+                                            result.Atas[i]["Group"],
+                                            result.Atas[i]["Machine"],
+                                            result.Atas[i]["Brand"],
+                                            result.Atas[i]["OpeningPack"],
+                                            result.Atas[i]["WIPManual"],
+                                            result.Atas[i]["StockAwal"],
+                                            result.Atas[i]["packOnMachine"],
+                                            result.Atas[i]["PackOnSamplingCabinet"],
+                                            result.Atas[i]["PackOutofMachine"],
+                                            result.Atas[i]["WIPfromOtherMachine"],
+                                            result.Atas[i]["TotalOpening"],
+                                            result.Atas[i]["CasewithTS"],
+                                            result.Atas[i]["CasewithOTS"],
+                                            result.Atas[i]["TaxStampReturn"],
+                                            result.Atas[i]["SisaAkhirBandrol"],
+                                            result.Atas[i]["PackOnSamplingCabinetClosing"],
+                                            result.Atas[i]["packOnMachineClosing"],
+                                            result.Atas[i]["PackOutofMachineClosing"],
+                                            result.Atas[i]["ClaimablePack"],
+                                            result.Atas[i]["IPCCounted"],
+                                            result.Atas[i]["IPCOther"],
+                                            result.Atas[i]["QASamplewStamp"],
+                                            result.Atas[i]["QASampleWOStamp"],
+                                            result.Atas[i]["WIPtoOtherMachine"],
+                                            result.Atas[i]["TotalClosing"],
+                                            result.Atas[i]["TotalLoss"],
+                                            parseFloat(result.Atas[i]["PercentLoss"]).toFixed(2),
+                                            result.Atas[i]["Usage"],
+                                            result.Atas[i]["plusminusbandrol"],
+                                            "",
+                                            "",
+                                            result.Atas[i]["TSCode"], ""
+                                        ]).draw(true);
+                                    }
+                                    $('#buttonexcelOther').hide();
+                                    $('#buttonexcel').show();
+                                    $('#PMIDTable').removeClass("d-none");
+                                }
+                                else {
+                                    var dataAtas = result.Atas;
+                                    $("#pemakaianbandrolPMID td").remove();
+                                    $("#pemakaianbandrol td").remove();
+
+                                    PMIDTable.clear().draw();
+                                    OtherTable.clear().draw();
+
+                                    for (var i = 0; i < result.Atas.length; i++) {
+                                        var curDate = new Date(result.Atas[i].Date.match(/\d+/)[0] * 1);
+                                        var Machine = result.Atas[i].Machine;
+                                        if (Machine == null) {
+                                            Machine = "";
+                                        }
+                                        var Shift = result.Atas[i].Shift;
+                                        if (Shift == null) {
+                                            Shift = "";
+                                        }
+
+                                        OtherTable.row.add([
+                                            moment(curDate).format("dddd"),
+                                            moment(curDate).format("DD-MMM-YY"),
+                                            Shift.trim(),
+                                            result.Atas[i].Brand,
+                                            Machine.trim(),
+                                            result.Atas[i].SisaAwalWeek,
+                                            result.Atas[i].HasilBox,
+                                            result.Atas[i].HasilCounter,
+                                            result.Atas[i].HasilProduksi,
+                                            result.Atas[i].StockAwal,
+                                            result.Atas[i].ReworkFromMachine,
+                                            result.Atas[i].ReceiveFromRework,
+                                            result.Atas[i].StockAkhir,
+                                            result.Atas[i].TerimaBandrol,
+                                            result.Atas[i].Pakai,
+                                            result.Atas[i].BSAfkir,
+                                            result.Atas[i].SampleQA,
+                                            result.Atas[i].IPC,
+                                            result.Atas[i].SisaAkhirBandrol,
+                                            result.Atas[i].BandrolHilang,
+                                            parseFloat(result.Atas[i].PercentBandrolHilang).toFixed(2),
+                                            result.Atas[i].ReworkTBPlus,
+                                            result.Atas[i].BandrolLepas,
+                                            result.Atas[i].Claimable,
+                                            result.Atas[i].LPHvsRework
+                                        ]).draw(true);
+                                    }
+
+                                    $('#buttonexcelOther').show();
+                                    $('#buttonexcel').hide();
+                                    $('#OtherTable').removeClass("d-none");
+                                }
+
+                                $('#loading_overlay').addClass('d-none');
+                            }
+                        });
+                    }
+                }
+            });
+
+            $('.report').removeClass("d-none");
+        });
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+        }
+        function getDates(startDate, stopDate) {
+            var dateArray = [];
+            dateArray["dates"] = [];
+            dateArray["day"] = [];
+            var currentDate = moment(startDate);
+            console.log(currentDate);
+            var stopDate = moment(stopDate);
+            while (currentDate <= stopDate) {
+                dateArray["dates"].push(moment(currentDate).format('DD-MMM-YY'));
+                dateArray["day"].push(moment(currentDate).format('dddd'));
+                currentDate = moment(currentDate).add(1, 'days');
+            }
+            return dateArray;
+        }
+    </script>
+}

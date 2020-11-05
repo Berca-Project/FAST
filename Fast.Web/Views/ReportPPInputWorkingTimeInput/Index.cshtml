@@ -1,0 +1,1160 @@
+﻿@model Fast.Web.Models.LPH.LPHHeaderModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+    var selected = "";
+}
+
+@****** ***** ***** ***** ***** Copy ***** ***** ***** ***** ******@
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Input Data Working Time</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Input Data Working Time</h4>
+            </div>
+            @*<div class="d-none d-md-block">
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                    <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                    <button id="btnSave" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+                </div>*@
+        </div>
+
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label class="col-2 col-form-label mg-l-10">Prodtech</label>
+                            <div class="col-2" style="margin-left:-15px;">
+                                <select class="form-control select2" name="prodtech">
+                                    <option label="Select Prod. Center"></option>
+                                    <option value="[80414114] Abdul Azis Zaelani">[80414114] Abdul Azis Zaelani</option>
+                                    <option value="[80413736] Aan Supriyanto">[80413736] Aan Supriyanto</option>
+                                    <option value="[80423393] Aang Septian Ignanta">[80423393] Aang Septian Ignanta</option>
+                                    <option value="[80428838] Abd Rohman">[80428838] Abd Rohman</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-2 col-form-label mg-l-10">Week</label>
+                                <div class="col-2" style="margin-left:-15px;">
+                                <input type="number" class="col-4 form-control" name="week" />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-2 col-form-label mg-l-10">Working Time</label>
+                            <div class="col-2 row" style="margin-left:-15px;">
+                                <input type="number" class="col-4 form-control" name="workingtime" /> &nbsp; Hours
+                            </div>
+                        </div>
+
+                        <br />
+                        <label class="col-2 col-form-label"></label>
+                        <a href="@(Url.Action("Index","ReportPPInputWorkingTime"))" class="btn btn-sm pd-x-15 btn-success btn-uppercase" id="btnOV">Submit Working Time</a>
+                    </div>
+                </div>
+            </div>
+
+            
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+
+
+    <script>
+        @*
+            v2.5.1
+            - ieFix()
+                - adding border to table
+            - htmlEncode(), htmlDecode()
+                - handler special character
+            v2.5
+            - configInput()
+                - add input time completion
+                - add input number function
+            - collectAllComponent()
+                - adjusting type for input number
+            - collectAllData()
+                - adjusting type for input number
+            v2.4
+            - normalData(button), addToTable(button)
+                - add checkbox get value support on add and save
+            - releaseDisabledInput(), editData()
+                - fix multiple click event fired after edit
+            - setPreview(button)
+                - select not selected on preview
+            v2.3.2
+            - addToTable(button)
+                - fix input not blank after add
+            - collectAllComponent()
+                - fix extra type when saving to database
+            v2.3.1
+            - clean code a bit
+            - addToTable(button), normalData(button)
+                - fix undefined input
+            v2.3
+            - addToTable(button), normalData(button), configInput()
+                - adding popover for required field
+            - collectAllComponent()
+                - fix getting value from checkbox
+            v2.2.1
+            - setPreview(button)
+                - removing mode conditioning, kinda dumb
+            v2.2
+            - setPreview(button)
+                - no re-layout when generate preview
+                - count subtable summary on preview model
+            - countSummary(targetTable),
+                - count on TableMode.SPREAD now implemented
+        *@
+        const TableMode = {
+            NORMAL: 'normal',
+            SPREAD: 'spread'
+        }
+        Array.prototype.absorb = function (d) { this.push.apply(this, d); };
+        Array.prototype.truncate = function () { this.length = 0; };
+        function deepCloneObject(d) { return Object.assign({}, d); }
+        function ieFix() {
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").each(function () {
+                    $(this).find("table").prop("cellspacing", "1");
+                    //if (!$(this).hasClass("no-ie-fix")) {
+                    //    $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom":"0" });
+                    //    $(this).find("table").css({ "margin-bottom": "32px" });
+                    //    $(this).css({ "overflow-y": "scroll" });
+                    //    const summaryBody = $(this).find("thead tr.summary-body");
+                    //    const ths = $(summaryBody).find("th, td");
+                    //    $(this).find("tfoot tr.input td").each(function (i) {
+                    //        $(this).css({ "min-width": Math.floor($($(ths)[i]).width()), "position": "static" });
+                    //    });
+                    //}
+                });
+            }
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+        function setPreview(button) {
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const index = findInArray(id, configAle[targetTable].data);
+                const data = configAle[targetTable].data[index];
+                let inputWrapper = $("#" + targetTable).closest(".tableWrapper").siblings(".input-wrapper").clone();
+                const header = $(button).closest(".card-body").siblings(".card-header").text();
+                const modal = $("#detail-modal");
+
+                $(inputWrapper).find(`#get-pss-data, .button-area, .tableWrapper tr.input`).remove();
+                $(inputWrapper).find("input, select, textarea").each(function (i, input) {
+                    if ($(input).prop("nodeName") == "SELECT") {
+                        $(input).parent().html(`<input value="${data[$(input).prop("name")]}" disabled class="form-control"/>`);
+                    } else {
+                        setValue($(input), data[$(input).prop("name")]);
+                        $(input).prop("disabled", true);
+                    }
+                });
+                $(inputWrapper).find(".tableWrapper tbody").each(function (i, tbody) {
+                    const subtable = $(tbody).prop("id");
+                    $(tbody).html(generateTable(data[subtable], subtable));
+                    if (configAle[targetTable].countSummary != undefined) {
+                        const rowData = configAle[targetTable].countSummary();
+                        const table = $(tbody).closest('table');
+                        const summaryTds = $(table).find('.summary-body').children();
+                        $(table).find('.input td').each(function (i, td) {
+                            const name = $(td).children().attr("name");
+                            if (rowData.hasOwnProperty(name))
+                                $(summaryTds[i]).html(rowData[name]);
+                        });
+                    }
+                });
+                $(inputWrapper).find(".tableWrapper tr").each(function () {
+                    $(this).children().last().remove();
+                });
+                if (configAle[targetTable].onPreview != undefined) {
+                    inputWrapper = configAle[targetTable].onPreview(data, inputWrapper);
+                }
+                $(modal).find(".detail-body").html(inputWrapper);
+                $(modal).find(".detail-header").html(`${header} Detail`);
+                $(modal).modal("show");
+            }
+        }
+        function generateRow(data, targetTable) {
+            let r = "";
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                $(`#${targetTable}`).siblings("thead").find("tr.summary-body").find("td, th").each(function () {
+                    const name = $(this).data("name");
+                    if (name != "Action") r += `<td>${data[name]}</td>`;
+                });
+            } else {
+                $(`#${targetTable}`).siblings("tfoot").find("tr.input").find("input, select, textarea").each(function () {
+                    const name = $(this).prop("name");
+                    r += `<td>${data[name]}</td>`;
+                });
+            }
+
+            r += `<td class="tx-center">`;
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                r += `<i onClick="javascript:setPreview(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fas fa-eye"></i>`;
+            }
+            r += `<i onClick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit"></i>`;
+            r += `<i onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-trash"></i>`;
+            r += `</td >`;
+
+            if (configAle[targetTable].onGenRow != undefined) {
+                r = configAle[targetTable].onGenRow(r);
+                if (r == null) return "";
+            }
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const targetTable = $(button).data("target-table");
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                const id = $(button).data("id");
+                if (configAle[targetTable].onEdit != undefined) {
+                    if (configAle[targetTable].onEdit(id)) {
+                        return;
+                    }
+                }
+                $(table).data("edited", true);
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    const index = findInArray(id, configAle[targetTable].data);
+                    const data = configAle[targetTable].data[index];
+                    const inputWrapper = $(button).closest(".tableWrapper").siblings(".input-wrapper");
+                    const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                    const notInputs = $(tableWrapper).find("input, select, textarea");
+                    const allInputs = $(inputWrapper).find("input, select, textarea");
+                    $(allInputs).not($(notInputs)).each(function (i, input) {
+                        setValue($(input), data[$(input).prop("name")]);
+                    });
+                    $(tableWrapper).find("tbody").each(function (i, tbody) {
+                        const subtable = $(tbody).prop("id");
+                        configAle[subtable].data.absorb(data[subtable]);
+                        startupSetup(subtable);
+                    });
+                    $(inputWrapper).find("#get-pss-data").hide();
+                    let newbuttons = "";
+                    newbuttons += `<button class="btn btn-lg pd-x-15 btn-primary" onClick="javascript:cancelEdit(this)" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Cancel</button>&nbsp;`;
+                    newbuttons += `<button class="btn btn-lg pd-x-15 btn-primary" onClick="javascript:normalData(this)" data-id="${id}" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Save</button>`;
+                    $(inputWrapper).find(".button-area").html(newbuttons);
+                } else {
+                    const tds = $(button).closest("tr").children('td');
+                    const inputTr = $(table).find('tr.input');
+                    const inputTds = $(inputTr).children('td');
+                    const tdsCount = $(tds).length;
+
+                    $(button).closest("tr").addClass("input-wrapper");
+                    $(tds).each(function (i, e) {
+                        const el = $(inputTds[i]).children()[0];
+                        if (i != tdsCount - 1) {
+                            const html = $(e).text();
+                            const newInput = $(el).clone();
+                            if (!$(el).hasClass("disabled"))
+                                $(newInput).prop("disabled", false);
+
+                            $(el).prop("disabled", true);
+                            setValue(newInput, html);
+                            $(e).html(newInput);
+                        } else {
+                            $(el).attr("onClick", "");
+                            const edit = $(e).find(".fa.fa-edit");
+                            $(edit).attr("onClick", "javascript:normalData(this)");
+                            $(edit).removeClass("fa-edit");
+                            $(edit).addClass("fa-save");
+                            const trash = $(e).find(".fa.fa-trash");
+                            $(trash).attr("onClick", "javascript:revertEdit(this)");
+                            $(trash).removeClass("fa-trash");
+                            $(trash).addClass("fa-times");
+                        }
+                    });
+                    configInput();
+                    ieFix();
+                }
+            }
+        }
+        function revertEdit(button) {
+            const targetTable = $(button).data("target-table");
+            if (configAle[targetTable].onCancel != undefined) {
+                if (configAle[targetTable].onCancel()) {
+                    return;
+                }
+            }
+            releaseDisabledInput($(button).closest("table"));
+            startupSetup(targetTable);
+        }
+        function cancelEdit(button) {
+            const targetTable = $(button).data("target-table");
+            if (configAle[targetTable].onCancel != undefined) {
+                if (configAle[targetTable].onCancel()) {
+                    return;
+                }
+            }
+            const inputWrapper = $(button).closest(".input-wrapper");
+            const tableWrapper = $(inputWrapper).find(".tableWrapper");
+            const notInputs = $(tableWrapper).find("input, select, textarea");
+            const allInputs = $(inputWrapper).find("input, select, textarea");
+            $(button).closest(".button-area").html(`<button class="btn btn-lg pd-x-15 btn-primary" onClick="javascript:addToTable(this)" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Add To Table</button>`);
+            $(allInputs).not($(notInputs)).each(function () { setValue(this, "") });
+            $(inputWrapper).siblings(".tableWrapper").find("table").data("edited", false);
+            $(inputWrapper).find("#get-pss-data").show();
+            $(tableWrapper).find("table").each(function (i, table) {
+                releaseDisabledInput(table);
+                const subtable = $(table).find("tbody").prop("id");
+                configAle[subtable].data.truncate();
+                startupSetup(subtable);
+            });
+        }
+        function getValue(e) {
+            let val = $(e).val();
+            if ($(e).prop("type") == "checkbox")
+                val = $(e).prop("checked");
+            return htmlEncode(val);
+        }
+        function setValue(node, val) {
+            const type = $(node).prop("type");
+            if (type == "radio" || type == "checkbox") {
+                $("[value=" + val + "]").prop('checked', true);
+            } else {
+                $(node).val(val);
+            }
+            if ($(node).hasClass("select2"))
+                $(node).trigger('change');
+        }
+        const $tmpDiv = $('<div/>');
+        function htmlEncode(value){
+	        return $tmpDiv.text(value).html();
+        }
+        function htmlDecode(value){
+	        return $tmpDiv.html(value).text();
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    if($(el).attr("onClick") == "")
+                        $(el).attr("onClick", "javascript:addToTable(this)");
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).text();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).closest(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target) {
+            const table = generateTable(configAle[target].data, target);
+            $("#" + target).html(table);
+            countSummary(target);
+            ieFix();
+        }
+        function configInput() {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.time').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "00:00");
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+                $(field).blur(function () {
+                    let a = $(this).val();
+                    switch (a.length) {
+                        case 0: $(this).val("00:00"); break;
+                        case 1: $(this).val(a + "0:00"); break;
+                        case 3: $(this).val(a + "00"); break;
+                        case 4: $(this).val(a + "0"); break;
+                    }
+                });
+            });
+            $('.number, .number-positive').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+            });
+            $('.datepicker').toArray().forEach(function (field) {
+                //$(field).attr("placeholder", "01-Jan-19");
+                $(field).datepicker({
+                    format: 'dd-M-yy',
+                    language: 'id-ID'
+                });
+            });
+            $(".input-wrapper [required]").focus(function () {
+                showRequiredField(this);
+            });
+            $(".input-wrapper [required]").blur(function () {
+                hideRequiredField(this);
+            });
+        }
+        function showRequiredField(input) {
+            $(input).data("toggle", "popover");
+            $(input).data("placement", "top");
+            $(input).css("box-shadow", "0px 0px 7.5px red");
+            if ($(input).data("content") == undefined) {
+                $(input).data("content", "Value can't be null!");
+            }
+            $(input).popover("show");
+        }
+        function hideRequiredField(input) {
+            $(input).css("box-shadow", "");
+            $(input).popover("hide");
+        }
+        function isEmptyOrSpaces(str) {
+            return str === null || str.match(/^ *$/) !== null;
+        }
+        function addToTable(button) {
+            const targetTable = $(button).data("target-table");
+            const inputWrapper = $(button).closest(".input-wrapper");
+            const tableWrapper = $(inputWrapper).find(".tableWrapper");
+            const notInputs = $(tableWrapper).find("input, select, textarea");
+            const allInputs = $(inputWrapper).find("input, select, textarea");
+            const inputs = $(allInputs).not($(notInputs));
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(inputs).each(function (tdIndex, input) {
+                if ($(input).prop("required") && isEmptyOrSpaces($(input).val())) {
+                    showRequiredField(input);
+                    setTimeout(function () { $(input).popover("hide"); }, 10000);
+                    shouldReturn = true;
+                    return false;
+                }
+                if ($(input).attr("name") != undefined) {
+                    const name = $(input).attr("name");
+                    const val = getValue(input);
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+
+            if (configAle[targetTable].onAdd != undefined) {
+                newdata = configAle[targetTable].onAdd(newdata);
+                if (newdata == null) return;
+            }
+            $(inputs).each(function (i, input) { setValue($(input), "") });
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                $(tableWrapper).find("tbody").each(function (i, tbody) {
+                    const tableName = $(tbody).prop("id");
+                    newdata[tableName] = configAle[tableName].data.slice();
+                    configAle[tableName].data.truncate();
+                    startupSetup(tableName);
+                });
+                cancelEdit(button);
+            }
+
+            configAle[targetTable].data.push(newdata);
+            startupSetup(targetTable);
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const table = $('#' + targetTable).closest('table');
+                const summaryTds = $(table).find('.summary-body').children();
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    $(summaryTds).each(function (i, td) {
+                        const name = $(td).data("name");
+                        if (rowData.hasOwnProperty(name))
+                            $(summaryTds[i]).html(rowData[name]);
+                    });
+                } else {
+                    $(table).find('.input td').each(function (i, td) {
+                        const name = $(td).children().attr("name");
+                        if (rowData.hasOwnProperty(name))
+                            $(summaryTds[i]).html(rowData[name]);
+                    });
+                }
+            }
+        }
+        function deleteData(button) {
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                if (confirm("Are you sure?")) {
+                    const id = $(button).data("id");
+                    const targetTable = $(button).data("target-table");
+                    releaseDisabledInput(table);
+                    if (configAle[targetTable].onDelete != undefined) {
+                        if (configAle[targetTable].onDelete(id)) {
+                            return;
+                        }
+                    }
+                    deleteFromArray(id, configAle[targetTable].data);
+                    startupSetup(targetTable);
+                }
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const cardBody = $(button).closest(".card-body");
+                const table = $(cardBody).find(`table:has(tbody#${targetTable})`);
+                const index = findInArray(id, configAle[targetTable].data);
+
+                var newdata = {
+                    id: uuidv4()
+                };
+                let shouldReturn = false;
+                const inputWrapper = $(button).closest(".input-wrapper");
+                const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                const notInputs = $(tableWrapper).find("input, select, textarea");
+                const allInputs = $(inputWrapper).find("input, select, textarea");
+                $(allInputs).not($(notInputs)).each(function () {
+                    if ($(this).prop("required") && isEmptyOrSpaces($(this).val())) {
+                        showRequiredField(this);
+                        setTimeout(function () { $(this).popover("hide"); }, 10000);
+                        shouldReturn = true;
+                        return false;
+                    }
+                    const name = $(this).prop("name");
+                    const val = getValue(this);
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                });
+
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    $(tableWrapper).find("tbody").each(function (i, tbody) {
+                        const tableName = $(tbody).prop("id");
+                        newdata[tableName] = configAle[tableName].data.slice();
+                        configAle[tableName].data.truncate();
+                        startupSetup(tableName);
+                    });;
+                    cancelEdit(button);
+                }
+
+                if (shouldReturn) return;
+
+                if (configAle[targetTable].onSave != undefined) {
+                    newdata = configAle[targetTable].onSave(newdata);
+                    if (newdata == null) return;
+                }
+
+                configAle[targetTable].data[index] = newdata;
+
+                if (configAle[targetTable].mode == undefined ||
+                    configAle[targetTable].mode == TableMode.NORMAL) {
+                    releaseDisabledInput(table);
+                }
+
+                startupSetup(targetTable);
+            }
+        }
+        function countDuration(start, end) {
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                return diffMinutes;
+            }
+            return 0;
+        };
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input[type=text], input[type=number], select, textarea, input[type=radio]:checked, input[type=checkbox]').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+
+
+                    let type = "NonNumeric";
+                    if ($(e).is(".number, .number-positive")) type = "Numeric";
+                    values.push({
+                        Value: getValue(e),
+                        ValueType: type,
+                    });
+                });
+            });
+            return [components, values];
+        }
+        function collectAllData(config) {
+            let collectorArray = [];
+            for (var tableId in config) {
+                let tableColumnType = {};
+                let table = $(`#${tableId} ~ tfoot tr.input`);
+                if (configAle[tableId].mode != undefined &&
+                    configAle[tableId].mode == TableMode.SPREAD) {
+                    table = $(`#${tableId}`).parents(".tableWrapper").siblings(".input-wrapper");
+                }
+                $(table).find("input, select, textarea").each(function () {
+                    tableColumnType[$(this).prop("name")] =
+                        $(this).is(".number, .number-positive") ? "number" : "text";
+                });
+                const data = config[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    if (config[tableId].onCollectDataRow != undefined) {
+                        data[i] = config[tableId].onCollectDataRow(data[i]);
+                    }
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let type = "NonNumeric";
+                            if (tableColumnType[prop] == "number") type = "Numeric";
+                            let val = data[i][prop];
+                            if (val instanceof Object) val = JSON.stringify(val);
+                            let newInsertData = {
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: val,
+                                ValueType: type,
+                                RowNumber: i
+                            };
+                            if (config[tableId].onCollectDataSingle != undefined) {
+                                newInsertData = config[tableId].onCollectDataSingle(newInsertData);
+                            }
+                            collectorArray.push(newInsertData);
+                        }
+                    }
+                }
+            }
+            return collectorArray;
+        }
+        function notEmptyValidation(name, val) {
+            if (val == "") {
+                alert("Value can't be empty");
+                return true;
+            }
+            return false;
+        }
+        function configEditPage(model, handleImageFunction) {
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                let val = model.CompoVal[i].Value.Value;
+                //val = htmlDecode(val ? val : "");
+                if (type == "ImageURL") {
+                    handleImageFunction(val);
+                } else {
+                    const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                    const parent = tn[0];
+                    tn.shift();
+                    const child = tn.join("-");
+                    const node = $("#" + parent + " " + type + "[name=" + child + "]");
+                    $(node).val(val);
+                    if ($(node).hasClass("select2")) $(node).trigger('change');
+                }
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        const val = model.Extras[i].Value;
+                        //data[model.Extras[i].FieldName] = htmlDecode(val ? val : "");
+                        data[model.Extras[i].FieldName] = val ? val : "";
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                    }
+                }
+                configAle[table].data.push(data);
+            }
+            if ($("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                configAle.wasteBodyManual.data.truncate();
+                configAle.wasteBodyManual.data.absorb(configAle.waste);
+                configAle.waste.data.truncate();
+            }
+            for (let targetTable in configAle) {
+                configAle[targetTable].data.reverse();
+                startupSetup(targetTable);
+            }
+        }
+        $(document).ready(function () {
+            ieFix();
+            configInput();
+            $( window ).resize(function() {
+                ieFix();
+            });
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": Math.floor(top) });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).closest(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $("#btnSave").click(function () {
+                $('#loading_overlay').removeClass('d-none');
+                let config = Object.assign({}, configAle);
+                if ($("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                    config.waste = config.wasteBodyManual;
+                }
+                delete config.wasteBodyManual;
+                console.log(config);
+
+                const extras = collectAllData(config);
+                const comVal = collectAllComponent();
+                const components = comVal[0];
+                const values = comVal[1];
+
+                console.log("components");
+                console.log(components);
+                console.log("values");
+                console.log(values);
+                console.log("extras");
+                console.log(extras);
+
+                // chanif: simpan data
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create", "LPHPrimaryWhiteLinePackingWhite")",
+                    data: JSON.stringify({
+                        detailsExtras: extras,
+                        detailComponent: components,
+                        detailValue: values
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        $('#loading_overlay').addClass('d-none');
+                        console.log(result.Status);
+					    if (result.Status == 'True') {
+						    var notice = new PNotify({
+							    title: "@UIResources.Confirmation",
+							    text: "@UIResources.CreateSucceed",
+							    width: "400px",
+							    type: 'success',
+							    addclass: 'stack-bottomright'
+						    });
+
+						    notice.get().click(function () {
+							    notice.remove();
+                            });
+
+                            setTimeout(function () {
+                                location.reload();
+                            }, 3000);
+					    }
+					    else {
+						    var notice = new PNotify({
+							    title: "@UIResources.ErrorMessage",
+							    text: "@UIResources.CreateFailed",
+							    width: "400px",
+                                type: 'error',
+                                addclass: 'stack-bottomright',
+							    hide: false,
+							    buttons: {
+								    sticker: false
+							    }
+						    });
+
+						    notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        const boxPssData = {
+            BoxBlend: "V0K2Q",
+            BoxSapBatch: "1325324",
+            BoxSap: "440.001",
+            BoxTypeBox: "C 48",
+            BoxStart: "06:00",
+            BoxStop: "08:00",
+            BoxJumlahBox: "82",
+            BoxKg: "110.00",
+            BoxTotNetto: "93031.80",
+        };
+        const cluPssData = {
+            CLUBlend: "V0K2Q",
+            CLUSapBatch: "1325324",
+            CLUSiloAsal: "440.001",
+            CLUStart: "06:00",
+            CLUStop: "08:00",
+            CLUTopFeeder: "82",
+            CLUTopFeeder: "40",
+            CLUTotKg: "110.00",
+        };
+        $(document).ready(function () {
+            $('.get-pss-data-box').click(function () {
+                for (var prop in boxPssData) {
+                    if (Object.prototype.hasOwnProperty.call(boxPssData, prop)) {
+                        setValue($("[name=" + prop + "]"), boxPssData[prop]);
+                    }
+                }
+            });
+            $('.get-pss-data-clu').click(function () {
+                for (var prop in cluPssData) {
+                    if (Object.prototype.hasOwnProperty.call(cluPssData, prop)) {
+                        setValue($("[name=" + prop + "]"), cluPssData[prop]);
+                    }
+                }
+            });
+        });</script>
+
+    <script>
+        var wasteOpt = [
+            {
+                waste: "Sapon",
+                type: "Dry Waste",
+            },
+            {
+                waste: "Vacum",
+                type: "Dust",
+            },
+        ];
+
+
+        var selected;
+        $(document).ready(function () {
+            $('#phase-waste-modal').on('show.bs.modal', function (e) {
+                let opts = [];
+                for (var i = 0; i < wasteOpt.length; i++) {
+                    opts.push(wasteOpt[i].waste);
+                }
+                $(this).find(".kind").html(generateWizardButton(opts));
+            });
+            $('#phase-waste-modal').on('next', function (e, i, info) {
+                if (!selected) {
+                    info.shouldReturn = true;
+                    return;
+                }
+                const tr = $("#waste ~ tfoot tr.input");
+                switch (i) {
+                    case 0:
+                        info.shouldHide = true;
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            if (wasteOpt[i].waste == selected) {
+                                $(tr).find("[name=Waste]").val(wasteOpt[i].waste);
+                                $(tr).find("[name=WasteType]").val(wasteOpt[i].type);
+                                break;
+                            }
+                        }
+                        $(tr).find("[name=Weight]").val("19.55");
+                        $(tr).find(".fa.fa-plus-circle").click();
+                        break;
+                }
+            });
+            $('#phase-waste-modal').on('hide', function (e) {
+                selected = null;
+            });
+        });
+           $('#btnHistory').on('click', function (e) {
+		     location.href = '@Url.Action("Index", "HistoryPrimary")';
+          });
+    </script>
+
+    <!---------------------------- TIMEPICKER ------------------------------>
+    <script>
+        $('.time').toArray().forEach(function (field) {
+            $(field).attr("placeholder", "00:00");
+            new Cleave(field, {
+                time: true,
+                timePattern: ['h', 'm']
+            });
+            $(field).blur(function () {
+                let a = $(this).val();
+                switch (a.length) {
+                    case 1: a + "0:00";
+                    case 3: a + "00";
+                    case 4: a + "0";
+                }
+                $(this).val(a);
+            });
+        });
+    </script>
+}
+
+
+

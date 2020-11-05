@@ -1,0 +1,1992 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="AddNew" xml:space="preserve">
+    <value>Tambah Baru</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Alamat</value>
+  </data>
+  <data name="AssignModules" xml:space="preserve">
+    <value>Assign Modules</value>
+  </data>
+  <data name="AssignRoles" xml:space="preserve">
+    <value>Assign Roles</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="BirthDate" xml:space="preserve">
+    <value>Birth Date</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="Browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Batal</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Ubah</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Ubah Password</value>
+  </data>
+  <data name="ChangeStyle" xml:space="preserve">
+    <value>Ubah Style</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Konfirmasi</value>
+  </data>
+  <data name="ConfirmNewPassword" xml:space="preserve">
+    <value>Konfirmasi Password Baru</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreatedDate" xml:space="preserve">
+    <value>Created Date</value>
+  </data>
+  <data name="CreateFailed" xml:space="preserve">
+    <value>Create failed. Please check your user logs</value>
+  </data>
+  <data name="CreateRegion" xml:space="preserve">
+    <value>Create Region</value>
+  </data>
+  <data name="CreateRole" xml:space="preserve">
+    <value>Create Role</value>
+  </data>
+  <data name="CreateSucceed" xml:space="preserve">
+    <value>Data has been created successfully</value>
+  </data>
+  <data name="CreateUser" xml:space="preserve">
+    <value>Create User</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete </value>
+  </data>
+  <data name="DeleteFailed" xml:space="preserve">
+    <value>Delete failed. Please check your user logs</value>
+  </data>
+  <data name="DeleteSucceed" xml:space="preserve">
+    <value>The data has been deleted successfully</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Detail" xml:space="preserve">
+    <value>Detail</value>
+  </data>
+  <data name="Directory" xml:space="preserve">
+    <value>Directory</value>
+  </data>
+  <data name="DisplayName" xml:space="preserve">
+    <value>Display Name</value>
+  </data>
+  <data name="DisplayOrder" xml:space="preserve">
+    <value>Display Order</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EditFailed" xml:space="preserve">
+    <value>Save failed. Please check the user logs.</value>
+  </data>
+  <data name="EditModule" xml:space="preserve">
+    <value>Edit Module</value>
+  </data>
+  <data name="EditRegion" xml:space="preserve">
+    <value>Edit Region</value>
+  </data>
+  <data name="EditRole" xml:space="preserve">
+    <value>Edit Role</value>
+  </data>
+  <data name="EditSucceed" xml:space="preserve">
+    <value>The changes have been saved successfully</value>
+  </data>
+  <data name="EditUser" xml:space="preserve">
+    <value>Edit User</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Error Message</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>Filename</value>
+  </data>
+  <data name="FileType" xml:space="preserve">
+    <value>File Type</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="ForgotPassword" xml:space="preserve">
+    <value>Forgot Password</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="IPAddress" xml:space="preserve">
+    <value>IP Address</value>
+  </data>
+  <data name="IsActive" xml:space="preserve">
+    <value>Is Active</value>
+  </data>
+  <data name="IsDefault" xml:space="preserve">
+    <value>Is Default</value>
+  </data>
+  <data name="IsDeleted" xml:space="preserve">
+    <value>Is Deleted</value>
+  </data>
+  <data name="IsParentMenu" xml:space="preserve">
+    <value>Is Parent Menu</value>
+  </data>
+  <data name="LastLogin" xml:space="preserve">
+    <value>Last Login</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="Level" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Login | SRC ONE</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Logs" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <data name="LogTime" xml:space="preserve">
+    <value>Log Time</value>
+  </data>
+  <data name="MenuClass" xml:space="preserve">
+    <value>Menu Class</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Module" xml:space="preserve">
+    <value>Modul</value>
+  </data>
+  <data name="ModuleList" xml:space="preserve">
+    <value>Module List</value>
+  </data>
+  <data name="ModuleManagement" xml:space="preserve">
+    <value>Module Management</value>
+  </data>
+  <data name="ModuleName" xml:space="preserve">
+    <value>Module Name</value>
+  </data>
+  <data name="MyProfile" xml:space="preserve">
+    <value>My Profile</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="NewPasswordDoesntMatch" xml:space="preserve">
+    <value>New password does not match</value>
+  </data>
+  <data name="OldPassword" xml:space="preserve">
+    <value>Old Password</value>
+  </data>
+  <data name="OldPasswordInvalid" xml:space="preserve">
+    <value>The old password is invalid</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="PageAction" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="PageController" xml:space="preserve">
+    <value>Controller</value>
+  </data>
+  <data name="PageIcon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="PageSlug" xml:space="preserve">
+    <value>Page Slug</value>
+  </data>
+  <data name="ParentModule" xml:space="preserve">
+    <value>Parent Module</value>
+  </data>
+  <data name="ParentModuleID" xml:space="preserve">
+    <value>Parent ID</value>
+  </data>
+  <data name="ParentRegion" xml:space="preserve">
+    <value>Parent Region</value>
+  </data>
+  <data name="ParentRegionID" xml:space="preserve">
+    <value>Parent Region ID</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Permission" xml:space="preserve">
+    <value>Permission</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="ProjectManagement" xml:space="preserve">
+    <value>Project Management</value>
+  </data>
+  <data name="Region" xml:space="preserve">
+    <value>Region</value>
+  </data>
+  <data name="RegionList" xml:space="preserve">
+    <value>Region List</value>
+  </data>
+  <data name="RegionManagement" xml:space="preserve">
+    <value>Region Management</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>Remember Me</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="RoleConfiguration" xml:space="preserve">
+    <value>Role {0} Configuration</value>
+  </data>
+  <data name="RoleList" xml:space="preserve">
+    <value>Role List</value>
+  </data>
+  <data name="RoleManagement" xml:space="preserve">
+    <value>Role Management</value>
+  </data>
+  <data name="RoleModuleManagement" xml:space="preserve">
+    <value>Role Module Management</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SelectFile" xml:space="preserve">
+    <value>Select File</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Thumbnail" xml:space="preserve">
+    <value>Thumbnail</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="UserCount" xml:space="preserve">
+    <value>Jumlah User</value>
+  </data>
+  <data name="UserList" xml:space="preserve">
+    <value>Daftar User</value>
+  </data>
+  <data name="UserLog" xml:space="preserve">
+    <value>User Logs</value>
+  </data>
+  <data name="UserLogs" xml:space="preserve">
+    <value>User Logs</value>
+  </data>
+  <data name="UserManagement" xml:space="preserve">
+    <value>User Management</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="UserProfile" xml:space="preserve">
+    <value>User Profile</value>
+  </data>
+  <data name="UserStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="AddNewUser" xml:space="preserve">
+    <value>Tambah  User</value>
+  </data>
+  <data name="FillAllRequiredFields" xml:space="preserve">
+    <value>Please fill out all required fields.</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="AdddNewRole" xml:space="preserve">
+    <value>Tambah Role Baru</value>
+  </data>
+  <data name="AddNewRole" xml:space="preserve">
+    <value>Tambah  Role</value>
+  </data>
+  <data name="LocationList" xml:space="preserve">
+    <value>Location List</value>
+  </data>
+  <data name="LocationManagement" xml:space="preserve">
+    <value>Location Management</value>
+  </data>
+  <data name="ParentID" xml:space="preserve">
+    <value>Parent ID</value>
+  </data>
+  <data name="AddNewLocation" xml:space="preserve">
+    <value>Tambah Location</value>
+  </data>
+  <data name="RoleNameExist" xml:space="preserve">
+    <value>Role {0} already exist</value>
+  </data>
+  <data name="DeleteLocationConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete this location?</value>
+  </data>
+  <data name="DeleteRoleConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete this role?</value>
+  </data>
+  <data name="DeleteUserConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete this user?</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="NO" xml:space="preserve">
+    <value>NO</value>
+  </data>
+  <data name="YES" xml:space="preserve">
+    <value>YES</value>
+  </data>
+  <data name="NEW" xml:space="preserve">
+    <value>NEW</value>
+  </data>
+  <data name="AddNewUserType" xml:space="preserve">
+    <value>Tambah  User Type</value>
+  </data>
+  <data name="UserTypeList" xml:space="preserve">
+    <value>User Type List</value>
+  </data>
+  <data name="UserTypeManagement" xml:space="preserve">
+    <value>User Type Management</value>
+  </data>
+  <data name="MachineList" xml:space="preserve">
+    <value>Machine List</value>
+  </data>
+  <data name="MachineManagement" xml:space="preserve">
+    <value>Machine Management</value>
+  </data>
+  <data name="AddNewSkill" xml:space="preserve">
+    <value>Tambah  Skill</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Kode</value>
+  </data>
+  <data name="SkillList" xml:space="preserve">
+    <value>Employee Skill List</value>
+  </data>
+  <data name="SkillManagement" xml:space="preserve">
+    <value>Employee Skill Management</value>
+  </data>
+  <data name="SubProcess" xml:space="preserve">
+    <value>Sub Process</value>
+  </data>
+  <data name="AccessRightList" xml:space="preserve">
+    <value>Daftar Hak Akses</value>
+  </data>
+  <data name="AccessRightManagement" xml:space="preserve">
+    <value>Manajemen Hak Akses</value>
+  </data>
+  <data name="AddNewAccessRight" xml:space="preserve">
+    <value>Tambah Hak Akses</value>
+  </data>
+  <data name="AddNewReference" xml:space="preserve">
+    <value>Tambah  Reference</value>
+  </data>
+  <data name="Purpose" xml:space="preserve">
+    <value>Purpose</value>
+  </data>
+  <data name="ReferenceList" xml:space="preserve">
+    <value>Reference List</value>
+  </data>
+  <data name="ReferenceManagement" xml:space="preserve">
+    <value>Reference Management</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="ProductionCenter" xml:space="preserve">
+    <value>Production Center</value>
+  </data>
+  <data name="SubDepartment" xml:space="preserve">
+    <value>Sub Department</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>Negara</value>
+  </data>
+  <data name="EditUserType" xml:space="preserve">
+    <value>Edit User Type</value>
+  </data>
+  <data name="EditAccessRight" xml:space="preserve">
+    <value>Edit Access Right</value>
+  </data>
+  <data name="EditEmployeeSkill" xml:space="preserve">
+    <value>Edit Employee Skill</value>
+  </data>
+  <data name="EditMachine" xml:space="preserve">
+    <value>Edit Machine</value>
+  </data>
+  <data name="AddNewMachine" xml:space="preserve">
+    <value>Tambah Machine</value>
+  </data>
+  <data name="ParentMenu" xml:space="preserve">
+    <value>Parent Menu</value>
+  </data>
+  <data name="EditReference" xml:space="preserve">
+    <value>Edit Reference Details</value>
+  </data>
+  <data name="AddNewMenu" xml:space="preserve">
+    <value>Tambah Menu</value>
+  </data>
+  <data name="EditMenu" xml:space="preserve">
+    <value>Edit Menu</value>
+  </data>
+  <data name="MenuList" xml:space="preserve">
+    <value>Menu List</value>
+  </data>
+  <data name="MenuManagement" xml:space="preserve">
+    <value>Menu Management</value>
+  </data>
+  <data name="BrandList" xml:space="preserve">
+    <value>Brand List</value>
+  </data>
+  <data name="BrandManagement" xml:space="preserve">
+    <value>Brand Management</value>
+  </data>
+  <data name="LocationTypeList" xml:space="preserve">
+    <value>Location Type List</value>
+  </data>
+  <data name="LocationTypeManagement" xml:space="preserve">
+    <value>Location Type Management</value>
+  </data>
+  <data name="AddNewBrand" xml:space="preserve">
+    <value>Tambah Brand</value>
+  </data>
+  <data name="AddNewCountry" xml:space="preserve">
+    <value>Tambah Negara</value>
+  </data>
+  <data name="AddNewLocationType" xml:space="preserve">
+    <value>Tambah Location Type</value>
+  </data>
+  <data name="EditBrand" xml:space="preserve">
+    <value>Edit Brand</value>
+  </data>
+  <data name="EditCountry" xml:space="preserve">
+    <value>Edit Country</value>
+  </data>
+  <data name="EditLocation" xml:space="preserve">
+    <value>Edit Location</value>
+  </data>
+  <data name="EditLocationType" xml:space="preserve">
+    <value>Edit Location Type</value>
+  </data>
+  <data name="CountryList" xml:space="preserve">
+    <value>Daftar Negara</value>
+  </data>
+  <data name="CountryManagement" xml:space="preserve">
+    <value>Country Management</value>
+  </data>
+  <data name="LocationType" xml:space="preserve">
+    <value>Location Type</value>
+  </data>
+  <data name="ParentName" xml:space="preserve">
+    <value>Parent Name</value>
+  </data>
+  <data name="Upload" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="WeeklyProductionPlan" xml:space="preserve">
+    <value>Weekly Production Plan</value>
+  </data>
+  <data name="WppManagement" xml:space="preserve">
+    <value>WPP Management</value>
+  </data>
+  <data name="Week" xml:space="preserve">
+    <value>Week ( 1 = Update, 2 = Next Week )</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="Maker" xml:space="preserve">
+    <value>Maker</value>
+  </data>
+  <data name="Packer" xml:space="preserve">
+    <value>Packer</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>Failed to upload the document</value>
+  </data>
+  <data name="UploadSucceed" xml:space="preserve">
+    <value>Document has been uploaded successfully</value>
+  </data>
+  <data name="Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Jumlah</value>
+  </data>
+  <data name="DateFormatInvalid" xml:space="preserve">
+    <value>Invalid date {0}. The date format should be 'DDMMYYYY'</value>
+  </data>
+  <data name="WeekDateInvalid" xml:space="preserve">
+    <value>Invalid date {0} for week {1}. The date should be in the next week range.</value>
+  </data>
+  <data name="UserType" xml:space="preserve">
+    <value>User Type</value>
+  </data>
+  <data name="UserInactive" xml:space="preserve">
+    <value>User inactive</value>
+  </data>
+  <data name="EmployeeID" xml:space="preserve">
+    <value>Employee ID</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="GroupDesc" xml:space="preserve">
+    <value>Group Desc</value>
+  </data>
+  <data name="MppList" xml:space="preserve">
+    <value>MPP List</value>
+  </data>
+  <data name="MppManagement" xml:space="preserve">
+    <value>Man Power Planning Management</value>
+  </data>
+  <data name="Remark" xml:space="preserve">
+    <value>Remark</value>
+  </data>
+  <data name="SkillID" xml:space="preserve">
+    <value>Skill ID</value>
+  </data>
+  <data name="UserID" xml:space="preserve">
+    <value>User ID</value>
+  </data>
+  <data name="UserTypeName" xml:space="preserve">
+    <value>User Type</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="AccessRightExist" xml:space="preserve">
+    <value>Kombinasi Role dan Menu sudah ada di sistem</value>
+  </data>
+  <data name="CalendarManagement" xml:space="preserve">
+    <value>Master Calendar Management</value>
+  </data>
+  <data name="Calendar" xml:space="preserve">
+    <value>Kalender</value>
+  </data>
+  <data name="CalendarHoliday" xml:space="preserve">
+    <value>Kalender Libur</value>
+  </data>
+  <data name="CalendarHolidayReport" xml:space="preserve">
+    <value>Laporan Kalender Libur</value>
+  </data>
+  <data name="CalendarReport" xml:space="preserve">
+    <value>Laporan Kalender</value>
+  </data>
+  <data name="GroupType" xml:space="preserve">
+    <value>GType</value>
+  </data>
+  <data name="Report" xml:space="preserve">
+    <value>Laporan</value>
+  </data>
+  <data name="Shift1" xml:space="preserve">
+    <value>Shift 1</value>
+  </data>
+  <data name="Shift2" xml:space="preserve">
+    <value>Shift 2</value>
+  </data>
+  <data name="Shift3" xml:space="preserve">
+    <value>Shift 3</value>
+  </data>
+  <data name="JobTitleList" xml:space="preserve">
+    <value>Job Title List</value>
+  </data>
+  <data name="JobTitleManagement" xml:space="preserve">
+    <value>Job Title Management</value>
+  </data>
+  <data name="AddNewJobTitle" xml:space="preserve">
+    <value>Tambah Jabatan</value>
+  </data>
+  <data name="JobTitle" xml:space="preserve">
+    <value>Job Title</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>Items</value>
+  </data>
+  <data name="LegalEntity" xml:space="preserve">
+    <value>Legal Entity</value>
+  </data>
+  <data name="MachineNo" xml:space="preserve">
+    <value>Machine No</value>
+  </data>
+  <data name="MachineType" xml:space="preserve">
+    <value>Machine Type</value>
+  </data>
+  <data name="Merk" xml:space="preserve">
+    <value>Merk</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="SamID" xml:space="preserve">
+    <value>Sam ID</value>
+  </data>
+  <data name="AddNewUserMachineType" xml:space="preserve">
+    <value>Tambah User Machine Type</value>
+  </data>
+  <data name="EditUserMachineType" xml:space="preserve">
+    <value>Edit User Machine Type</value>
+  </data>
+  <data name="UserMachineTypeList" xml:space="preserve">
+    <value>User Machine Type List</value>
+  </data>
+  <data name="UserMachineTypeManagement" xml:space="preserve">
+    <value>User Machine Type Management</value>
+  </data>
+  <data name="AddNewMachineType" xml:space="preserve">
+    <value>Tambah Machine Type</value>
+  </data>
+  <data name="EditMachineType" xml:space="preserve">
+    <value>Edit Machine Type</value>
+  </data>
+  <data name="MachineTypeList" xml:space="preserve">
+    <value>Machine Type List</value>
+  </data>
+  <data name="MachineTypeManagement" xml:space="preserve">
+    <value>Machine Type Management</value>
+  </data>
+  <data name="Parent" xml:space="preserve">
+    <value>Parent</value>
+  </data>
+  <data name="ParentType" xml:space="preserve">
+    <value>Parent Type</value>
+  </data>
+  <data name="LocationExist" xml:space="preserve">
+    <value>Combination of Country Parent and Location already exist</value>
+  </data>
+  <data name="AddNewLinkUpMachine" xml:space="preserve">
+    <value>Tambah Link Up Machine</value>
+  </data>
+  <data name="EditLinkUpMachine" xml:space="preserve">
+    <value>Edit LinkUp Machine</value>
+  </data>
+  <data name="LinkUpID" xml:space="preserve">
+    <value>Link Up ID</value>
+  </data>
+  <data name="LinkUpMachine" xml:space="preserve">
+    <value>Link Up Machine</value>
+  </data>
+  <data name="LinkUpMachineList" xml:space="preserve">
+    <value>Link Up Machine List</value>
+  </data>
+  <data name="LinkUpMachineManagement" xml:space="preserve">
+    <value>Link Up Machine Management</value>
+  </data>
+  <data name="MachineID" xml:space="preserve">
+    <value>Machine ID</value>
+  </data>
+  <data name="Machine" xml:space="preserve">
+    <value>Machine</value>
+  </data>
+  <data name="LinkUp" xml:space="preserve">
+    <value>Link Up</value>
+  </data>
+  <data name="BackToHome" xml:space="preserve">
+    <value>Back To Home</value>
+  </data>
+  <data name="ContactAdministrator" xml:space="preserve">
+    <value>Mohon hubungi staff IT</value>
+  </data>
+  <data name="DontHaveAccess" xml:space="preserve">
+    <value>You don't have privilege to access this page</value>
+  </data>
+  <data name="UnAuthorized401" xml:space="preserve">
+    <value>401 Unauthorized</value>
+  </data>
+  <data name="WPPID" xml:space="preserve">
+    <value>WPP ID</value>
+  </data>
+  <data name="LocationID" xml:space="preserve">
+    <value>Location ID</value>
+  </data>
+  <data name="AccessManagement" xml:space="preserve">
+    <value>Manajemen Akses</value>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>Others</value>
+  </data>
+  <data name="Primary" xml:space="preserve">
+    <value>Primary</value>
+  </data>
+  <data name="Secondary" xml:space="preserve">
+    <value>Secondary</value>
+  </data>
+  <data name="WProductionPlan" xml:space="preserve">
+    <value>W. Production Plan</value>
+  </data>
+  <data name="UserLogDetails" xml:space="preserve">
+    <value>User Log Details</value>
+  </data>
+  <data name="UserLogList" xml:space="preserve">
+    <value>User Log List</value>
+  </data>
+  <data name="UserLogManagement" xml:space="preserve">
+    <value>User Log Management</value>
+  </data>
+  <data name="Stacktrace" xml:space="preserve">
+    <value>Stacktrace</value>
+  </data>
+  <data name="Timestamp" xml:space="preserve">
+    <value>Timestamp</value>
+  </data>
+  <data name="LocationCode" xml:space="preserve">
+    <value>Location Code</value>
+  </data>
+  <data name="LocationStructure" xml:space="preserve">
+    <value>Location Tree View</value>
+  </data>
+  <data name="IsTopMenu" xml:space="preserve">
+    <value>Is Top Menu</value>
+  </data>
+  <data name="MachineSN" xml:space="preserve">
+    <value>Machine SN</value>
+  </data>
+  <data name="AddNewCalendarHoliday" xml:space="preserve">
+    <value>Tambah Kalender Libur</value>
+  </data>
+  <data name="CalendarHolidayList" xml:space="preserve">
+    <value>Daftar Kalender Libur</value>
+  </data>
+  <data name="CalendarHolidayManagement" xml:space="preserve">
+    <value>Manajemen Kalender Libur</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Month</value>
+  </data>
+  <data name="MppDataManagement" xml:space="preserve">
+    <value>MPP Data Management</value>
+  </data>
+  <data name="MppManualInput" xml:space="preserve">
+    <value>MPP Manual Input</value>
+  </data>
+  <data name="WppDataManagement" xml:space="preserve">
+    <value>WPP Data Management</value>
+  </data>
+  <data name="WppManualInput" xml:space="preserve">
+    <value>WPP Manual Input</value>
+  </data>
+  <data name="EditCalendarHoliday" xml:space="preserve">
+    <value>Edit Calendar Holiday</value>
+  </data>
+  <data name="EditJobTitle" xml:space="preserve">
+    <value>Edit Job Title</value>
+  </data>
+  <data name="GroupA" xml:space="preserve">
+    <value>Group A</value>
+  </data>
+  <data name="GroupB" xml:space="preserve">
+    <value>Group B</value>
+  </data>
+  <data name="GroupC" xml:space="preserve">
+    <value>Group C</value>
+  </data>
+  <data name="GroupD" xml:space="preserve">
+    <value>Group D</value>
+  </data>
+  <data name="PONumber" xml:space="preserve">
+    <value>PO Number</value>
+  </data>
+  <data name="AddNewMpp" xml:space="preserve">
+    <value>Tambah MPP</value>
+  </data>
+  <data name="AddNewWpp" xml:space="preserve">
+    <value>Tambah  WPP</value>
+  </data>
+  <data name="WppList" xml:space="preserve">
+    <value>Wpp List</value>
+  </data>
+  <data name="TheSelectedData" xml:space="preserve">
+    <value>the selected data</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Start Date</value>
+  </data>
+  <data name="MachineA" xml:space="preserve">
+    <value>Machine A</value>
+  </data>
+  <data name="MachineB" xml:space="preserve">
+    <value>Machine B</value>
+  </data>
+  <data name="MachineC" xml:space="preserve">
+    <value>Machine C</value>
+  </data>
+  <data name="MachineD" xml:space="preserve">
+    <value>Machine D</value>
+  </data>
+  <data name="BusinessUnit" xml:space="preserve">
+    <value>Business Unit</value>
+  </data>
+  <data name="DepartmentDesc" xml:space="preserve">
+    <value>Department Desc</value>
+  </data>
+  <data name="EmployeeDataManagement" xml:space="preserve">
+    <value>Employee Data Management</value>
+  </data>
+  <data name="EmployeeList" xml:space="preserve">
+    <value>Employee List</value>
+  </data>
+  <data name="GroupName" xml:space="preserve">
+    <value>GName</value>
+  </data>
+  <data name="PositionDesc" xml:space="preserve">
+    <value>Position Desc</value>
+  </data>
+  <data name="BaseTownCity" xml:space="preserve">
+    <value>Base Town City</value>
+  </data>
+  <data name="BaseTownLocation" xml:space="preserve">
+    <value>Base Town Location</value>
+  </data>
+  <data name="EditEmployee" xml:space="preserve">
+    <value>Edit Employee</value>
+  </data>
+  <data name="UserMachineList" xml:space="preserve">
+    <value>User Machine List</value>
+  </data>
+  <data name="UserMachineManagement" xml:space="preserve">
+    <value>User Machine Management</value>
+  </data>
+  <data name="EditUserMachine" xml:space="preserve">
+    <value>Edit User Machine</value>
+  </data>
+  <data name="AddNewUserMachine" xml:space="preserve">
+    <value>Tambah  User Machine</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="Approval" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Read</value>
+  </data>
+  <data name="SubMenu" xml:space="preserve">
+    <value>Sub Menu</value>
+  </data>
+  <data name="Write" xml:space="preserve">
+    <value>Write</value>
+  </data>
+  <data name="MenuID" xml:space="preserve">
+    <value>Menu ID</value>
+  </data>
+  <data name="SubMenuID" xml:space="preserve">
+    <value>Sub Menu ID</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Tambah</value>
+  </data>
+  <data name="UpdateConfirmation" xml:space="preserve">
+    <value>Are you sure you want to update </value>
+  </data>
+  <data name="UpdatePrivilege" xml:space="preserve">
+    <value>Update Privilege</value>
+  </data>
+  <data name="UpdatePrivilegeFailed" xml:space="preserve">
+    <value>Failed to update the privilege</value>
+  </data>
+  <data name="UpdatePrivilegeSucceed" xml:space="preserve">
+    <value>Privilege has been updated</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="RoleOrSecurity" xml:space="preserve">
+    <value>Role / Security</value>
+  </data>
+  <data name="UpdateFailed" xml:space="preserve">
+    <value>Failed to update the data</value>
+  </data>
+  <data name="UpdateSucceed" xml:space="preserve">
+    <value>Data has been updated successfully</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Warna</value>
+  </data>
+  <data name="EmployeeSkillList" xml:space="preserve">
+    <value>Employee Skill List</value>
+  </data>
+  <data name="EmployeeSkillManagement" xml:space="preserve">
+    <value>Employee Skill Data Management</value>
+  </data>
+  <data name="Skills" xml:space="preserve">
+    <value>Skills</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>Employee</value>
+  </data>
+  <data name="DeleteLog" xml:space="preserve">
+    <value>Delete Logs</value>
+  </data>
+  <data name="DeleteLogInfo" xml:space="preserve">
+    <value>Less than or equal to the date will be deleted</value>
+  </data>
+  <data name="LatestLogDate" xml:space="preserve">
+    <value>Latest Log Date</value>
+  </data>
+  <data name="Template" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="ReferenceType" xml:space="preserve">
+    <value>Reference Type</value>
+  </data>
+  <data name="HmsOrg3" xml:space="preserve">
+    <value>HMSOrg3</value>
+  </data>
+  <data name="HometownLocation" xml:space="preserve">
+    <value>Hometown Location</value>
+  </data>
+  <data name="ReportToID1" xml:space="preserve">
+    <value>Report To ID1</value>
+  </data>
+  <data name="ReportToID2" xml:space="preserve">
+    <value>ReportTo ID2</value>
+  </data>
+  <data name="AddEditReference" xml:space="preserve">
+    <value>Tambah / Ubah Reference</value>
+  </data>
+  <data name="CreateOrEditFailed" xml:space="preserve">
+    <value>Create or edit has failed.</value>
+  </data>
+  <data name="CreateOrEditSucceed" xml:space="preserve">
+    <value>Create or edit has been successfully executed</value>
+  </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>Role Name</value>
+  </data>
+  <data name="NameDescriptionRequired" xml:space="preserve">
+    <value>Name and description are required when creating new role</value>
+  </data>
+  <data name="UpdateGroupType" xml:space="preserve">
+    <value>Update Group Type &amp; Location</value>
+  </data>
+  <data name="UpdateGroupTypeUsingExcel" xml:space="preserve">
+    <value>Update Employee GType &amp; Location via excel</value>
+  </data>
+  <data name="CodeDescRequired" xml:space="preserve">
+    <value>Kode dan deskripsi wajib diisi</value>
+  </data>
+  <data name="NothingToMove" xml:space="preserve">
+    <value>Nothing to move. Please select the title first.</value>
+  </data>
+  <data name="EmployeeLeaveList" xml:space="preserve">
+    <value>Employee Leave List</value>
+  </data>
+  <data name="EmployeeLeaveMasterData" xml:space="preserve">
+    <value>Employee Leave Master Data</value>
+  </data>
+  <data name="EmployeeOvertimeList" xml:space="preserve">
+    <value>Employee Overtime List</value>
+  </data>
+  <data name="EmployeeOvertimeMasterData" xml:space="preserve">
+    <value>Employee Overtime Master Data</value>
+  </data>
+  <data name="ActualIn" xml:space="preserve">
+    <value>Actual In</value>
+  </data>
+  <data name="ActualOut" xml:space="preserve">
+    <value>Actual Out</value>
+  </data>
+  <data name="ClockIn" xml:space="preserve">
+    <value>Jam Masuk</value>
+  </data>
+  <data name="ClockOut" xml:space="preserve">
+    <value>Jam Keluar</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Komentar</value>
+  </data>
+  <data name="CostCenter" xml:space="preserve">
+    <value>Cost Center</value>
+  </data>
+  <data name="Overtime" xml:space="preserve">
+    <value>Overtime</value>
+  </data>
+  <data name="AllHalfDay" xml:space="preserve">
+    <value>All Half Day</value>
+  </data>
+  <data name="EmployeeType" xml:space="preserve">
+    <value>Employee Type</value>
+  </data>
+  <data name="EndDateHalfDay" xml:space="preserve">
+    <value>End Date Half Day</value>
+  </data>
+  <data name="EndDatePagiSiang" xml:space="preserve">
+    <value>End Date Pagi Siang</value>
+  </data>
+  <data name="LeaveType" xml:space="preserve">
+    <value>Leave Type</value>
+  </data>
+  <data name="StartDateHalfDay" xml:space="preserve">
+    <value>Start Date Half Day</value>
+  </data>
+  <data name="StartDatePagiSiang" xml:space="preserve">
+    <value>Start Date Pagi Siang</value>
+  </data>
+  <data name="TimesheetLastModified" xml:space="preserve">
+    <value>Timesheet LastModified</value>
+  </data>
+  <data name="DeleteUntilDate" xml:space="preserve">
+    <value>Delete Logs until Date</value>
+  </data>
+  <data name="Process" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="ChangeGroup" xml:space="preserve">
+    <value>Ubah Group &amp; Lokasi</value>
+  </data>
+  <data name="GroupTypeInvalidAt" xml:space="preserve">
+    <value>Group type {0} in row {1} is invalid.</value>
+  </data>
+  <data name="ActiveDirectoryUserList" xml:space="preserve">
+    <value>Active Directory User List</value>
+  </data>
+  <data name="ActiveDirectoryUserManagement" xml:space="preserve">
+    <value>Active Directory User Management</value>
+  </data>
+  <data name="Company" xml:space="preserve">
+    <value>Perusahaan</value>
+  </data>
+  <data name="Manager" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="Act" xml:space="preserve">
+    <value>Act</value>
+  </data>
+  <data name="AssetID" xml:space="preserve">
+    <value>Asset ID</value>
+  </data>
+  <data name="EmpID" xml:space="preserve">
+    <value>Emp ID</value>
+  </data>
+  <data name="NewOS" xml:space="preserve">
+    <value>New OS</value>
+  </data>
+  <data name="EmployeeIDExist" xml:space="preserve">
+    <value>Employee ID already exist</value>
+  </data>
+  <data name="AddNewOSUser" xml:space="preserve">
+    <value>Tambah Outsource User</value>
+  </data>
+  <data name="SupervisorID" xml:space="preserve">
+    <value>Supervisor ID</value>
+  </data>
+  <data name="SupervisorName" xml:space="preserve">
+    <value>Supervisor Name</value>
+  </data>
+  <data name="Supervisor" xml:space="preserve">
+    <value>Supervisor</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="DownloadTemplate" xml:space="preserve">
+    <value>Download Template</value>
+  </data>
+  <data name="ManagerID" xml:space="preserve">
+    <value>Manager ID</value>
+  </data>
+  <data name="Position" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="TownLocation" xml:space="preserve">
+    <value>Town Location</value>
+  </data>
+  <data name="LocationMachineTypeDataManagement" xml:space="preserve">
+    <value>Machine Type Data Management</value>
+  </data>
+  <data name="LocationMachineTypeManagement" xml:space="preserve">
+    <value>Machine Type Management</value>
+  </data>
+  <data name="NEWHMS" xml:space="preserve">
+    <value>New HMS</value>
+  </data>
+  <data name="ProdCenter" xml:space="preserve">
+    <value>Prod. Center</value>
+  </data>
+  <data name="SubDepart" xml:space="preserve">
+    <value>Sub Depart.</value>
+  </data>
+  <data name="SearchBy" xml:space="preserve">
+    <value>Search By</value>
+  </data>
+  <data name="EmpShiftOneList" xml:space="preserve">
+    <value>Emp for LongShift 1</value>
+  </data>
+  <data name="EmpShiftThreeList" xml:space="preserve">
+    <value>Emp for LongShift 2</value>
+  </data>
+  <data name="EditMPP" xml:space="preserve">
+    <value>Edit MPP </value>
+  </data>
+  <data name="EditMPPManagement" xml:space="preserve">
+    <value>Managing shift replacement for on leave employee</value>
+  </data>
+  <data name="EditWPP" xml:space="preserve">
+    <value>Edit WPP</value>
+  </data>
+  <data name="BatchSAP" xml:space="preserve">
+    <value>Batch SAP</value>
+  </data>
+  <data name="OPSNumber" xml:space="preserve">
+    <value>OPS Number</value>
+  </data>
+  <data name="ApprovalFailed" xml:space="preserve">
+    <value>Gagal approve LPH terpilih</value>
+  </data>
+  <data name="ApprovalSucceed" xml:space="preserve">
+    <value>LPH sudah diapprove</value>
+  </data>
+  <data name="ApprovalConfirmation" xml:space="preserve">
+    <value>Apakah anda akan approve LPH dengan ID </value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>Internal Server Error</value>
+  </data>
+  <data name="PleaseContactITSupport" xml:space="preserve">
+    <value>Please contact your IT Support</value>
+  </data>
+  <data name="OopssInternalServerError" xml:space="preserve">
+    <value>Oopps... The server encountered an internal server error</value>
+  </data>
+  <data name="DeleteRoleFailed" xml:space="preserve">
+    <value>Delete failed. The role is being used by access right</value>
+  </data>
+  <data name="ApproveSucceed" xml:space="preserve">
+    <value>LPH berhasil diapprove</value>
+  </data>
+  <data name="RejectSucceed" xml:space="preserve">
+    <value>LPH has been rejected successfully</value>
+  </data>
+  <data name="Activity" xml:space="preserve">
+    <value>Aktifitas</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="IsAdmin" xml:space="preserve">
+    <value>Is Admin</value>
+  </data>
+  <data name="TrainingList" xml:space="preserve">
+    <value>Training List</value>
+  </data>
+  <data name="TrainingMasterData" xml:space="preserve">
+    <value>Training Data Management</value>
+  </data>
+  <data name="Score" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="Trainer" xml:space="preserve">
+    <value>Trainer</value>
+  </data>
+  <data name="TrainingCategory" xml:space="preserve">
+    <value>Training Category</value>
+  </data>
+  <data name="TrainingTitle" xml:space="preserve">
+    <value>Training Title</value>
+  </data>
+  <data name="MachineBrand" xml:space="preserve">
+    <value>Machine Brand</value>
+  </data>
+  <data name="NoDataInSelectedCriteria" xml:space="preserve">
+    <value>There is no data in the selected criteria</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Semua</value>
+  </data>
+  <data name="AmountNegative" xml:space="preserve">
+    <value>Jumlah tidak boleh kurang dari 0</value>
+  </data>
+  <data name="BrandBlendNotExist" xml:space="preserve">
+    <value>Brand / Blend not Exist</value>
+  </data>
+  <data name="DataExist" xml:space="preserve">
+    <value>{0} {1} already exist in the system</value>
+  </data>
+  <data name="DataHasBeenSaved" xml:space="preserve">
+    <value>Data has been saved</value>
+  </data>
+  <data name="DateIsLessThanToday" xml:space="preserve">
+    <value>Invalid date {0}. The date is less than today {1}</value>
+  </data>
+  <data name="DateIsMoreThanEndWeek" xml:space="preserve">
+    <value>Invalid date {0}. The maximum date for update is {1}</value>
+  </data>
+  <data name="DateOutOfRange" xml:space="preserve">
+    <value>Invalid date {0}. The date should be between {1} and {2}</value>
+  </data>
+  <data name="EmployeeLeaveManagement" xml:space="preserve">
+    <value>Employee Leave Management</value>
+  </data>
+  <data name="EmployeeNotExist" xml:space="preserve">
+    <value>Employee ID {0} does not exist</value>
+  </data>
+  <data name="EmployeeNotFoundOnAD" xml:space="preserve">
+    <value>Employee ID {0} not found in Active Directory</value>
+  </data>
+  <data name="EmployeeOvertimeManagement" xml:space="preserve">
+    <value>Employee Overtime Management</value>
+  </data>
+  <data name="FieldEmpty" xml:space="preserve">
+    <value>Field may not be empty</value>
+  </data>
+  <data name="FileCorrupted" xml:space="preserve">
+    <value>File corrupted. Please make sure the file content is valid.</value>
+  </data>
+  <data name="FileNotSupported" xml:space="preserve">
+    <value>Invalid file. The file extension should be xls or xlsx</value>
+  </data>
+  <data name="GeneratedBy" xml:space="preserve">
+    <value>Generated By</value>
+  </data>
+  <data name="GeneratedDate" xml:space="preserve">
+    <value>Generated Date</value>
+  </data>
+  <data name="HolidayExist" xml:space="preserve">
+    <value>Holiday for {0} in the selected location already exist in the system</value>
+  </data>
+  <data name="InvalidData" xml:space="preserve">
+    <value>Invalid Data. Please make sure all required fields are filled</value>
+  </data>
+  <data name="InvalidModelState" xml:space="preserve">
+    <value>Invalid Model State</value>
+  </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>Password invalid</value>
+  </data>
+  <data name="InvalidUsername" xml:space="preserve">
+    <value>Username not found</value>
+  </data>
+  <data name="LinkUpMachineExist" xml:space="preserve">
+    <value>LinkUpMachine with those combination already exist</value>
+  </data>
+  <data name="LocationInvalid" xml:space="preserve">
+    <value>At least production center is selected</value>
+  </data>
+  <data name="LocationIsMissing" xml:space="preserve">
+    <value>Please select location before upload</value>
+  </data>
+  <data name="LocationNameExist" xml:space="preserve">
+    <value>Location {0} already exist</value>
+  </data>
+  <data name="LogAdd" xml:space="preserve">
+    <value>Added new {0} {1}</value>
+  </data>
+  <data name="LogAddRole" xml:space="preserve">
+    <value>Added new role {0}</value>
+  </data>
+  <data name="LogAddUser" xml:space="preserve">
+    <value>Added new user {0}</value>
+  </data>
+  <data name="LogDelete" xml:space="preserve">
+    <value>Deleted {0} {1}</value>
+  </data>
+  <data name="LogDeleteRole" xml:space="preserve">
+    <value>Deleted role {0}</value>
+  </data>
+  <data name="LogDeleteUser" xml:space="preserve">
+    <value>Deleted user {0}</value>
+  </data>
+  <data name="LogEdit" xml:space="preserve">
+    <value>Edited {0} {1}</value>
+  </data>
+  <data name="LogEditRole" xml:space="preserve">
+    <value>Edited role {0}</value>
+  </data>
+  <data name="LogEditUser" xml:space="preserve">
+    <value>Edited user {0}</value>
+  </data>
+  <data name="LogLoginFailed" xml:space="preserve">
+    <value>Failed logged into system.</value>
+  </data>
+  <data name="LogLoginSucceed" xml:space="preserve">
+    <value>Successfully logged into system.</value>
+  </data>
+  <data name="LogSignoutSucceed" xml:space="preserve">
+    <value>Successfully signout from system</value>
+  </data>
+  <data name="LogViewIndex" xml:space="preserve">
+    <value>View {0} List</value>
+  </data>
+  <data name="MachineCodeNotExit" xml:space="preserve">
+    <value>Machine Code {0} does not exist.</value>
+  </data>
+  <data name="MachineNotExist" xml:space="preserve">
+    <value>Machine code not exist</value>
+  </data>
+  <data name="MachineNotSelected" xml:space="preserve">
+    <value>There is no selected Machine Type</value>
+  </data>
+  <data name="MenuTitle" xml:space="preserve">
+    <value>Menu Title</value>
+  </data>
+  <data name="NamePurposeAreMandatory" xml:space="preserve">
+    <value>Name and Purpose are mandatory fields</value>
+  </data>
+  <data name="NewPasswordInvalid" xml:space="preserve">
+    <value>New password and confirm new password does not match</value>
+  </data>
+  <data name="NoLogs" xml:space="preserve">
+    <value>There is no user logs on the selected date period</value>
+  </data>
+  <data name="NoSelectedFile" xml:space="preserve">
+    <value>No excel file selected to be uploaded</value>
+  </data>
+  <data name="NoSubDepDefined" xml:space="preserve">
+    <value>There is no sub departement defined from the selected location</value>
+  </data>
+  <data name="PageControllerAndActionRequired" xml:space="preserve">
+    <value>Controller and Action are required for non parent / top menu</value>
+  </data>
+  <data name="PleaseSelect" xml:space="preserve">
+    <value>- Please Select -</value>
+  </data>
+  <data name="ProdCenterIsMissing" xml:space="preserve">
+    <value>Production Center must be selected</value>
+  </data>
+  <data name="ReferenceMissingDetails" xml:space="preserve">
+    <value>At least each reference has one reference detail.</value>
+  </data>
+  <data name="SubDepartmentIsMissing" xml:space="preserve">
+    <value>Sub Department is missing</value>
+  </data>
+  <data name="TrainingManagement" xml:space="preserve">
+    <value>Training Management</value>
+  </data>
+  <data name="UnauthorizedAccess" xml:space="preserve">
+    <value>You do not have the privilege to access this page</value>
+  </data>
+  <data name="UserDeleted" xml:space="preserve">
+    <value>User has been deleted</value>
+  </data>
+  <data name="UserLogin" xml:space="preserve">
+    <value>User has been log in to the system</value>
+  </data>
+  <data name="UserMachineTypeExist" xml:space="preserve">
+    <value>Combination of User and MachineType already exist in the system</value>
+  </data>
+  <data name="UsernameExist" xml:space="preserve">
+    <value>Username {0} already exist in the system</value>
+  </data>
+  <data name="UserSignOut" xml:space="preserve">
+    <value>User has been sign out from the system</value>
+  </data>
+  <data name="BlendList" xml:space="preserve">
+    <value>Blend List</value>
+  </data>
+  <data name="BlendMasterData" xml:space="preserve">
+    <value>Blend Master Data</value>
+  </data>
+  <data name="BrandMasterData" xml:space="preserve">
+    <value>Brand Master Data</value>
+  </data>
+  <data name="EditBlend" xml:space="preserve">
+    <value>Edit Blend</value>
+  </data>
+  <data name="UserRoleList" xml:space="preserve">
+    <value>User Role List</value>
+  </data>
+  <data name="UserRoleManagement" xml:space="preserve">
+    <value>User Role Management</value>
+  </data>
+  <data name="Ch_ApprovalStatus" xml:space="preserve">
+    <value>Status Approval</value>
+  </data>
+  <data name="Ch_ApproverFor" xml:space="preserve">
+    <value>Anda adalah approver dari submission di bawah ini</value>
+  </data>
+  <data name="Ch_ColumnNumber" xml:space="preserve">
+    <value>Jumlah Kolom</value>
+  </data>
+  <data name="Ch_DefineChecklistHeader" xml:space="preserve">
+    <value>Membuat Header Checklist</value>
+  </data>
+  <data name="Ch_HeaderTitle" xml:space="preserve">
+    <value>Nama Checklist</value>
+  </data>
+  <data name="Ch_MainInformation" xml:space="preserve">
+    <value>Informasi Umum</value>
+  </data>
+  <data name="Ch_MenuTitle" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="Ch_SubmissionFrequency" xml:space="preserve">
+    <value>Frekwensi Pengisian</value>
+  </data>
+  <data name="Ch_UploadIcon" xml:space="preserve">
+    <value>Upload Gambar untuk Icon</value>
+  </data>
+  <data name="Locations" xml:space="preserve">
+    <value>Pilih Lokasi</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Jam</value>
+  </data>
+  <data name="AddNewBlend" xml:space="preserve">
+    <value>Tambah Blend</value>
+  </data>
+  <data name="IsFast" xml:space="preserve">
+    <value>Is Fast</value>
+  </data>
+  <data name="AddNewMaterialCode" xml:space="preserve">
+    <value>Add New Material Code</value>
+  </data>
+  <data name="EditMaterialCode" xml:space="preserve">
+    <value>Edit Material Code</value>
+  </data>
+  <data name="MaterialCodeList" xml:space="preserve">
+    <value>Material Code List</value>
+  </data>
+  <data name="MaterialCodeMasterData" xml:space="preserve">
+    <value>Material Code Master Data</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Cari</value>
+  </data>
+  <data name="GetPDF" xml:space="preserve">
+    <value>Download PDF</value>
+  </data>
+  <data name="ShowOnScreen" xml:space="preserve">
+    <value>Tampilkan di Layar</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="Fast" xml:space="preserve">
+    <value>Fast</value>
+  </data>
+  <data name="PeopleSoftDataManagement" xml:space="preserve">
+    <value>People Soft Data Management</value>
+  </data>
+  <data name="PeopleSoftList" xml:space="preserve">
+    <value>People Soft List</value>
+  </data>
+  <data name="DateInvalid" xml:space="preserve">
+    <value>The {0} is invalid date.</value>
+  </data>
+  <data name="BlendDataManagement" xml:space="preserve">
+    <value>Blend Data Management</value>
+  </data>
+  <data name="BrandDataManagement" xml:space="preserve">
+    <value>Brand Data Management</value>
+  </data>
+  <data name="EmployeeAllManagement" xml:space="preserve">
+    <value>Employee All Management</value>
+  </data>
+  <data name="MaterialCodesManagement" xml:space="preserve">
+    <value>Material Codes Management</value>
+  </data>
+  <data name="EditEmployeeOvertime" xml:space="preserve">
+    <value>Edit Employee Overtime</value>
+  </data>
+  <data name="EditTraining" xml:space="preserve">
+    <value>Edit Training</value>
+  </data>
+  <data name="DateWppInvalid" xml:space="preserve">
+    <value>Invalid date {0}. WPP date format should be 'yyyyMMdd'</value>
+  </data>
+  <data name="DateWppLessThanEqualToday" xml:space="preserve">
+    <value>Invalid date {0}. WPP date should be more than today date {1}</value>
+  </data>
+  <data name="FailedGetDataFromAD" xml:space="preserve">
+    <value>Failed to get username from Active Directory</value>
+  </data>
+  <data name="GenerateFailed" xml:space="preserve">
+    <value>Generate failed. Please check user logs for the details.</value>
+  </data>
+  <data name="EmployeeIdIsMissing" xml:space="preserve">
+    <value>EmployeeID is missing. Please check value in [ {0} ]</value>
+  </data>
+  <data name="GroupNameInvalid" xml:space="preserve">
+    <value>EmployeeID {0} GroupName is {1} not {2}</value>
+  </data>
+  <data name="EditWppPrimary" xml:space="preserve">
+    <value>Edit Wpp Primary</value>
+  </data>
+  <data name="WppPrimaryList" xml:space="preserve">
+    <value>Wpp Primary List</value>
+  </data>
+  <data name="WppPrimaryManagement" xml:space="preserve">
+    <value>Wpp Primary Management</value>
+  </data>
+  <data name="Blend" xml:space="preserve">
+    <value>Blend</value>
+  </data>
+  <data name="OldBatch" xml:space="preserve">
+    <value>Old Batch</value>
+  </data>
+  <data name="WeeklyProductionPlanPrimary" xml:space="preserve">
+    <value>Weekly Production Plan Primary</value>
+  </data>
+  <data name="BlendNotExist" xml:space="preserve">
+    <value>Blend {0} does not exist in the system</value>
+  </data>
+  <data name="BrandCode" xml:space="preserve">
+    <value>Brand Code</value>
+  </data>
+  <data name="BrandConversion" xml:space="preserve">
+    <value>Brand Conversion</value>
+  </data>
+  <data name="BrandConversionList" xml:space="preserve">
+    <value>Brand Conversion List</value>
+  </data>
+  <data name="BrandConversionMasterData" xml:space="preserve">
+    <value>Brand Conversion Management</value>
+  </data>
+  <data name="EditBrandConversion" xml:space="preserve">
+    <value>Edit Brand Conversion</value>
+  </data>
+  <data name="UOM1" xml:space="preserve">
+    <value>UOM 1</value>
+  </data>
+  <data name="UOM2" xml:space="preserve">
+    <value>UOM 2</value>
+  </data>
+  <data name="Value1" xml:space="preserve">
+    <value>Value 1</value>
+  </data>
+  <data name="Value2" xml:space="preserve">
+    <value>Value 2</value>
+  </data>
+  <data name="AddNewBrandConversion" xml:space="preserve">
+    <value>Add New Brand Conversion</value>
+  </data>
+  <data name="LoadDataFailed" xml:space="preserve">
+    <value>Load data failed. Please check the user logs</value>
+  </data>
+  <data name="GenerateSucceed" xml:space="preserve">
+    <value>The file has been generated successfully</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="AddNewManPower" xml:space="preserve">
+    <value>Add New Man Power</value>
+  </data>
+  <data name="EditManPower" xml:space="preserve">
+    <value>Edit Man Power</value>
+  </data>
+  <data name="ManPowerManagement" xml:space="preserve">
+    <value>Man Power Management</value>
+  </data>
+  <data name="Area" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="Assigned" xml:space="preserve">
+    <value>Assigned</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Idle</value>
+  </data>
+  <data name="AddNewUserExtraRole" xml:space="preserve">
+    <value>Add New User Extra Role</value>
+  </data>
+  <data name="EditUserExtraRole" xml:space="preserve">
+    <value>Edit User Extra Role</value>
+  </data>
+  <data name="ExtraRoleInvalid" xml:space="preserve">
+    <value>{0} default role is {1} No need to add it as extra role</value>
+  </data>
+  <data name="UserExtraRoleList" xml:space="preserve">
+    <value>User Extra Role List</value>
+  </data>
+  <data name="UserProfiles" xml:space="preserve">
+    <value>User Profiles</value>
+  </data>
+  <data name="AddNewTrainingMachineType" xml:space="preserve">
+    <value>Add New Training Machine Type</value>
+  </data>
+  <data name="AddNewTrainingTitle" xml:space="preserve">
+    <value>Add New Training Title</value>
+  </data>
+  <data name="EditTrainingMachineType" xml:space="preserve">
+    <value>Edit Training Machine Type</value>
+  </data>
+  <data name="EditTrainingTitle" xml:space="preserve">
+    <value>Edit Training Title</value>
+  </data>
+  <data name="TrainingMachineTypeDataManagement" xml:space="preserve">
+    <value>Training Title and Machine Type Management</value>
+  </data>
+  <data name="TrainingMachineTypeList" xml:space="preserve">
+    <value>Training Machine Type List</value>
+  </data>
+  <data name="TrainingTitleDataManagement" xml:space="preserve">
+    <value>Training Title Data Management</value>
+  </data>
+  <data name="TrainingTitleList" xml:space="preserve">
+    <value>Training Title List</value>
+  </data>
+  <data name="AddNewMealRequest" xml:space="preserve">
+    <value>Add New Meal Request</value>
+  </data>
+  <data name="EditMealRequest" xml:space="preserve">
+    <value>Edit Meal Request</value>
+  </data>
+  <data name="GuestName" xml:space="preserve">
+    <value>Guest Name</value>
+  </data>
+  <data name="MealRequestDataManagement" xml:space="preserve">
+    <value>Meal Request Data Management</value>
+  </data>
+  <data name="MealRequestList" xml:space="preserve">
+    <value>Meal Request List</value>
+  </data>
+  <data name="MealRequestManagement" xml:space="preserve">
+    <value>Meal Request Management</value>
+  </data>
+  <data name="NumGuest" xml:space="preserve">
+    <value>Total Guest(s)</value>
+  </data>
+  <data name="Requestor" xml:space="preserve">
+    <value>Requestor</value>
+  </data>
+  <data name="Period" xml:space="preserve">
+    <value>Periode</value>
+  </data>
+  <data name="Canteen" xml:space="preserve">
+    <value>Kantin</value>
+  </data>
+  <data name="GuestType" xml:space="preserve">
+    <value>Guest Type</value>
+  </data>
+  <data name="HmsPIC" xml:space="preserve">
+    <value>HMS PIC</value>
+  </data>
+  <data name="TotalGuest" xml:space="preserve">
+    <value>Total Guest</value>
+  </data>
+  <data name="CompanyOrGuestName" xml:space="preserve">
+    <value>Company / Guest Name(s)</value>
+  </data>
+  <data name="PleaseUseEmpId" xml:space="preserve">
+    <value>Please use your Employee ID to sign in</value>
+  </data>
+  <data name="UpdateOvertimeCategory" xml:space="preserve">
+    <value>Update Overtime Category</value>
+  </data>
+  <data name="UpdateOvertimeCategoryViaExcel" xml:space="preserve">
+    <value>Update Overtime Category via Excel</value>
+  </data>
+  <data name="BU" xml:space="preserve">
+    <value>BU</value>
+  </data>
+  <data name="SpvID" xml:space="preserve">
+    <value>Spv ID</value>
+  </data>
+  <data name="SpvName" xml:space="preserve">
+    <value>Spv Name</value>
+  </data>
+  <data name="ModifiedBy" xml:space="preserve">
+    <value>Modified By</value>
+  </data>
+  <data name="ModifiedDate" xml:space="preserve">
+    <value>Modified Date</value>
+  </data>
+  <data name="CompanyOrGuest" xml:space="preserve">
+    <value>Company / guest(s)</value>
+  </data>
+  <data name="Guest" xml:space="preserve">
+    <value>Guest(s)</value>
+  </data>
+  <data name="AddNewShuttleRequest" xml:space="preserve">
+    <value>Add New Shuttle Request</value>
+  </data>
+  <data name="EditShuttleRequest" xml:space="preserve">
+    <value>Edit Shuttle Request</value>
+  </data>
+  <data name="LocationFrom" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="LocationTo" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ShuttleRequestDataManagement" xml:space="preserve">
+    <value>Shuttle Request Data Management</value>
+  </data>
+  <data name="ShuttleRequestList" xml:space="preserve">
+    <value>Shuttle Request List</value>
+  </data>
+  <data name="TotalPassengers" xml:space="preserve">
+    <value>Total Passengers</value>
+  </data>
+  <data name="ShuttleRequestManagement" xml:space="preserve">
+    <value>Shuttle Request Management</value>
+  </data>
+  <data name="DetailReportForMeal" xml:space="preserve">
+    <value>Detail Report for Meal</value>
+  </data>
+  <data name="DetailReportForShuttle" xml:space="preserve">
+    <value>Detail Report for Shuttle</value>
+  </data>
+  <data name="SummaryReportForMeal" xml:space="preserve">
+    <value>Summary Report for Meal</value>
+  </data>
+  <data name="SummaryReportForShuttle" xml:space="preserve">
+    <value>Summary Report for Shuttle</value>
+  </data>
+  <data name="Request" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="PIC" xml:space="preserve">
+    <value>PIC</value>
+  </data>
+  <data name="Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="BulkUpdate" xml:space="preserve">
+    <value>Bulk Update</value>
+  </data>
+  <data name="MassUpload" xml:space="preserve">
+    <value>Mass Upload</value>
+  </data>
+  <data name="Cluster" xml:space="preserve">
+    <value>Cluster</value>
+  </data>
+  <data name="FAccountRolesInvalid" xml:space="preserve">
+    <value>You are not allowed to sign in into the system</value>
+  </data>
+  <data name="OrderNumber" xml:space="preserve">
+    <value>Order No</value>
+  </data>
+  <data name="AddNewMachineAllocation" xml:space="preserve">
+    <value>Add New Machine Allocation</value>
+  </data>
+  <data name="EditMachineAllocation" xml:space="preserve">
+    <value>Edit Machine Allocation</value>
+  </data>
+  <data name="MachineAllocationDataManagement" xml:space="preserve">
+    <value>Machine Allocation Data Management</value>
+  </data>
+  <data name="MachineAllocationList" xml:space="preserve">
+    <value>Machine Allocation List</value>
+  </data>
+  <data name="Friday" xml:space="preserve">
+    <value>Friday</value>
+  </data>
+  <data name="Monday" xml:space="preserve">
+    <value>Monday</value>
+  </data>
+  <data name="Saturday" xml:space="preserve">
+    <value>Saturday</value>
+  </data>
+  <data name="Sunday" xml:space="preserve">
+    <value>Sunday</value>
+  </data>
+  <data name="Thursday" xml:space="preserve">
+    <value>Thursday</value>
+  </data>
+  <data name="Tuesday" xml:space="preserve">
+    <value>Tuesday</value>
+  </data>
+  <data name="VolPerOps" xml:space="preserve">
+    <value>Vol per Ops ('000 kg)</value>
+  </data>
+  <data name="Wednesday" xml:space="preserve">
+    <value>Wednesday</value>
+  </data>
+  <data name="Ch_EditIcon" xml:space="preserve">
+    <value>Biarkan kosong jika icon tidak ingin dirubah</value>
+  </data>
+  <data name="Competency" xml:space="preserve">
+    <value>Competency</value>
+  </data>
+  <data name="Trainees" xml:space="preserve">
+    <value>Trainees</value>
+  </data>
+  <data name="DataNotFound" xml:space="preserve">
+    <value>Data Not Found</value>
+  </data>
+  <data name="ExtractSuccess" xml:space="preserve">
+    <value>Data has been extracted successfully</value>
+  </data>
+</root>

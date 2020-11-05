@@ -1,0 +1,1848 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Shift &amp; Daily</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Shift &amp; Daily</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-sm pd-x-15 btn-outline-danger btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-pdf"></i> Export PDF</button>
+                <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export Excel</button>
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-envelope"></i> &nbsp; Send</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date :</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label tx-right">Week</label>
+                                <div class="col-8">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Country :</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="country">
+                                        <option label="Select Country"></option>
+                                        <option value="id">ID - Indonesia</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center :</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        <option value="pi">PI - PMID Karawang</option>
+                                        <option value="pkk">PK - SKM Karawang</option>
+                                        <option value="pb">PB - SIS Sukorejo</option>
+                                        <option value="pks">PK - SKM Sukorejo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <!--div class="flex-1">
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Departement :</label>
+            <div class="col-6">
+                <select class="form-control select2" name="department">
+                    <option label="Select Departement"></option>
+                </select>
+            </div>
+        </div>
+    </!--div-->
+
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand :</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="brand">
+                                        <!--DATANYA AMBIL DI LPH RIPPER (SECTION INFORMATION), SUDAH COMPLETE BRANDNYA-->
+                                        <option label="Select Brand"></option>
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <ul id="line-tabs" class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">SIS ALL</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">LU51</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">LU57</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">LU59</a>
+                        </li>
+                    </ul>
+
+                    <div id="lines" class="carousel" data-pause="true">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">SIS ALL</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper col-12" id="collapseExamplesisall" style="min-height:300px;">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info">
+                                                            <tr>
+                                                                <th>SIS ALL</th>
+                                                                <th>Trend</th>
+                                                                <th>10-Dec</th>
+                                                                <th>11-Dec</th>
+                                                                <th>12-Dec</th>
+                                                                <th>WTD</th>
+                                                                <th>MTD</th>
+                                                                <th>MTG</th>
+                                                                <th>Target</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Production Volume</td>
+                                                                <td><center><i class='fas fa-caret-down'></i></center></td>
+                                                                <td>17</td>
+                                                                <td>16</td>
+                                                                <td>16</td>
+                                                                <td>111</td>
+                                                                <td>379</td>
+                                                                <td>51</td>
+                                                                <td>728</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Uptime Packer</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>86.0</td>
+                                                                <td>83.8</td>
+                                                                <td>83.8</td>
+                                                                <td>85.3</td>
+                                                                <td>77.6</td>
+                                                                <td>103.5</td>
+                                                                <td>80.0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-up' style="color: #5CB85C"></i></center></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>636</td>
+                                                                <td>75</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>CRR</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>STRS</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--SIS ALL-->
+                                </div>
+                            </div> <!-- SIS ALL -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">LU51</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper col-12" id="collapseExamplelu51" style="min-height:300px;">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info">
+                                                            <tr>
+                                                                <th>LU51</th>
+                                                                <th>Trend</th>
+                                                                <th>10-Dec</th>
+                                                                <th>11-Dec</th>
+                                                                <th>12-Dec</th>
+                                                                <th>WTD</th>
+                                                                <th>MTD</th>
+                                                                <th>MTG</th>
+                                                                <th>Target</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Production Volume</td>
+                                                                <td><center><i class='fas fa-caret-down'></i></center></td>
+                                                                <td>17</td>
+                                                                <td>16</td>
+                                                                <td>16</td>
+                                                                <td>111</td>
+                                                                <td>379</td>
+                                                                <td>51</td>
+                                                                <td>728</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Uptime Packer</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>86.0</td>
+                                                                <td>83.8</td>
+                                                                <td>83.8</td>
+                                                                <td>85.3</td>
+                                                                <td>77.6</td>
+                                                                <td>103.5</td>
+                                                                <td>80.0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-up' style="color: #5CB85C"></i></center></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>636</td>
+                                                                <td>75</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>CRR</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>STRS</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--LU51-->
+                                </div>
+                            </div> <!-- LU51 -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">LU57</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper col-12" id="collapseExamplelu57" style="min-height:300px;">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info">
+                                                            <tr>
+                                                                <th>LU57</th>
+                                                                <th>Trend</th>
+                                                                <th>10-Dec</th>
+                                                                <th>11-Dec</th>
+                                                                <th>12-Dec</th>
+                                                                <th>WTD</th>
+                                                                <th>MTD</th>
+                                                                <th>MTG</th>
+                                                                <th>Target</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Production Volume</td>
+                                                                <td><center><i class='fas fa-caret-down'></i></center></td>
+                                                                <td>17</td>
+                                                                <td>16</td>
+                                                                <td>16</td>
+                                                                <td>111</td>
+                                                                <td>379</td>
+                                                                <td>51</td>
+                                                                <td>728</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Uptime Packer</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>86.0</td>
+                                                                <td>83.8</td>
+                                                                <td>83.8</td>
+                                                                <td>85.3</td>
+                                                                <td>77.6</td>
+                                                                <td>103.5</td>
+                                                                <td>80.0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-up' style="color: #5CB85C"></i></center></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>636</td>
+                                                                <td>75</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>CRR</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>STRS</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--LU57-->
+                                </div>
+                            </div> <!-- LU57 -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">LU59</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper col-12" id="collapseExamplelu59" style="min-height:300px;">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info">
+                                                            <tr>
+                                                                <th>LU59</th>
+                                                                <th>Trend</th>
+                                                                <th>10-Dec</th>
+                                                                <th>11-Dec</th>
+                                                                <th>12-Dec</th>
+                                                                <th>WTD</th>
+                                                                <th>MTD</th>
+                                                                <th>MTG</th>
+                                                                <th>Target</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Production Volume</td>
+                                                                <td><center><i class='fas fa-caret-down'></i></center></td>
+                                                                <td>17</td>
+                                                                <td>16</td>
+                                                                <td>16</td>
+                                                                <td>111</td>
+                                                                <td>379</td>
+                                                                <td>51</td>
+                                                                <td>728</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Uptime Packer</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>86.0</td>
+                                                                <td>83.8</td>
+                                                                <td>83.8</td>
+                                                                <td>85.3</td>
+                                                                <td>77.6</td>
+                                                                <td>103.5</td>
+                                                                <td>80.0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>87.5</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>83.9</td>
+                                                                <td>83.6</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>86.6</td>
+                                                                <td>84.7</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-up' style="color: #5CB85C"></i></center></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>636</td>
+                                                                <td>75</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>71</td>
+                                                                <td>68</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>CRR</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VQI</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>STRS</td>
+                                                                <td><center><i class='fas fa-caret-down' style="color: #5CB85C"></i></center></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>-</td>
+                                                                <td>17.82</td>
+                                                                <td>2.10</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 1</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.55</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 2</td>
+                                                                <td></td>
+                                                                <td>1.46</td>
+                                                                <td>1.84</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pl-5">Shift 3</td>
+                                                                <td></td>
+                                                                <td>1.50</td>
+                                                                <td>-</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--LU59-->
+                                </div>
+                            </div> <!-- LU59 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-12 mg-b-20 d-flex">
+                <div class="card flex-1">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">SIS Report - Shift 1</div>
+                    <div class="card-body">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width:50%;">Uptime</th>
+                                        <th style="width:50%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>PS1</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1. sgc 20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2. sgc 15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PS7</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1. Cil + ganti safety switch + trial vibrator full 38"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card flex-1">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">SIS Report - Shift 2</div>
+                    <div class="card-body">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width:50%;">Uptime</th>
+                                        <th style="width:50%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>P 51</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- sgc = 20"</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- Foil out of position (perbaikan disc bobin sebelah kiri/disc kocak) = 10</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- Film unwinding jam (reseting )</td>
+                                    </tr>
+                                    <tr>
+                                        <td>P 57</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- CIL = 25"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card flex-1">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">SIS Report - Shift 3</div>
+                    <div class="card-body">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width:50%;">Uptime</th>
+                                        <th style="width:50%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>P51 :</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- SGC = 20"</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- Foil out of position >> ganti rubber oneway >> 5 mnt</td>
+                                    </tr>
+                                    <tr>
+                                        <td>- Sensor mark foil kiri >> setting kepekaan sensor 5 mnt</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+
+
+@section Scripts{
+    <!-- Resources -->
+    <script src="~/Content/dashforge/lib/amcharts/core.js"></script>
+    <script src="~/Content/dashforge/lib/amcharts/charts.js"></script>
+    <script src="~/Content/dashforge/lib/amcharts/themes/animated.js"></script>
+
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+
+
+    
+
+
+    <!------------------------ HIDE TABEL ------------------------------------>
+    <script>
+        $("#btnShowHidesisall").click(function () {
+            var x = document.getElementById("collapseExamplesisall");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+        $("#btnShowHidelu51").click(function () {
+            var x = document.getElementById("collapseExamplelu51");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+        $("#btnShowHidelu57").click(function () {
+            var x = document.getElementById("collapseExamplelu57");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+        $("#btnShowHidelu59").click(function () {
+            var x = document.getElementById("collapseExamplelu59");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+
+
+        $("#btnShowHidesisallbar").click(function () {
+            var x = document.getElementById("collapseExamplesisallbar");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+
+        $("#btnShowHidelu51bar").click(function () {
+            var x = document.getElementById("collapseExamplelu51bar");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+
+        $("#btnShowHidelu57bar").click(function () {
+            var x = document.getElementById("collapseExamplelu57bar");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+
+        $("#btnShowHidelu59bar").click(function () {
+            var x = document.getElementById("collapseExamplelu59bar");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+    </script> @*hide button*@
+
+
+    <!------------------------ JS TAB ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().toggleClass("active");
+                const index = $(this).index() + 1;
+                $("#lines .carousel-item.active").removeClass("active");
+                const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                $(carouselItem).toggleClass("active");
+            });
+        });
+    </script>
+
+
+    <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+    <script>
+        const loc = {
+            pi: [
+                "MARLB DRYME825 Y KS BOX 20 HK04 10000",
+                "MARLBORO DRYME825 MNT HK04 [.] [.]",
+                "BOND ST. SILVER 100 DSP 20 IQ04 10000",
+                "LARK FF KS RCB 20",
+            ],
+            pkk: [
+                "CHESTERFIELD BLUE KS RCB 20",
+                "SIL Silver 237/1700/150 [.]",
+                "QTPP NPO 64.00/3500/65.0 STD 207041",
+            ],
+            pb: [
+                "TOBACOLL A 7636 ID LIQ PVA",
+                "MED 24.0g/26.25mm/5000m/120.0mm",
+                "WF.0129 343/3200/76",
+                "1.6/12000/30 TH.0021",
+            ],
+            pks: [
+                "SPTOBACOLL A 7636 ID LIQ PVAM",
+                "WF.0241 343/2000/76 Argha Karya",
+            ],
+        }
+        $(document).ready(function () {
+            $("[name=prodCenter]").on("change", function () {
+                let opt = '<option label="Select Brand"></option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < loc[val].length; i++)
+                    opt += `<option value="${loc[val][i]}">${loc[val][i]}</option>`;
+                $("[name=brand]").html(opt);
+            })
+        });
+    </script>
+
+
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                //format: 'D, dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+}

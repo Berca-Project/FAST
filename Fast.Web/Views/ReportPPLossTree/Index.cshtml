@@ -1,0 +1,1224 @@
+﻿
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+    ViewBag.Planned = "";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        td, th {
+            border: 2px solid grey;
+            padding: 4px;
+        }
+
+        th {
+            font-weight: bold
+        }
+
+        th, tr {
+            font-size: small;
+        }
+
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Loss Tree</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Loss Tree</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5" id="extractData"><i class="fas fa-file-excel"></i> Extract Excel</button>
+                @*<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>*@
+                @*<button id ="btnExportCSV" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export CSV</button>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body" style="display:flex">
+                        <div style="flex:2">
+                            <div class="row">
+                                <label class="col-2">Date</label>
+                                <div class="col-10">
+                                    <div class="input-group">
+                                        @*<input type="week" class="form-control" name="weekStart">*@
+                                        <input type="datetime" class="form-control" id="tbDateStart">
+                                        <input type="text" class="form-control" value="06:00" disabled>
+                                        <label>&nbsp; to &nbsp;</label>
+                                        @*<input type="week" class="form-control" name="weekEnd" />*@
+                                        <input type="datetime" class="form-control" id="tbDateEnd">
+                                        <input type="text" class="form-control" value="06:00" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div style="flex:2">
+                            <div class="form-group row">
+                                @*<label class="col-5 col-form-label"></label>*@
+                                <div class="col-4">
+                                    <select class="form-control select2" name="prodCenter">
+                                        <option label="Select Prod Center"></option>
+                                        <option value="pp">PP - PP White - Karawang</option>
+                                        <option value="pk">PK - PP Kretek - Karawang</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-control select2" name="area">
+                                        <option label="Select Area"></option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-control select2" name="line">
+                                        <option label="Select Line"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+
+                        <div style="flex:1;max-width:50px;">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        LOSS TREE
+                    </div>
+
+                    <div class="card-body">
+                        <div class="flex-input collect-component" id="HandoverLogbook">
+                            <div class="mg-b-10" style="flex:14">
+                                <div class="form-group d-flex" style="margin-left:-5px;margin-right:-5px;margin-bottom:0;">
+                                    <label class="col-form-label" style="flex:8">Calendar Time</label>
+
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="CalendarTimeMin" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Min</label>
+                                    </div>
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="CalendarTimeHour" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Hour</label>
+                                    </div>
+                                </div>
+                                <div class="form-group d-flex" style="margin-left:-5px;margin-right:-5px;margin-bottom:0;">
+                                    <label style="flex:8" class=" col-form-label">Exclude Time</label>
+
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="ExcludeMinute" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Min</label>
+                                    </div>
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="ExcludeHour" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Hour</label>
+                                    </div>
+                                </div>
+                                <div class="form-group d-flex" style="margin-left:-5px;margin-right:-5px;margin-bottom:0;">
+                                    <label style="flex:8" class=" col-form-label">Scheduled Time</label>
+
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="ScheduledMinute" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Min</label>
+                                    </div>
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="ScheduledHour" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Hour</label>
+                                    </div>
+                                </div>
+                                <div class="form-group d-flex" style="margin-left:-5px;margin-right:-5px;margin-bottom:0;">
+                                    <label style="flex:8" class=" col-form-label">Downtime</label>
+
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="DowntimeMinute" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Min</label>
+                                    </div>
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="DowntimeHour" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Hour</label>
+                                    </div>
+                                </div>
+                                <div class="form-group d-flex" style="margin-left:-5px;margin-right:-5px;margin-bottom:0;">
+                                    <label style="flex:8" class=" col-form-label">Running Time</label>
+
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="RunningTimeMinute" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Min</label>
+                                    </div>
+                                    <div style="flex:6">
+                                        <input type="text" class="form-control number" name="RunningTimeHour" style="text-align:right;" disabled />
+                                    </div>
+                                    <div style="flex:3">
+                                        <label>&nbsp; Hour</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="mg-b-10" style="flex:5">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Output</label>
+                                    <div class="col-8">
+                                        <input type="text" name="Output" class="form-control" style="text-align:right;" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Flow</label>
+                                    <div class="col-8">
+                                        <input type="text" name="Flow" class="form-control" style="text-align:right;" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-vertical"></div>
+                            <div class="mg-b-10" style="flex:5">
+
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">PR</label>
+                                    <div class="col-8">
+                                        <input type="text" name="PR" class="form-control" style="text-align:right;" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider-text divider-horizontal"></div>
+
+                        <div class="row">
+                            <div id="containerTable" class="col-7"></div>
+                            <div id="containerTablePss4" class="col-5"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+
+    <script>
+        $("#btnShowHide").click(function () {
+            var x = document.getElementById("collapseExample");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+    </script> @*hide button*@
+
+
+
+    <script>
+        const loc = {
+            pp: [
+                {
+                    opts: [
+                        {
+                            opt: "Lamina White",
+                            value: "DTAssignPMIDWhiteTable",
+                            lineProd: [
+                                {
+                                    name: "FTD",
+                                    category: ["FTD"],
+                                    equipment: ["Weight Belt 45030"],
+                                    flow: ["U02.FTDFlowSP.reAverageResPout"],
+                                    output: ["U02.FTDwetQtyOnWeigherDs.reSumResPout"],
+                                },
+                                {
+                                    name: "Addback",
+                                    category: ["Addback"],
+                                    equipment: ["Weight Belt 620.150"],
+                                    flow: ["MasterWB620.150AverageTob"],
+                                    output: ["MasterWB620.150TotWetTob"],
+                                },
+                                {
+                                    name: "Packing",
+                                    category: ["Packing"],
+                                    equipment: ["Topping 8080"],
+                                    flow: ["SiloDischSpd"],
+                                    output: ["CartonDataTobNetWeig"],
+                                },
+                                {
+                                    name: "Feeding DCCC",
+                                    category: ["Infeed","DCCC"],
+                                    equipment: ["Weight Belt 320.050"],
+                                    flow: ["101 - Tobacco Flow","102 - Tobacco Flow","103 - Tobacco Flow"],
+                                    output: ["101 - Report.WeighBelt320.050.TotalWetTob","102 - Report.WeighBelt320.050.TotalWetTob","103 - Report.WeighBelt320.050.TotalWetTob"],
+                                },
+                            ],
+                        },
+                        //{
+                        //    opt: "IS White",
+                        //    value: "DTAssignPMIDIsTable",
+                        //    lineProd: [
+                        //        {
+                        //            name: "All Line",
+                        //            category: [""],
+                        //            flow: ["WeighBelt810065.TobFlowSP"],
+                        //            output: ["WeighBelt810065.TotWetTobacco"],
+                        //        },
+                        //        {
+                        //            name: "IS",
+                        //            category: ["IS"],
+                        //            flow: ["WeighBelt810065.TobFlowSP"],
+                        //            output: ["WeighBelt810065.TotWetTobacco"],
+                        //        },
+                        //    ],
+                        //},
+                    ],
+                },
+            ],
+            pk: [
+                {
+                    opts: [
+                        {
+                            opt: "Clove Line",
+                            value: "DTAssignHMSCloveTable",
+                            lineProd: [
+                                //{
+                                //    name: "All Line",
+                                //    category: [""],
+                                //    flow: ["CloveCutDry_46135_flowSP","CloveCutDry_46140_flowSP"],
+                                //    output: ["CloveCutDry_1_WetTobQty","CloveCutDry_2_WetTobQty"],
+                                //},
+                                //{
+                                //    name: "Infeed",
+                                //    category: ["Infeed"],
+                                //    flow: ["CloveCutDry_46135_flowSP","CloveCutDry_46140_flowSP"],
+                                //    output: ["CloveCutDry_1_WetTobQty","CloveCutDry_2_WetTobQty"],
+                                //},
+                                {
+                                    name: "Cutting Drying",
+                                    category: ["Cutting","Drying"],
+                                    equipment: ["Weight Belt 46135", "Weight Belt 46140"],
+                                    timedivider: 2,
+                                    flow: ["CloveCutDry_46135_flowSP","CloveCutDry_46140_flowSP"],
+                                    output: ["CloveCutDry_1_WetTobQty","CloveCutDry_2_WetTobQty"],
+                                },
+                                //{
+                                //    name: "Conditioning",
+                                //    category: ["Conditioning"],
+                                //    flow: ["CloveCutDry_46135_flowSP","CloveCutDry_46140_flowSP"],
+                                //    output: ["CloveCutDry_1_WetTobQty","CloveCutDry_2_WetTobQty"],
+                                //},
+                                //{
+                                //    name: "Infeed KR",
+                                //    category: ["Infeed KR"],
+                                //    flow: ["CloveCutDry_46135_flowSP","CloveCutDry_46140_flowSP"],
+                                //    output: ["CloveCutDry_1_WetTobQty","CloveCutDry_2_WetTobQty"],
+                                //},
+                            ],
+                        },
+                        {
+                            opt: "Cres Line",
+                            value: "DTAssignHMSCresTable",
+                            lineProd: [
+                                //{
+                                //    name: "All Line",
+                                //    category: [""],
+                                //    flow: ["END_CDS_flowSP"],
+                                //    output: ["V3_Dryer-WB-Qty-Real"],
+                                //},
+                                //{
+                                //    name: "Infeed",
+                                //    category: ["Infeed"],
+                                //    flow: ["END_CDS_flowSP"],
+                                //    output: ["V3_Dryer-WB-Qty-Real"],
+                                //},
+                                //{
+                                //    name: "Crying",
+                                //    category: ["Crying"],
+                                //    flow: ["END_CDS_flowSP"],
+                                //    output: ["V3_Dryer-WB-Qty-Real"],
+                                //},
+                                {
+                                    name: "Cutting Drying",
+                                    category: ["Cutting", "Drying"],
+                                    equipment: ["Weight Belt 55105"],
+                                    flow: ["END_CDS_flowSP"],
+                                    output: ["V3_Dryer-WB-Qty-Real"],
+                                },
+                                //{
+                                //    name: "Conditioning",
+                                //    category: ["Conditioning"],
+                                //    flow: ["END_CDS_flowSP"],
+                                //    output: ["V3_Dryer-WB-Qty-Real"],
+                                //},
+                            ],
+                        },
+                        {
+                            opt: "CSF Line",
+                            value: "DTAssignHMSCsfTable",
+                            lineProd: [
+                                //{
+                                //    name: "All Line",
+                                //    category: [""],
+                                //    flow: ["CSF Z3 I60102 weighcon flow SP","CSF Z3 I60202 weighcon flow SP","CSF Z3 I60302 weighcon flow SP"],
+                                //    output: ["CSF Z3 I60102_WeighconTotalizer","CSF Z3 I60202_WeighconTotalizer","CSF Z3 I60302_WeighconTotalizer"],
+                                //},
+                                {
+                                    name: "Microwave",
+                                    category: ["Microwave"],
+                                    equipment: ["Weight Belt 60102", "Weight Belt 60202", "Weight Belt 60302"],
+                                    timedivider: 3,
+                                    flow: ["CSF Z3 I60102 weighcon flow SP","CSF Z3 I60202 weighcon flow SP","CSF Z3 I60302 weighcon flow SP"],
+                                    output: ["CSF Z3 I60102_WeighconTotalizer","CSF Z3 I60202_WeighconTotalizer","CSF Z3 I60302_WeighconTotalizer"],
+                                },
+                                //{
+                                //    name: "Cutting Drying",
+                                //    category: ["Cutting", "Drying"],
+                                //    flow: ["CSF Z3 I60102 weighcon flow SP","CSF Z3 I60202 weighcon flow SP","CSF Z3 I60302 weighcon flow SP"],
+                                //    output: ["CSF Z3 I60102_WeighconTotalizer","CSF Z3 I60202_WeighconTotalizer","CSF Z3 I60302_WeighconTotalizer"],
+                                //},
+                                //{
+                                //    name: "Drying",
+                                //    category: ["Drying"],
+                                //    equipment: ["Weight Belt 60102", "Weight Belt 60202", "Weight Belt 60302"],
+                                //    timedivider: 3,
+                                //    flow: ["CSF Z3 I60102 weighcon flow SP","CSF Z3 I60202 weighcon flow SP","CSF Z3 I60302 weighcon flow SP"],
+                                //    output: ["CSF Z3 I60102_WeighconTotalizer","CSF Z3 I60202_WeighconTotalizer","CSF Z3 I60302_WeighconTotalizer"],
+                                //},
+                                //{
+                                //    name: "Infeed KR",
+                                //    category: ["Infeed KR"],
+                                //    flow: ["CSF Z3 I60102 weighcon flow SP","CSF Z3 I60202 weighcon flow SP","CSF Z3 I60302 weighcon flow SP"],
+                                //    output: ["CSF Z3 I60102_WeighconTotalizer","CSF Z3 I60202_WeighconTotalizer","CSF Z3 I60302_WeighconTotalizer"],
+                                //},
+                            ],
+                        },
+                        //{
+                        //    opt: "Kitchen Line",
+                        //    value: "DTAssignHMSKitchenTable",
+                        //    lineProd: [
+                        //        {
+                        //            name: "All Line",
+                        //            category: [""],
+                        //            flow: ["MasterWB620.150AverageTob"],
+                        //            output: ["MasterWB620.150TotWetTob"],
+                        //        },
+                        //        {
+                        //            name: "Bright Casing",
+                        //            category: ["Bright Casing"],
+                        //            flow: ["MasterWB620.150AverageTob"],
+                        //            output: ["MasterWB620.150TotWetTob"],
+                        //        },
+                        //        {
+                        //            name: "Burley Spray",
+                        //            category: ["Burley Spray"],
+                        //            flow: ["MasterWB620.150AverageTob"],
+                        //            output: ["MasterWB620.150TotWetTob"],
+                        //        },
+                        //    ],
+                        //},
+                        {
+                            opt: "Lamina Kretek",
+                            value: "DTAssignHMSKretekTable",
+                            lineProd: [
+                                {
+                                    name: "FTD",
+                                    category: ["FTD"],
+                                    equipment: ["Weight Belt 45060"],
+                                    flow: ["END_FTDFlowrateNOPSPRe"],
+                                    output: ["END_FTDwetQtyOnWeigher"],
+                                },
+                                //{
+                                //    name: "Cutting",
+                                //    category: ["Cutting"],
+                                //    flow: ["END_FTDFlowrateNOPSPRe"],
+                                //    output: ["END_FTDwetQtyOnWeigher"],
+                                //},
+                                {
+                                    name: "Addback",
+                                    category: ["Addback"],
+                                    equipment: ["Weight Belt 600.010"],
+                                    flow: ["END_AB_WB600010AvgTob_Mst"],
+                                    output: ["END_AB_WB600010TotWetTob_Mst"],
+                                },
+                                {
+                                    name: "Packing",
+                                    category: ["Packing"],
+                                    equipment: ["Charger 700.060","Charger 700.090","Charger 700.135","Charger 700.140"],
+                                    flow: ["END_Packing_Throughput Target"],
+                                    output: ["BlendCert_PackingNetQty"],
+                                },
+                                {
+                                    name: "Feeding - DCCC RJ",
+                                    category: ["Infeed RJ","DCCC RJ"],
+                                    equipment: ["Weight Belt 100.045"],
+                                    flow: ["END_IRJ_WB100045TobFlow101","END_IRJ_WB100045TobFlow102","END_IRJ_WB100045TobFlow103"],
+                                    output: ["END_IRJ_WB100045TotWetTob101","END_IRJ_WB100045TotWetTob102","END_IRJ_WB100045TotWetTob103"],
+                                },
+                                {
+                                    name: "Feeding - DCCC KR",
+                                    category: ["Infeed KR","DCCC KR"],
+                                    equipment: ["Weight Belt 200.045"],
+                                    flow: ["END_IKR_WB20045TobFlow201","END_IKR_WB20045TobFlow202","END_IKR_WB20045TobFlow203"],
+                                    output: ["END_IKR_WB200045TotWetTob201","END_IKR_WB200045TotWetTob202","END_IKR_WB200045TotWetTob203"],
+                                },
+                            ],
+                        },
+                        {
+                            opt: "RTC Line",
+                            value: "DTAssignHMSRtcTable",
+                            lineProd: [
+                                //{
+                                //    name: "All Line",
+                                //    category: [""],
+                                //    flow: ["Z4-Master-FlowrateSP"],
+                                //    output: ["Tobacco Totalizer"],
+                                //},
+                                //{
+                                //    name: "Dryer",
+                                //    category: ["Dryer"],
+                                //    flow: ["Z4-Master-FlowrateSP"],
+                                //    output: ["Tobacco Totalizer"],
+                                //},
+                                {
+                                    name: "Drying",
+                                    category: ["Drying"],
+                                    equipment: ["Line 3","Line 4"],
+                                    timedivider: 2,
+                                    flow: ["Z4-Master-FlowrateSP"],
+                                    output: ["Tobacco Totalizer"],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
+        const $tmpDiv = $('<div/>');
+        htmlEncode = (value) => $tmpDiv.text(value).html();
+        htmlDecode = (value) => $tmpDiv.html(value).text();
+        $(document).ready(function () {
+            $(".selectable-section").hide();
+            $("[name=prodCenter]").on("change", function () {
+                let opt = '<option label="Select Area"></option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < loc[val].length; i++) {
+                    for (let j = 0; j < loc[val][i].opts.length; j++)
+                        opt += `<option value="${loc[val][i].opts[j].value}">${loc[val][i].opts[j].opt}</option>`;
+                }
+                $("[name=area]").html(opt);
+            });
+            $("[name=area]").on("change", function () {
+                let opt = '<option label="Select Line"></option>';
+                const prodCenter = $("[name=prodCenter]").val();
+                const area = $(this).val();
+                if (prodCenter != "") for (let i = 0; i < loc[prodCenter].length; i++) {
+                    for (let j = 0; j < loc[prodCenter][i].opts.length; j++)
+                        if (loc[prodCenter][i].opts[j].value == area) {
+                            for (let k = 0; k < loc[prodCenter][i].opts[j].lineProd.length; k++)
+                                opt += `<option value="${loc[prodCenter][i].opts[j].lineProd[k].name}">${loc[prodCenter][i].opts[j].lineProd[k].name}</option>`;
+                            break;
+                        }
+                }
+                $("[name=line]").html(opt);
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+        }
+        var dataLossTree = {};
+        $(document).ready(function () {
+            let today = moment();
+            $('#tbDateStart').datepicker({
+                format: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true
+             });
+            $('#tbDateEnd').datepicker({
+                format: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true
+            });
+
+            //$('.datepicker').datepicker({
+            //    calendarWeeks: true,
+            //    enableOnReadonly: true,
+            //    todayHighlight: true,
+            //    format: 'dd-M-yyyy',
+            //    language: 'id-ID',
+            //    weekStart: 1,
+            //    endDate: new Date(),
+            //});
+            $("#tbDateStart").on('changeDate', function (selected) {
+                $("#tbDateStart").datepicker('hide');
+                $("#tbDateEnd").datepicker('setStartDate', selected.date);
+                if ($("#tbDateEnd").val() == "") $("#tbDateEnd").focus();
+            });
+            $("#tbDateEnd").on('changeDate', function (selected) {
+                $("#tbDateEnd").datepicker('hide');
+                $("#tbDateStart").datepicker('setEndDate', selected.date);
+                if ($("#tbDateStart").val() == "") $("#tbDateStart").focus();
+            });
+            //const max = moment().day(0).startOf('isoweek').format('YYYY-[W]WW');
+            //$("[name='weekStart']").prop("max", max);
+            //$("[name='weekEnd']").prop("max", max);
+            //$("[name='weekStart']").on('change', function () {
+            //    const val = $(this).val();
+            //    const selected = moment().day(0).year(val.substr(0, 4)).isoWeek(val.substr(6, 2));
+            //    $("[name='weekEnd']").prop("min", selected.format("YYYY-[W]WW"));
+            //    $("[name='weekStart']").datepicker('hide');
+            //    $("[name='weekEnd']").focus();
+            //    $("[name='start']").datepicker('update', selected.startOf('isoweek').format('DD-MMM-YYYY'));
+            //});
+            //$("[name='weekEnd']").on('change', function () {
+            //    const val = $(this).val();
+            //    const selected = moment().day(0).year(val.substr(0, 4)).isoWeek(val.substr(6, 2));
+            //    $("[name='weekStart']").prop("max", selected.format("YYYY-[W]WW"));
+            //    if ($("[name='weekStart']").val() == "") {
+            //        $("[name='weekEnd']").datepicker('hide');
+            //        $("[name='weekStart']").focus();
+            //    }
+            //    $("[name='end']").datepicker('update', selected.startOf('isoweek').format('DD-MMM-YYYY'));
+            //});
+        //});
+
+            $("#btnSearch").on("click", function () {
+
+                var startDate = $("[id=tbDateStart]").val();
+                dataLossTree.startDate = startDate;
+                if (startDate == "") {
+                    showError("Start Date can't be empty");
+                    return;
+                }
+                var endDate = $("[id=tbDateEnd]").val();
+                dataLossTree.endDate = endDate;
+                if (endDate == "") {
+                    showError("End Date can't be empty");
+                    return;
+                }
+                const prodCenter = $("[name=prodCenter]").val();
+                dataLossTree.prodCenter = prodCenter;
+                if (prodCenter == "") {
+                    showError("Production Center can't be empty");
+                    return;
+                }
+                const area = htmlEncode($("[name=area]").val());
+                dataLossTree.area = area;
+                if (area == "") {
+                    showError("Area can't be empty");
+                    return;
+                }
+                const line = htmlEncode($("[name=line]").val());
+                dataLossTree.line = line;
+                if (line == "") {
+                    showError("Line can't be empty");
+                    return;
+                }
+                let category = "";
+                let flow = "";
+                let output = "";
+                let equipment = "";
+                let timedivider = 1;
+                $('#loading_overlay').removeClass('d-none');
+
+                var date1 = moment(startDate, "DD-MMM-YY");
+                var date2 = moment(endDate, "DD-MMM-YY");
+                // To calculate the time difference of two dates
+                var Difference_In_Time = date2.format("x") - date1.format("x");
+                // To calculate the no. of days between two dates
+                var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+                for (let j = 0; j < loc[prodCenter][0].opts.length; j++)
+                    if (loc[prodCenter][0].opts[j].value == area) {
+                        for (let k = 0; k < loc[prodCenter][0].opts[j].lineProd.length; k++)
+                            if (loc[prodCenter][0].opts[j].lineProd[k].name == line) {
+                                category = loc[prodCenter][0].opts[j].lineProd[k].category;
+                                flow = loc[prodCenter][0].opts[j].lineProd[k].flow;
+                                output = loc[prodCenter][0].opts[j].lineProd[k].output;
+                                equipment = loc[prodCenter][0].opts[j].lineProd[k].equipment;
+                                timedivider = loc[prodCenter][0].opts[j].lineProd[k].timedivider || 1;
+                                break;
+                            }
+                        break;
+                    }
+                $.ajax({
+                    type: "post",
+                    url: fastApp.BaseUrl + "/ReportPPLossTree/GetReport",
+                    data: {
+                        startDate: startDate,
+                        endDate: endDate,
+                        area: area,
+                        category: category,
+                        flow: flow,
+                        output: output,
+                        equipment: equipment,
+                    },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (result) {
+                        console.log(result);
+                        emptyField();
+                        if (!(result.Data1 && result.Data2 && result.Data3 && result.Data4)) return;
+
+                        var valGeneral = JSON.parse(result.Data1); // general data
+                        var valPlanned = JSON.parse(result.Data2); // planned
+                        var valUnplanned = JSON.parse(result.Data3); // unplanned
+                        var valPss4 = JSON.parse(result.Data4); // pss4 data
+
+                        const pdtIndex = valGeneral.findIndex(d => d.Kode == "PDT");
+                        var durationPDTMinute = (pdtIndex >= 0 ? valGeneral[pdtIndex].Duration : 0) / timedivider;
+                        var durationPDTCount = pdtIndex >= 0 ? valGeneral[pdtIndex].Count : 0;
+                        const updtIndex = valGeneral.findIndex(d => d.Kode == "UPDT");
+                        var durationUPDTMinute = (updtIndex >= 0 ? valGeneral[updtIndex].Duration : 0) / timedivider;
+                        var durationUPDTCount = updtIndex >= 0 ? valGeneral[updtIndex].Count : 0;
+
+                        var downtimeMinute = durationPDTMinute + durationUPDTMinute;
+                        var downtimeHour = downtimeMinute / 60;
+                    
+                        const xdtIndex = valGeneral.findIndex(d => d.Kode == "XDT");
+                        var durationXDTMinute = (xdtIndex >= 0 ? valGeneral[xdtIndex].Duration : 0) / timedivider;
+                        var durationXDTHour = durationXDTMinute / 60;
+
+                        //var durationZDTMinute = valGeneral[3] != null ? valGeneral[3].Duration : 0;
+                        //var durationZDTHour = durationZDTMinute / 60;
+
+                        var calendarTimeMinute = Difference_In_Days * 24 * 60;
+
+                        var scheduledTimeMinute = calendarTimeMinute - durationXDTMinute;
+                        var scheduledTimeHour = scheduledTimeMinute / 60;
+
+                        var durationZDTMinute = scheduledTimeMinute - downtimeMinute;
+                        var durationZDTHour = durationZDTMinute / 60;
+
+                        $("input[name='CalendarTimeMin'").val( parseFloat(calendarTimeMinute).toFixed(2));
+                        $("input[name='CalendarTimeHour'").val(parseFloat(calendarTimeMinute/60).toFixed(2));
+                        dataLossTree.CalendarTimeMin = calendarTimeMinute;
+                        dataLossTree.CalendarTimeHour = calendarTimeMinute / 60;
+
+                        $("input[name='ExcludeMinute'").val(parseFloat(durationXDTMinute).toFixed(2));
+                        $("input[name='ExcludeHour'").val(parseFloat(durationXDTHour).toFixed(2));
+                        dataLossTree.ExcludeMinute = durationXDTMinute;
+                        dataLossTree.ExcludeHour = durationXDTHour;
+
+                        $("input[name='ScheduledMinute'").val(parseFloat(scheduledTimeMinute).toFixed(2));
+                        $("input[name='ScheduledHour'").val(parseFloat(scheduledTimeHour).toFixed(2));
+                        dataLossTree.ScheduledMinute = scheduledTimeMinute;
+                        dataLossTree.ScheduledHour = scheduledTimeHour;
+
+                        $("input[name='DowntimeMinute'").val(parseFloat(downtimeMinute).toFixed(2));
+                        $("input[name='DowntimeHour'").val(parseFloat(downtimeHour).toFixed(2));
+                        dataLossTree.DowntimeMinute = downtimeMinute;
+                        dataLossTree.DowntimeHour = downtimeHour;
+
+                        $("input[name='RunningTimeMinute'").val(parseFloat(durationZDTMinute).toFixed(2));
+                        $("input[name='RunningTimeHour'").val(parseFloat(durationZDTHour).toFixed(2));
+                        dataLossTree.RunningTimeMinute = durationZDTMinute;
+                        dataLossTree.RunningTimeHour = durationZDTHour;
+
+                        let sumOfAverageTob = 0;
+                        let sumOfTotWetTob = 0;
+                        let sumOfHour = 0;
+                        let pss4Table = `<table style="width:100%;"><tr><th>Batch ID</th><th>Flow</th><th>Output</th><th>Run Time</th></tr>`;
+                        for (var i = 0; i < valPss4.length; i++) {
+                            if (valPss4[i].TotWetTob == null || valPss4[i].TotWetTob == 'NULL') continue; 
+                            sumOfAverageTob += valPss4[i].AverageTob;
+                            sumOfTotWetTob += valPss4[i].TotWetTob;
+                            sumOfHour += valPss4[i].Hour;
+                            pss4Table += `<tr><td>${valPss4[i].BatchIdent}</td><td>${valPss4[i].AverageTob}</td><td>${valPss4[i].TotWetTob}</td><td>${parseFloat(valPss4[i].Hour).toFixed(2)}</td></tr>`;
+                        }
+                        pss4Table += `<tr><th>Total</th><th>${sumOfAverageTob}</th><th>${sumOfTotWetTob}</th><th>${sumOfHour}</th></tr>`;
+                        pss4Table += `</table>`;
+                        $("#containerTablePss4").html(pss4Table);
+                        let flowAverage = sumOfTotWetTob / sumOfHour;
+                        var masterWetVal = sumOfTotWetTob.toFixed(2);
+                        var flowVal = flowAverage.toFixed(2);
+                        var prVal = (masterWetVal / (scheduledTimeHour * flowAverage)) * 100;
+                        prVal = parseFloat(prVal).toFixed(2);
+
+                        $("input[name='Output'").val(masterWetVal);
+                        $("input[name='Flow'").val(flowVal);
+                        $("input[name='PR'").val(prVal);
+                        dataLossTree.Output = masterWetVal;
+                        dataLossTree.Flow = flowVal;
+                        dataLossTree.PR = prVal;
+                        dataLossTree.Table = [];
+
+                        var orderArrayHeader = ["Status", "Group Downtime", "Description", "Stops", "Durasi (Menit)", "OEE Loss (%)"];
+                        var container = document.getElementById('containerTable');
+
+                        var table = document.createElement('table');
+                        var tbody = document.createElement('tbody');
+                        var thead = document.createElement('thead');
+
+                        var tableData = {};
+                        var TableLossTree = [];
+                        tableData.Status = 'Status';
+                        tableData.GroupDowntime = 'Group Downtime';
+                        tableData.Description = 'Description';
+                        tableData.Stops = 'Stops';
+                        tableData.Durasi = 'Durasi';
+                        tableData.OEELoss = 'OEE Loss';
+                        TableLossTree.push(tableData);
+
+                        table.appendChild(thead);
+
+                        for (var i = 0; i < orderArrayHeader.length; i++) {
+                            thead.appendChild(document.createElement("th")).
+                                appendChild(document.createTextNode(orderArrayHeader[i]));
+                        }
+
+                        var row = document.createElement('tr');
+
+                        var cell = document.createElement('td');
+                        cell.textContent = "PLANNED DOWNTIME";
+                        row.appendChild(cell);
+
+                        var cellEmptyPL = document.createElement('td');
+                        cellEmptyPL.textContent = "";
+                        row.appendChild(cellEmptyPL);
+
+                        var cellEmptyPL2 = document.createElement('td');
+                        cellEmptyPL2.textContent = "";
+                        row.appendChild(cellEmptyPL2);
+
+                        var cellStopsPL = document.createElement('td');
+                        cellStopsPL.textContent = durationPDTMinute;
+                        row.appendChild(cellStopsPL);
+
+                        var cellDurationPL = document.createElement('td');
+                        cellDurationPL.textContent = durationPDTMinute.toFixed(2);
+                        row.appendChild(cellDurationPL);
+
+                        var cellOEEPL = document.createElement('td');
+                        var oee = ((durationPDTMinute / 60) / scheduledTimeHour)*100;
+                        oee = parseFloat(oee).toFixed(2);
+                        cellOEEPL.textContent = oee;
+                        row.appendChild(cellOEEPL);
+
+                        tbody.appendChild(row);
+                    
+                        tableData = {};
+                        tableData.Status = 'PLANNED DOWNTIME';
+                        tableData.GroupDowntime = '';
+                        tableData.Description = '';
+                        tableData.Stops = durationPDTCount;
+                        tableData.Durasi = durationPDTMinute;
+                        tableData.OEELoss = oee;
+                        TableLossTree.push(tableData);
+
+                        for (var i = 0; i < valPlanned.length; i++)
+                        {
+                            var rowPlanned = document.createElement('tr');
+
+                            var cellEmpty = document.createElement('td');
+                            cellEmpty.textContent = "";
+                            rowPlanned.appendChild(cellEmpty);
+
+                            var cellGroup = document.createElement('td');
+                            cellGroup.textContent = valPlanned[i].GroupDowntime;
+                            rowPlanned.appendChild(cellGroup);
+
+                            var cellDesc = document.createElement('td');
+                            cellDesc.textContent = valPlanned[i].Description;
+                            rowPlanned.appendChild(cellDesc);
+
+                            var cellStops = document.createElement('td');
+                            cellStops.textContent = valPlanned[i].Count;
+                            rowPlanned.appendChild(cellStops);
+
+                            var cellDuration = document.createElement('td');
+                            var dur = parseFloat(valPlanned[i].Duration) / timedivider;
+                            cellDuration.textContent = dur.toFixed(2);
+                            rowPlanned.appendChild(cellDuration);
+
+                            var cellLast = document.createElement('td');
+                            var oeePL = ((dur / 60) / scheduledTimeHour)*100 ;
+                            oeePL = parseFloat(oeePL).toFixed(2);
+                            cellLast.textContent = oeePL;
+                            rowPlanned.appendChild(cellLast);
+
+                            tbody.appendChild(rowPlanned);
+                        
+                            tableData = {};
+                            tableData.Status = '';
+                            tableData.GroupDowntime = valPlanned[i].GroupDowntime;
+                            tableData.Description = valPlanned[i].Description;
+                            tableData.Stops = valPlanned[i].Count;
+                            tableData.Durasi = valPlanned[i].Duration;
+                            tableData.OEELoss = oeePL;
+                            TableLossTree.push(tableData);
+                        }
+
+                        var rowUP = document.createElement('tr');
+
+                        var cellUP = document.createElement('td');
+                        cellUP.textContent = "UNPLANNED DOWNTIME";
+                        rowUP.appendChild(cellUP);
+
+                        var cellEmptyUP = document.createElement('td');
+                        cellEmptyUP.textContent = "";
+                        rowUP.appendChild(cellEmptyUP);
+
+                        var cellEmptyUP2 = document.createElement('td');
+                        cellEmptyUP2.textContent = "";
+                        rowUP.appendChild(cellEmptyUP2);
+
+                        var cellStopsUP = document.createElement('td');
+                        cellStopsUP.textContent = durationUPDTMinute;
+                        rowUP.appendChild(cellStopsUP);
+
+                        var cellDurationUP = document.createElement('td');
+                        cellDurationUP.textContent = parseFloat(durationUPDTMinute).toFixed(2);
+                        rowUP.appendChild(cellDurationUP);
+
+                        var cellOEEUP = document.createElement('td');
+                        var oeeUP = ((durationUPDTMinute / 60) / scheduledTimeHour)*100;
+                        oeeUP = parseFloat(oeeUP).toFixed(2);
+                        cellOEEUP.textContent = oeeUP;
+                        rowUP.appendChild(cellOEEUP);
+
+                        tbody.appendChild(rowUP);
+
+                        tableData = {};
+                        tableData.Status = 'UNPLANNED DOWNTIME';
+                        tableData.GroupDowntime = '';
+                        tableData.Description = '';
+                        tableData.Stops = durationUPDTCount;
+                        tableData.Durasi = durationUPDTMinute;
+                        tableData.OEELoss = oeeUP;
+                        TableLossTree.push(tableData);
+
+                        for (var i = 0; i < valUnplanned.length; i++)
+                        {
+                            var rowUnplanned = document.createElement('tr');
+
+                            var cellEmpty = document.createElement('td');
+                            cellEmpty.textContent = "";
+                            rowUnplanned.appendChild(cellEmpty);
+
+                            var cellGroup = document.createElement('td');
+                            cellGroup.textContent = valUnplanned[i].GroupDowntime;
+                            rowUnplanned.appendChild(cellGroup);
+
+                            var cellDesc = document.createElement('td');
+                            cellDesc.textContent = valUnplanned[i].Description;
+                            rowUnplanned.appendChild(cellDesc);
+
+                            var cellStops = document.createElement('td');
+                            cellStops.textContent = valUnplanned[i].Count;
+                            rowUnplanned.appendChild(cellStops);
+
+                            var cellDuration = document.createElement('td');
+                            var dur = parseFloat(valUnplanned[i].Duration) / timedivider;
+                            cellDuration.textContent = dur.toFixed(2);
+                            rowUnplanned.appendChild(cellDuration);
+
+                            var cellLast = document.createElement('td');
+                            var oeeUP = ((dur / 60) / scheduledTimeHour)*100;
+                            oeeUP = parseFloat(oeeUP).toFixed(2);
+                            cellLast.textContent = oeeUP;
+                            rowUnplanned.appendChild(cellLast);
+
+                            tbody.appendChild(rowUnplanned);
+                        
+                            tableData = {};
+                            tableData.Status = '';
+                            tableData.GroupDowntime = valUnplanned[i].GroupDowntime;
+                            tableData.Description = valUnplanned[i].Description;
+                            tableData.Stops = valUnplanned[i].Count;
+                            tableData.Durasi = valUnplanned[i].Duration;
+                            tableData.OEELoss = oeeUP;
+                            TableLossTree.push(tableData);
+                        }
+                        dataLossTree.Table = JSON.stringify(TableLossTree);
+                        table.appendChild(tbody);
+                        container.appendChild(table);
+
+                    },
+                    complete: function() {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+			     });
+
+            });
+            function emptyField() {
+                $("input[name='CalendarTimeMin'").val("");
+                $("input[name='CalendarTimeHour'").val("");
+
+                $("input[name='ExcludeMinute'").val("");
+                $("input[name='ExcludeHour'").val("");
+
+                $("input[name='ScheduledMinute'").val("");
+                $("input[name='ScheduledHour'").val("");
+
+                $("input[name='DowntimeMinute'").val("");
+                $("input[name='DowntimeHour'").val("");
+
+                $("input[name='RunningTimeMinute'").val("");
+                $("input[name='RunningTimeHour'").val("");
+
+                $("input[name='Output'").val("");
+                $("input[name='Flow'").val("");
+                $("input[name='PR'").val("");
+                $("#containerTable").html("");
+            }
+
+            $("#extractData").on("click", function () {
+			    var datajson = JSON.stringify({
+				    data: dataLossTree
+			    });
+                
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: fastApp.BaseUrl + "/ReportPPLossTree/ExportTable",
+                    data: datajson,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        $('#loading_overlay').addClass('d-none');
+                        if (result.Status) {
+                                window.location = fastApp.BaseUrl + "/ReportPPLossTree/Download";
+                        }
+                    },
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            })
+
+            $('#tbDateStart').val(today.subtract(1, 'd').format('DD-MMM-YY'));
+            $('#tbDateEnd').datepicker('setDate', 'today');
+            $($("[name=prodCenter]").children()[2]).prop('selected', 'selected');
+            $("[name=prodCenter]").trigger("change");
+            $($("[name=area]").children()[1]).prop('selected', 'selected');
+            $("[name=area]").trigger("change");
+            $($("[name=line]").children()[1]).prop('selected', 'selected');
+            $("#btnSearch").click();
+        });
+
+    </script>
+}

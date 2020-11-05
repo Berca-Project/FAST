@@ -1,0 +1,2448 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Rekap Produksi SIS</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Rekap Produksi</h4>
+            </div>
+            <div class="d-none d-md-block">
+                @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                    <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                    <button id="btnSave" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group d-flex">
+                                <label class="col-2" style="flex:1">Date</label>
+                                <div style="flex:3">
+                                    <div class="input-group col-12">
+                                        <input type="week" class="form-control" name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="week" class="form-control" name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" data-mock-width="150px" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        <option value="pi">PI - PMID Karawang</option>
+                                        <option value="pk">PK - SKM Karawang</option>
+                                        <option value="pb">PB - SIS Sukorejo</option>
+                                        <option value="pj">PJ - SKM Sukorejo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand</label>
+                                <div class="col-9">
+                                    <select class="form-control select2" data-mock-width="310px" name="brand">
+                                        <option label="Select Brand"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="segment_RPH1">
+                </div>
+            </div> <!--rph1-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">RPH1</div>
+                    <div class="card-body row">
+                        <div class="col-12 row" id="collapseExample" style="display:none;">
+                            <div class="content col-9">
+                                <canvas id="chrph1" height="100"></canvas>
+                            </div>
+
+                            <div class="divider-text divider-vertical" style="height:280px; margin:2em 5em 0em 2em;"></div>
+
+                            <div class="card col-2 pd-l-10 pd-t-10 mg-t-20" style="height:180px;">
+                                <label style="font-weight:bold;">Legend</label>
+                                <div class="mg-b-0 mg-l-10">
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Total Shift</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; MIO</span>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+
+                        <div class="col-12 tx-center">
+                            <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHide" style="margin: auto 0 15px 0;">Show Chart</button>
+                        </div>
+
+                        <div class="tableWrapper" style="min-height:450px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:160px;">Date</th>
+                                        <th rowspan="2" style="min-width:100px;">Location</th>
+                                        <th rowspan="2" style="min-width:260px;">Brand</th>
+                                        <th rowspan="2" style="min-width:110px;">Item Code</th>
+                                        <th rowspan="2" style="min-width:190px;">M/C</th>
+                                        <th colspan="3" style="min-width:90px;">Monday, 23 Sep 2019</th>
+                                        <th colspan="3" style="min-width:90px;">Tuesday, 24 Sep 2019</th>
+                                        <th colspan="3" style="min-width:90px;">Wednesday, 25 Sep 2019</th>
+                                        <th colspan="3" style="min-width:90px;">Thursday, 26 Sep 2019</th>
+                                        <th colspan="3" style="min-width:90px;">Friday, 27 Sep 2019</th>
+                                        <th colspan="3" style="min-width:90px;">Saturday, 28 Sep 2019</th>
+                                        <th colspan="3" style="min-width:90px;">Sunday, 29 Sep 2019</th>
+                                        <th colspan="3">Output</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+
+
+                                        <th style="min-width:90px;">Box</th>
+                                        <th style="min-width:120px;">Stick per Box</th>
+                                        <th style="min-width:90px;">mio</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rph1" class="tx-center">
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">SKM</td>
+                                        <td rowspan="2">SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td rowspan="2">FA067814.08</td>
+                                        <td rowspan="2">MB51PB51</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">68.04</td>
+                                        <td style="background-color:#1e90ff40;">68.04</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">272.16</td>
+                                        <td style="background-color:#1e90ff40;">271.59</td>
+                                        <td style="background-color:#1e90ff40;">5306.55</td>
+                                        <td style="background-color:#1e90ff40;">9600</td>
+                                        <td style="background-color:#1e90ff40;">50.942879999999995</td>
+                                    </tr>
+                                    <tr>
+                                        <td>287</td>
+                                        <td>275</td>
+                                        <td>285</td>
+                                        <td>284</td>
+                                        <td>291</td>
+                                        <td>279</td>
+                                        <td>274</td>
+                                        <td>264</td>
+                                        <td>284</td>
+                                        <td></td>
+                                        <td>276</td>
+                                        <td>281</td>
+                                        <td>214</td>
+                                        <td>273</td>
+                                        <td>290</td>
+                                        <td>281</td>
+                                        <td>296</td>
+                                        <td>296</td>
+                                        <td>297</td>
+                                        <td>284</td>
+                                        <td>290</td>
+                                        <td>5601</td>
+                                        <td>9600</td>
+                                        <td>53.769599999999997</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">SKM</td>
+                                        <td rowspan="2">SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td rowspan="2">FA067814.08</td>
+                                        <td rowspan="2">MB57PB57</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">71.40</td>
+                                        <td style="background-color:#1e90ff40;">71.40</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">285.60</td>
+                                        <td style="background-color:#1e90ff40;">5569.2</td>
+                                        <td style="background-color:#1e90ff40;">9600</td>
+                                        <td style="background-color:#1e90ff40;">53.464320000000015</td>
+                                    </tr>
+                                    <tr>
+                                        <td>276</td>
+                                        <td>281</td>
+                                        <td>291</td>
+                                        <td>276</td>
+                                        <td>283</td>
+                                        <td>275</td>
+                                        <td>245</td>
+                                        <td>280</td>
+                                        <td>271</td>
+                                        <td></td>
+                                        <td>268</td>
+                                        <td>257</td>
+                                        <td>205</td>
+                                        <td>276</td>
+                                        <td>267</td>
+                                        <td>269</td>
+                                        <td>286</td>
+                                        <td>293</td>
+                                        <td>257</td>
+                                        <td>284</td>
+                                        <td>291</td>
+                                        <td>5431</td>
+                                        <td>9600</td>
+                                        <td>52.137599999999999</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">SKM</td>
+                                        <td rowspan="2">SAMPOERNA U MILD LTK BOX 12 SLI FISKAL 2019</td>
+                                        <td rowspan="2">FA068324.04</td>
+                                        <td rowspan="2">MB59PB59</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">52.29</td>
+                                        <td style="background-color:#1e90ff40;">52.29</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">209.16</td>
+                                        <td style="background-color:#1e90ff40;">4078.6166666667</td>
+                                        <td style="background-color:#1e90ff40;">9600</td>
+                                        <td style="background-color:#1e90ff40;">39.15471999999999</td>
+                                    </tr>
+                                    <tr>
+                                        <td>219</td>
+                                        <td>201</td>
+                                        <td>210</td>
+                                        <td>212</td>
+                                        <td>210</td>
+                                        <td>201</td>
+                                        <td>207</td>
+                                        <td>216</td>
+                                        <td>201</td>
+                                        <td></td>
+                                        <td>163</td>
+                                        <td>204</td>
+                                        <td>158</td>
+                                        <td>217</td>
+                                        <td>220</td>
+                                        <td>216</td>
+                                        <td>219</td>
+                                        <td>229</td>
+                                        <td>209</td>
+                                        <td>220</td>
+                                        <td>222</td>
+                                        <td>4154</td>
+                                        <td>9600</td>
+                                        <td>39.878399999999999</td>
+                                    </tr>
+
+
+
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">CIGARILLO</td>
+                                        <td rowspan="2">CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17 </td>
+                                        <td rowspan="2">FC100319.16</td>
+                                        <td rowspan="2">FOCKE 65</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">120</td>
+                                        <td style="background-color:#1e90ff40;">120</td>
+                                        <td style="background-color:#1e90ff40;">120</td>
+                                        <td style="background-color:#1e90ff40;">120</td>
+                                        <td style="background-color:#1e90ff40;">96.47</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">576.47</td>
+                                        <td style="background-color:#1e90ff40;">8.500</td>
+                                        <td style="background-color:#1e90ff40;">4.900</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>108</td>
+                                        <td>124</td>
+                                        <td>100</td>
+                                        <td>110</td>
+                                        <td>112</td>
+                                        <td>21</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>575</td>
+                                        <td>8.500</td>
+                                        <td>4.888</td>
+                                    </tr>
+
+
+
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO CHOICE ORIGINAL BLUE P21 25</td>
+                                        <td rowspan="2">FG102198.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;">108</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">392</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">500</td>
+                                        <td style="background-color:#1e90ff40;">4.50</td>
+                                        <td style="background-color:#1e90ff40;">2250</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>16</td>
+                                        <td></td>
+                                        <td>205</td>
+                                        <td>253</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>26</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>500</td>
+                                        <td>4.50</td>
+                                        <td>2250</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO PETER JACKSON BLUE P21 25</td>
+                                        <td rowspan="2">FG102206.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">223</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">223</td>
+                                        <td style="background-color:#1e90ff40;">4.50</td>
+                                        <td style="background-color:#1e90ff40;">1003.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>148</td>
+                                        <td>75</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>223</td>
+                                        <td>4.50</td>
+                                        <td>1003.5</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO CRAFTSMAN ORIGINAL BATCH P11 30</td>
+                                        <td rowspan="2">FG102210.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">93</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">93</td>
+                                        <td style="background-color:#1e90ff40;">5.40</td>
+                                        <td style="background-color:#1e90ff40;">502.20000000000005</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>93</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>93</td>
+                                        <td>3.00</td>
+                                        <td>279</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO CRAFTSMAN FINE CUT P11 30.0</td>
+                                        <td rowspan="2">FG102334.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">102</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">102</td>
+                                        <td style="background-color:#1e90ff40;">5.40</td>
+                                        <td style="background-color:#1e90ff40;">550.80000000000007</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>102</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>102</td>
+                                        <td>5.40</td>
+                                        <td>550.80000000000007</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO CRAFTSMAN EXPRESSO P21 15.0</td>
+                                        <td rowspan="2">FG102201.01</td>
+                                        <td rowspan="2">MAN</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">38</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">38</td>
+                                        <td style="background-color:#1e90ff40;">2.70</td>
+                                        <td style="background-color:#1e90ff40;">102.60000000000001</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>38</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>38</td>
+                                        <td>2.70</td>
+                                        <td>102.60000000000001</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO CRAFTSMAN SAILORS RUM P11 30.0</td>
+                                        <td rowspan="2">FG102209.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">186</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">186</td>
+                                        <td style="background-color:#1e90ff40;">5.40</td>
+                                        <td style="background-color:#1e90ff40;">1004.4000000000001</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>116</td>
+                                        <td></td>
+                                        <td>70</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>186</td>
+                                        <td>5.40</td>
+                                        <td>1004.4000000000001</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO LONGBEACH ORIGINAL YELLOW P21 25</td>
+                                        <td rowspan="2">FG102204.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;">353</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">353</td>
+                                        <td style="background-color:#1e90ff40;">4.50</td>
+                                        <td style="background-color:#1e90ff40;">1588.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>163</td>
+                                        <td>190</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>353</td>
+                                        <td>4.50</td>
+                                        <td>1588.5</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="2">Monday, 23 Sep 2019</td>
+                                        <td rowspan="2">RYO</td>
+                                        <td rowspan="2">RYO CHOICE FULL RED P21 25.0</td>
+                                        <td rowspan="2">FG102200.01</td>
+                                        <td rowspan="2">TDC</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">69</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">21</td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;"></td>
+                                        <td style="background-color:#1e90ff40;">90</td>
+                                        <td style="background-color:#1e90ff40;">4.50</td>
+                                        <td style="background-color:#1e90ff40;">405</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>90</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>90</td>
+                                        <td>4.50</td>
+                                        <td>405</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--rph1-->
+
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">RPH</div>
+                    <div class="card-body row">
+
+                        <div class="col-12 row" id="collapseExamplerph" style="display:none;">
+                            <div class="content col-9">
+                                <canvas id="chrph" height="100"></canvas>
+                            </div>
+
+                            <div class="divider-text divider-vertical" style="height:280px; margin:2em 5em 0em 2em;"></div>
+
+                            <div class="card col-2 pd-l-10 pd-t-10 mg-t-20" style="height:180px;">
+                                <label style="font-weight:bold;">Legend</label>
+                                <div class="mg-b-0 mg-l-10">
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Total/Day</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; TH Stick</span>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 tx-center">
+                            <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHiderph" style="margin: auto 0 15px 0;">Show Chart</button>
+                        </div>
+
+                        <div class="tableWrapper" style="min-height:450px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:160px;">Date</th>
+                                        <th rowspan="2" style="min-width:100px;">Location</th>
+                                        <th rowspan="2" style="min-width:260px;">Brand</th>
+                                        <th rowspan="2" style="min-width:110px;">Item Code</th>
+                                        <th rowspan="2" style="min-width:190px;">Planning / Actual</th>
+                                        <th colspan="4" style="min-width:90px;">Monday</th>
+                                        <th colspan="4" style="min-width:90px;">Tuesday</th>
+                                        <th colspan="4" style="min-width:90px;">Wednesday</th>
+                                        <th colspan="4" style="min-width:90px;">Thursday</th>
+                                        <th colspan="4" style="min-width:90px;">Friday</th>
+                                        <th colspan="4" style="min-width:90px;">Saturday</th>
+                                        <th colspan="4" style="min-width:90px;">Sunday</th>
+                                        <th colspan="2" style="min-width:90px;">Total Output</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">23 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">24 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">25 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">26 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">27 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">28 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Shift 1</th>
+                                        <th style="min-width:90px;">Shift 2</th>
+                                        <th style="min-width:90px;">Shift 3</th>
+                                        <th style="min-width:90px;">29 Sep 2019</th>
+
+                                        <th style="min-width:90px;">Box</th>
+                                        <th style="min-width:90px;">TH Stick</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rph" class="tx-center">
+                                    <tr>
+                                        <td rowspan="3">Monday, 23 Sep 2019</td>
+                                        <td rowspan="3">SKM</td>
+                                        <td rowspan="3">SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td rowspan="3">FA067814.08</td>
+                                        <td>PLAN.</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>1673.28</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>1673.28</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>1673.28</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>1673.28</td>
+                                        <td>139.44</td>
+                                        <td>139.44</td>
+                                        <td>557.76</td>
+                                        <td>836.64</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>1673.28</td>
+                                        <td>557.76</td>
+                                        <td>557.76</td>
+                                        <td>557.19</td>
+                                        <td>1672.71</td>
+                                        <td>10875.75</td>
+                                        <td>104407.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ACT.</td>
+                                        <td>563</td>
+                                        <td>556</td>
+                                        <td>576</td>
+                                        <td>1695.00</td>
+                                        <td>560</td>
+                                        <td>574</td>
+                                        <td>554</td>
+                                        <td>1688.00</td>
+                                        <td>519.00</td>
+                                        <td>544.00</td>
+                                        <td>555.00</td>
+                                        <td>1618.00</td>
+                                        <td>0.00</td>
+                                        <td>544.00</td>
+                                        <td>538.00</td>
+                                        <td>1082.00</td>
+                                        <td>419.00</td>
+                                        <td>549.00</td>
+                                        <td>557.00</td>
+                                        <td>1525.00</td>
+                                        <td>550.00</td>
+                                        <td>582.00</td>
+                                        <td>589.00</td>
+                                        <td>1721.00</td>
+                                        <td>554.00</td>
+                                        <td>568.00</td>
+                                        <td>581.00</td>
+                                        <td>1703.00</td>
+                                        <td>11032</td>
+                                        <td>105907.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>WTD (%)</td>
+                                        <td>100.94%</td>
+                                        <td>99.68%</td>
+                                        <td>103.27%</td>
+                                        <td>101.30%</td>
+                                        <td>100.40%</td>
+                                        <td>102.91%</td>
+                                        <td>99.33%</td>
+                                        <td>100.88%</td>
+                                        <td>93.05%</td>
+                                        <td>97.53%</td>
+                                        <td>99.51%</td>
+                                        <td>96.70%</td>
+                                        <td>0.00%</td>
+                                        <td>97.53%</td>
+                                        <td>96.46%</td>
+                                        <td>64.66%</td>
+                                        <td>300.49%</td>
+                                        <td>393.72%</td>
+                                        <td>99.86%</td>
+                                        <td>101.04%</td>
+                                        <td>0.99</td>
+                                        <td>1.04</td>
+                                        <td>1.06</td>
+                                        <td>1.01</td>
+                                        <td>0.99</td>
+                                        <td>1.02</td>
+                                        <td>1.04</td>
+                                        <td>1.01</td>
+                                        <td>101.44%</td>
+                                        <td>101.44%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="3">Monday, 23 Sep 2019</td>
+                                        <td rowspan="3">SKM</td>
+                                        <td rowspan="3">SAMPOERNA U MILD LTK BOX 12 SLI FISKAL 2019</td>
+                                        <td rowspan="3">FA068324.04</td>
+                                        <td>PLAN.</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>627.48</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>627.48</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>627.48</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>627.48</td>
+                                        <td>52.29</td>
+                                        <td>52.29</td>
+                                        <td>209.16</td>
+                                        <td>313.74</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>627.48</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>209.16</td>
+                                        <td>627.48</td>
+                                        <td>4078.6166666666668</td>
+                                        <td>39154.720000000001</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ACT.</td>
+                                        <td>219</td>
+                                        <td>201</td>
+                                        <td>210</td>
+                                        <td>630.00</td>
+                                        <td>212.00</td>
+                                        <td>210.00</td>
+                                        <td>201.00</td>
+                                        <td>623.00</td>
+                                        <td>207.00</td>
+                                        <td>216.00</td>
+                                        <td>201.00</td>
+                                        <td>624.00</td>
+                                        <td>0.00</td>
+                                        <td>163.00</td>
+                                        <td>204.00</td>
+                                        <td>367.00</td>
+                                        <td>158.00</td>
+                                        <td>217.00</td>
+                                        <td>220.00</td>
+                                        <td>595.00</td>
+                                        <td>216.00</td>
+                                        <td>219.00</td>
+                                        <td>229.00</td>
+                                        <td>664.00</td>
+                                        <td>209.00</td>
+                                        <td>220.00</td>
+                                        <td>222.00</td>
+                                        <td>651.00</td>
+                                        <td>4154.00</td>
+                                        <td>39878.400000000001</td>
+                                    </tr>
+                                    <tr>
+                                        <td>WTD (%)</td>
+                                        <td>104.70%</td>
+                                        <td>96.10%</td>
+                                        <td>100.40%</td>
+                                        <td>100.40%</td>
+                                        <td>101.36%</td>
+                                        <td>100.40%</td>
+                                        <td>96.10%</td>
+                                        <td>99.29%</td>
+                                        <td>98.97%</td>
+                                        <td>103.27%</td>
+                                        <td>96.10%</td>
+                                        <td>99.71%</td>
+                                        <td>0.00%</td>
+                                        <td>77.93%</td>
+                                        <td>97.53%</td>
+                                        <td>89.41%</td>
+                                        <td>302.18%</td>
+                                        <td>414.99%</td>
+                                        <td>105.18%</td>
+                                        <td>100.54%</td>
+                                        <td>103.27%</td>
+                                        <td>104.70%</td>
+                                        <td>109.49%</td>
+                                        <td>101.50%</td>
+                                        <td>99.92%</td>
+                                        <td>105.18%</td>
+                                        <td>106.14%</td>
+                                        <td>101.85%</td>
+                                        <td>101.85%</td>
+                                        <td>101.85%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td rowspan="3">Monday, 23 Sep 2019</td>
+                                        <td rowspan="3">SKM</td>
+                                        <td rowspan="3">CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17 </td>
+                                        <td rowspan="3">FC100319.16</td>
+                                        <td>PLAN.</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>120</td>
+                                        <td>120</td>
+                                        <td>120</td>
+                                        <td>360</td>
+                                        <td>120</td>
+                                        <td>96.47</td>
+                                        <td>0</td>
+                                        <td>216.47</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>576.47</td>
+                                        <td>4899.9949999999999</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ACT.</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>108</td>
+                                        <td>124</td>
+                                        <td>100</td>
+                                        <td>332</td>
+                                        <td>110</td>
+                                        <td>112</td>
+                                        <td>21</td>
+                                        <td>243</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>575</td>
+                                        <td>4887.5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>WTD (%)</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0.9</td>
+                                        <td>1.2853736913029958</td>
+                                        <td>0</td>
+                                        <td>1.5336998198364669</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0.99744999739795648</td>
+                                        <td>0.99744999739795659</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--rph-->
+
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">LPH</div>
+                    <div class="card-body row">
+                        <div class="col-12 row" id="collapseExamplelph" style="display:none;">
+                            <div class="content col-9">
+                                <canvas id="chlph" height="100"></canvas>
+                            </div>
+
+                            <div class="divider-text divider-vertical" style="height:280px; margin:2em 5em 0em 2em;"></div>
+
+                            <div class="card col-2 pd-l-10 pd-t-10 mg-t-20" style="height:180px;">
+                                <label style="font-weight:bold;">Legend</label>
+                                <div class="mg-b-0 mg-l-10">
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Total/Day</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 mg-b-10">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; TH Stick</span>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 tx-center">
+                            <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHidelph" style="margin: auto 0 15px 0;">Show Chart</button>
+                        </div>
+
+                        <div class="tableWrapper" style="min-height:300px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:160px;">Date</th>
+                                        <th rowspan="2" style="min-width:100px;">Location</th>
+                                        <th rowspan="2" style="min-width:260px;">Brand</th>
+                                        <th rowspan="2" style="min-width:110px;">Item Code</th>
+                                        <th rowspan="2" style="min-width:190px;">Stock Awal</th>
+                                        <th colspan="3" style="min-width:90px;">Monday</th>
+                                        <th colspan="3" style="min-width:90px;">Tuesday</th>
+                                        <th colspan="3" style="min-width:90px;">Wednesday</th>
+                                        <th colspan="3" style="min-width:90px;">Thursday</th>
+                                        <th colspan="3" style="min-width:90px;">Friday</th>
+                                        <th colspan="3" style="min-width:90px;">Saturday</th>
+                                        <th colspan="3" style="min-width:90px;">Sunday</th>
+                                        <th colspan="3">Total</th>
+                                        <th rowspan="2" style="min-width:90px;">Reject</th>
+                                        <th colspan="1" style="min-width:120px;">Stock Akhir</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">In</th>
+                                        <th style="min-width:90px;">Out</th>
+                                        <th style="min-width:90px;">Stock</th>
+
+                                        <th style="min-width:90px;">Awal</th>
+                                        <th style="min-width:90px;">Prod</th>
+                                        <th style="min-width:90px;">Kirim</th>
+
+                                        <th style="min-width:90px;">Passed</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lph" class="tx-center">
+                                    <tr>
+                                        <td>Monday, 23 Sep 2019</td>
+                                        <td>DOMESTIC</td>
+                                        <td>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td>FA067814.08</td>
+                                        <td>ATB</td>
+                                        <td>0</td>
+                                        <td>1695</td>
+                                        <td>2000</td>
+                                        <td>-305</td>
+                                        <td>1688</td>
+                                        <td>2000</td>
+                                        <td>-617</td>
+                                        <td>1618</td>
+                                        <td>2000</td>
+                                        <td>-999</td>
+                                        <td>1082</td>
+                                        <td>2000</td>
+                                        <td>-1917</td>
+                                        <td>1525</td>
+                                        <td>2000</td>
+                                        <td>-2392</td>
+                                        <td>1721</td>
+                                        <td>1032</td>
+                                        <td>-1703</td>
+                                        <td>1703</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>11032</td>
+                                        <td>11032</td>
+                                        <td></td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monday, 24 Sep 2019</td>
+                                        <td>DOMESTIC</td>
+                                        <td>SAMPOERNA U MILD LTK BOX 12 SLI </td>
+                                        <td>FA068324.04</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>219</td>
+                                        <td>201</td>
+                                        <td>210</td>
+                                        <td>630</td>
+                                        <td>1000</td>
+                                        <td>-370</td>
+                                        <td>212</td>
+                                        <td>210</td>
+                                        <td>201</td>
+                                        <td>623</td>
+                                        <td>1000</td>
+                                        <td>-747</td>
+                                        <td>207</td>
+                                        <td>216</td>
+                                        <td>201</td>
+                                        <td>624</td>
+                                        <td>1000</td>
+                                        <td>-1123</td>
+                                        <td>0</td>
+                                        <td>163</td>
+                                        <td>204</td>
+                                        <td>367</td>
+                                        <td>1000</td>
+                                        <td>-1756</td>
+                                        <td>158</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monday, 23 Sep 2019</td>
+                                        <td>DOMESTIC</td>
+                                        <td>EXPORT - CGS</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monday, 23 Sep 2019</td>
+                                        <td>DOMESTIC</td>
+                                        <td>L&M BLUE LABEL KS BOX 12</td>
+                                        <td>FC100310.03</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monday, 23 Sep 2019</td>
+                                        <td>DOMESTIC</td>
+                                        <td>L&M RED LABEL KS BOX 12</td>
+                                        <td>FC100309.03</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monday, 23 Sep 2019</td>
+                                        <td>DOMESTIC</td>
+                                        <td>CIGRILL L&M CIGARILOS KS BOX 12</td>
+                                        <td>FC100319.16</td>
+                                        <td></td>
+                                        <td>648</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>648</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>648</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>648</td>
+                                        <td>108</td>
+                                        <td>124</td>
+                                        <td>100</td>
+                                        <td>332</td>
+                                        <td>648</td>
+                                        <td>332</td>
+                                        <td>332</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--rph-->
+
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+
+    <!------------------------------- chan: load partial biar lebih mudah dibaca ---------------------------------->
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.select2[data-mock-width]').on("select2:open", function () {
+                $(".select2-dropdown.select2-dropdown--below").css("min-width", $(this).data("mock-width"));
+            });
+
+
+            function RenderRPH1() {
+                $("#segment_RPH1").load(fastApp.BaseUrl + "/ReportRekapProduksiSIS/RPH1");
+            };
+
+            RenderRPH1();
+        });
+    </script>
+
+
+    <script>
+        /* chart.js chart examples */
+
+        // chart colors
+        var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+        var chBar = document.getElementById("chrph1");
+        var chartData = {
+            labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+            datasets: [{
+                data: [847, 854, 822, 557, 777, 873, 871],
+                backgroundColor: colors[0]
+            },
+            {
+                data: [53.77, 53.77, 53.77, 53.77, 53.77, 53.77, 53.77],
+                backgroundColor: colors[1]
+            }]
+        };
+
+        if (chBar) {
+            new Chart(chBar, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            barPercentage: 0.4,
+                            categoryPercentage: 0.5
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        }
+    </script> @*chrph1*@
+
+    <script>
+        /* chart.js chart examples */
+
+        // chart colors
+        var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+        var chBar = document.getElementById("chrph");
+        var chartData = {
+            labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+            datasets: [{
+                data: [1695.00, 1688.00, 1618.00, 1082.00, 1525.00, 1721.00, 17003.00],
+                backgroundColor: colors[0]
+            },
+            {
+                data: [105907.20, 105907.20, 105907.20, 105907.20, 105907.20, 105907.20, 105907.20],
+                backgroundColor: colors[1]
+            }]
+        };
+
+        if (chBar) {
+            new Chart(chBar, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            barPercentage: 0.4,
+                            categoryPercentage: 0.5
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        }
+    </script> @*chrph*@
+
+    <script>
+        /* chart.js chart examples */
+
+        // chart colors
+        var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+        var chBar = document.getElementById("chlph");
+        var chartData = {
+            labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+            datasets: [{
+                data: [22064.0, 22064.0, 22064.0, 22064.0, 22064.0, 22064.0, 22064.0],
+                backgroundColor: colors[0]
+            },
+            {
+                data: [0, 0, 0, 0, 0, 0, 0],
+                backgroundColor: colors[1]
+            }]
+        };
+
+        if (chBar) {
+            new Chart(chBar, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            barPercentage: 0.4,
+                            categoryPercentage: 0.5
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        }
+    </script> @*chlph*@
+
+    <!------------------------ STICKY ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().toggleClass("active");
+                const index = $(this).index() + 1;
+                $("#lines .carousel-item.active").removeClass("active");
+                const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                $(carouselItem).toggleClass("active");
+                $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+                ieFix();
+            });
+        });
+    </script> @*tabbel wrapper*@
+
+    <script>
+        $("#btnShowHide").click(function () {
+            var x = document.getElementById("collapseExample");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+
+        $("#btnShowHiderph").click(function () {
+            var x = document.getElementById("collapseExamplerph");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+
+        $("#btnShowHidelph").click(function () {
+            var x = document.getElementById("collapseExamplelph");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+    </script> @*hide button*@
+
+
+    <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+    <script>
+        const loc = {
+            pi: [
+                "[FA000963.01] MARLBORO MNT KS SOF 20",
+                "[FA000963.03] MARLBORO MNT KS SOF 20",
+            ],
+            pk: [
+                "[FA044121.18] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045300.06] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA045796.17] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA048259.10] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA069010.04] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA071690.00] - PHILIP MORRIS BOLD LTK BOX 12",
+            ],
+            pb: [
+                "[FG102151.01] - RYO CRAFTSMAN EXPRESSO P17 15.0",
+                "[FA071650.01] - SAMPOERNA U BOLD LTK BOX 12",
+                "[FA067815.06] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA068324.04] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.08] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.03] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.09] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068849.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FG102194.01] - RYO CRAFTSMAN SAILORS RUM P21 25",
+                "[FG102194.00] - RYO CRAFTSMAN SAILORS RUM P21 25",
+                "[FG102195.01] - RYO CRAFTSMAN BRUNSWICK BLEND P21 25",
+                "[FG102196.01] - RYO CRAFTSMAN SAILORS RUM P21 15",
+                "[FG102196.00] - RYO CRAFTSMAN SAILORS RUM P21 15",
+                "[FG102195.00] - RYO CRAFTSMAN BRUNSWICK BLEND P21 25",
+                "[FG102200.01] - RYO CHOICE FULL RED P21 25.0",
+                "[FG102201.01] - RYO CRAFTSMAN EXPRESSO P21 15.0",
+                "[FG102198.00] - RYO CHOICE ORIGINAL BLUE P21 25",
+                "[FG102200.00] - RYO CHOICE FULL RED P21 25.0",
+                "[FG102198.01] - RYO CHOICE ORIGINAL BLUE P21 25",
+                "[FG102201.00] - RYO CRAFTSMAN EXPRESSO P21 15.0",
+                "[FG102203.00] - RYO LONGBEACH RICH P21 25",
+                "[FG102199.01] - RYO CHOICE RICH GOLD P21 25.0",
+                "[FG102197.01] - RYO CRAFTSMAN BRUNSWICK BLEND P21 15",
+                "[FG102203.01] - RYO LONGBEACH RICH P21 25",
+                "[FG102197.00] - RYO CRAFTSMAN BRUNSWICK BLEND P21 15",
+                "[FG102202.01] - RYO CRAFTSMAN EXPRESSO P21 25.0",
+                "[FG102202.00] - RYO CRAFTSMAN EXPRESSO P21 25.0",
+                "[FG102199.00] - RYO CHOICE RICH GOLD P21 25.0",
+                "[FG102205.00] - RYO PETER JACKSON BLUE P21 15",
+                "[FG102204.00] - RYO LONGBEACH ORIGINAL YELLOW P21 25",
+                "[FG102205.01] - RYO PETER JACKSON BLUE P21 15",
+                "[FG102206.00] - RYO PETER JACKSON BLUE P21 25",
+                "[FG102204.01] - RYO LONGBEACH ORIGINAL YELLOW P21 25",
+                "[FG102206.01] - RYO PETER JACKSON BLUE P21 25",
+                "[FG102331.01] - RYO BOND STREET GOLD P21 15.0",
+                "[FG102329.01] - RYO BOND STREET RED P21 15.0",
+                "[FG102330.01] - RYO BOND STREET BLUE P21 15.0",
+                "[FG102371.00] - RYO BOND STREET RED P21 25.0",
+                "[FG102371.01] - RYO BOND STREET RED  25.0",
+                "[FG102372.00] - RYO BOND STREET BLUE P21 25.0",
+                "[FG102372.01] - RYO BOND STREET BLUE P21 25.0",
+                "[FG102373.01] - RYO BOND STREET GOLD P21 25.0",
+                "[FG102373.00] - RYO BOND STREET GOLD P21 25.0",
+                "[FG102318.00] - RYO MARLBORO P31 25.0",
+                "[FG102210.01] - RYO CRAFTSMAN ORIGINAL BATCH P11 30",
+                "[FG102209.01] - RYO CRAFTSMAN SAILORS RUM P11 30.0",
+                "[FG102329.00] - RYO BOND STREET RED P21 15.0",
+                "[FG102330.00] - RYO BOND STREET BLUE P21 15.0",
+                "[FG102336.00] - RYO AITO NOIR P31 30.0",
+                "[FG102337.00] - RYO MARLBORO P31 30.0",
+                "[FG102210.00] - RYO CRAFTSMAN ORIGINAL BATCH P11 30",
+                "[FG102328.00] - RYO LONGBEACH BYCRAFTS P11 30.0",
+                "[FG102209.00] - RYO CRAFTSMAN SAILORS RUM P11 30.0",
+                "[FG102331.00] - RYO BOND STREET GOLD P21 15.0",
+                "[FG102334.00] - RYO CRAFTSMAN FINE CUT P11 30.0",
+                "[FG102334.01] - RYO CRAFTSMAN FINE CUT P11 30.0",
+                "[FG102375.00] - RYO MARLBORO P31 25.0",
+                "[FC100365.07] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FC100309.03] - CIGRILL L&M RED LABEL KS BOX 12",
+                "[FA067814.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FC100319.15] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FC100689.00] - CIGRILL CRAFTSMAN NATURAL KS BOX 12",
+                "[FC100310.03] - CIGRILL L&M BLUE LABEL KS BOX 12",
+                "[FC100365.08] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FG102191.00] - RYO CHOICE ORIGINAL BLUE P21 15.0",
+                "[FG102192.01] - RYO CHOICE RICH GOLD P21 15.0",
+                "[FG102191.01] - RYO CHOICE ORIGINAL BLUE P21 15.0",
+                "[FG102193.00] - RYO CHOICE FULL RED P21 15.0",
+                "[FG102192.00] - RYO CHOICE RICH GOLD P21 15.0",
+                "[FG102193.01] - RYO CHOICE FULL RED P21 15.0",
+                "[FC100319.16] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FG102384.01] - RYO LONGBEACH ORIGINAL YELLOW P22 45.0",
+                "[FG102384.00] - RYO LONGBEACH ORIGINAL YELLOW P22 45.0",
+                "[FG102385.00] - RYO LONGBEACH RICH P22 45.0",
+                "[FG102385.01] - RYO LONGBEACH RICH P22 45.0",
+                "[FC100278.09] - CIGRILL L&M CIGARILOS KS BOX 12",
+                "[FG102151.00] - RYO CRAFTSMAN EXPRESSO P17 15.0",
+                "[FG102176.00] - RYO PETER JACKSON BLUE P17 15.0",
+                "[FC100307.09] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 12",
+                "[FC100365.10] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FC100319.17] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FG102177.00] - RYO PETER JACKSON BLUE P17 25.0",
+                "[FG102120.01] - RYO CRAFTSMAN BRUNSWICK BLEND P17 15.0",
+                "[FG102106.01] - RYO CRAFTSMAN SAILORS RUM P17 25.0",
+                "[FG102104.01] - RYO CRAFTSMAN BRUNSWICK BLEND P17 25.0",
+                "[FG102166.00] - RYO CHOICE RICH GOLD P17 25.0",
+                "[FG102119.01] - RYO CRAFTSMAN SAILORS RUM P17 15.0",
+                "[FG102165.00] - RYO CHOICE ORIGINAL BLUE P17 25.0",
+                "[FG102150.01] - RYO CRAFTSMAN EXPRESSO P17 25.0",
+                "[FG102175.00] - RYO LONGBEACH ORIGINAL YELLOW P17 25.0",
+                "[FG102174.00] - RYO LONGBEACH RICH P17 25.0",
+                "[FG102167.00] - RYO CHOICE FULL RED P17 25.0",
+                "[FG102168.00] - RYO CHOICE ORIGINAL BLUE P17 15.0",
+                "[FG102170.00] - RYO CHOICE FULL RED P17 15.0",
+                "[FC100319.18] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FA071197.01] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FG100848.03] - RYO LONGBEACH ORIGINAL YELLOW POU 55",
+                "[FA067815.01] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA067814.06] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA071196.00] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.04] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA067815.04] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA068849.01] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068849.02] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA071197.00] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA071649.00] - SAMPOERNA U BOLD LTK BOX 12",
+                "[FA067814.10] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.05] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067815.07] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+
+            ],
+            pj: [
+                "[FA067629.04] - DJI SAM SOE NF LS SOF 12",
+                "[FA073805.00] - SAMPOERNA HIJAU SPECIAL NF LS SOF 12",
+                "[FA073804.00] - SAMPOERNA HIJAU ORIGINAL NF LS SOF 12",
+                "[FA070756.01] - SAMPOERNA HIJAU NF LS SOF 12",
+                "[FA071130.01] - DJI SAM SOE NF LS SOF 12",
+                "[FA049104.02] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA045796.11] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA050466.03] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA072334.00] - DJI SAM SOE LTK TIN 12 MAG",
+                "[FA073632.00] - SAMPOERNA U MNT KS BOX 20",
+                "[FA073634.00] - SAMPOERNA A KS BOX 20",
+                "[FA073635.00] - SAMPOERNA A MNT KS BOX 20",
+                "[FA044773.07] - SAMPOERNA HIJAU ORIGINAL NF LS SOF 12",
+                "[FA050597.06] - DJI SAM SOE NF LS SOF 12",
+                "[FA034649.12] - SAMPOERNA HIJAU NF LS SOF 12",
+                "[FA054807.05] - SAMPOERNA HIJAU SPECIAL NF LS SOF 12",
+                "[FA044182.08] - MARLBORO ULTRA LIGHTS KS BOX 20",
+                "[FA044428.08] - MARLBORO FILTER KS BOX 20",
+                "[FA073563.00] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA043509.08] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA073564.00] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044314.07] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA073565.00] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA070976.01] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA071127.03] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA048259.09] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA048258.10] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA073509.00] - SAMPOERNA A MILD LTK BOX 50 SLI",
+                "[FA068849.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA069779.03] - SAMPOERNA HIJAU NF LS SOF 10",
+                "[FA035621.19] - DJI SAM SOE SUPER PREMIUM NF LS SHO 12",
+                "[FA071115.05] - PANAMAS KUNING NF LS SOF 12",
+                "[FA067629.03] - DJI SAM SOE NF LS SOF 12",
+                "[FA072610.00] - SAMPOERNA A SPLASHTR MIX LTK BOX 16 SLI",
+                "[FA072611.00] - SAMPOERNA A SPLASHSU MIX LTK BOX 16 SLI",
+                "[FA061183.04] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.03] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA052576.18] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA061183.05] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069772.03] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.02] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA068715.07] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069748.06] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069772.02] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA010784.19] - DJI SAM SOE NF LS SOF 16",
+                "[FA064382.05] - DJI SAM SOE NF LS SOF 12",
+                "[FA068324.03] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.08] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.04] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067815.06] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA029605.10] - MARLBORO MENTHOL MNT KS BOX 20",
+                "[FA044121.24] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA048258.09] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA045796.17] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA045300.06] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA048259.08] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA045795.17] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA071271.02] - DJI SAM SOE MILD LTK OCT 20 SLI",
+                "[FA069010.04] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA062333.10] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA061184.04] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA073151.01] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA048258.08] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.03] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA044121.20] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045795.14] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA048258.07] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA031149.06] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA044504.06] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA048258.06] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.05] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.02] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA069393.00] - SAMPOERNA A PLATINUM LTK BOX 16 SLI",
+                "[FA069010.00] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA041433.05] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044504.05] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA045300.02] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA053179.02] - U BOLD LTK OCT 12 MAG",
+                "[FA048258.03] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.01] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA041433.04] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044504.04] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA061184.00] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA048258.01] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.00] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA050466.00] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA030853.03] - KRATON DALEM KRETEK NF LS SOF 12",
+                "[FA030853.02] - KRATON DALEM KRETEK NF LS SOF 12",
+                "[FA073563.01] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA073564.01] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA043509.09] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA073565.01] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA044314.08] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA071271.03] - DJI SAM SOE MILD LTK OCT 20 SLI",
+                "[FA045795.18] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA045300.07] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA073151.06] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA045796.18] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA062333.11] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA061184.06] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA072610.01] - SAMPOERNA A SPLASHTR MIX LTK BOX 16 SLI",
+                "[FA072611.01] - SAMPOERNA A SPLASHSU MIX LTK BOX 16 SLI",
+                "[FA044121.26] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA035621.21] - DJI SAM SOE SUPER PREMIUM NF LS SHO 12",
+                "[FA067629.05] - DJI SAM SOE NF LS SOF 12",
+                "[FA010784.21] - DJI SAM SOE NF LS SOF 16",
+                "[FA048258.11] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA052576.17] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA073151.02] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.04] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.03] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.05] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA062333.02] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA060147.00] - SAMPOERNA A KLIK MNT KS BOX 20 SLI",
+                "[FA052943.00] - MARLBORO FUSION KS BOX 20",
+                "[FA066705.00] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA066704.00] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA068877.00] - MARLBORO MILD TOUCH LTK BOX 16 SLI",
+                "[FA052565.00] - MARLBORO FUSION (C) KS BOX 20",
+                "[FA066530.00] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA061183.12] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA071530.05] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA069772.10] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.10] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA068774.00] - DJI SAM SOE MILD LTK BOX 12 SLI",
+                "[FA069393.02] - SAMPOERNA A PLATINUM LTK BOX 16 SLI",
+                "[FA050607.00] - DJI SAM SOE RED LTK OCT 12 MAG",
+                "[FA069010.01] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA069744.00] - MARLBORO MILD BLACK KS BOX 20 SLI",
+                "[FA050615.00] - MARLBORO FLAVOR PLUS KS BOX 20",
+                "[FA049647.14] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA056040.00] - SAMPOERNA KLIK KS BOX 20 SLI",
+                "[FA050583.00] - PHILIP MORRIS WHITE (1MG) KS RCB 20",
+                "[FA066531.00] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA050613.00] - MARLBORO REFINE KS BOS 20",
+                "[FA066530.01] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA069783.00] - SAMPOERNA MNT KS BOX 10 SLI",
+                "[FA069782.00] - SAMPOERNA KS BOX 10 SLI",
+                "[FA044504.03] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA066531.01] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA069074.01] - SAMPOERNA A REGULAR KS BOX 20 SLI",
+                "[FA067816.03] - SAMPOERNA U BOLD LTK OCT 12 MAG",
+                "[FA062631.00] - L&M MIXX KS BOX 20",
+                "[FA062632.00] - L&M GREEN MIXX MNT KS BOX 20",
+                "[FA058600.00] - SAMPOERNA HIJAU FILTER LTK OCT 12 MAG",
+                "[FA057763.00] - SAMPOERNA A KLIK KS BOX 20 SLI",
+                "[FA068351.00] - SAMPOERNA A ABSOLSEN LTK BOX 16 SLI",
+                "[FA071720.00] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA069732.01] - MARLBORO MILD BLACK LTK BOX 16 SLI",
+                "[FG100848.03] - RYO LONGBEACH ORIGINAL YELLOW POU 55",
+                "[FA058183.00] - SAMPOERNA A MILD KS BOX 20 SLI",
+                "[FA067816.02] - SAMPOERNA U BOLD LTK OCT 12 MAG",
+                "[FA065417.00] - SAMPOERNA A ABSOLSEN LTK RCS 20 SLI",
+                "[FA049646.13] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.27] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.35] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.12] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.33] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.35] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.27] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.33] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.34] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA050602.01] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA071719.00] - MARLBORO FILTER BLACK LTK BOX 50",
+                "[FA043582.04] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA042526.05] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA049104.01] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA050599.00] - SAMPOERNA A VOLUTION 100 TIN 20 SSL",
+                "[FA049505.08] - SAMPOERNA KS BOX 20 SLI",
+                "[FA053959.00] - MARLBORO CLOVE MIX KS BOX 20",
+                "[FA055165.00] - MARLBORO FLAVOR PLUS KS BOS 20",
+                "[FA056983.00] - MARLBORO CLOVE MIX (2.0) KS BOX 20",
+                "[FA049170.00] - MARLBORO FRESH FUSION MNT KS BOX 20",
+                "[FA050484.00] - SAMPOERNA A MILD MNT LTK BOS 16 SLI",
+                "[FA050840.00] - FORTUNE KRETEK KS BOX 20",
+                "[FA049646.26] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050602.00] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA050601.00] - SAMPOERNA A BLUE LTK BOX 16 SLI",
+                "[FA050863.01] - SAMPOERNA KS BOX 20 SLI",
+                "[FA044121.10] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA050939.00] - MARLBORO REFINED KS BOX 20",
+                "[FA049171.00] - MARLBORO FUSION KS BOX 20",
+                "[FA051598.00] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA053457.00] - MARLBORO SPICE KS BOX 20",
+                "[FA050789.00] - FORTUNE KRETEK MINT MNT KS BOX 20",
+                "[FA050770.00] - MARLBORO KRETEK MNT KS BOX 20",
+                "[FA050858.00] - SAMPOERNA NEW RED FLAVOR KS BOX 20 SLI",
+                "[FA050940.00] - MARLBORO REFINED KS BOS 20",
+                "[FA053959.01] - MARLBORO CLOVE MIX KS BOX 20",
+                "[FA049647.19] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.36] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA067202.00] - SAMPOERNA KLIK MNT LTK OCT 20 SLI",
+                "[FA049678.01] - MARLBORO X-FUSION KS BOX 20",
+                "[FA069697.00] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA065407.01] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA044123.11] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA057592.00] - L&M M-FUSION MNT KS BOX 20",
+                "[FA029426.13] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA061036.00] - SAMPOERNA U (WHITE) KS BOX 20 SLI",
+                "[FA064563.00] - DJI SAM SOE BLUE LTK OCT 20 SLI",
+                "[FA065407.00] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA029426.11] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA044314.03] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA045373.04] - SAMPOERNA A VOLUTION 100 LSB 16 SSL",
+                "[FA029426.12] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA029426.14] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA041433.03] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA045300.00] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA045372.06] - SAMPOERNA A VOLUTION MNT 100 LSB 16 SSL",
+                "[FA041433.06] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA045373.06] - SAMPOERNA A VOLUTION 100 LSB 16 SSL",
+                "[FA019622.00] - SAMPOERNA A MILD MNT KS BOX 20 SLI",
+                "[FA045372.04] - SAMPOERNA A VOLUTION MNT 100 LSB 16 SSL",
+                "[FA045796.07] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA049646.14] - SAMPOERNA KS BOX 20 SLI",
+                "[FA044121.17] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA050857.00] - SAMPOERNA TROPICAL MNT KS BOX 20 SLI",
+                "[FA029426.10] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA049646.34] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050435.00] - SAMPOERNA A VOLUTION KS BOX 20",
+                "[FA050582.00] - MARLBORO (RED FWD) 100 BOX 20",
+                "[FA053212.00] - MARLBORO FUSION KS BOX 20",
+                "[FA049646.30] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050863.00] - SAMPOERNA KS BOX 20 SLI",
+                "[FA056040.01] - SAMPOERNA KLIK KS BOX 20 SLI",
+                "[FA045796.05] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA049646.10] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.31] - SAMPOERNA KS BOX 20 SLI",
+                "[FA057591.00] - L&M FUSION KS BOX 20",
+                "[FA048258.04] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.02] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA049646.29] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.25] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.32] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.11] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.31] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.20] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA048259.03] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA049646.20] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.12] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA043509.04] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA049506.07] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.25] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.28] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.30] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.04] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA050466.02] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA049647.32] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA058184.00] - SAMPOERNA A MILD KS BOX 20 SLI",
+                "[FA065392.00] - MARLBORO MILD LTK RCS 20 SLI",
+                "[FA049646.19] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.26] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.13] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA061184.05] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA071530.04] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA061183.11] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.09] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.09] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA044121.25] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA071127.04] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA010784.20] - DJI SAM SOE NF LS SOF 16",
+                "[FA074380.00] - PHILIP MORRIS BOLD LTK BOX 16",
+                "[FA074381.00] - SAMPOERNA A FILTER LTK BOX 16",
+                "[FA074277.00] - SAMPOERNA A KS BOX 20 SLI",
+                "[FA074279.00] - SAMPOERNA A MNT KS BOX 20 SLI",
+                "[FA074278.00] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA071530.03] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA050466.04] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045795.12] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA049104.00] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA049104.03] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA044121.18] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA062333.04] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA074125.00] - DJI SAM SOE NF LS SOF 16",
+                "[FA069772.07] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.07] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA061183.09] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA061183.08] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.06] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.06] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA071530.02] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA045796.16] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA069773.05] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA061183.07] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069772.05] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA073954.00] - PANAMAS KUNING NF LS BOX 12",
+                "[FA073904.00] - PANAMAS KUNING NF LS BOX 12",
+                "[FA061183.06] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.04] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.04] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA071530.01] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[34.C24J] - HCD RIG NPO",
+                "[34.C24JC] - HCD RIG NPO",
+                "[34.C28B] - HCD RIG NPO",
+                "[34.C2LV] - HCD RIG NPO",
+                "[34.C2LVC] - HCD RIG NPO",
+                "[33.B0QW] - MONO STD",
+                "[33.B0YV] - HAT STD",
+                "[34.C1LIC] - C1LIC",
+            ],
+        }
+        $(document).ready(function () {
+            $("[name=prodCenter]").on("change", function () {
+                let opt = '<option label="Select Brand"></option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < loc[val].length; i++)
+                    opt += `<option value="${loc[val][i]}">${loc[val][i]}</option>`;
+                $("[name=brand]").html(opt);
+            })
+        });
+    </script>
+
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                //format: 'D, dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+
+}

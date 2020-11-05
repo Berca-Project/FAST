@@ -1,0 +1,173 @@
+﻿@model Fast.Web.Models.Report.ReportRemarksModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Create";
+}
+
+
+@using (Html.BeginForm("Create", "ReportInputRemarks", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div class="content content-fixed lph-form">
+        <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+            <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                            <li class="breadcrumb-item"><a href="#">Report</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Input Remarks</li>
+                        </ol>
+                    </nav>
+                    <h4 class="mg-b-0 tx-spacing--1">Input Remarks</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mg-b-20">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label mg-l-10">KPI</label>
+                                <div class="col-2" style="margin-left:-15px;">
+                                    @Html.DropDownListFor(x => x.RSA, (IEnumerable<SelectListItem>)ViewBag.RSAList, new { @class = "form-control", @id = "ddlRSA" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label mg-l-10">Shift</label>
+                                <div class="col-2" style="margin-left:-15px;">
+                                    @Html.DropDownListFor(x => x.Shift, (IEnumerable<SelectListItem>)ViewBag.ShiftList, new { @class = "form-control", @id = "ddlRSA" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label mg-l-10">Date</label>
+                                <div class="col-2" style="margin-left:-15px;">
+                                    @Html.TextBoxFor(x => x.Date, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDate", autocomplete = "off" })
+                                </div>
+                            </div>
+
+
+                            @*<div class="form-group row">
+            <div class="input input-group col-12">
+                <label class="col-2 col-form-label">Location</label>
+                @Html.DropDownListFor(x => x.LocationID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment" })
+            </div>
+        </div>*@
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label mg-l-10">Focus</label>
+                                <div class="col-4" style="margin-left:-15px;">
+                                    @Html.TextAreaFor(x => x.Focus, new { @class = "form-control" })
+                                </div>
+
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label mg-l-10">Action Plan</label>
+                                <div class="col-4" style="margin-left:-15px;">
+                                    @Html.TextAreaFor(x => x.ActionPlan, new { @class = "form-control" })
+                                </div>
+
+                            </div>
+                            <br />
+                            <div class="modal-footer pd-x-20 pd-y-15">
+                                <button type="button" class="btn btn-white">@UIResources.Cancel</button>
+                                <button type="submit" class="btn btn-primary">@UIResources.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- row -->
+        </div><!-- container -->
+    </div><!-- content -->
+}
+
+<!-- content -->
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#tbDate').datepicker({
+                format: "dd-MM-yyyy",
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+         var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			var error = "@ViewBag.ErrorMessage";
+			var message = "@ViewBag.Message";
+
+			if (result != "") {
+				if (result == "True") {
+					if (message == "") {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.Save",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: message,
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+				else {
+					if (error == "") {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DataNotFound",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: error,
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			}
+    </script>
+    
+
+
+}
+           
+
+
+

@@ -1,0 +1,734 @@
+﻿@model List<Fast.Web.Models.ChecklistComponentModel>
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+
+@{
+    App.counter = -1;
+    App.isContainBarcode = "false";
+    App.isContainWebcam = false;
+}
+
+@helper GenerateHeader(List<Fast.Web.Models.ChecklistComponentModel> components)
+{
+    var headers = components.Where(x => x.Segment.Trim() == "header").OrderBy(x => x.OrderNum).ToList();
+    var columnHeader = (int)ViewBag.Checklist.ColumnHeader;
+    if (columnHeader < 1)
+    {
+        columnHeader = 1;
+    }
+    for (var i = 0; i < headers.Count(); i++)
+    {
+        App.counter++;
+        var col_sm = 5;
+        if (i < (headers.Count() - 1) && headers[i + 1].ComponentType.Trim() == "blank")
+        {
+            col_sm = 12;
+        }
+
+        <div class="form-group row col-@(12/columnHeader)">
+            <label class="col-sm-@(col_sm) col-form-label">@headers[i].ComponentName</label>
+            @if (i < (headers.Count() - 1) && headers[i + 1].ComponentType.Trim() != "blank")
+            {
+                <div class="col-sm-6">
+                    @if (headers[i + 1].ComponentType.Trim() == "input_text")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <input name="[@App.counter].Value" type="text" class="form-control" value="@(ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" @((headers[i].IsRequired == true) ? "required" : "") />
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_number")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <input name="[@App.counter].Value" autocomplete="off" type="number" onkeypress="validateNumber(event)" class="form-control" value="@(ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" @((headers[i].IsRequired == true) ? "required" : "") />
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_date")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <input name="[@App.counter].Value" autocomplete="off" type="text" class="form-control hasDatepicker" value="@(ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" @((headers[i].IsRequired == true) ? "required" : "") />
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_time")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <div class="clockpicker" data-placement="left" data-align="top" data-autoclose="true" data-default="now">
+                            <input name="[@App.counter].Value" autocomplete="off" type="text" class="form-control" value="@(ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" @((headers[i].IsRequired == true) ? "required" : "") />
+                        </div>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_checkbox")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <div class="custom-control custom-checkbox mg-t-10">
+                            <input type="checkbox" class="custom-control-input" id="customCheck@(App.counter)" name="[@App.counter].Value" @((ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum] == "on") ? "checked" : "") @((headers[i].IsRequired == true) ? "required" : "") )>
+                            <label class="custom-control-label" for="customCheck@(App.counter)"></label>
+                        </div>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_file")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="upload@(App.counter)" name="[@App.counter].ValueFile" accept="image/*" @((headers[i].IsRequired == true) ? "required" : "")>
+                            <label class="custom-file-label" for="upload@(App.counter)">@((ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum] != "") ? ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum] : "Upload your images here")</label>
+                        </div>
+                        <small class="form-text text-muted">Recommended image size: 600x600 pixels</small>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_option")
+                    {
+                        List<string> options = new List<string>(headers[++i].ComponentName.Split(','));
+
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <select class="form-control" name="[@App.counter].Value" @((headers[i].IsRequired == true) ? "required" : "")>
+                            @foreach (var option in options)
+                            {
+                                <option value="@option" @((ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum] == option) ? "selected" : "")>@option</option>
+                            }
+                        </select>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_user")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <select class="form-control select2-user" name="[@App.counter].Value" @((headers[i].IsRequired == true) ? "required" : "")>
+                            <option value="">Select User</option>
+                            @foreach (Fast.Web.Models.EmployeeModel option in ViewBag.Userlist)
+                            {
+                                <option value="@option.EmployeeID" @((ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum] == option.EmployeeID) ? "selected" : "")>[@(option.EmployeeID.Trim())] @option.FullName</option>
+                            }
+                        </select>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_location")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <select class="form-control selection-location" @((headers[i].IsRequired == true) ? "required" : "")></select>
+                        <select class="form-control selection-department" @((headers[i].IsRequired == true) ? "required" : "")></select>
+                        <select class="form-control selection-subdepartment" name="[@App.counter].Value" @((headers[i].IsRequired == true) ? "required" : "") data-selected="@(ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])"></select>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "input_reference")
+                    {
+                        List<Fast.Web.Models.ReferenceDetailModel> RefeList = ViewBag.Referencelist;
+                        RefeList = RefeList.Where(x => x.ReferenceID.ToString() == headers[i + 1].ComponentName).OrderBy(x => x.Description).ToList();
+
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <select class="form-control select2-reference" name="[@App.counter].Value" @((headers[i].IsRequired == true) ? "required" : "")>
+                            <option value="">Choose One</option>
+                            @foreach (var option in RefeList)
+                            {
+                                <option value="@option.ID" @((ViewBag.ListValues[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum] == option.ID.ToString()) ? "selected" : "")>@option.Description</option>
+                            }
+                        </select>
+                    }
+                    else if (headers[i + 1].ComponentType.Trim() == "image")
+                    {
+                        i++;
+                        <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[headers[i].ID + "_" + headers[i].OrderNum + "_" + headers[i].ColumnNum])" />
+                        <img src="~/Uploads/checklist/component/@(headers[i].ComponentName)" class="img-fluid" style="margin: 5px auto;display: block;">
+                    }
+
+                </div>
+            }
+            else
+            {
+                ++i;
+
+                <input name="[@App.counter].ChecklistComponentID" type="hidden" value="@headers[i].ID" />
+                <input name="[@App.counter].OrderNum" type="hidden" value="@headers[i].OrderNum" />
+                <input name="[@App.counter].ColumnNum" type="hidden" value="@headers[i].ColumnNum" />
+                <input name="[@App.counter].ValueType" type="hidden" value="option" />
+            }
+
+        </div>
+    }
+}
+
+@helper GenerateTable(List<Fast.Web.Models.ChecklistComponentModel> components)
+{
+    var random = new Random();
+    components = components.Where(x => x.Segment.Trim() == "content").ToList();
+    var headers = components.Where(x => x.ComponentType.Trim() == "header").OrderBy(x => x.OrderNum).ToList();
+    var contents = components.Where(x => x.ComponentType.Trim() != "header").ToList();
+    var max_cell = components.Max(x => x.ColumnNum);
+
+    <table class="table table-bordered table-primary">
+        <thead>
+            <tr>
+                @foreach (var header in headers)
+                {
+                    <th style="width:@(header.AdditionalValue)%">@header.ComponentName</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 1; i <= max_cell; i++)
+            {
+
+                var comps = contents.Where(x => x.ColumnNum == i).OrderBy(x => x.OrderNum).ToList();
+
+                if ((i - 1) % headers.Count() == 0)
+                {
+                    if (i == 1)
+                    {
+                        @Html.Raw("<tr>")
+                    }
+                    else
+                    {
+                        @Html.Raw("</tr><tr>")
+                    }
+
+                }
+
+        <td>
+
+            @foreach (var compo in comps)
+            {
+                if (compo.ComponentType.Trim() == "label")
+                {
+                    <label class="d-block mg-t-9">@compo.ComponentName</label>
+                }
+                else if (compo.ComponentType.Trim() == "blank")
+                {
+                    <div class="delete-me"></div>
+                }
+                else if (compo.ComponentType.Trim() == "button_ok")
+                {
+                    <button type="button" class="btn btn-block btn-info">OK</button>
+                }
+                else if (compo.ComponentType.Trim() == "button_nok")
+                {
+                    <button type="button" class="btn btn-block btn-danger">NOT OK</button>
+                }
+                else if (compo.ComponentType.Trim() == "image")
+                {
+                    <img src="~/Uploads/checklist/component/@compo.ComponentName" class="img-fluid" style="margin: 5px auto;display: block;">
+                }
+                else if (compo.ComponentType.Trim() == "input_text")
+                {
+                    App.counter++;
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <input name="[@App.counter].Value" type="text" class="form-control mg-b-5" value="@(ViewBag.ListValues[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" @((compo.IsRequired == true) ? "required" : "") />
+                }
+                else if (compo.ComponentType.Trim() == "input_number")
+                {
+                    App.counter++;
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <input name="[@App.counter].Value" autocomplete="off" type="number" onkeypress="validateNumber(event)" class="form-control mg-b-5" value="@(ViewBag.ListValues[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" @((compo.IsRequired == true) ? "required" : "") />
+                }
+                else if (compo.ComponentType.Trim() == "input_date")
+                {
+                    App.counter++;
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <input name="[@App.counter].Value" autocomplete="off" type="text" class="form-control hasDatepicker mg-b-5" value="@(ViewBag.ListValues[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" @((compo.IsRequired == true) ? "required" : "") />
+                }
+                else if (compo.ComponentType.Trim() == "input_checkbox")
+                {
+                    App.counter++;
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <div class="custom-control custom-checkbox text-center mg-t-10 mg-b-10">
+                        <input type="checkbox" class="custom-control-input" id="customCheck@(App.counter)" name="[@App.counter].Value" @((ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] == "on") ? "checked" : "") />
+                        <label class="custom-control-label" for="customCheck@(App.counter)"></label>
+                    </div>
+                }
+                else if (compo.ComponentType.Trim() == "input_file")
+                {
+                    App.counter++;
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <div class="custom-file mg-b-5">
+                        <input type="file" class="custom-file-input" id="upload@(App.counter)" name="[@App.counter].ValueFile" accept="image/*" @((compo.IsRequired == true) ? "required" : "") />
+                        <label class="custom-file-label" for="upload@(App.counter)"> @((ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] == "") ? "Upload your images here" : "")</label>
+                    </div>
+                    <small class="form-text text-muted">Recommended image size: 600x600 pixels</small>
+                }
+                else if (compo.ComponentType.Trim() == "input_option")
+                {
+                    App.counter++;
+                    List<string> options = new List<string>(compo.ComponentName.Split(','));
+
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <select class="form-control mg-b-5" name="[@App.counter].Value" @((compo.IsRequired == true) ? "required" : "")>
+                        @foreach (var option in options)
+                        {
+                            <option value="@option" @((ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] == option) ? "selected" : "")>@option</option>
+
+                        }
+                    </select>
+                }
+                else if (compo.ComponentType.Trim() == "input_radio")
+                {
+                    App.counter++;
+                    List<string> options = new List<string>(compo.ComponentName.Split(','));
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <div class="row mg-l-0 mg-r-0">
+                        @foreach (var option in options)
+                        {
+                            var identifier = random.Next(0, 1000);
+                            <div class="custom-control custom-radio col-4">
+                                <input type="radio" id="customRadio@(identifier)_@(App.counter)" name="[@App.counter].Value" class="custom-control-input" value="@option" @((ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] == option) ? "checked" : "") @((compo.IsRequired == true) ? "required" : "") />
+                                <label class="custom-control-label" for="customRadio@(identifier)_@(App.counter)">@option</label>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (compo.ComponentType.Trim() == "input_barcode")
+                {
+                    App.counter++;
+                    App.isContainBarcode = "true";
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+
+                    <div class="input-group">
+                        <input name="[@App.counter].Value" autocomplete="off" type="text" class="form-control barcode-check" data-barcode="@(compo.ComponentName)" aria-label="Input Barcode" value="@(ViewBag.ListValues[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" @((compo.IsRequired == true) ? "required" : "")>
+
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <div class="custom-control custom-checkbox pd-r-5">
+                                    <input type="checkbox" class="custom-control-input checkbox-barcode" id="customCheck@(App.counter)" @((ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] == compo.ComponentName) ? "checked" : "")>
+                                    <label class="custom-control-label" for="customCheck@(App.counter)"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="@((ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] == compo.ComponentName) ? "text" : "hidden")" class="form-control barcode-date" name="[@App.counter].ValueDate" value="@(ViewBag.ListValueDates[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" readonly>
+                }
+                else if (compo.ComponentType.Trim() == "input_reference")
+                {
+                    App.counter++;
+                    List<Fast.Web.Models.ReferenceDetailModel> RefeList = ViewBag.Referencelist;
+                    RefeList = RefeList.Where(x => x.ReferenceID.ToString() == compo.ComponentName).OrderBy(x => x.Description).ToList();
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <select class="form-control select2-reference" name="[@App.counter].Value" @((compo.IsRequired == true) ? "required" : "")>
+                        <option value="">Choose One</option>
+                        @foreach (var option in RefeList)
+                        {
+                            <option value="@option.ID" @(option.ID.ToString() == ViewBag.ListValues[compo.ID + "_" + compo.OrderNum + "_" + compo.ColumnNum] ? "selected":"")>@option.Description</option>
+                        }
+                    </select>
+                }
+                else if (compo.ComponentType.Trim() == "input_webcam")
+                {
+                    App.isContainWebcam = true;
+
+                    App.counter++;
+
+                    <input name="[@App.counter].ID" type="hidden" value="@(ViewBag.ListID[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" />
+                    <input name="[@App.counter].Value" type="hidden">
+
+                    <div class="form-group row">
+                        <div class="col-12" id="image_1"><img id="webcam@(compo.ID)" class="input-webcam mx-auto d-block" src="~/Uploads/checklist/value/@(ViewBag.ListValues[compo.ID+"_"+compo.OrderNum+"_"+compo.ColumnNum])" data-toggle="modal" data-target="#photo-modal"></div>
+                    </div>
+                }
+            }
+
+
+        </td>
+        }
+            @Html.Raw("</tr>")
+            </tbody>
+        </table>
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/dashforge/lib/clockpicker/bootstrap-clockpicker.min.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+        .table th, .table td {
+            /*vertical-align: middle;*/
+        }
+
+        input.barcode-check:focus {
+            background-color: #ffe7a0;
+        }
+
+        .header-segment .form-group {
+            margin-bottom: 1px;
+        }
+
+        .table th, .table td {
+            padding: 3px 10px;
+            line-height: 1.5;
+        }
+
+        .input-webcam {
+            max-width: 100%;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item"><a href="#">Edit Value</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@ViewBag.Checklist.Header</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">[@(ViewBag.Checklist.MenuTitle)] @ViewBag.Checklist.Header</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="barcode_next" type="button" class="d-none btn btn-sm btn-primary">Focus on Barcode <i data-feather="play" class="mg-l-5"></i></button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                @using (Html.BeginForm("EditValue", "Checklist", FormMethod.Post, new { @class = "preventDoubleSubmission", @autocomplete = "false", encType = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("SubmitID", new Uri(Context.Request.Url.ToString()).Segments.Last())
+
+                    <div class="card mg-b-20">
+                        <div class="card-body header-segment row">
+                            @GenerateHeader(Model)
+                        </div>
+                    </div>
+
+                    @GenerateTable(Model)
+
+                    <div class="card mg-t-20">
+                        <div class="card-header bg-primary tx-white font-weight-bold">
+                            Approval History
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered table-striped table-primary">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Date &amp; Time</th>
+                                        <th>Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ var temp_comm = ""; }
+                                    @foreach (Fast.Web.Models.ChecklistApprovalModel rekap in ViewBag.ApprovalRekap)
+                                    {
+                                        <tr>
+                                            <td>[@(rekap.EmployeeID)] @rekap.User.FullName</td>
+                                            <td>@rekap.Role</td>
+                                            <td>@rekap.Status</td>
+                                            <td>@(((DateTime)rekap.ModifiedDate).ToString("dd-MMM-yy HH:mm"))</td>
+                                            <td>@rekap.Comments</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mg-t-10 float-right"><i data-feather="save" class="wd-10 mg-l-5"></i> Submit</button>
+
+                }
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Taking Picture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <select id="videoSource" class="tx-center"><option value="" selected="selected"></option></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 tx-center">
+                        <video autoplay="true" width="160" height="120" id="videoElement"> </video><br />
+                        <button id="snapHat">Capture Image </button><br />
+                    </div>
+                    <div class="col-md-6 tx-center">
+                        <canvas id="snapshot" style="max-width:160px !important"></canvas><br />
+                        <p id="demo"></p>
+
+                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/clockpicker/bootstrap-clockpicker.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.header-segment').find('img.hide-prev').each(function () {
+                $(this).parent().prev().hide();
+                $(this).parent().removeClass('col-sm-6');
+                $(this).parent().addClass('col-sm-12');
+            });
+
+            if (@(App.isContainBarcode)) {
+                $('#barcode_next').removeClass('d-none');
+            }
+
+            $('#barcode_next').click(function () {
+                $('table.table-primary').find('.barcode-check').each(function () {
+                    if ($(this).val() != $(this).attr('data-barcode')) {
+                        $(this).val("");
+                        $(this).focus();
+                        return false;
+                    }
+                })
+            })
+
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+            });
+
+            $('.clockpicker').clockpicker();
+
+            $("form").on("change", "input[type='file']", function () {
+                $(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+            });
+
+            $("form").on("click", "input.checkbox-barcode", function (e) {
+                e.preventDefault();
+                $input = $(this).closest('.input-group').find('input').first();
+                if ($input.val() == $input.attr('data-barcode')) {
+                    // do nothing
+                } else {
+                    // reset
+                    $(this).closest('.input-group').find('input.barcode-check').val("");
+                    $(this).closest('.input-group').find('input.barcode-check').focus();
+                }
+
+            });
+
+            $("form").on("change paste keyup", "input.barcode-check", function () {
+                if ($(this).val() == $(this).attr('data-barcode')) {
+                    $(this).siblings('.input-group-append').find('input.checkbox-barcode').prop('checked', true);
+					
+					var $this = $(this);
+					$.ajax({
+						type: "POST",
+						url: "@Url.Action("GetDateTime", "Checklist")",
+						success: function (data) {
+							$this.parent().next().val(data);
+						}
+					});
+
+                    $(this).parent().next().attr("type", "text");
+
+                    $this = $(this);
+                    var flag = 0;
+                    $('table.table-primary').find('.barcode-check').each(function () {
+                        if (flag == 1) {
+                            $(this).focus();
+                            return false;
+                        }
+                        if ($(this).val() == $this.val()) {
+                            this.blur();
+                            flag = 1;
+                        }
+                    })
+                } else {
+                    $(this).siblings('.input-group-append').find('input.checkbox-barcode').prop('checked', false);
+                     $(this).parent().next().val("");
+                    $(this).parent().next().attr("type", "hidden");
+                }
+            });
+
+            var i = 0;
+            var $trs = $('table.table-primary tr');
+            var height = $trs.length;
+
+            for (i = height - 2; i >= 0; i--) {
+                $($($trs[i]).find('td').get().reverse()).each(function () {
+                    var cellIndex = $(this).index();
+                    var $tdUnder = $($trs[i + 1]).children().eq(cellIndex)
+                    if ($tdUnder.length && ($tdUnder.html() != "") && ($tdUnder.children("div").hasClass("delete-me"))) {
+                        var attr = $tdUnder.attr('rowspan');
+                        var rowspan = 2;
+
+                        if (typeof attr !== typeof undefined && attr !== false) {
+                            rowspan = parseInt(attr) + 1;
+                        }
+
+                        $(this).attr('rowspan', rowspan);
+                        $tdUnder.remove();
+
+                    }
+                });
+            }
+
+            $('.select2-user').select2({
+                placeholder: 'Select User',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            $('.select2-reference').select2({
+                placeholder: 'Select Reference Detail',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose Location"></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value=' + i + '>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            var locat_selected;
+            $(document).on("change", ".selection-location", function () {
+                locat_selected = $(this).val();
+
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose Department"></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if (i == locat_selected) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value=' + LocationTree.ProductionCenters[i].Departments[j].LocationID + '>' + LocationTree.ProductionCenters[i].Code + "-" + LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                    }
+                }
+            });
+
+            $(document).on("change", ".selection-department", function () {
+                var department_selected = $(this).val();
+
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose Sub Department"></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if (i == locat_selected) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value=' + LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID + '>' + LocationTree.ProductionCenters[i].Code + "-" + LocationTree.ProductionCenters[i].Departments[j].Code + "-" + LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            $(document).on("keydown", "form", function(event) {
+                return event.key != "Enter";
+            });
+        });
+    </script>
+
+    @if (App.isContainWebcam)
+    {
+        <script src="~/Scripts/webcam_help/main.js"></script>
+        <script src="~/Scripts/webcam_help/MRZ_417_230119.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                $(document).on("click", ".input-webcam", function () {
+                    $("#photo-modal").attr('data-id', $(this).attr('id'));
+                });
+
+                $(document).on("click", "#snapHat", function () {
+                    document.getElementById("demo").innerHTML = "Image captured";
+
+                    canvas.width = 1600;//video.videoWidth; // set its size to the one of the video
+                    canvas.height = 1200;// video.videoHeight;
+                    ctx.drawImage(video, 0, 0, 1600, 1200); // the video
+
+                    var jpegUrl = ctx.canvas.toDataURL("image/jpeg"); // get base64 output - no longer using toBlob
+
+                    state = $(this).closest('#photo-modal').attr('data-id');
+                    renderImage(jpegUrl, state);
+                });
+
+            });
+
+            var imageIndex = 0;
+            var max = 1;
+
+            function renderImage(link, state) {
+                if (link == null || link == "") {
+                    console.log('chanif: cannot extract image from video');
+                }
+                else {
+                    $('#' + state).attr('src', link);
+                    $('#' + state).parent().parent().prev().val(link);
+                }
+            }
+
+            // Video Part
+            var video = document.querySelector("#videoElement");
+            var hdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+            var hhdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+            var vgaConstraints = {
+                video: {
+                    mandatory: {
+                        maxWidth: 160,
+                        maxHeight: 120
+                    }
+                }
+            };
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+            if (navigator.getUserMedia) {
+                document.getElementById("demo").innerHTML = "";
+
+                try {
+                    navigator.getUserMedia(hhdConstraints, handleVideo, videoError);
+                } catch (error) {
+                    navigator.getUserMedia(hdConstraints, handleVideo, videoError);
+                }
+            }
+
+            function handleVideo(stream) {
+                try {
+                    this.srcObject = stream;
+                } catch (error) {
+                    this.src = window.URL.createObjectURL(stream);
+                }
+            }
+
+            function videoError(e) {
+                // do something
+            }
+
+            // Capture Image Part
+            var player = document.getElementById('videoElement');
+            var snapshotCanvas = document.getElementById('snapshot');
+
+            var canvas = document.querySelector('canvas');
+            var ctx = canvas.getContext('2d');
+        </script>
+    }
+}

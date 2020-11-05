@@ -1,0 +1,143 @@
+﻿@using Fast.Web.Resources;
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/dashforge/lib/morris.js/morris.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: inherit;
+        }
+
+        .select2-search--dropdown {
+            display: none;
+        }
+
+        .select2-container--default .select2-results > .select2-results__options {
+            max-height: 400px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report KPI</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1" id="PagiTitle">Report KPI (Key Performance Index)</h4>
+            </div>
+            <div class="d-none d-md-block tx-right">
+                <select class="form-control select2" id="ShowPage">
+                    <optgroup label="Report">
+                        <option value="ReportKPI" selected>Report KPI (Key Performance Index)</option>
+                        <option value="ReportYield">Report Yield</option>
+                        <option value="ReportTRS">Report TRS Rate</option>
+                    </optgroup>
+                    <optgroup label="Master Data">
+                        <option value="DataProdVol">Data Production Volume</option>
+                        <option value="DataDIM">Data DIM</option>
+                        <option value="DataYield">Data Yield</option>
+                        <option value="DataCRR">Data Uptime CRR</option>
+
+                        <option value="DataTarget">Internal and OB Target</option>
+
+                        <option value="DataWorkHour">Work Hour (for Uptime Calculation)</option>
+                        <option value="DataStickPerPack">Stick per Pack (for Uptime Calculation)</option>
+
+                        <option value="DataCRRConversion">CRR Conversion (for Yield Calculation)</option>
+                        <option value="DataTobaccoWeight">Tobacco Weight and MC (for Yield Calculation)</option>
+                        <option value="DataRipperInfo">Ripper Information (for Yield Calculation)</option>
+                        <option value="DataDust">Dust, Winnower and Floor Sweepings (for Yield Calculation)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="df-example demo-table">
+                    <div class="card" id="main_container">
+
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="modalUploadData" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+        <div class="modal-content" id="FormUpload">
+
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script src="~/Content/dashforge/lib/raphael/raphael.min.js"></script>
+    <script src="~/Content/dashforge/lib/morris.js/morris.min.js"></script>
+
+    <script>
+        function modalUploadData(DataType) {
+            $("#FormUpload").load(fastApp.BaseUrl + "/ReportKPI/FormUpload/"+DataType);
+            $("#modalUploadData").modal();
+        };
+
+        $(document).ready(function () {
+            $('#loading_overlay').removeClass('d-none');
+            //defaultnya tampilan report KPI
+            @if (ViewBag.Main == "")
+            {
+                @:$("#main_container").load(fastApp.BaseUrl + "/ReportKPI/ReportKPI", function () {$('#loading_overlay').addClass('d-none');});
+            } else
+            {
+                @:$('#ShowPage').val("@(ViewBag.Main)").trigger("change");
+                @:$("#main_container").load(fastApp.BaseUrl + "/ReportKPI/@(ViewBag.Main)", function () {$('#loading_overlay').addClass('d-none');});
+                @:$('#PagiTitle').text($("#ShowPage option:selected").html());
+            }
+
+
+            $('.select2').select2({
+                placeholder: 'Choose locations',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            $(document).on("change", "#ShowPage", function () {
+                $('#loading_overlay').removeClass('d-none');
+                var data = $(this).select2('data');
+
+                $('#PagiTitle').text(data[0].text);
+                $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/" + data[0].id, function () {$('#loading_overlay').addClass('d-none');});
+            });
+        });
+    </script>
+}

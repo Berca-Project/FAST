@@ -1,0 +1,102 @@
+﻿@model Fast.Web.Models.Report.InputTargetModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+
+
+@using (Html.BeginForm("Create", "ReportInputTarget", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div class="content content-fixed lph-form">
+        <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+            <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                            <li class="breadcrumb-item"><a href="#">Report</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Input Target Data Shiftly Daily</li>
+                        </ol>
+                    </nav>
+                    <h4 class="mg-b-0 tx-spacing--1">Input Data Target</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mg-b-20">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Location</label>
+                                <div class="col-2">
+                                    <select class="form-control select2" data-mock-width="150px" name="location">
+                                        <option label="Select Location"></option>
+                                        <option value="ID" selected>indonesia</option>
+                                    </select>
+                                    @*@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry2" })*@
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Version</label>
+                                <div class="col-2">
+                                    @Html.DropDownListFor(x => x.Version, (IEnumerable<SelectListItem>)ViewBag.VersionList, new { @class = "form-control", @id = "ddlVersion" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Month</label>
+                                <div class="col-2">
+                                    @Html.DropDownListFor(x => x.Month, (IEnumerable<SelectListItem>)ViewBag.MonthList, new { @class = "form-control", @id = "ddlMonth" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Prod. Center</label>
+                                <div class="col-2">
+                                    @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter2" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">KPI</label>
+                                <div class="col-2">
+                                    @Html.DropDownListFor(x => x.KPI, (IEnumerable<SelectListItem>)ViewBag.KPIList, new { @class = "form-control", @id = "ddlKPI" })
+                                </div>
+                            </div>
+                            <br />
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Value</label>
+                                <div class="col-2">
+                                    @Html.TextBoxFor(x => x.Value, new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="modal-footer pd-x-20 pd-y-15">
+                                <button id ="btnCancel" type="button" class="btn btn-white">@UIResources.Cancel</button>
+                                <button type="submit" class="btn btn-primary">@UIResources.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{    
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+          
+        });
+        $("#btnCancel").on("click", function () {
+               window.location.href = fastApp.BaseUrl  + '/ReportInputTarget/Index';
+        });
+    </script>
+        
+}
+
+
+

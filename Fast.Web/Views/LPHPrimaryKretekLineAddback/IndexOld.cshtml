@@ -1,0 +1,2095 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        .tableWrapper {
+            position:relative;
+            overflow: auto;
+            max-height: 150px;
+            transform:translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Kretek Addback
+                        </li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">
+                    LPH Kretek Addback
+                </h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+        <div class="col-12 mg-b-20">
+            <div class="card">
+                <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                <div class="card-body d-flex">
+                    <div class="flex-1">
+                        <div class="form-group row">
+                            <label class="col-3 col-form-label">Date</label>
+                            <div class="col-8">
+                                <input type="text" class="form-control" disabled value="Thu / 05-Sep-19">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider-text divider-vertical"></div>
+                    <div class="flex-1">
+                        <div class="form-group row">
+                            <label class="col-3 col-form-label">Shift</label>
+                            <div class="col-3">
+                                <input type="text" class="form-control" disabled value="3">
+                            </div>
+                            <label class="col-3 col-form-label tx-right">Week</label>
+                            <div class="col-3">
+                                <input type="text" class="form-control" disabled value="22">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider-text divider-vertical"></div>
+                    <div class="flex-1">
+                        <div class="form-group row">
+                            <label class="col-4 col-form-label">Prodtech</label>
+                            <div class="col-8">
+                                <input type="text" class="form-control" disabled value="Dimastya Subekti">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider-text divider-vertical"></div>
+                    <div class="flex-1">
+                        <div class="form-group row">
+                            <label class="col-4 col-form-label">Supervisor</label>
+                            <div class="col-8">
+                                <input type="text" class="form-control" disabled value="Andi">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!--INFORMATION-->
+        <div class="col-12 mg-b-20">
+            <div class="card">
+                <div class="card-header bg-primary tx-white tx-center font-weight-bold">Addback</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3 mg-b-20">
+                            <div class="row">
+                                <div class="col-12 mg-b-20">
+                                    <div class="form-group row">
+                                        <label class="col-6 col-form-label">Batch No.</label>
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" value="839102403">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-6 col-form-label" style="padding-right:0px"></label>
+                                        <div class="col-6">
+                                            <button class="btn btn-sm mg-b-10 btn-primary" id="get-pss-data" style="padding: 0.391rem 0.5rem;">Get PSS Data</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 mg-b-20">
+                                    <div class="form-group row">
+                                        <label class="col-6 col-form-label" style="padding-right:0px"></label>
+                                        <div class="col-6">
+                                            <button class="btn btn-sm btn-primary" id="add-to-table" onclick="javascript:addRow(this)" data-target="addback" style="padding: 0.391rem 0.5rem;">Add To Table</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 mg-b-20">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Blend</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" id="blend">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">SAP Batch</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" id="sapBatch">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Start/Stop</label>
+                                <div class="input-group col-3">
+                                    <input type="text" class="form-control" id="start">
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="input-group col-3">
+                                    <input type="text" class="form-control" id="stop">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">SILO Asal</label>
+                                <div class="col-7">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="siloAsal">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">SILO Tujuan</label>
+                                <div class="col-7">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="siloTujuan">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-3 mg-b-20">
+
+                            <div class="col-12 mg-b-20">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Master</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Total Wet</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="totalWet1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Total Dry</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="totalDry1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">OV</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="ov1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Flow Avg</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="flowAvg1">
+                                    </div>
+                                </div>
+                            </div> <!-- MASTER -->
+                        </div>
+
+                        <div class="col-3 mg-b-20">
+
+                            <div class="col-12 mg-b-20">
+                                <div class="form-group row">
+                                    <label class="col-12 col-form-label"><b>Weigher Totalizer</b></label>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Flowrate Avg</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="wtFlowrate">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">MC</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="wtMC">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">SD MC</label>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="wtSDMC">
+                                    </div>
+                                </div>
+                            </div> <!-- Weigher Totalizer -->
+                        </div>
+
+                        <div class="col-6 mg-b-20">
+                            <label class="col-12 col-form-label tx-bold">Flavour Application</label>
+
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Tot Qty</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                        @*<tr class="summary-body">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>180 Min</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>*@
+                                    </thead>
+                                    <tbody id="Flavour-Application">
+                                        @*<tr>
+                                            <td>751.97</td>
+                                            <td>879103002</td>
+                                            <td>113.60</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="Flavour-Application" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control numOnly" id="fa1"></td>
+                                            <td><input type="text" class="form-control numOnly" id="fa2"></td>
+                                            <td><input type="text" class="form-control numOnly" id="fa3"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="Flavour-Application" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- Flavour-Application -->
+
+                        <div class="col-6 mg-b-20">
+
+                            <label class="col-12 col-form-label tx-bold">Clove</label>
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC Clove</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                        @*<tr class="summary-body">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>180 Min</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>*@
+                                    </thead>
+                                    <tbody id="Clove">
+                                        @*<tr>
+                                            <td>3062.64</td>
+                                            <td>839192801</td>
+                                            <td>3704.00</td>
+                                            <td>11.84</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="Clove" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="clove1"></td>
+                                            <td><input type="text" class="form-control" id="clove2"></td>
+                                            <td><input type="text" class="form-control" id="clove3"></td>
+                                            <td><input type="text" class="form-control" id="clove4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="Clove" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- Clove -->
+
+                        <div class="col-6 mg-b-20">
+
+                            <label class="col-12 col-form-label tx-bold">CSF</label>
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC CSF</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                        @*<tr class="summary-body">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>180 Min</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>*@
+                                    </thead>
+                                    <tbody id="CSF">
+                                        @*<tr>
+                                            <td>637.55</td>
+                                            <td>839102804</td>
+                                            <td>772.00</td>
+                                            <td>12.54</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="CSF" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="csf1"></td>
+                                            <td><input type="text" class="form-control" id="csf2"></td>
+                                            <td><input type="text" class="form-control" id="csf3"></td>
+                                            <td><input type="text" class="form-control" id="csf4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="CSF" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- CSF -->
+
+
+                        <div class="col-6 mg-b-20">
+
+                            <label class="col-12 col-form-label tx-bold">Diet/Small Lamina</label>
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC Diet/SL</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                        @*<tr class="summary-body">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>180 Min</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>*@
+                                    </thead>
+                                    <tbody id="DSL">
+                                        @*<tr>
+                                            <td>774.28</td>
+                                            <td>119072207</td>
+                                            <td>925.00</td>
+                                            <td>11.60</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="DSL" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="dsl1"></td>
+                                            <td><input type="text" class="form-control" id="dsl2"></td>
+                                            <td><input type="text" class="form-control" id="dsl3"></td>
+                                            <td><input type="text" class="form-control" id="dsl4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="DSL" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- DSL -->
+
+
+                        <div class="col-6 mg-b-20">
+                            <label class="col-12 col-form-label tx-bold">Ripper Short</label>
+
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC RS</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="RS">
+                                        @*<tr>
+                                            <td>667.92</td>
+                                            <td>D0A1TRS</td>
+                                            <td>740.00</td>
+                                            <td>10.74</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="RS" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="rs1"></td>
+                                            <td><input type="text" class="form-control" id="rs2"></td>
+                                            <td><input type="text" class="form-control" id="rs3"></td>
+                                            <td><input type="text" class="form-control" id="rs4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="RS" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- RS -->
+
+
+                        <div class="col-6 mg-b-20">
+                            <label class="col-12 col-form-label tx-bold">CRES</label>
+
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC CRES</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="CRES">
+                                        @*<tr>
+                                            <td>1129.26</td>
+                                            <td>829102404</td>
+                                            <td>1577.00</td>
+                                            <td>13.19</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="CRES" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="cres1"></td>
+                                            <td><input type="text" class="form-control" id="cres2"></td>
+                                            <td><input type="text" class="form-control" id="cres3"></td>
+                                            <td><input type="text" class="form-control" id="cres4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="CRES" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- CRES -->
+
+
+
+                        <div class="col-6 mg-b-20">
+
+                            <label class="col-12 col-form-label tx-bold">RTC</label>
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC RTC</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="RTC">
+                                        @*<tr>
+                                            <td>728.68</td>
+                                            <td>889102101</td>
+                                            <td>878.00</td>
+                                            <td>14.71</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="RTC" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="rtc1"></td>
+                                            <td><input type="text" class="form-control" id="rtc2"></td>
+                                            <td><input type="text" class="form-control" id="rtc3"></td>
+                                            <td><input type="text" class="form-control" id="rtc4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="RTC" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- RTC -->
+                        <div class="col-6 mg-b-20">
+                            <label class="col-12 col-form-label tx-bold">Out of Spec</label>
+
+                            <div class="tableWrapper" style="max-height: 210px">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Flowrate Avg</th>
+                                            <th>Batch No</th>
+                                            <th>Totalizer</th>
+                                            <th>MC RS</th>
+                                            <th style="min-width:70px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="OoS">
+                                        @*<tr>
+                                            <td>3062.64</td>
+                                            <td>839192801</td>
+                                            <td>3704.00</td>
+                                            <td>11.84</td>
+                                            <td class="tx-center">
+                                                <div class="btn-group">
+                                                    <i onclick="javascript:toEdit(this)" data-target="OoS" class="fa fa-edit"></i>
+                                                    <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                                </div>
+                                            </td>
+                                        </tr>*@
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" id="oos1"></td>
+                                            <td><input type="text" class="form-control" id="oos2"></td>
+                                            <td><input type="text" class="form-control" id="oos3"></td>
+                                            <td><input type="text" class="form-control" id="oos4"></td>
+                                            <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="OoS" class="fa fa-plus-circle"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+
+                        </div><!-- OoS -->
+
+
+                    </div>
+
+                    <br />
+                    <div class="tableWrapper" style="max-height:310px;">
+                        <table class="table table-bordered table-hover table-striped ">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th rowspan="2" style="min-width: 100px;">Batch No</th>
+                                    <th rowspan="2">Blend</th>
+                                    <th rowspan="2" style="min-width: 100px;">SAP Batch</th>
+                                    <th rowspan="2" style="min-width: 120px;">Silo Asal</th>
+                                    <th rowspan="2" style="min-width: 120px;">Silo Tujuan</th>
+                                    <th rowspan="2">Start</th>
+                                    <th rowspan="2">Stop</th>
+                                    <th rowspan="2" style="min-width: 100px;">Duration</th>
+
+                                    <th colspan="4" class="tx-center">Master</th>
+                                    <th colspan="3" class="tx-center">Weight Totalizer</th>
+                                    <th colspan="3" class="tx-center">Flavour Application</th>
+
+                                    <th colspan="4" class="tx-center">Clove</th>
+                                    <th colspan="4" class="tx-center">CSF</th>
+                                    <th colspan="4" class="tx-center">Diet/Small Lamina</th>
+                                    <th colspan="4" class="tx-center">Ripper Short</th>
+                                    <th colspan="4" class="tx-center">CRES</th>
+                                    <th colspan="4" class="tx-center">RTC</th>
+                                    <th colspan="4" class="tx-center">Out of Spec</th>
+
+                                    <th rowspan="2" style="min-width: 70px;">Action</th>
+                                </tr>
+                                <tr>
+                                    <th style="min-width: 110px;">Total Wet</th>
+                                    <th style="min-width: 110px;">Total Dry</th>
+                                    <th style="min-width: 110px;">OV</th>
+                                    <th style="min-width: 110px;">Flow Avg</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">MC</th>
+                                    <th style="min-width: 110px;">SD MC</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Tot Qty</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC Clove</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC CSF</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC Diet/SL</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC RS</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC CRES</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC RTC</th>
+
+                                    <th style="min-width: 110px;">Flowrate Avg</th>
+                                    <th style="min-width: 110px;">Batch No</th>
+                                    <th style="min-width: 110px;">Totalizer</th>
+                                    <th style="min-width: 110px;">MC RS</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="addback">
+                                <tr>
+                                    <td rowspan="3">819102306</td>
+                                    <td rowspan="3">D0A1T</td>
+                                    <td rowspan="3">1325528</td>
+                                    <td rowspan="3">300025</td>
+                                    <td rowspan="3">700010</td>
+                                    <td rowspan="3">06:36</td>
+                                    <td rowspan="3">07:51</td>
+                                    <td rowspan="3">75</td>
+                                    <td rowspan="3">8804.00</td>
+                                    <td rowspan="3">7632.44</td>
+                                    <td rowspan="3">8694.31</td>
+                                    <td rowspan="3">13.36</td>
+
+                                    <td rowspan="3">15336.84</td>
+                                    <td rowspan="3">13.12</td>
+                                    <td rowspan="3">0.27</td>
+
+                                    <td>715.97</td>
+                                    <td>8791030002</td>
+                                    <td>113.60</td>
+
+                                    <td>3062.64</td>
+                                    <td>839102801</td>
+                                    <td>3704.00</td>
+                                    <td>11.84</td>
+
+                                    <td>637.55</td>
+                                    <td>839102804</td>
+                                    <td>772.00</td>
+                                    <td>12.54</td>
+
+                                    <td>774.28</td>
+                                    <td>119072207</td>
+                                    <td>925.00</td>
+                                    <td>11.60</td>
+
+                                    <td>667.92</td>
+                                    <td>D0A1TRS</td>
+                                    <td>740.00</td>
+                                    <td>10.74</td>
+
+                                    <td>1129.26</td>
+                                    <td>829102404</td>
+                                    <td>1577.00</td>
+                                    <td>13.19</td>
+
+                                    <td>728.68</td>
+                                    <td>889102101</td>
+                                    <td>878.00</td>
+                                    <td>14.71</td>
+
+                                    <td>3062.64</td>
+                                    <td>839192801</td>
+                                    <td>3704.00</td>
+                                    <td>11.84</td>
+
+                                    <td rowspan="3" class="tx-center">
+                                        <div class="btn-group">
+                                            <i onclick="javascript:toEdit(this)" data-target="addback" class="fa fa-edit"></i>
+                                            <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>715.97</td>
+                                    <td>8791030002</td>
+                                    <td>113.60</td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td>637.55</td>
+                                    <td>839102804</td>
+                                    <td>772.00</td>
+                                    <td>12.54</td>
+
+                                    <td>774.28</td>
+                                    <td>119072207</td>
+                                    <td>925.00</td>
+                                    <td>11.60</td>
+
+                                    <td>667.92</td>
+                                    <td>D0A1TRS</td>
+                                    <td>740.00</td>
+                                    <td>10.74</td>
+
+                                    <td>1129.26</td>
+                                    <td>829102404</td>
+                                    <td>1577.00</td>
+                                    <td>13.19</td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td>3062.64</td>
+                                    <td>839192801</td>
+                                    <td>3704.00</td>
+                                    <td>11.84</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td>774.28</td>
+                                    <td>119072207</td>
+                                    <td>925.00</td>
+                                    <td>11.60</td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+
+                                    <td>3062.64</td>
+                                    <td>839192801</td>
+                                    <td>3704.00</td>
+                                    <td>11.84</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <div class="col-12 mg-b-20">
+            <div class="card">
+                <div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+                <div class="card-body" style="padding:10px">
+                    <div class="row" style="margin:0">
+                        <div class="col-2" style="padding: 0 10px 0 0">
+                            <table class="table table-bordered table-hover table-striped" style="min-height:150px;">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th class="tx-center"><label class="tx-center" style="margin:0px;"> Weight</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="row form-group" style="margin-left: 0; margin-right: 0">
+                                                <div class="col-12 tx-center" style="margin-right:0px;">
+                                                    <label class="tx-center font-weight-bold" style="font-size:32px;margin-right:0px;">19.55 Kg</label>
+                                                </div>
+                                            </div>
+                                            <div class="row form-group">
+                                                <div class="col-3 tx-center">
+                                                    <label class="tx-center">&nbsp;</label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <button type="button" class="phase-show btn btn-lg btn-primary " style="width:100%;padding-right:5px;padding-left:5px" data-toggle="modal" data-target="#phase-waste-modal">Add</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tableWrapper col-10">
+                            <table class="table table-bordered table-hover table-striped ">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Waste</th>
+                                        <th>Waste Type</th>
+                                        <th>Weight</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td>35</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="waste">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- WASTE -->
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Downtime</th>
+                                        <th>Problem</th>
+                                        <th>Description</th>
+                                        <th style="max-width:60px;">Start</th>
+                                        <th style="max-width:60px;">End</th>
+                                        <th style="max-width:80px;">Duration</th>
+                                        <th>PIC</th>
+                                        <th>Status</th>
+                                        <th style="min-width:100px;">Action Plan</th>
+                                        <th style="min-width:70px;"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>180 Min</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="machine-problem">
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>301 Minor Stop</td>
+                                        <td>Bobbin Putus</td>
+                                        <td>Mesin AUS</td>
+                                        <td>12:00</td>
+                                        <td>13:00</td>
+                                        <td>60 Min</td>
+                                        <td>Hengki</td>
+                                        <td>Done</td>
+                                        <td>CBM</td>
+                                        <td class="tx-center">
+                                            <div class="btn-group">
+                                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">301 Minor Stop</option>
+                                                <option value="302">302 Proces Adjustment</option>
+                                                <option value="401">401 Breakdown</option>
+                                                <option value="501">501 Distruption of Material Flow</option>
+                                                <option value="601">601 Cleaning</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="1">Done</option>
+                                                <option value="2">On Progres</option>
+                                                <option value="3">Pending</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2">
+                                                <option label="Choose one"></option>
+                                                <option value="301">SLAC</option>
+                                                <option value="302">CBM</option>
+                                                <option value="303">PM</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem" class="fa fa-plus-circle"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bagas</td>
+                                    <td>Requester</td>
+                                    <td>Submit to Supervisor</td>
+                                    <td>05-Sep-19 13:15</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagus</td>
+                                    <td>Supervisor</td>
+                                    <td>Confirmed</td>
+                                    <td>05-Sep-19 13:25</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!--APPROVAL SEGMENT-->
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+<div class="modal fade wizard-modal" id="phase-waste-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Waste</h5>
+                            <hr />
+                            <center class="kind">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-white prev" style="float:left;display:none;">Prev</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>$(function () {
+
+            $('.select2').click({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+        })</script>
+    <script>
+const machineProblemRow = `<td>301 Minor Stop</td><td>Bobbin Putus</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+        const machineProblemEditRow = `<td><select class="form-control select2"><option label="Choose one"></option><option value="301">301 Minor Stop</option><option value="302">302 Proces Adjustment</option><option value="401">401 Breakdown</option><option value="501">501 Distruption of Material Flow</option><option value="601">601 Cleaning</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem" class="fa fa-trash"></i></td>`;
+        const addbackRow = `
+<td rowspan="3">819102306</td>
+<td rowspan="3">D0A1T</td>
+<td rowspan="3">1325528</td>
+<td rowspan="3">300025</td>
+<td rowspan="3">700010</td>
+<td rowspan="3">06:36</td>
+<td rowspan="3">07:51</td>
+<td rowspan="3">75</td>
+<td rowspan="3">8804.00</td>
+<td rowspan="3">7632.44</td>
+<td rowspan="3">8694.31</td>
+<td rowspan="3">13.36</td>
+
+<td rowspan="3">15336.84</td>
+<td rowspan="3">13.12</td>
+<td rowspan="3">0.27</td>
+
+<td>715.97</td>
+<td>8791030002</td>
+<td>113.60</td>
+
+<td>3062.64</td>
+<td>839102801</td>
+<td>3704.00</td>
+<td>11.84</td>
+
+<td>637.55</td>
+<td>839102804</td>
+<td>772.00</td>
+<td>12.54</td>
+
+<td>774.28</td>
+<td>119072207</td>
+<td>925.00</td>
+<td>11.60</td>
+
+<td>667.92</td>
+<td>D0A1TRS</td>
+<td>740.00</td>
+<td>10.74</td>
+
+<td>1129.26</td>
+<td>829102404</td>
+<td>1577.00</td>
+<td>13.19</td>
+
+<td>728.68</td>
+<td>889102101</td>
+<td>878.00</td>
+<td>14.71</td>
+
+<td>3062.64</td>
+<td>839192801</td>
+<td>3704.00</td>
+<td>11.84</td>
+
+<td rowspan="3" class="tx-center">
+<div class="btn-group">
+<i onclick="javascript:toEdit(this)" data-target="addback" class="fa fa-edit"></i>
+<i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+</div>
+</td>
+</tr>
+<tr>
+<td>715.97</td>
+<td>8791030002</td>
+<td>113.60</td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td>637.55</td>
+<td>839102804</td>
+<td>772.00</td>
+<td>12.54</td>
+
+<td>774.28</td>
+<td>119072207</td>
+<td>925.00</td>
+<td>11.60</td>
+
+<td>667.92</td>
+<td>D0A1TRS</td>
+<td>740.00</td>
+<td>10.74</td>
+
+<td>1129.26</td>
+<td>829102404</td>
+<td>1577.00</td>
+<td>13.19</td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td>3062.64</td>
+<td>839192801</td>
+<td>3704.00</td>
+<td>11.84</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td>774.28</td>
+<td>119072207</td>
+<td>925.00</td>
+<td>11.60</td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
+<td>3062.64</td>
+<td>839192801</td>
+<td>3704.00</td>
+<td>11.84</td>`;
+
+        const flavourApplicationEditRow = `
+        <td><input type="text" class="form-control" value="751.97"></td>
+        <td><input type="text" class="form-control" value="879103002"></td>
+        <td><input type="text" class="form-control" value="113.60"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="Flavour-Application" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const cloveEditRow = `
+        <td><input type="text" class="form-control" value="3062.64"></td>
+        <td><input type="text" class="form-control" value="839192801"></td>
+        <td><input type="text" class="form-control" value="3704.00"></td>
+        <td><input type="text" class="form-control" value="11.84"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="Clove" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const csfEditRow = `
+        <td><input type="text" class="form-control" value="637.55"></td>
+        <td><input type="text" class="form-control" value="839102804"></td>
+        <td><input type="text" class="form-control" value="772.00"></td>
+        <td><input type="text" class="form-control" value="12.54"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="CSF" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const dslEditRow = `
+        <td><input type="text" class="form-control" value="774.28"></td>
+        <td><input type="text" class="form-control" value="119072207"></td>
+        <td><input type="text" class="form-control" value="925.00"></td>
+        <td><input type="text" class="form-control" value="11.60"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="DSL" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const rsEditRow = `
+        <td><input type="text" class="form-control" value="667.92"></td>
+        <td><input type="text" class="form-control" value="D0A1TRS"></td>
+        <td><input type="text" class="form-control" value="740.00"></td>
+        <td><input type="text" class="form-control" value="10.74"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="RS" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const cresEditRow = `
+        <td><input type="text" class="form-control" value="1129.26"></td>
+        <td><input type="text" class="form-control" value="829102404"></td>
+        <td><input type="text" class="form-control" value="1577.00"></td>
+        <td><input type="text" class="form-control" value="13.19"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="CRES" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const rtcEditRow = `
+        <td><input type="text" class="form-control" value="728.68"></td>
+        <td><input type="text" class="form-control" value="889102101"></td>
+        <td><input type="text" class="form-control" value="878.00"></td>
+        <td><input type="text" class="form-control" value="14.71"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="RTC" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+
+
+        const oosEditRow = `
+        <td><input type="text" class="form-control" value="3062.64"></td>
+        <td><input type="text" class="form-control" value="839192801"></td>
+        <td><input type="text" class="form-control" value="3704.00"></td>
+        <td><input type="text" class="form-control" value="11.84"></td>
+        <td class="tx-center">
+            <div class="btn-group">
+                <i data-target="OoS" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+            </div>
+        </td>
+        `;
+        function toEdit(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $(button).parents("tr").html(machineProblemEditRow);
+                    break;
+                case "addback":
+                    $('#get-pss-data').click();
+                    $('#add-to-table').attr("onclick","toNormal(this)");
+                    $('#add-to-table').text("Save");
+                    break;
+                case "Flavour-Application":
+                    $(button).parents("tr").html(flavourApplicationEditRow);
+                    break;
+                case "Clove":
+                    $(button).parents("tr").html(cloveEditRow);
+                    break;
+                case "CSF":
+                    $(button).parents("tr").html(csfEditRow);
+                    break;
+                case "DSL":
+                    $(button).parents("tr").html(dslEditRow);
+                    break;
+                case "RS":
+                    $(button).parents("tr").html(rsEditRow);
+                    break;
+                case "CRES":
+                    $(button).parents("tr").html(cresEditRow);
+                    break;
+                case "RTC":
+                    $(button).parents("tr").html(rtcEditRow);
+                    break;
+                case "OoS":
+                    $(button).parents("tr").html(oosEditRow);
+                    break;
+            }
+            ieFix();
+        }
+        function toNormal(button) {
+            if (confirm("Are you sure?")) {
+                const target = $(button).data("target");
+                switch (target) {
+                    case "machine-problem":
+                        $(button).parents("tr").html(machineProblemRow);
+                        break;
+                    case "addback":
+                        $('#add-to-table').attr("onclick","addRow(this)");
+                        $('#add-to-table').text("Add To Table");
+                        for (var prop in pssData) {
+                            if (Object.prototype.hasOwnProperty.call(pssData, prop)) {
+                                $("#" + prop).val("");
+                            }
+                        }
+                        $("#Flavour-Application").html("");
+                        $("#Clove").html("");
+                        $("#CSF").html("");
+                        $("#DSL").html("");
+                        $("#RS").html("");
+                        $("#CRES").html("");
+                        $("#RTC").html("");
+                        $("#OoS").html("");
+                        break;
+                    case "Flavour-Application":
+                        $(button).parents("tr").html(generateRow(FlavourNewData, target));
+                        break;
+                    case "Clove":
+                        $(button).parents("tr").html(generateRow(CloveNewData, target));
+                        break;
+                    case "CSF":
+                        $(button).parents("tr").html(generateRow(CSFNewData, target));
+                        break;
+                    case "DSL":
+                        $(button).parents("tr").html(generateRow(DSLNewData, target));
+                        break;
+                    case "RS":
+                        $(button).parents("tr").html(generateRow(RSNewData, target));
+                        break;
+                    case "CRES":
+                        $(button).parents("tr").html(generateRow(CRESNewData, target));
+                        break;
+                    case "RTC":
+                        $(button).parents("tr").html(generateRow(RTCNewData, target));
+                        break;
+                    case "OoS":
+                        $(button).parents("tr").html(generateRow(OoSNewData, target));
+                        break;
+                }
+                ieFix();
+            }
+        }
+
+        var FlavourNewData = {
+            fAvg : "751.97",
+            BatchNo : "879103002",
+            TotQty : "113.60",
+        };
+        var CloveNewData = {
+            fAvg : '3062.64',
+            BatchNo : '839192801',
+            TotQty : '3704.00',
+            MC : '11.84'
+        };
+        var CSFNewData = {
+            fAvg : '637.55',
+            BatchNo : '839102804',
+            TotQty : '772.00',
+            MC : '12.54'
+        };
+        var DSLNewData = {
+            fAvg : '774.28',
+            BatchNo : '119072207',
+            TotQty : '925.00',
+            MC : '11.60'
+        };
+        var RSNewData = {
+            fAvg : '667.92',
+            BatchNo : 'D0A1TRS',
+            TotQty : '740.00',
+            MC : '10.74'
+        };
+        var CRESNewData = {
+            fAvg : '1129.26',
+            BatchNo : '829102404',
+            TotQty : '1577.00',
+            MC : '13.19'
+        };
+        var RTCNewData = {
+            fAvg : '728.68',
+            BatchNo : '889102101',
+            TotQty : '878.00',
+            MC : '14.71'
+        };
+        var OoSNewData = {
+            fAvg : '3062.64',
+            BatchNo : '839192801',
+            TotQty : '3704.00',
+            MC : '11.84'
+        };
+        function addRow(button) {
+            const target = $(button).data("target");
+            switch (target) {
+                case "machine-problem":
+                    $("#" + target).append($(`<tr>${machineProblemRow}</tr>`));
+                    break;
+                case "addback":
+                    $("#" + target).append($(`<tr>${addbackRow}</tr>`));
+                    for (var prop in pssData) {
+                        if (Object.prototype.hasOwnProperty.call(pssData, prop)) {
+                            $("#" + prop).val("");
+                        }
+                    }
+                    $("#Flavour-Application").html("");
+                    $("#Clove").html("");
+                    $("#CSF").html("");
+                    $("#DSL").html("");
+                    $("#RS").html("");
+                    $("#CRES").html("");
+                    $("#RTC").html("");
+                    $("#OoS").html("");
+                    break;
+                case "Flavour-Application":
+                    //if ($("#fa1").val().trim().length != 0 && $("#fa2").val().trim().length != 0 && $("#fa3").val().trim().length != 0) {
+                        FlavourNewData.fAvg = '751.97';//$("#fa1").val();
+                        FlavourNewData.BatchNo = '879103002';//$("#fa2").val();
+                        FlavourNewData.TotQty = '113.60';//$("#fa3").val();
+                        $("#" + target).append($(`<tr>${generateRow(FlavourNewData, target)}</tr>`));
+                        document.getElementById("fa1").value = '';
+                        document.getElementById("fa2").value = '';
+                        document.getElementById("fa3").value = '';
+                    @*} else {
+                        alert('Semua harus di isi');
+                    }*@
+                    break;
+                case "Clove":
+                    CloveNewData.fAvg = '3062.64';//$("#clove1").val();
+                    CloveNewData.BatchNo = '839192801';//$("#clove2").val();
+                    CloveNewData.TotQty = '3704.00';//$("#clove3").val();
+                    CloveNewData.MC = '11.84';//$("#clove4").val();
+                    $("#" + target).append($(`<tr>${generateRow(CloveNewData, target)}</tr>`));
+                    document.getElementById("clove1").value = '';
+                    document.getElementById("clove2").value = '';
+                    document.getElementById("clove3").value = '';
+                    document.getElementById("clove4").value = '';
+                    break;
+                case "CSF":
+                    CSFNewData.fAvg = '637.55';//$("#csf1").val();
+                    CSFNewData.BatchNo = '839102804';//$("#csf2").val();
+                    CSFNewData.TotQty = '772.00';//$("#csf3").val();
+                    CSFNewData.MC = '12.54';//$("#csf4").val();
+                    $("#" + target).append($(`<tr>${generateRow(CSFNewData, target)}</tr>`));
+                    document.getElementById("csf1").value = '';
+                    document.getElementById("csf2").value = '';
+                    document.getElementById("csf3").value = '';
+                    document.getElementById("csf4").value = '';
+                    break;
+                case "DSL":
+                    DSLNewData.fAvg = '774.28';//$("#dsl1").val();
+                    DSLNewData.BatchNo = '119072207';//$("#dsl2").val();
+                    DSLNewData.TotQty = '925.00';//$("#dsl3").val();
+                    DSLNewData.MC = '11.60';//$("#dsl4").val();
+                    $("#" + target).append($(`<tr>${generateRow(DSLNewData, target)}</tr>`));
+                    document.getElementById("dsl1").value = '';
+                    document.getElementById("dsl2").value = '';
+                    document.getElementById("dsl3").value = '';
+                    document.getElementById("dsl4").value = '';
+                    break;
+                case "RS":
+                    RSNewData.fAvg = '667.92';//$("#rs1").val();
+                    RSNewData.BatchNo = 'D0A1TRS';//$("#rs2").val();
+                    RSNewData.TotQty = '740.00';//$("#rs3").val();
+                    RSNewData.MC = '10.74';//$("#rs4").val();
+                    $("#" + target).append($(`<tr>${generateRow(RSNewData, target)}</tr>`));
+                    document.getElementById("rs1").value = '';
+                    document.getElementById("rs2").value = '';
+                    document.getElementById("rs3").value = '';
+                    document.getElementById("rs4").value = '';
+                    break;
+                case "CRES":
+                    CRESNewData.fAvg = '1129.26';//$("#cres1").val();
+                    CRESNewData.BatchNo = '829102404';//$("#cres2").val();
+                    CRESNewData.TotQty = '1577.00';//$("#cres3").val();
+                    CRESNewData.MC = '13.19';//$("#cres4").val();
+                    $("#" + target).append($(`<tr>${generateRow(CRESNewData, target)}</tr>`));
+                    document.getElementById("cres1").value = '';
+                    document.getElementById("cres2").value = '';
+                    document.getElementById("cres3").value = '';
+                    document.getElementById("cres4").value = '';
+                    break;
+
+                case "RTC":
+                    RTCNewData.fAvg = '728.68';//$("#rtc1").val();
+                    RTCNewData.BatchNo = '889102101';//$("#rtc2").val();
+                    RTCNewData.TotQty = '878.00';//$("#rtc3").val();
+                    RTCNewData.MC = '14.71';//$("#rtc4").val();
+                    $("#" + target).append($(`<tr>${generateRow(RTCNewData, target)}</tr>`));
+                    document.getElementById("rtc1").value = '';
+                    document.getElementById("rtc2").value = '';
+                    document.getElementById("rtc3").value = '';
+                    document.getElementById("rtc4").value = '';
+                    break;
+
+                case "OoS":
+                    OoSNewData.fAvg = '3062.64';//$("#oos1").val();
+                    OoSNewData.BatchNo = '839192801';//$("#oos2").val();
+                    OoSNewData.TotQty = '3704.00';//$("#oos3").val();
+                    OoSNewData.MC = '11.84';//$("#oos4").val();
+                    $("#" + target).append($(`<tr>${generateRow(OoSNewData, target)}</tr>`));
+                    document.getElementById("oos1").value = '';
+                    document.getElementById("oos2").value = '';
+                    document.getElementById("oos3").value = '';
+                    document.getElementById("oos4").value = '';
+                    break;
+            }
+            ieFix();
+        }
+        function removeRow(button) {
+            if (confirm("Are you sure?")) {
+                const target = $(button).siblings(".fa").data("target");
+                if(target == "addback"){
+                    const rs = $(button).parents("td").attr("rowspan") - 1;
+                    $(button).parents("tr").nextAll(`*:lt(${rs})`).remove();
+                } 
+                $(button).parents("tr").remove();
+                ieFix();
+            }
+        }
+        function ieFix() {
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").each(function () {
+                    $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+                    $(this).find("table").css({ "margin-bottom": "32px" });
+                    $(this).css({ "overflow-y":"scroll" });
+                    const ths = $(this).find("thead tr:first-child th");
+                    $(this).find("tfoot td").each(function (i) {
+                        console.log($($(ths)[i]).width() + 20);
+                        $(this).css({ "min-width":$($(ths)[i]).width()+20, "position": "static" });
+                    });
+                });
+            }
+        }
+        const pssData = {
+            blend: "D0A1T",
+            sapBatch: "1325528",
+            start: "06:30",
+            stop: "07:51",
+            duration: "75 Min",
+            siloAsal: "300025",
+            siloTujuan: "700010",
+
+            totalWet1: "8804.00",
+            totalDry1: "7632.44",
+            ov1: "8694.31",
+            flowAvg1: "13.36",
+
+            wtFlowrate: "15336.84",
+            wtMC: "13.12",
+            wtSDMC: "0.27",
+
+        };
+        $(document).ready(function () {
+            //$('.numOnly').each(function () {
+            //    console.log("panggil");
+
+            //});
+
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $('#get-pss-data').click(function () {
+                for (var prop in pssData) {
+                    if (Object.prototype.hasOwnProperty.call(pssData, prop)) {
+                        $("#" + prop).val(pssData[prop]);
+                    }
+                }
+
+
+                $("#Flavour-Application").html("");
+                $("#Flavour-Application").append($(`<tr>${generateRow(FlavourNewData, 'Flavour-Application')}</tr>`));
+                $("#Flavour-Application").append($(`<tr>${generateRow(FlavourNewData, 'Flavour-Application')}</tr>`));
+
+                $("#Clove").html("");
+                $("#Clove").append($(`<tr>${generateRow(CloveNewData, 'Clove')}</tr>`));
+
+                $("#CSF").html("");
+                $("#CSF").append($(`<tr>${generateRow(CSFNewData, 'CSF')}</tr>`));
+                $("#CSF").append($(`<tr>${generateRow(CSFNewData, 'CSF')}</tr>`));
+
+                $("#DSL").html("");
+                $("#DSL").append($(`<tr>${generateRow(DSLNewData, 'DSL')}</tr>`));
+                $("#DSL").append($(`<tr>${generateRow(DSLNewData, 'DSL')}</tr>`));
+                $("#DSL").append($(`<tr>${generateRow(DSLNewData, 'DSL')}</tr>`));
+
+                $("#RS").html("");
+                $("#RS").append($(`<tr>${generateRow(RSNewData, 'RS')}</tr>`));
+                $("#RS").append($(`<tr>${generateRow(RSNewData, 'RS')}</tr>`));
+
+                $("#CRES").html("");
+                $("#CRES").append($(`<tr>${generateRow(CRESNewData, 'CRES')}</tr>`));
+                $("#CRES").append($(`<tr>${generateRow(CRESNewData, 'CRES')}</tr>`));
+
+                $("#RTC").html("");
+                $("#RTC").append($(`<tr>${generateRow(RTCNewData, 'RTC')}</tr>`));
+
+                $("#OoS").html("");
+                $("#OoS").append($(`<tr>${generateRow(OoSNewData, 'OoS')}</tr>`));
+                $("#OoS").append($(`<tr>${generateRow(OoSNewData, 'OoS')}</tr>`));
+                $("#OoS").append($(`<tr>${generateRow(OoSNewData, 'OoS')}</tr>`));
+            });
+        });</script>
+    <script>function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        const buttonDelete = ``;
+        function generateRow(data, targetTable) {
+            let r = "";
+            for (var prop in data) {
+                if (Object.prototype.hasOwnProperty.call(data, prop)) {
+                    if (prop == "id") continue;
+                    r += `<td data-name="${prop}">${data[prop]}</td>`;
+                }
+            }
+            r += `<td class="tx-center">`;
+            if (targetTable == 'waste') {
+                r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+                r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            } else {
+                r += `<i onclick="javascript:toEdit(this)" data-id="${data.id}" data-target="${targetTable}" class="fa fa-edit edit"></i>`;
+                r += `<span onClick="javascript:removeRow(this)" data-id="${data.id}" data-target="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            }
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                var tableBody = "";
+                switch (targetTable) {
+                    case "#waste":
+                        crrData = deleteFromArray(id, wasteData);
+                        tableBody = generateTable(wasteData, targetTable);
+                        break;
+                }
+                $(targetTable).html(tableBody);
+            }
+        }
+        function editData(button) {
+            const tds = $(button).parents("tr").children('td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                if (i == tdsCount - 1) {
+                    const edit = $(e).find(".edit");
+                    $(edit).attr("onclick", "javascript:normalData(this)");
+                    $(edit).removeClass("fa-edit");
+                    $(edit).addClass("fa-save");
+                } else if (i == tdsCount - 2) {
+                    const html = $(e).html();
+                    $(e).html(`<input type="text" class="form-control" value="${html}">`);
+                } else {
+                    const html = $(e).html();
+                    $(e).html(`<input type="text" class="form-control" value="${html}" disabled>`);
+
+                }
+            });
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                let row = "";
+                switch (targetTable) {
+                    case "#waste":
+                        const index = findInArray(id, wasteData);
+                        $(tds).each(function (i, e) {
+                            if (i != tdsCount - 1) {
+                                wasteData[index][$(e).data("name")] = $(e).find("input").val();
+                            } else {
+                                const edit = $(e).find(".edit");
+                                $(edit).attr("onclick", "javascript:editData(this)");
+                                $(edit).removeClass("fa-save");
+                                $(edit).addClass("fa-edit");
+                            }
+                        });
+                        row = generateRow(wasteData[index], targetTable)
+                        console.log(wasteData);
+                        break;
+                }
+                $(button).parents("tr").html(row);
+            }
+        }
+        var wasteOpt = [
+            {
+                waste: "AC Cylinder Cleaning",
+                type: "Wet Waste",
+            },
+            {
+                waste: "Sapon",
+                type: "Dry Waste",
+            },
+            {
+                waste: "Vacuum",
+                type: "Dust",
+            },
+            {
+                waste: "Variance in Addbacks",
+                type: "Inventory Adjustment",
+            },
+        ];
+
+
+        //var wasteOpt = [
+        //    {
+        //        waste: "Sapon",
+        //        type: "Dry Waste",
+        //    },
+        //    {
+        //        waste: "Vacum",
+        //        type: "Dust",
+        //    },
+        //    {
+        //        waste: "AC Cylinder Cleaning",
+        //        type: "Wet Waste",
+        //    },
+        //];
+        var wasteNewData = {};
+        var wasteData = [];
+
+
+        var selected;
+        function wizardButtonSetSelection(button) {
+            selected = $(button).text();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        $(document).ready(function () {
+            $("#waste").html(generateTable(wasteData, "#waste"));
+
+            $(".wizard-modal .next").click(function () {
+                wizardButtonNext(this);
+            });
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+            $('#phase-waste-modal').on('show.bs.modal', function (e) {
+                let opts = [];
+                console.log(wasteOpt.length);
+                for (var i = 0; i < wasteOpt.length; i++) {
+                    opts.push(wasteOpt[i].waste);
+                    console.log(wasteOpt[i].waste);
+                }
+                $(this).find(".kind").html(generateWizardButton(opts));
+            });
+            $('#phase-waste-modal').on('next', function (e, i, info) {
+                if (!selected) {
+                    info.shouldReturn = true;
+                    return;
+                }
+                switch (i) {
+                    case 0:
+                        info.shouldHide = true;
+                        wasteNewData.id = uuidv4();
+                        for (var i = 0; i < wasteOpt.length; i++) {
+                            if (wasteOpt[i].waste == selected) {
+                                wasteNewData.waste = wasteOpt[i].waste;
+                                wasteNewData.type = wasteOpt[i].type;
+                                break;
+                            }
+                        }
+                        wasteNewData.weight = "19.55";
+                        wasteData.push(wasteNewData);
+                        tableBody = generateTable(wasteData, '#waste');
+                        $('#waste').html(tableBody);
+                        break;
+                }
+            });
+            $('#phase-waste-modal').on('hide', function (e) {
+                wasteNewData = {};
+                selected = null;
+            });
+        });</script>
+
+    <script>
+        // Restricts input for the given textbox to the given inputFilter.
+    function setInputFilter(textbox, inputFilter) {
+      ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+        textbox.oldValue = "";
+        textbox.addEventListener(event, function() {
+          if (inputFilter(this.value)) {
+            this.oldValue = this.value;
+            this.oldSelectionStart = this.selectionStart;
+            this.oldSelectionEnd = this.selectionEnd;
+          } else if (this.hasOwnProperty("oldValue")) {
+            this.value = this.oldValue;
+            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+          }
+        });
+      });
+    }
+
+        // Restrict input to digits and '.' by using a regular expression filter.
+        setInputFilter(document.getElementById("fa1"), function (value) {
+                    return /^\d*\.?\d*$/.test(value);
+                });
+
+        setInputFilter(document.getElementById("fa3"), function (value) {
+                    return /^\d*\.?\d*$/.test(value);
+                });
+   
+    
+    </script>
+}
+
+
+

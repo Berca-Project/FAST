@@ -1,0 +1,849 @@
+﻿@model Fast.Web.Models.Report.InputDailyModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+    <style>
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+    </style>
+}
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        @*<li class="breadcrumb-item"><a href="#">Report</a></li>*@
+                        <li class="breadcrumb-item active" aria-current="page">Input Shift Daily</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Input Shift Daily</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "ShiftDaily")'">
+                    <i data-feather="arrow-left-circle" class="mg-r-5"></i> @UIResources.Back
+                </button>
+
+                <div data-toggle="modal" data-target="#modalGenerate" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5" id="btnWorkingTime"><i class="fas fa-file-csv"></i> Generate</div>
+                <div data-toggle="modal" data-target="#modalUpload" class="btn btn-sm pd-x-15 btn-success btn-uppercase mg-l-5" id="btnWorkingTime"><i data-feather="upload" class="wd-10 mg-r-5"></i> Upload</div>
+                @*<a href="@(Url.Action("Create","InputDaily"))" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnWorkingTime"><i data-feather="plus-circle" class="wd-10 mg-r-5"></i> New</a>*@
+            </div>
+        </div>
+        <div class="col-12 mg-b-20">
+            <div class="card collect-component" id="Information">
+                <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                <div class="card-body d-flex">
+                    <div style="flex:2">
+                        <div class="form-group d-flex">
+                            <label class="col-2" style="flex:1">Date</label>
+                            <div style="flex:1">
+                                <div class="input-group col-4">
+
+                                    @Html.TextBoxFor(x => x.Date, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDate", autocomplete = "off" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider-text divider-vertical"></div>
+                    <div class="flex-1">
+                        <div class="form-group row">
+                            <label class="col-5 col-form-label">Prod. Center</label>
+                            <div class="col-7">
+                                @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider-text divider-vertical"></div>
+                    <div class="flex-1">
+                        <div class="form-group row">
+                            <label class="col-4 col-form-label">Machine</label>
+                            <div class="col-6">
+                                <select class="form-control select2" name="machine">
+                                    <option label="Select Machine"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1" style="max-width:50px;">
+                        <div class="form-group row">
+                            <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 mg-b-20">
+            <div class="card">
+                <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                    Input Shift Daily
+                </div>
+                <div class="card-body">
+                    <div class="tableWrapper" style="max-height: 350px">
+                        <table class="table table-bordered table-hover table-striped" id="inputList" style="display:block;overflow-x:auto; white-space:nowrap;">
+                            <thead class="thead-info">
+                                <tr class="tx-center">
+                                    <th style="min-width:95px;">ID</th>
+                                    <th style="min-width:95px;">Production Centre</th>
+                                    <th style="min-width:95px;">Tgl</th>
+                                    <th style="min-width:95px;">Shift</th>
+                                    <th style="min-width:95px;">LU</th>
+                                    <th style="min-width:95px;">MTBF - Value</th>
+                                    <th style="min-width:95px;">MTBF - Focus</th>
+                                    <th style="min-width:95px;">MTBF - Action Plan</th>
+                                    <th style="min-width:95px;">CPQI - Value</th>
+                                    <th style="min-width:95px;">CPQI - Focus</th>
+                                    <th style="min-width:95px;">CPQI - Action Plan</th>
+                                    <th style="min-width:95px;">VQI - Value</th>
+                                    <th style="min-width:95px;">VQI - Focus</th>
+                                    <th style="min-width:95px;">VQI - Action Plan</th>
+                                    <th style="min-width:95px;">Working Time - Value</th>
+                                    <th style="min-width:95px;">Working Time - Focus</th>
+                                    <th style="min-width:95px;">Working Time - Action Plan</th>
+                                    <th style="min-width:95px;">Uptime - Value</th>
+                                    <th style="min-width:95px;">Uptime - Focus</th>
+                                    <th style="min-width:95px;">Uptime - Action Plan</th>
+                                    <th style="min-width:95px;">STRS - Value</th>
+                                    <th style="min-width:95px;">STRS - Focus</th>
+                                    <th style="min-width:95px;">STRS - Action Plan</th>
+                                    <th style="min-width:95px;">Production Volume - Value</th>
+                                    <th style="min-width:95px;">Production Volume - Focus</th>
+                                    <th style="min-width:95px;">Production Volume - Action Plan</th>
+                                    <th style="min-width:95px;">CRR - Value</th>
+                                    <th style="min-width:95px;">CRR - Focus</th>
+                                    <th style="min-width:95px;">CRR - Action Plan</th>
+                                    <th style="min-width:40px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inputdaily">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- row -->
+</div><!-- container -->
+
+
+
+<div class="modal fade" id="modalGenerate" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("GenerateExcel", "InputDaily", FormMethod.Post, new { encType = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i class="fas fa-file-csv" style="font-size:50px;"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Generate</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Generate Excel for Input Daily</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+        <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+
+            <div class="form-group row">
+                <div class="col-4">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProductionCenter</label>
+                </div>
+                <div class="col-8">
+                    @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter2", @required = "required" })
+                </div>
+            </div>
+
+            @*<div class="form-group row">
+            <div class="col-4">
+                <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Date</label>
+            </div>
+            <div class="col-8">
+                @Html.TextBoxFor(x => x.Date, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDateStart", autocomplete = "off" })
+            </div>
+        </div>
+        <div class="form-group row">
+                <div class="col-4">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Shift</label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-1"></div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsAllShift, new { @class = "form-check-input", @id = "cbAllShift" }) All
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsShift1, new { @class = "form-check-input", @id = "cbShift1" }) Shift 1
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsShift2, new { @class = "form-check-input", @id = "cbShift2" }) Shift 2
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsShift3, new { @class = "form-check-input", @id = "cbShift3" }) Shift 3
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsDaily, new { @class = "form-check-input", @id = "cbDaily" }) Daily
+                </div>
+
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">KPI</label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-1"></div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsAllKPI, new { @class = "form-check-input", @id = "cbIsAllKPI" }) All
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsMTBF, new { @class = "form-check-input", @id = "cbIsMTBF" }) MTBF
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsCPQI, new { @class = "form-check-input", @id = "cbIsCPQI" }) CPQI
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsVQI, new { @class = "form-check-input", @id = "cbIsVQI" }) VQI
+                </div>
+                <div class="col-3">
+                    @Html.CheckBoxFor(x => x.IsWorkingTime, new { @class = "form-check-input", @id = "cbIsWorking" }) Working Time
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-1"></div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsUptime, new { @class = "form-check-input", @id = "cbIsUptime" }) Uptime
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsSTRS, new { @class = "form-check-input", @id = "cbIsSTRS" }) STRS
+                </div>
+                <div class="col-4">
+                    @Html.CheckBoxFor(x => x.IsProdVolume, new { @class = "form-check-input", @id = "cbIsProd" }) Production Volume
+                </div>
+                <div class="col-2">
+                    @Html.CheckBoxFor(x => x.IsCRR, new { @class = "form-check-input", @id = "cbIsCRR" }) CRR
+                </div>
+            </div>*@
+
+        </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">@UIResources.DownloadTemplate</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal Generate-->
+
+<div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("Upload", "InputDaily", FormMethod.Post, new { encType = "multipart/form-data", @id = "UploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Upload</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Upload for Input Daily</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+
+                    @*<div class="form-group row">
+                        <div class="col-4">
+                            <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProductionCenter</label>
+                        </div>
+                        <div class="col-8">
+                            @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter2" })
+                        </div>
+                    </div>*@
+
+                    <div class="form-group row">
+                        <div class="col-4">
+                            <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Date</label>
+                        </div>
+                        <div class="col-8">
+                            @Html.TextBoxFor(x => x.Date, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDateStart", @required = "required", autocomplete = "off" })
+                        </div>
+                    </div>
+                    <div class="form-control-static">
+                        <span class="btn btn-success fileinput-button btn-block">
+                            @Html.TextBoxFor(x => x.PostedFilename, null, new { @type = "file", @accept = ".xls, .xlsx", @required = "required", @id = "customFile" })
+                        </span>
+                    </div>
+                    <br />
+                    <div class="progress" id="loadingbar" style="height: 30px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Please wait a few seconds...</div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal" id="btnCancel">@UIResources.Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnSubmit" onclick="OnSubmit()">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal Upload-->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+        <div class="modal-content">
+            <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+                <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+                <div class="media align-items-center">
+                    <span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+                    <div class="media-body mg-sm-l-20">
+                        <h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+                    </div>
+                </div><!-- media -->
+            </div><!-- modal-header -->
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+                </div>
+            </div><!-- modal-body -->
+            <div class="modal-footer pd-x-20 pd-y-15">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+                <button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+            </div>
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script>
+        var result = "@ViewBag.Result";
+		    if (result != "") {
+			    if (result == "True") {
+				    var message = "@ViewBag.Message";
+
+				    var notice = new PNotify({
+					    title: "@UIResources.Confirmation",
+					    text: message,
+					    width: "400px",
+					    type: 'success',
+					    addclass: 'stack-bottomright',
+					    delay: 2000
+				    });
+
+				    notice.get().click(function () {
+					    notice.remove();
+				    });
+			    }
+			    else {
+				    var error = "@ViewBag.ErrorMessage";
+
+				    var notice = new PNotify({
+					    title: "@UIResources.ErrorMessage",
+					    text: error,
+					    width: "400px",
+					    type: 'error',
+					    addclass: 'stack-bottomright',
+					    delay: 2000
+				    });
+
+				    notice.get().click(function () {
+					    notice.remove();
+				    });
+			    }
+            }
+
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+          $('#loadingbar').hide();
+          $('#tbDate').datepicker({
+                format: "dd-M-yyyy",
+                changeMonth: true,
+                changeYear: true
+          });
+            $('#tbDateStart').datepicker({
+                format: "dd-MM-yyyy",
+                changeMonth: true,
+                changeYear: true
+          });
+            $("[name=ProdCenterID]").on("change", function () {
+                let opt = '<option label="Select Machine"></option><option value="All">All</option>';
+                const val = $(this).val();
+
+                $.ajax({
+                    type: "post",
+                    url: fastApp.BaseUrl + "/ShiftDaily/GetLinkUpList",
+                    data: {
+                        prodcenterID: $("[name=ProdCenterID]").val(),
+                    },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (result) {
+                        console.log(result);
+                        if (result.Status == "True") {
+                            for (let i = 0; i < result.Data.length; i++)
+                            opt += `<option value="${result.Data[i]}">${result.Data[i]}</option>`;
+                            $("[name=machine]").html(opt);
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            })
+            $('#ddlProdCenter2').change(function () {
+
+			if ($('#ddlProdCenter2').val() != "0") {
+				$("#tbLocationID2").val($('#ddlProdCenter2').val());
+				$("#tbLocationType2").val('productioncenter');
+			} else {
+				$("#tbLocationType2").val('country');
+			}
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/User/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenter2').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartment2').html(ddlTemp);
+					$('#ddlSubDepartment2').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+
+		$('#ddlDepartment2').change(function () {
+
+			if ($('#ddlDepartment2').val() != "0") {
+				$("#tbLocationID2").val($('#ddlDepartment2').val());
+				$("#tbLocationType2").val('department');
+			} else {
+				$("#tbLocationType2").val('productioncenter');
+			}
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/User/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartment2').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartment2').html(ddlTemp);
+				}
+			});
+		});
+
+		    $('#ddlSubDepartment2').change(function () {
+
+			    if ($('#ddlSubDepartment2').val() != "0") {
+				    $("#tbLocationID2").val($('#ddlSubDepartment2').val());
+				    $("#tbLocationType2").val('subdepartment');
+			    } else {
+				    $("#tbLocationType2").val('department');
+			    }
+            });
+        
+            $('#btnSearch').on('click', function () {
+                dateFilter = $("[id=tbDate]").val();
+                prodCenter = $('[name=ProdCenterID]').val();
+                machine = $("[name=machine]").val();
+                
+                if (dateFilter == "") {
+                    showError("Date can't be empty");
+                    return;
+                }
+                if (prodCenter == "") {
+                    showError("Production Center can't be empty");
+                    return;
+                }
+                if (machine == "") {
+                    showError("Machine can't be empty");
+                    return;
+                }
+
+                
+              var table = $('#inputList').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"ajax": {
+                    "url": fastApp.BaseUrl + "/InputDaily/GetAll",
+                    "data": { dtFilter: dateFilter, prodCenter: prodCenter , machine: machine},
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+                        "searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [6],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [7],
+						"searchable": true,
+						"orderable": false
+                        } ,
+					{
+						"targets": [8],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [9],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [10],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [11],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [12],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [13],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [14],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [15],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [16],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [17],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [18],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [19],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [20],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [21],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [22],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [23],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [24],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [25],
+						"searchable": true,
+						"orderable": false
+                        },
+					{
+						"targets": [26],
+						"searchable": true,
+						"orderable": false
+                        },
+                    {
+						"targets": [27],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [28],
+						"searchable": true,
+						"orderable": false
+                        },
+                      {
+						"targets": [29],
+						"searchable": true,
+						"orderable": false
+                        }
+					],
+
+				"columns": [
+                    { "data": "ID", "name": "ID", "autoWidth": false },
+                    { "data": "ProductionCenter", "name": "ProductionCenter", "autoWidth": true },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YYYY");
+							else
+								return '';
+						}
+                    },
+                    { "data": "Shift", "name": "Shift", "autoWidth": true },
+                    { "data": "LinkUp", "name": "LinkUp", "autoWidth": true },
+                    { "data": "MTBFValue", "name": "MTBFValue", "autoWidth": true },
+                    { "data": "MTBFFocus", "name": "MTBFFocus", "autoWidth": true },
+                    { "data": "MTBFActPlan", "name": "MTBFActPlan", "autoWidth": true },
+                    { "data": "CPQIValue", "name": "CPQIValue", "autoWidth": true },
+                    { "data": "CPQIFocus", "name": "CPQIFocus", "autoWidth": true },
+                    { "data": "CPQIActPlan", "name": "CPQIActPlan", "autoWidth": true },
+                    { "data": "VQIValue", "name": "VQIValue", "autoWidth": true },
+                    { "data": "VQIFocus", "name": "VQIFocus", "autoWidth": true },
+                    { "data": "VQIActPlan", "name": "VQIActPlan", "autoWidth": true },
+                    { "data": "WorkingValue", "name": "WorkingValue", "autoWidth": true },
+                    { "data": "WorkingFocus", "name": "WorkingFocus", "autoWidth": true },
+                    { "data": "WorkingActPlan", "name": "WorkingActPlan", "autoWidth": true },
+                    { "data": "UptimeValue", "name": "UptimeValue", "autoWidth": true },
+                    { "data": "UptimeFocus", "name": "UptimeFocus", "autoWidth": true },
+                    { "data": "UptimeActPlan", "name": "UptimeActPlan", "autoWidth": true },
+                    { "data": "STRSValue", "name": "STRSValue", "autoWidth": true },
+                    { "data": "STRSFocus", "name": "STRSFocus", "autoWidth": true },
+                    { "data": "STRSActPlan", "name": "STRSActPlan", "autoWidth": true },
+                    { "data": "ProdVolumeValue", "name": "ProdVolumeValue", "autoWidth": true },
+                    { "data": "ProdVolumeFocus", "name": "ProdVolumeFocus", "autoWidth": true },
+                    { "data": "ProdVolumeActPlan", "name": "ProdVolumeActPlan", "autoWidth": true },
+                    { "data": "CRRValue", "name": "CRRValue", "autoWidth": true },
+                    { "data": "CRRFocus", "name": "CRRFocus", "autoWidth": true },
+                    { "data": "CRRActPlan", "name": "CRRActPlan", "autoWidth": true },
+				    {
+						"render": function (data, type, full, meta) {
+								return '<button class="btn-menu btn-default" onclick="Edit(\'' + full['ID'] + '\')"  title="Edit"><i class="fa fa-edit"></i></button>'+
+									   '<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] +  '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					}
+				]
+			});
+
+            });
+        });
+
+
+        $('#cbIsAllKPI').change(function() {
+             if (this.checked) {
+                 $("#cbIsMTBF").prop("disabled", true);
+                 $("#cbIsCPQI").prop("disabled", true);
+                 $("#cbIsVQI").prop("disabled", true);
+                 $("#cbIsWorking").prop("disabled", true);
+                 $("#cbIsUptime").prop("disabled", true);
+                 $("#cbIsSTRS").prop("disabled", true);
+                 $("#cbIsProd").prop("disabled", true);
+                 $("#cbIsCRR").prop("disabled", true);
+
+                 $("#cbIsMTBF").prop("checked", false);
+                 $("#cbIsCPQI").prop("checked", false);
+                 $("#cbIsVQI").prop("checked", false);
+                 $("#cbIsWorking").prop("checked", false);
+                 $("#cbIsUptime").prop("checked", false);
+                 $("#cbIsSTRS").prop("checked", false);
+                 $("#cbIsProd").prop("checked", false);
+                 $("#cbIsCRR").prop("checked", false);
+             }
+             if (this.checked == false) {
+                 $("#cbIsMTBF").prop("disabled", false);
+                 $("#cbIsCPQI").prop("disabled", false);
+                 $("#cbIsVQI").prop("disabled", false);
+                 $("#cbIsWorking").prop("disabled", false);
+                 $("#cbIsUptime").prop("disabled", false);
+                 $("#cbIsSTRS").prop("disabled", false);
+                 $("#cbIsProd").prop("disabled", false);
+                 $("#cbIsCRR").prop("disabled", false);
+            }
+         });
+        $('#cbAllShift').change(function() {
+             if (this.checked) {
+                 $("#cbShift1").prop("disabled", true);
+                 $("#cbShift2").prop("disabled", true);
+                 $("#cbShift3").prop("disabled", true);
+                 $("#cbDaily").prop("disabled", true);
+
+                 $("#cbShift1").prop("checked", false);
+                 $("#cbShift2").prop("checked", false);
+                 $("#cbShift3").prop("checked", false);
+                 $("#cbDaily").prop("checked", false);
+
+             }
+             if (this.checked == false) {
+                 $("#cbShift1").prop("disabled", false);
+                 $("#cbShift2").prop("disabled", false);
+                 $("#cbShift3").prop("disabled", false);
+                 $("#cbDaily").prop("disabled", false);
+
+            }
+         });
+
+
+        var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+        var Edit = function (ID) {
+          window.location.href = fastApp.BaseUrl  + '/InputDaily/Edit?id=' + ID;
+        }
+
+        var Delete = function (ID) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(""));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteInput(ID);
+			});
+        }
+
+        function DeleteInput(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/InputDaily/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						location.reload();
+					}, 1000);
+				}
+			});
+		}
+        function OnSubmit() {
+			$('#loadingbar').show();
+			$("#btnSubmit").attr("disabled", true);
+			$("#btnCancel").attr("disabled", true);
+
+			document.getElementById('UploadForm').submit();
+			return (true);
+		}
+    </script>
+
+}
+
+
+

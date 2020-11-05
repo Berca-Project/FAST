@@ -1,0 +1,540 @@
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[{"id":"18894349-d9f1-41c9-9b75-31b166f7e21a","FaFlowAvg":"111","FaBatchNo":"1","FaTotQty":"1"}]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[{"id":"d6d5c637-3c2b-4b4e-bbbf-3fd49e450ead","DslFlowAvg":"122","DslBatchNo":"2","DslTotalizer":"22","DslMCDiet":"2"}]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"b42d71d5-7932-4a19-a8d3-81fd905dfbab","RtcFlowAvg":"3333","RtcBatchNo":"3","RtcTotalizer":"3","RtcMCRtc":"3"}]
+-------------------------------------------
+
+Log Entry : 4:40:23 PM Thursday, September 10, 2020
+Message : 9/10/2020 4:40:23 PM 11112222 EDIT JSON LPHID=17480 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:15:21 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:15:21 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:24:10 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:24:10 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:26:01 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:26:01 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:31:07 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:31:07 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:40:42 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:42 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:40:53 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:40:53 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:43:39 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:43:39 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:48:06 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:48:06 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:49:40 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:49:40 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:50:03 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:50:03 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:51:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:51:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:53:16 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:16 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:53:43 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:53:43 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,flavourApplication ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,clove ROWNUMBER=0 VALUE=[{"id":"418a411d-1698-46c6-b7d3-dc4cbcdde45f","CloveFlowAvg":"4","CloveBatchNo":"4","CloveTotalizer":"4","CloveMCClove":"4"}]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,csf ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,dsl ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,smallLamina ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rs ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,cres ROWNUMBER=0 VALUE=[]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,rtc ROWNUMBER=0 VALUE=[{"id":"2de96e0e-5344-4cf1-b274-6b8306471fd0","RtcFlowAvg":"5","RtcBatchNo":"5","RtcTotalizer":"5","RtcMCRtc":"5"}]
+-------------------------------------------
+
+Log Entry : 5:54:55 PM Thursday, September 17, 2020
+Message : 9/17/2020 5:54:55 PM 11112222 EDIT JSON LPHID=17481 HEADER,FIELD=addback,oos ROWNUMBER=0 VALUE=[]
+-------------------------------------------

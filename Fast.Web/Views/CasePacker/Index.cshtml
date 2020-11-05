@@ -1,0 +1,2373 @@
+﻿@model Fast.Web.Models.LPH.LPHHeaderModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Insert CasePacker";
+    var selected = "";
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .fas {
+            cursor: pointer;
+        }
+        #generalInfo label{
+            padding-right:0;
+        }
+
+        .input-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .input-img-card {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        /* chanif: tolong tambahkan css dari sini sampai bawah untuk memperbaiki tampilan select2 */
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            display: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            font-size: 13px;
+            padding: 0 0 0 5px;
+        }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .select2-results__option[aria-selected=true] {
+            display: none;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Case Packer</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH Case Packer</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <a href="@Url.Action("Index", "History")" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</a>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" id="top_photo" data-toggle="modal" data-target="#photo-modal" onclick="infoId(this)"><i data-feather="camera" class="wd-10 mg-r-5"></i> Photo</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" id="btnNewLPH"><i data-feather="plus" class="wd-10 mg-r-5"></i> New</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" id="btnSaveDraft"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card" id="generalInfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" class="form-control information-datepicker mandatory" id="txtDateInfo" value="@(Model.Date.ToString("ddd, dd-MMM-yy"))">
+                                </div>
+                                <label class="col-2 col-form-label tx-right pd-r-0-f">Week</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" id="txtWeekNumber" disabled value="@(Model.Week)">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Machine *</label>
+                                <div class="col-4">
+                                    <select class="form-control select2 mandatory" id="machInfo">
+                                        <option value="">Select Machine</option>
+                                        @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                        {
+                                            selected = "";
+                                            if (Model.Machines.Count != 0 && Model.Machines[0] != null)
+                                            {
+                                                if (machine.Code == Model.Machines[0])
+                                                {
+                                                    selected = "selected";
+                                                }
+
+                                                if (machine.Code == ViewBag.MachineSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (machine.Code == ViewBag.MachineSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+
+                                            <option value="@(machine.Code)" @selected>@(machine.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Brand *</label>
+                                <div class="col-9">
+                                    <select class="form-control select2 mandatory" id="brandInfo">
+                                        <option value="">Select Brand</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.Brand)
+                                        {
+                                            selected = "";
+                                            if (Model.Brands.Count != 0 && Model.Brands[0] != null)
+                                            {
+                                                if (brand.Code == Model.Brands[0])
+                                                {
+                                                    selected = "selected";
+                                                }
+                                                if (brand.Code == ViewBag.BrandSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                if (brand.Code == ViewBag.BrandSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+
+                                            <option value="@(brand.Code)" @selected>[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Prodtech *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" id="prodTech" multiple>
+                                        <option value="">Select Prodtech</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+                                        {
+                                            selected = "";
+                                            if (Model.ProdTech != null && Model.ProdTech.Trim() != "")
+                                            {
+                                                if (employee.EmployeeID == Model.ProdTech)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (employee.EmployeeID == ViewBag.AccountEmployeeID || employee.EmployeeID == ViewBag.ProdtechSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            <option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            @*<div class="form-group row">
+                            <label class="col-3 col-form-label">Foreman</label>
+                            <div class="col-8">
+                                <select class="form-control select2 mandatory" id="foreman">
+                                    <option value="">Select Foreman</option>
+                                    @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Foremans)
+                                    {
+                                        selected = "";
+                                        if (Model.Foreman != null && Model.Foreman.Trim() != "")
+                                        {
+                                            if (employee.EmployeeID == Model.Foreman)
+                                            {
+                                                selected = "selected";
+                                            }
+                                        }
+                                        <option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>*@
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Mechanic *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" id="mekanik">
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Mechanics)
+                                        {
+                                            selected = "";
+                                            if (Model.Mechanic != null && Model.Mechanic.Trim() != "")
+                                            {
+                                                if (employee.EmployeeID == Model.Mechanic)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (employee.EmployeeID == ViewBag.MechanicSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            <option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Electrician *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" id="elektrik">
+                                        <option value="">Select Electrician</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Electrics)
+                                        {
+                                            selected = "";
+                                            if (Model.Electrician != null && Model.Electrician.Trim() != "")
+                                            {
+                                                if (employee.EmployeeID == Model.Electrician)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (employee.EmployeeID == ViewBag.ElectricSelected)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            <option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Supervisor *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" id="teamLeader">
+                                        <option value="">Select Team Leader</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                            selected = "";
+                                            if (Model.TeamLeader != null && Model.TeamLeader.Trim() != "")
+                                            {
+                                                if (employee.EmployeeID == Model.TeamLeader)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (employee.EmployeeID == ViewBag.AccountSpvEmployeeID)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            <option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">PO Number</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="PONumber" id="PONumber">
+                                        <option value="">Select PO Number</option>
+                                        @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                        {
+                                            <option value="@(wpp.PONumber)">@(wpp.PONumber)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Shift / Group *</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control mandatory" id="shift" value="@(Model.Shift)">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    @*<input type="text" class="form-control mandatory" id="group" value="@(Model.Group)">*@
+                                    <select class="form-control select2 mandatory" name="Group" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.referenceGroup)
+                                        {
+                                            <option value="@(detail.Code)">@(detail.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Start / Stop *</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStart" class="form-control input-time" value="@(Model.Start):000">
+                                    </div>
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStop" class="form-control input-time" value="@(Model.Stop):000">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    @*<div class="card-body row">
+                <div class="col-6">
+                    <div class="form-group row">
+                        <label class="col col-form-label font-weight-bold">Quality</label>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-6 col-form-label">
+                            Quality Flags
+                        </label>
+                        <div class="col-2">
+                            <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlqualityFlags" class="form-control ">*@
+                    @*<select class="form-control select2" id="hlqualityFlags">
+                    <option value="NA">NA</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                </select>*@
+                    @*</div>
+                    <div class="col-4">
+                        <input type="text" id="hlqualityFlagsAction" class="form-control " placeholder="Mitigation/Immediate Correction Actions">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-6 col-form-label">
+                        Quality Incidents
+                    </label>
+                    <div class="col-2">
+                        <input type="number" onkeypress="validateNumber(event)" placeholder="0" id="hlqualityIncidents" class="form-control ">*@
+                    @*<select class="form-control select2" id="hlqualityIncidents">
+                    <option value="NA">NA</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                </select>*@
+                    @*</div>
+                        <div class="col-4">
+                            <input type="text" id="hlqualityIncidentsAction" class="form-control " placeholder="Mitigation/Immediate Correction Actions">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-6 col-form-label">
+                            Completition of VQI & CPQI selfinspection during the shift
+                        </label>
+                        <div class="col-2">
+                            <select class="form-control select2 " id="hlqualityCompletitionofVQI">
+                                <option value="NA">NA</option>
+                                <option value="YES">YES</option>
+                                <option value="NO">NO</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" id="hlqualityCompletitionofVQIAction" class="form-control " placeholder="Mitigation/Immediate Correction Actions">
+                        </div>
+                    </div>
+                </div>*@
+
+                    @*<div class="col-6">
+                        <div class="form-group row">
+                            <label class="col col-form-label font-weight-bold">&nbsp;</label>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-6 col-form-label">
+                                SPC physical parameters out of control limits and/or trends breaking the SPC rule
+                            </label>
+                            <div class="col-2">
+                                <select class="form-control select2 " id="hlqualitySPC">
+                                    <option value="NA">NA</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <input type="text" id="hlqualitySPCAction" class="form-control " placeholder="Mitigation/Immediate Correction Actions">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-6 col-form-label">
+                                Incomplete documentation
+                            </label>
+                            <div class="col-2">
+                                <select class="form-control select2 " id="hlqualityIncompleteDoc">
+                                    <option value="NA">NA</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <input type="text" id="hlqualityIncompleteDocAction" class="form-control " placeholder="Mitigation/Immediate Correction Actions">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-6 col-form-label">
+                                Higher RR
+                            </label>
+                            <div class="col-2">
+                                <select class="form-control select2 " id="hlqualityHigherRR">
+                                    <option value="NA">NA</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <input type="text" id="hlqualityHigherRRAction" class="form-control " placeholder="Mitigation/Immediate Correction Actions">
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="min-width:120px;">Stops and Location</th>
+                                        <th style="min-width:100px;"># of Stops</th>
+                                        <th style="min-width:120px;">Initial Root Cause (Describe the issue) / Action Taken &amp; Impact</th>
+                                        <th style="min-width:120px;">Action Taken in your shift</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logbook">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="StopAndLocation"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="NOfStop"></td>
+                                        <td><input type="text" class="form-control" name="InitialCause"></td>
+                                        <td><input type="text" class="form-control" name="ActionTaken"></td>
+                                        <td class="tx-center"><i data-target="logbook" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="width:50%;">Action proposed for next shift</th>
+                                        <th style="min-width:90px;">Owner</th>
+                                        <th style="min-width:70px;">Start Time</th>
+                                        <th style="min-width:70px;">End Time</th>
+                                        <th style="min-width:60px;">Duration (Min)</th>
+                                        <th style="min-width:100px;">Status</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="action">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="NextAction"></td>
+                                        <td><input type="text" class="form-control" name="NextOwner"></td>
+                                        <td><input type="text" class="form-control date" name="NextStart" id="start" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control date" name="NextEnd" id="end" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control disabled" disabled value="0" name="NextDurasi" id="duration"></td>
+                                        <td>
+                                            <select class="form-control select2" name="Status">
+                                                <option label="Choose one"></option>
+                                                <option value="ONPROGRESS">ONPROGRESS</option>
+                                                <option value="DONE">DONE</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i data-target="action" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam*</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row mandatory image-mandatory">
+                                <div class="col-12" id="image_1">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" class="input-img rounded mx-auto d-block" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" width="auto">
+                                    </center>
+                                </div>
+                                <div class="col-12">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Barcode CBL</i></label>
+                                        <i onclick="printImage('image_1_show','image_1')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div><!-- FOTO PRODUKSI-->
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-2 mg-b-20">
+                <div class="card" id="productInfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Product Information
+                    </div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label pr-0">Result (Box)*</label>
+                                <div class="col-6">
+                                    <input type="number" onkeypress="validateNumber(event)" id="result" class="form-control mandatory" value="0">
+                                </div>
+                                @*<label class="col-3 col-form-label">Box</label>*@
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label pr-0">Mesin</label>
+                                <div class="col-6">
+                                    <input type="number" onkeypress="validateNumber(event)" id="mesin" class="form-control" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label pr-0">Manual</label>
+                                <div class="col-6">
+                                    <input type="number" onkeypress="validateNumber(event)" id="manual" class="form-control" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label pr-0">Rebox Robot</label>
+                                <div class="col-6">
+                                    <input type="number" onkeypress="validateNumber(event)" id="reboxrobot " class="form-control" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-12 col-form-label tx-center"><b>Remaining*</b></label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Bal</label>
+                                <div class="col-6">
+                                    <input type="number" onkeypress="validateNumber(event)" id="bal" class="form-control mandatory" value="0">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">Slof</label>
+                                <div class="col-6">
+                                    <input type="number" onkeypress="validateNumber(event)" id="slof" class="form-control mandatory" value="0">
+                                </div>
+                            </div>
+                            @*<div class="form-group row">
+                        <label class="col-4 col-form-label">Claimable</label>
+                        <div class="col-5">
+                            <input type="text" class="form-control" disabled value="5">
+                        </div>
+                        <label class="col-2 col-form-label">Pack</label>
+                    </div>*@
+                        </div>
+                        @*<div class="divider-text divider-vertical"></div>
+                <div class="flex-1">
+                    <div class="form-group row">
+                        <label class="col-12 col-form-label tx-center"><b>Rework</b></label>
+                    </div>
+                    <hr>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <input type="text" class="form-control" disabled value="135">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <input type="text" class="form-control" disabled value="135">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <input type="text" class="form-control" disabled value="135">
+                        </div>
+                    </div>
+                </div>*@<!-- REWORK -->
+                        @*<div class="divider-text divider-vertical"></div>
+                <div class="flex-1">
+                    <div class="form-group row">
+                        <label class="col-12 col-form-label tx-center"><b>Claim</b></label>
+                    </div>
+                    <hr>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <input type="text" class="form-control" disabled value="Rusak">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <input type="text" class="form-control" disabled value="Jelek">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <input type="text" class="form-control" disabled value="-">
+                        </div>
+                    </div>
+                </div>*@<!-- CLAIMABLE-->
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-7 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Box Reject</div>
+                    <div class="card-body">
+
+                        <div class="row" style="margin:0">
+                            <div class="tableWrapper col-12" style="max-height:200px">
+
+                                <table class="table table-bordered table-hover table-striped" id="dtBoxReject">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Nomor shipping case</th>
+                                            <th>Weight</th>
+                                            <th>Remark</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reject"></tbody>
+                                    <tfoot>
+                                        <tr class="input">
+                                            <td><input type="text" class="form-control" name="NomorShippingCase"></td>
+                                            <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="Weight"></td>
+                                            <td><input type="text" class="form-control" name="Remark"></td>
+                                            <td><select class="form-control select2" name="Status"><option value="">Choose one</option><option value="pass">Pass</option><option value="reject">Reject</option></select></td>
+                                            <td class="tx-center"><i data-target="reject" class="fa fa-plus-circle add-to-table"></i></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog" style="min-width:90%;height:auto;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <h5><label id="next-1">Take Picture For 'Barcode 778'</label></h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <video autoplay="true" width="500" height="300" id="videoElement"> </video><br />
+                                        <button id="snapHat">Capture Image </button><br />
+                                    </center>
+                                </div>
+                                <div class="col-md-6">
+                                    <center>
+                                        <canvas id="snapshot" style="max-width: 500px;max-height: 300px !important"></canvas><br />
+                                        <p id="demo"></p>
+
+                                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                                    </center>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <hr>
+                    <div>
+                        @*<button type="button" onclick="javascript:wizardButtonSetSelection(this)" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Add</button>*@
+                        <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade wizard-modal" id="submission-modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                @*<div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>*@
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            Employee ID: <span id="submission_employee"></span><br />
+                            Login Name: <span id="submission_employee_name"></span><br />
+                            Your last draft was on <span id="submission_date"></span><br />
+                            Do you want to continue or reset?
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <center>
+                        <button type="button" id="continue_btn" class="wizard-button btn btn-primary continue">Continue</button>
+                        <button type="button" id="reset-submission" class="wizard-button btn btn-primary reset">Reset</button>
+                    </center>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="submission" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.Reset))' />
+<input type="hidden" id="employee_id" value='@ViewBag.AccountEmployeeID' />
+<input type="hidden" id="employee_name" value='@ViewBag.AccountName' />
+<input type="hidden" id="oneday" value='@ViewBag.OneDay' />
+@section Scripts{
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script src="~/Scripts/webcam_help/main.js"></script>
+    <script src="~/Scripts/webcam_help/MRZ_417_230119.js"></script>
+
+
+    <script>
+        $('.datepicker').datepicker({
+            format: 'D,d-M-yy',
+            //language: 'id-id'
+        });
+        $('.information-datepicker').toArray().forEach(function (field) {
+            $(field).datepicker({
+                todayHighlight: true,
+                format: 'D, dd-M-yy',
+                startDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+                //maxDate: 2,
+                //minDate: -2,
+            });
+        });
+        $('input[type=text]').on('input', function (e) {
+            var val = e.currentTarget.value;
+            var myRegexp = /^[a-zA-Z0-9\s\.\,\:]*/m;
+            var match = myRegexp.exec(val);
+            console.log(match);
+            if (match == null) {
+                if (e.preventDefault) e.preventDefault(); //normal browsers
+                e.returnValue = false; //IE
+            } else {
+                if (match.join('') != val) {
+                    e.currentTarget.value = e.currentTarget.value.substring(0, e.currentTarget.value.length-1);
+                     e.preventDefault(); //normal browsers
+                    e.returnValue = false; //IE
+                }
+            }
+        });
+        function ieFix() {
+            /*
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").each(function () {
+                    $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+                    $(this).find("table").css({ "margin-bottom": "32px" });
+                    $(this).css({ "overflow-y": "scroll" });
+                    const ths = $(this).find("thead tr:first-child th");
+                    $(this).find("tfoot td").each(function (i) {
+                        $(this).css({ "min-width": $($(ths)[i]).width() + 20, "position": "static" });
+                    });
+                });
+            }
+            */
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            $(`#${targetTable} ~ tfoot tr.input td`).children("input, select").each(function () {
+                const name = $(this).prop("name");
+
+                r += `<td data-name="${name}">${data[name]}</td>`;
+            });
+
+            let useEdit = true;
+            let useDelete = true;
+            let additionalButtons = "";
+            if (configAle[targetTable].rowConfig !== undefined) {
+                if (configAle[targetTable].rowConfig.withEdit !== undefined)
+                    useEdit = configAle[targetTable].rowConfig.withEdit;
+                if (configAle[targetTable].rowConfig.withDelete !== undefined)
+                    useDelete = configAle[targetTable].rowConfig.withDelete;
+                if (configAle[targetTable].rowConfig.additionalButtons != undefined)
+                    additionalButtons = configAle[targetTable].rowConfig.additionalButtons(data);
+            }
+            r += `<td class="tx-center">`;
+            r += additionalButtons;
+            if (useEdit) r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            if (useDelete) r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const table = $(button).parents("table");
+            if (!$(table).data("edited")) {
+                $(table).data("edited", true);
+
+                const tds = $(button).parents("tr").children('td');
+                const inputTr = $(table).find('tr.input');
+                const inputTds = $(inputTr).children('td');
+                const tdsCount = $(tds).length;
+
+                $(table).find('select').each(function () {
+                    $(this).select2('destroy');
+                    $(this).removeAttr('data-select2-id');
+                });
+
+                $(tds).each(function (i, e) {
+                    const el = $(inputTds[i]).children()[0];
+                    if (i != tdsCount - 1) {
+                        const html = $(e).html();
+                        const newInput = $(el).clone();
+                        if (!$(el).hasClass("disabled"))
+                            $(newInput).prop("disabled", false);
+
+                        $(el).prop("disabled", true);
+                        $(newInput).val(html);
+                        $(e).html(newInput);
+                    } else {
+                        $(el).off("click");
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:normalData(this)");
+                        $(edit).removeClass("fa-edit");
+                        $(edit).addClass("fa-save");
+                    }
+                });
+            }
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            basicFunction();
+            ieFix();
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    var ev = $._data(el, 'events');
+                    if (!(ev && ev.click))
+                        $(el).on("click", addToTable);
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target, data) {
+            $(target).html(generateTable(data, target));
+            countSummary(target);
+        }
+        $(document).ready(function () {
+
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $(".add-to-table").on("click", addToTable);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+
+        });
+        function addToTable(button) {
+            const targetTable = $(this).data("target");
+            const tds = $(this).parents("tr").children("td");
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(tds).each(function (tdIndex, td) {
+                const input = $(td).children();
+                if (input.attr("name") != undefined) {
+                    const name = input.attr("name");
+                    const val = input.val();
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            if ((input[0].nodeName.toLowerCase() === 'select')) {
+                                $(input[0]).siblings(".select2-container").css('border', '1px solid red');
+                                $(input[0]).siblings(".select2-container").css('border-radius', '0.25rem');
+                                $(input[0]).on('select2:select', function (e) {
+                                    $(input[0]).siblings(".select2-container").css('border', 'none');
+                                    $(input[0]).siblings(".select2-container").css('border-radius', '0');
+                                });
+                            } else if (input[0].value === "") {
+                                input[0].style.borderColor = "red";
+                                $(input[0]).on('click', function (e) {
+                                    input[0].style.borderColor = "rgb(192, 204, 218)";
+                                });
+                            }
+                            return false;
+                        }
+                    }
+                    if (input[0].type.toLowerCase() == "number") {
+                        var myRegexp = /^00+$/g;
+                        var match = myRegexp.exec(val);
+                        if (match != null) {
+                            alert("Please input a valid number");
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+            $(tds).each(function (i, td) {
+                const node = $(td).children();
+                $(node).val("");
+                if ($(node).hasClass("select2"))
+                    $(node).trigger('change');
+            });
+
+            if (configAle[targetTable].onAdd != undefined) {
+                if (configAle[targetTable].onAdd(newdata)) {
+                    return;
+                }
+            }
+            configAle[targetTable].data.push(newdata);
+            $("#" + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+            countSummary(targetTable);
+            ieFix();
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const summaryTds = $('#' + targetTable).parents('table').find('.summary-body').children();
+                $('#' + targetTable).parents('table').find('.input td').each(function (i, td) {
+                    const name = $(td).children().attr("name");
+                    if (rowData.hasOwnProperty(name))
+                        $(summaryTds[i]).html(rowData[name]);
+                });
+            }
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const table = $(button).parents("table");
+                releaseDisabledInput(table);
+                if (configAle[targetTable].onDelete != undefined) {
+                    if (configAle[targetTable].onDelete(id)) {
+                        return;
+                    }
+                }
+                deleteFromArray(id, configAle[targetTable].data);
+                $('#' + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                const table = $(button).parents("table");
+
+                if (configAle[targetTable].onSave != undefined) {
+                    if (configAle[targetTable].onSave(id)) {
+                        return;
+                    }
+                }
+                const index = findInArray(id, configAle[targetTable].data);
+                let shouldReturn = false;
+                var newdata = {
+                    id: uuidv4()
+                };
+                $(tds).each(function (tdIndex, e) {
+                    if (tdIndex != tdsCount - 1) {
+                        const name = $(e).data("name");
+                        const val = $($(e).children()[0]).val();
+                        if (configAle[targetTable].onValidate != undefined) {
+                            if (configAle[targetTable].onValidate(name, val)) {
+                                shouldReturn = true;
+                                return false;
+                            }
+                        }
+                        newdata[name] = val;
+                    } else {
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:editData(this)");
+                        $(edit).removeClass("fa-save");
+                        $(edit).addClass("fa-edit");
+                    }
+                });
+                if (shouldReturn) return;
+
+                configAle[targetTable].data[index] = newdata;
+                const row = generateRow(configAle[targetTable].data[index], targetTable);
+                $(button).parents("tr").html(row);
+
+                releaseDisabledInput(table);
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function collectAllData() {
+            let collectorArray = [];
+            for (var tableId in configAle) {
+                let tableColumnType = {};
+                $(`#${tableId} ~ tfoot tr.input td input`).each(function () {
+                    tableColumnType[$(this).prop("name")] = $(this).prop("type");
+                });
+                const data = configAle[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let val = data[i][prop];
+                            if (configAle[tableId].onCollectData != undefined) {
+                                val = configAle[tableId].onCollectData(prop, val);
+                            }
+                            console.log(prop, val);
+                            collectorArray.push({
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: val,
+                                ValueType: tableColumnType[prop] == "number" ? "Numeric" : "NonNumeric",
+                                RowNumber: i
+                            });
+                            console.log(collectorArray);
+                        }
+                    }
+                }
+            }
+            return collectorArray;
+        }
+        function countDuration(start, end, duration) {
+            var end = $('#' + end).val();
+            var start = $('#' + start).val();
+
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                if (startdate > enddate) {
+                    enddate = new Date(enddate);
+                    enddate.setDate(enddate.getDate() + 1);
+                }
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                if (diffMinutes == NaN) {
+                    $('#' + duration).val(0);
+                } else {
+                    $('#' + duration).val(diffMinutes);
+                }
+            }
+        };
+    </script>
+    <script>
+        /*
+            * name = id dari tbody;
+            * data = array untuk menyimpan data;
+            * countSummary = dipanggil saat menghitung summary, return object dengan property sesuai dengan name pada `tfoot tr.input`;
+            * onAdd(newData) = dipanggil sebelum menambah data, return boolean apakah harus ditambahkan atau tidak;
+            * onDelete(idOfDeletedObject) = dipanggil sebelum menghapus data, return boolean apakah harus dihapus atau tidak;
+            * onSave(idOfUpdatedObject) = dipanggil sebelum mengubah data, return boolean apakah harus diubah atau tidak;
+            * onValidate(nameOfInput, valueOfInput) = validasi nilai saat tambah dan save, return boolean apakah harus diterus atau tidak;
+            *
+            * rowConfig = config untuk generate baris tabel;
+            * - withEdit = menampilkan edit, default true;
+            * - withDelete = menampilkan delete, default true;
+            * - additionalButtons(data) = fungsi untuk yang akan mengembalikan button tambahan untuk tiap baris, return element html dalam string;
+            */
+
+        var logbookData = [];
+        var rejectData = [];
+        var claimData = [];
+        var retrievalData = [];
+        var actionData = [];
+
+        const configAle = {
+            logbook: {
+                data: logbookData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            action: {
+                data: actionData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                countSummary: function () {
+                    let rowData = {};
+                    let NextDurasi = 0;
+                    for (var i = 0; i < actionData.length; i++) {
+                        NextDurasi += parseInt(actionData[i].NextDurasi);
+                    }
+                    rowData.NextDurasi = NextDurasi;
+                    return rowData;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            reject: {
+                data: rejectData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+        }</script>
+    <script>
+        function basicFunction() {
+            $('.select2').select2({
+		        allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+	            placeholder: 'Choose one or more',
+	            searchInputPlaceholder: 'Search options'
+            });
+            // chanif: brand dibuat spesial karena datanya banyak
+            /*$('#brandInfo').select2('destroy');
+            $('#brandInfo').select2({
+                minimumInputLength: 4,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });*/
+
+            $(document).find('.input-time').each(function () {
+                var cleave = new Cleave($(this), {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            })
+        }
+        var submission;
+        $(function () {
+            'use strict'
+
+            basicFunction();
+
+            // chanif: buat variabel LPHID untuk simpan ID, sebagai acuan untuk autosave & prev. timerID buat simpan variabel timer (biar bisa di-stop ketika submit)
+            var LPHID = 0;
+            var timerID;
+
+            // chanif: isi dari "$('#btnSave').click" tak pindah ke sini, jadi fungsi sendiri, biar gampang manggil berkali2
+            //         create & edit dibedakan cuma berdasarkan URL, karena parameter yg dikirirm mirip
+
+            var statusScroll = true;
+            function checkMandatory() {
+                var mandatory = $(".mandatory");
+                const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    console.log($(mandatory[i]));
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        if (statusScroll == true) {
+                            window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                            statusScroll = false;
+                        }
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                            $(e.target).siblings(".select2-container").css('border', 'none');
+                            $(e.target).siblings(".select2-container").css('border-radius', '0');
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    } else if ($(mandatory[i])[0].value === "") {
+                        if (statusScroll == true) {
+                            window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                            statusScroll = false;
+                        }
+                        $(mandatory[i])[0].style.borderColor = "red";
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('click', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        $(mandatory[i]).on('focus', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    }
+                    else if ($(mandatory[i]).hasClass("image-mandatory")) {
+
+                        console.log($(mandatory[i]).find("img"));
+                        const src = $(mandatory[i]).find("img").prop("src");
+                        console.log(src);
+                        if (src.indexOf("upload-img-mini.png") >= 0 || src.indexOf("_no_image.png") >= 0) {
+                            if (statusScroll == true) {
+                                window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                                statusScroll = false;
+                            }
+                            $(mandatory[i]).css('border', '1px solid red');
+                            $(mandatory[i]).prepend($('<span>', {
+                                style: "color: red; position: absolute; left: -10px;",
+                                html: '!'
+                            }));
+                            $(mandatory[i]).find("img").on('click', function () {
+                                $(this).closest(".row").css('border', 'none');
+                                $(this).closest(".row").children("span").first().remove();
+                            });
+                            status = false;
+                        }
+                    }
+                }
+                return status;
+            }
+
+            function saveLPH(url, isSubmit) {
+
+                console.log("simpan . . .");
+
+                // chanif: autosave mati ketika submit
+                if (isSubmit == 1)
+                    clearInterval(timerID);
+
+                var timeStart = $('#inputTimeStart').val();
+                var timeStop = $('#inputTimeStop').val();
+                const shift = $('#shift').val();
+
+                var collectorArray = collectAllData();
+
+                var detailSubmission = {
+                    StartTime: timeStart,
+                    EndTime: timeStop,
+                    Shift: shift
+                };
+
+                var collectorComponent = [];
+                var collectorValue = [];
+
+                $('#generalInfo').find('label').each(function () {
+                    if ($(this).text().length > 2) {
+                        if ($(this).text().includes('/')) {
+                            var array = $(this).text().split('/');
+                            var compo = {};
+                            let componame1 = array[0];
+                            let componame2 =array[1];
+                            compo.ComponentType="textfield";
+                            componame1 = componame1.replace("*", "");
+                            compo.ComponentName = componame1.replace(" ", "");
+                            collectorComponent.push(compo);
+                            var compo = {};
+                            compo.ComponentType="textfield";
+                            componame2 = componame2.replace("*", "");
+                            compo.ComponentName = componame2.replace(" ", "");
+                            collectorComponent.push(compo);
+                        } else {
+                            var compo = {};
+                            compo.ComponentType = "textfield";
+                            let componame = $(this).text().replace("*", "");
+                            compo.ComponentName = componame.replace(" ", "");
+                            collectorComponent.push(compo);
+                        }
+                    }
+                })
+                $('#productInfo').find('.form-group>label').each(function () {
+                    let componame = $(this).text().replace("*", "");
+                    if (componame != 'Remaining' && $(this).text() != 'Box') {
+                        var compo = {};
+                        compo.ComponentType="textfield";
+                        compo.ComponentName = componame;
+                        collectorComponent.push(compo);
+                    }
+                })
+
+                $('#generalInfo, #productInfo').find('input, select').each(function () {
+                    if ($(this).prop("id") != '') {
+                        var compo = {};
+                        var tem_value = $(this).val();
+                        if (Array.isArray(tem_value)) {
+                            tem_value = tem_value.join('___');
+                        }
+                        compo.Value = tem_value
+                        compo.ValueType = "NonNumeric";
+
+                        if ($(this).attr('type') == "number")
+                            compo.ValueType = "Numeric";
+
+                        collectorValue.push(compo);
+                    }
+                })
+
+     //           var dataNonNumericComponent = [
+
+     //               "hlqualityIncidents",
+     //               "hlqualityIncidentsAction",
+     //               "hlqualityCompletitionofVQI",
+     //               "hlqualityCompletitionofVQIAction",
+     //               "hlqualitySPC",
+     //               "hlqualitySPCAction",
+     //               "hlqualityIncompleteDoc",
+     //               "hlqualityIncompleteDocAction",
+     //               "hlqualityHigherRR",
+     //               "hlqualityHigherRRAction"
+     //           ];
+     //           var dataNumericComponent =[
+					//"hlqualityFlags",
+     //               "hlqualityFlagsAction",];
+     //           dataNonNumericComponent.forEach(function (entry) {
+     //               var componentInfo = {};
+     //               componentInfo.ComponentType="textfield";
+     //               componentInfo.ComponentName = entry;
+     //               collectorComponent.push(componentInfo);
+     //           });
+     //           dataNumericComponent.forEach(function (entry) {
+     //               var componentInfo = {};
+     //               componentInfo.ComponentType="textfield";
+     //               componentInfo.ComponentName = entry;
+     //               collectorComponent.push(componentInfo);
+     //           });
+
+     //           var dataNonNumericValue = [
+     //               "hlqualityIncidents",
+     //               "hlqualityIncidentsAction",
+     //               "hlqualityCompletitionofVQI",
+     //               "hlqualityCompletitionofVQIAction",
+     //               "hlqualitySPC",
+     //               "hlqualitySPCAction",
+     //               "hlqualityIncompleteDoc",
+     //               "hlqualityIncompleteDocAction",
+     //               "hlqualityHigherRR",
+     //               "hlqualityHigherRRAction"
+     //           ];
+     //           var dataNumericValue = [
+     //               "hlqualityFlags",
+     //               "hlqualityFlagsAction",];
+     //           dataNonNumericValue.forEach(function (entry) {
+     //               var dataValue = {};
+     //               dataValue.Value = $('#' + entry).val();
+     //               dataValue.ValueType = "NonNumeric";
+     //               collectorValue.push(dataValue);
+     //           });
+     //           dataNumericValue.forEach(function (entry) {
+     //               var dataValue = {};
+     //               dataValue.Value = $('#' + entry).val();
+     //               dataValue.ValueType = "Numeric";
+     //               collectorValue.push(dataValue);
+     //           });
+
+                var imgUrl1 = $("#image_1").find('img').first().attr('src');
+                var imageUrl1 = {};
+                imageUrl1.ComponentType="imagefield";
+                imageUrl1.ComponentName = "Image1";
+                //imageUrl1.ImagePath = imgUrl1;
+                collectorComponent.push(imageUrl1);
+
+                var compo = {};
+                compo.Value = imgUrl1;
+                compo.ValueType = "ImageURL";
+                collectorValue.push(compo);
+
+                $.ajax({
+                  type: "POST",
+                  url: url,
+                    data: JSON.stringify({
+                      // chanif: tambah LPHID supaya bisa pakai fungsi edit. tambah isSubmit untuk membedakan submit sama autosave
+                      id: LPHID,
+                      isSubmit: isSubmit,
+
+                      detailExtras: collectorArray,
+                      detailSubmission: detailSubmission,
+                      detailComponent: collectorComponent,
+                      detailValue: collectorValue
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                    success: function (result) {
+                      if (isSubmit == 1) {
+					        if (result.Status == 'True') {
+						        var notice = new PNotify({
+							        title: "@UIResources.Confirmation",
+							        text: "@UIResources.CreateSucceed",
+							        width: "400px",
+							        type: 'success',
+							        addclass: 'stack-bottomright'
+						        });
+
+						        notice.get().click(function () {
+							        notice.remove();
+                                });
+
+                                //window.location = window.location.href.split("?")[0];
+                                window.location.href = "@(Url.Action("Index", "History"))";
+					        }
+					        else {
+						        var notice = new PNotify({
+							        title: "@UIResources.ErrorMessage",
+							        text: "@UIResources.CreateFailed",
+							        width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+							        hide: false,
+							        buttons: {
+								        sticker: false
+							        }
+						        });
+
+						        notice.get().click(function () {
+								        notice.remove();
+							        });
+						        }
+                      } else {
+                          if (result.Status == 'True') {
+                              if (typeof result.LPHID === 'undefined') {
+                                      console.log("edit done");
+                                          var notice = new PNotify({
+							                title: "@UIResources.Confirmation",
+							                text: "@UIResources.EditSucceed",
+							                width: "400px",
+							                type: 'success',
+							                addclass: 'stack-bottomright'
+						                });
+
+                                      setTimeout(function(){
+                                            notice.remove();
+                                        }, 3000);
+                                  } else {
+                                      console.log("create done");
+                                      $('#btnSave').removeClass('d-none');
+                                      $('#btnReset').removeClass('d-none');
+                                      LPHID = result.LPHID;
+                                      console.log(LPHID);
+                                      var notice = new PNotify({
+							                title: "@UIResources.Confirmation",
+							                text: "@UIResources.CreateSucceed",
+							                width: "400px",
+							                type: 'success',
+							                addclass: 'stack-bottomright'
+						                });
+
+                                      setTimeout(function(){
+                                            notice.remove();
+                                        }, 3000);
+                                  }
+                          }
+                          else {
+
+                              // chanif: tetap munculkan error kalau gagal save ketika autosave
+						        var notice = new PNotify({
+							        title: "@UIResources.ErrorMessage",
+							        text: "@UIResources.CreateFailed",
+							        width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+							        hide: false,
+							        buttons: {
+								        sticker: false
+							        }
+						        });
+
+						        notice.get().click(function () {
+								        notice.remove();
+							        });
+						        }
+                            }
+                      },
+                      error: function (request, status, error) {
+                            window.location.reload(true);
+                      },
+                        complete: function() {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                });
+            }
+
+            // chanif: ketika page sudah selesai load, langsung simpan
+            $(window).load(function()
+            {
+                submission = JSON.parse($("#submission").attr("data-json"));
+                console.log(submission);
+                if (submission) {
+                    if ($('#oneday').val() == '1') {
+                        window.location.replace("@(Url.Action("Edit", "CasePacker"))?lphid=" + submission.LPHID);
+                    } else {
+                        $('#submission-modal').modal({ backdrop: 'static', keyboard: false });
+                        $('#submission_employee').html($('#employee_id').val());
+                        $('#submission_employee_name').html($('#employee_name').val());
+                        $('#submission_date').html(moment(submission.ModifiedDate).format("DD-MMM-YY hh:ss"));
+                        $('#submission-modal').modal('show');
+                    }
+
+                } else {
+                    saveLPH("@Url.Action("Create", "CasePacker")", 0);
+                    // chanif: lalu autosave tiap 3 menit
+                    setInterval(function () {
+                        $('#loading_overlay').removeClass('d-none');
+                        saveLPH("@Url.Action("Edit", "CasePacker")", 0);
+                    }, 10 * 60 * 1000);
+                }
+
+
+            });
+
+            $("#submission-modal .reset").click(function () {
+                window.location.href = "@(Url.Action("Index", "CasePacker"))/?reset=true";
+                //DeleteLPH(submission.LPHID);
+            });
+            $("#submission-modal .continue").click(function () {
+                window.location.replace("@(Url.Action("Edit", "CasePacker"))?lphid=" + submission.LPHID);
+            });
+            @*$(window).load(function()
+            {
+                saveLPH("@Url.Action("Create", "CasePacker")", 0);
+
+                // chanif: lalu autosave tiap 3 menit
+                setInterval(function () {
+                    saveLPH("@Url.Action("Edit", "CasePacker")", 0);
+                }, 10 * 60 * 1000);
+            });*@
+
+            $('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "CasePacker")",
+                  data: JSON.stringify({
+                      LPHID: LPHID,
+					  machine: $('#machInfo').val()
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "CasePacker"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No previous submissions found",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+            })
+
+            $('#btnSave').click(function () {
+                statusScroll = true;
+                if (checkMandatory()) {
+                    $('#loading_overlay').removeClass('d-none');
+                    saveLPH("@Url.Action("Edit", "CasePacker")", 1);
+
+                }else {
+                    var notice = new PNotify({
+						    title: "Warning",
+						    text: "Submit failed, input field with red border, and photo can't be empty",
+						    width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+						    hide: false,
+						    buttons: {
+							    sticker: false
+						    }
+                    });
+                    setTimeout(function(){
+                            notice.remove();
+                    }, 8000);
+                }
+            });
+            $('#btnSaveDraft').click(function () {
+                $('#loading_overlay').removeClass('d-none');
+                saveLPH("@Url.Action("Edit", "CasePacker")", 0);
+
+            });
+
+            $('#btnReset').click(function () {
+                var redirect = confirm("All unsubmitted changes will be lost. Do you really want to reset?");
+                if (redirect) {
+                    window.location.href = "@(Url.Action("Index", "CasePacker"))/?reset=true";
+                    @*DeleteLPH(LPHID);*@
+                }
+            });
+
+
+            $('#btnNewLPH').click(function () {
+                window.open("@(Url.Action("Index", "CasePacker"))/?reset=true");
+            });
+
+            function DeleteLPH(Id) {
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    url: fastApp.BaseUrl + '/History/Delete?lphid=' + Id,
+                    type: 'POST',
+                    success: function (result) {
+                        if (result.Status) {
+                            var notice = new PNotify({
+                            title: "@UIResources.Confirmation",
+                            text: 'Reset LPH Successfully',
+                            width: "400px",
+                            type: 'success',
+                            addclass: 'stack-bottomright'
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                        else {
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "@UIResources.DeleteFailed",
+                                width: "400px",
+                                type: 'error',
+                                hide: false,
+                                addclass: 'stack-bottomright',
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    complete: function (data) {
+                        $('#loading_overlay').addClass('d-none');
+                        setTimeout(function () {
+                            window.location.href = "@(Url.Action("Index", "CasePacker"))";
+                        }, 1000);
+                    }
+                });
+            }
+        })
+    </script>
+
+
+    <script>
+        var isImg = [];
+        var imgContent = [];
+        var imageIndex = 0;
+        var max = 1;
+
+        function infoId(e) {
+            console.log(e.id);
+
+            for (var i = 0; i < max; i++) {
+                if (e.id == "image_" + (i + 1)) {
+                    isImg[i] = true;
+                } else {
+                    isImg[i] = false;
+
+                    if ($(e).closest('.col-12').attr('id') == "image_" + (i + 1)) {
+                        isImg[i] = true;
+                    }
+                }
+                if (e.id == "top_photo") {
+                    isImg[0] = true;
+                }
+            }
+        }
+
+        function renderImage(link, state) {
+            if (link == null || link == "") {
+                isUrlLink = false;
+            }
+            else {
+
+                isUrlLink = true;
+                console.log("link " + link);
+                console.log("state: " + state);
+
+                for (var i = 0; i < max; i++) {
+                    if (state == "image_" + (i + 1) + "") {
+                        imgContent[i] = link;
+                        document.getElementById("image_" + (i + 1)).innerHTML = '<img class="input-img rounded mx-auto d-block" src=' + imgContent[i] + ' data-toggle="modal" data-target="#photo-modal" />';
+                    }
+                }
+            }
+        }
+
+        $("#t_barcode778").click(function () {
+            isImg[0] = true;
+        });
+
+
+        // Video Part
+        var video = document.querySelector("#videoElement");
+        var hdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var hhdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var vgaConstraints = {
+            video: {
+                mandatory: {
+                    maxWidth: 160,
+                    maxHeight: 120
+                }
+            }
+        };
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            document.getElementById("demo").innerHTML = "";
+
+            try {
+                navigator.getUserMedia(hhdConstraints, handleVideo, videoError);
+            } catch (error) {
+                navigator.getUserMedia(hdConstraints, handleVideo, videoError);
+            }
+        }
+
+        function handleVideo(stream) {
+            try {
+                this.srcObject = stream;
+            } catch (error) {
+                this.src = window.URL.createObjectURL(stream);
+            }
+        }
+
+        function videoError(e) {
+            // do something
+        }
+
+        // Capture Image Part
+        var player = document.getElementById('videoElement');
+        var snapshotCanvas = document.getElementById('snapshot');
+        var captureButton = document.getElementById('capture');
+        var captureButton3 = document.getElementById('capture3');
+        var textBottom = document.getElementById('saveText');
+
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        var txfname = "img_text";
+        var XdatStr = 'date';
+
+        textBottom.addEventListener('click', function () {
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            XdateStr = dateStr;
+            txfname = 'IMG_' + dateStr;
+
+            saveTextAsFile(txfname);
+            pcanvas2blob().then(download2X);
+
+            document.getElementById("demo").innerHTML = "saved ";
+
+        });
+
+        captureButton.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Reading PDF417.";
+
+            var VH = 1080;
+            var VW = 1920;
+
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var buf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, buf);
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var b = _pdf417JS(buf, VH, VW, 1024);
+
+            var heapBu = new Uint8Array(Module.HEAPU8.buffer, buf, 1028);
+            var vanz = bin2Strung(heapBu);
+
+
+            if (b <= 0) {
+                vanz = "No Read.";
+            }
+
+            Module._free(buf);
+            document.getElementById("demo").innerHTML = vanz;
+
+        });
+
+        captureButton3.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = " OCRing MRZ. ";
+
+            var VH = 1080;
+            var VW = 1920;
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4; //1280*720*4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var bluf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, bluf);
+
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var c = _DLreadJS(bluf, VH, VW, 1024);
+
+            var heapBuc = new Uint8Array(Module.HEAPU8.buffer, bluf, 1028);
+            var vanc = bin2Strung(heapBuc);
+
+            if (c <= 0) {
+                vanc = "No Read.";
+            }
+            Module._free(bluf);
+            document.getElementById("demo").innerHTML = vanc;
+        });
+
+        snapHat.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Image captured";
+
+            takeASnap();
+            //.then(download);
+        });
+
+        $('#btnNextPhoto').on('click', function () {
+            if (state != "") {
+                renderImage(jpegUrl, state);
+                $('#photo-modal').modal('hide');
+            }
+        });
+
+        var state = "";
+        var jpegUrl;
+        function takeASnap() {
+
+            canvas.width = 1280;//video.videoWidth; // set its size to the one of the video
+            canvas.height = 720;// video.videoHeight;
+            ctx.drawImage(video, 0, 0, 1280, 720); // the video
+
+            jpegUrl = ctx.canvas.toDataURL("image/jpeg"); // get base64 output - no longer using toBlob
+
+            for (var i = 0; i < max; i++) {
+                console.log(isImg[i]);
+                if (isImg[i] == true) {
+                    state = "image_" + (i + 1);
+                }
+            }
+            //renderImage(jpegUrl, state);
+        }
+
+        function pcanvas2blob() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+            });
+        }
+
+        function download2X(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            a.download = 'IMG_' + XdateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function download(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+
+            a.download = 'IMG_' + dateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+
+        function download_png(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            a.download = 'IMG_' + dateStr + '.png';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function canvaSnap() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/png'); // request a Blob from the canvas
+            });
+        }
+
+        function saveTextAsFile(txt_name) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var res = ocr_text.replace(/<br>/g, "\r\n");
+            var res2 = res.replace(/&lt;/g, '<');
+
+            var blab = new Blob([res2], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+
+            a.click();
+        }
+
+        function saveImageAndText(fname) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var blab = new Blob([ocr_text], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function bin2Strung(array) {
+            var result = "";
+            var max = 2048;
+            for (var i = 0; i < max; i++) {
+                var v = String.fromCharCode(array[i]);
+
+                if (array[i] == 10) {
+                    result += "<br/>";
+                }
+                else {
+                    if (array[i] == 60) {
+                        //result += "&#60";
+                        result += "&lt";
+                    }
+                    else {
+                        result += String.fromCharCode(array[i]);
+                    }
+                }
+                if (array[i] == 0) {
+                    i = max;
+                }
+            }
+            return result;
+        }</script>
+    <script>
+        function detectBrowser() {
+            var ua = navigator.userAgent, tem,
+                M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+            if (/trident/i.test(M[1])) {
+                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                return 'IE ' + (tem[1] || '');
+            }
+            if (M[1] === 'Chrome') {
+                tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
+                if (tem != null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+            }
+            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
+            if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+            return M.join(' ');
+        };
+        if (detectBrowser().indexOf("Chrome") < 0) {
+            $('input[type=number]').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+        }
+    </script>
+    <script>
+        function printImage(element, child) {
+            const imagedata = $("#image_1").find('img').first().attr('src');
+            if (imagedata.length > 200) {
+                let dataimage = new Image();
+                let windowOpen = window.open("");
+                dataimage.src = imagedata;
+                windowOpen.document.write(dataimage.outerHTML);
+                console.log(imagedata);
+                return;
+            } else {
+                pwin = window.open(imagedata, "_blank");
+            }
+
+        }
+    </script>
+}

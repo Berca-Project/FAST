@@ -1,0 +1,381 @@
+﻿@model Fast.Web.Models.ChecklistModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+        .add-sub, .remove-sub {
+            padding: 2px 5px;
+            font-size: 11px;
+            margin-top: 7px;
+        }
+        .bootstrap-tagsinput .tag{
+            margin-bottom: 2px;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item"><a href="#">Create</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Content</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Build Checklist Content for [@ViewBag.Checklist.MenuTitle] @ViewBag.Checklist.Header</h4>
+            </div>
+            <div class="d-none" id="print_barcode">
+                <a id="print_all" class="btn btn-sm pd-x-15 btn-primary btn-uppercase" href="#"><i class="fas fa-print"></i> Print Barcode</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                @using (Html.BeginForm("Content", "Checklist", FormMethod.Post, new { @class="preventDoubleSubmission", @autocomplete = "false", encType = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("ChecklistID", new Uri(Context.Request.Url.ToString()).Segments.Last())
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-2">Number of Columns</div>
+                                <div class="col-sm-1">
+                                    @Html.TextBoxFor(x => x.ColumnContent, null, new { @class = "form-control", @type = "number", @required = "required", @onkeypress="validateNumber(event)" })
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary" id="generate">Process</button>
+                                </div>
+                            </div>
+                            <div id="generated" class="mg-t-20"></div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="submit" class="btn btn-primary">Save &amp; Next <i data-feather="arrow-right-circle" class="wd-10 mg-l-5"></i></button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<div id="temp_tr" class="d-none"></div>
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/parsleyjs/parsley.min.js"></script>
+    <script src="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+
+    <script type="text/javascript">
+        var temp_tr = "";
+        var column = 1;
+        var counter = 0;
+
+        $(document).ready(function () {
+            $('#generate').click(function () {
+                var d = $('#ColumnContent').parsley();
+                counter = 0;
+                if (d.isValid()) {
+                    column = parseInt($('#ColumnContent').val());
+
+                    if (column < 2) {
+                        $('#ColumnContent').val(1);
+                        column = 1;
+                    }
+                    var table = "<table id='table_content' class='table table-bordered'><thead class='bg-primary'><tr>";
+                    for (var i = 0; i < column; i++) {
+                        table += `<td><div class='row mg-r-0 mg-l-0'>
+                                    <input type='text' class='form-control col-8' name='headers[]' placeholder='Header Label &amp; Width' autocomplete='off' />
+                                    <div class="input-group col-4 pd-l-0 pd-r-0">
+                                      <input type='number' class='form-control text-right' name='width[]' value='` + Math.round(100 / column) + `' aria-describedby="basic-addon2" />
+                                      <div class="input-group-append">
+                                        <span class="input-group-text pd-l-5 pd-r-5" id="basic-addon2">%</span>
+                                      </div>
+                                    </div>
+
+                                </div></td>`;
+                    }
+                    table += "<td></td></tr></thead><tbody><tr class='rowflag'>";
+                    for (var i = 0; i < column; i++) {
+                        table += `<td width="` + Math.round(10000 / column) / 100 + `%"><div class="row">
+                                        <div class="col-9">
+                                            <select class="form-control main-selection" name="model[`+ (counter) + `][]">
+                                                <option value="input_text">Input Text</option>
+                                                <option value="input_number">Input Number</option>
+                                                <option value="input_date">Input Date</option>
+                                                <option value="input_checkbox">Input Checkbox</option>
+                                                <option value="input_barcode">Input Barcode</option>
+                                                <!--<option value="input_file">Input Upload Image</option>-->
+                                                <option value="input_option">Input Option</option>
+                                                <option value="input_radio">Input Radio Button</option>
+                                                <option value="input_reference">Input Reference</option>
+                                                <option value="input_webcam">Input Webcam</option>
+                                                <option value="label">Label</option>
+                                                <option value="image">Image</option>
+                                                <option value="blank">Blank</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-3 pd-l-0">
+                                            <select class="form-control isrequired pd-x-2" name="model[`+ (counter++) + `][]">
+                                                <option value="True">Required</option>
+                                                <option value="False">Optional</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-2 pd-l-0 d-none">
+                                            <button type='button' class='btn btn-xs btn-success add-sub'><i class='fas fa-plus'></i></button>
+                                        </div>
+                                    </div></td>`;
+                    }
+                    table += "<td class='wd-100 text-center'><button type='button' class='btn btn-xs btn-info add'><i class='fas fa-plus'></i></button></td>";
+                    table += "</tr></tbody></table>";
+
+                    counter--;
+                    $('#generated').html(table);
+
+                    temp_tr = $('.rowflag').clone();
+
+                } else { d.validate(); }
+            })
+
+            $(document).on("click", "button.add", function () {
+                $('.tags-input').tagsinput('destroy');
+
+                var tr = $(this).closest('tr');
+                //var clone = temp_tr.clone();
+                var clone = tr.clone();
+
+                $('#temp_tr').html("");
+                $('#temp_tr').html(clone);
+
+                tr.after(clone);
+
+                $('#table_content tr:last').find('td').each(function () {
+                    counter++;
+                    $(this).find('select.main-selection').each(function () {
+                        $(this).attr('name', 'model[' + (counter) + '][]');
+                    });
+                    $(this).find('select.isrequired, select.subchild').each(function () {
+                        $(this).attr('name', 'model[' + (counter) + '][]');
+                    });
+                    $(this).find('input').each(function () {
+                        $(this).attr('name', 'model[' + (counter) + '][]');
+                    });
+
+                    if ($(this).hasClass('wd-100'))
+                        counter--;
+                });
+
+                $('#table_content tr:last').find('input.barcode').each(function () {
+                    var barcode_val = '@(ViewBag.Checklist.ID)' + '@(ViewBag.Checklist.ModifiedBy.Substring(0,1))' + Math.floor(Math.random() * 90 + 10) + '_' + ((Math.round((new Date()).getTime() / 100)+Math.floor(Math.random()*9)).toString()).substr(-9);;
+
+                    $(this).attr('value', barcode_val);
+                    var link = '@Url.Action("RenderBarcode", "Barcode")?sample=' + barcode_val;
+                    $(this).parent().siblings('div.barcodeImage').html('<img class="wd-100p" src=' + link + ' />');
+                })
+
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).addClass('remove').addClass('btn-danger');
+                $(this).removeClass('add').removeClass('btn-info');
+
+                $('.tags-input').tagsinput();
+                $('.tags-input').tagsinput('refresh');
+            });
+            $(document).on("click", "button.remove", function () {
+                $(this).closest('tr').remove();
+
+                var cellIndex = 0;
+                $('#table_content tbody').find('td').not(':last').each(function () {
+                    $(this).find('select').each(function () {
+                        $(this).attr('name', 'model[' + (cellIndex) + '][]');
+                    });
+                    $(this).find('input').each(function () {
+                        $(this).attr('name', 'model[' + (cellIndex) + '][]');
+                    });
+
+                    cellIndex++;
+                    if ($(this).hasClass('wd-100'))
+                        cellIndex--;
+
+                    counter = cellIndex-1;
+                })
+
+                if ($('input.barcode').length) {
+                }else{
+                    $('#print_barcode').addClass('d-none');
+                }
+            });
+
+            $(document).on("click", "button.add-sub", function () {
+                $('.tags-input').tagsinput('destroy');
+
+                var tr = $(this).closest('div.row');
+                var clone = tr.clone();
+                tr.find('.col-10:last').addClass('mg-b-5');
+                tr.after(clone);
+
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).addClass('remove-sub').addClass('btn-warning');
+                $(this).removeClass('add-sub').removeClass('btn-success');
+
+                $('.tags-input').tagsinput();
+                $('.tags-input').tagsinput('refresh');
+            });
+            $(document).on("click", "button.remove-sub", function () {
+                $(this).closest('div.row').remove();
+            });
+            $(document).on('change', 'select.main-selection', function () {
+                $(this).next(".subchild").remove();
+                $(this).next(".bootstrap-tagsinput").next('input').remove();
+                $(this).next(".bootstrap-tagsinput").next('.bootstrap-tagsinput').remove();
+                $(this).next(".bootstrap-tagsinput").remove();
+                var name = $(this).attr('name');
+                var val = $(this).val();
+                var unique = Math.floor(Math.random() * 100);
+                //$(this).find('option[value="' + val + '"]').attr('selected', 'selected');
+                $(this).find('option').each(function () {
+                    if ($(this).attr('value') == val)
+                        $(this).attr('selected', 'selected');
+                    else
+                        $(this).removeAttr('selected');
+                })
+
+                if (val == 'input_option' || val == 'input_radio') {
+                    $(this).after('<input type="text" name="' + name + '" class="form-control subchild tags-input" data-role="tagsinput" placeholder="Comma separated" />');
+                    $('.tags-input').tagsinput();
+                } else if (val == 'image') {
+
+                    $(this).after(`<div class="custom-file subchild">
+                                                <input type="file" class="custom-file-input" id="upload`+ unique + `" name="images` + unique + `" accept="image/*">
+                                                <label class="custom-file-label" for="upload`+ unique + `">Upload your images here</label>
+                                            </div>
+											<small class="form-text text-muted">Recommended image size: 600x600 pixels</small>`);
+                } else if (val == 'label') {
+                    $(this).after('<input name="' + name + '" type="text" class="form-control subchild" placeholder="Label" />');
+                } else if (val == 'input_barcode') {
+                    $('#print_barcode').removeClass('d-none');
+
+                    var barcode_val = '@(ViewBag.Checklist.ID)' + '@(ViewBag.Checklist.ModifiedBy.Substring(0,1))' + Math.floor(Math.random() * 90 + 10) + '_' + (Math.round((new Date()).getTime() / 100).toString()).substr(-9);;
+
+                    $(this).after(`<div class="subchild">
+                        <input type="text" name="`+name+`" class="form-control barcode" placeholder="Input Barcode" aria-describedby="button-addon`+unique+`" value="`+barcode_val+`" required />
+                        <div class="barcodeImage mg-t-3 ht-40 bd-b bd-x bd-gray-500 rounded overflow-hidden text-center"><img class="wd-100p" src='@(Url.Action("RenderBarcode", "Barcode"))?sample=`+barcode_val+`' /></div>
+                    </div>`);
+                } else if (val == 'input_reference') {
+                    $(this).after(`<select class="form-control subchild" name="` + name + `" required="required">
+                        @foreach(SelectListItem reference in ViewBag.ReferenceList)
+                        {
+                            <option value="@reference.Value">@reference.Text</option>
+                        }
+                        </select>`);
+                }
+
+                if (val == 'image' || val == 'label' || val == 'blank') {
+                    $(this).parent().addClass('col-12').removeClass('col-9');
+                    $(this).parent().next().addClass('d-none');
+                } else {
+                    $(this).parent().removeClass('col-12').addClass('col-9');
+                    $(this).parent().next().removeClass('d-none');
+                }
+            });
+            $(document).on('change', 'select.isrequired', function () {
+                var val = $(this).val();
+
+                $(this).find('option').each(function () {
+                    if ($(this).attr('value') == val)
+                        $(this).attr('selected', 'selected');
+                    else
+                        $(this).removeAttr('selected');
+                })
+            });
+
+            $("form").on("change", "input[type='file']", function () {
+                $(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+            });
+
+            $("form").on("change", 'input[name ="width[]"]', function () {
+                var total_width = 0.0;
+                $('table .row.mg-r-0.mg-l-0').find('input[name ="width[]"]').each(function () {
+                    if(isNaN($(this).val())){
+                        alert("Width must be a number");
+                    }else{
+                        total_width = total_width + parseFloat($(this).val());
+                    }
+                })
+
+                console.log('total width : '+total_width);
+
+                if (total_width > 101 || total_width < 99) {
+                    alert("Total table width = " + total_width + "%, it should be around 100%");
+                }
+            });
+
+            $("form").on("change paste keyup", "input.barcode", function () {
+                if ($(this).val().trim() != '') {
+                    var link = '@Url.Action("RenderBarcode", "Barcode")?sample=' + $(this).val();
+                    $(this).siblings('div.barcodeImage').html('<img class="wd-100p" src=' + link + ' />');
+                }
+            });
+
+            $(document).on("click", "#print_barcode", function () {
+                // A4 2480 pixels x 3508 pixels
+                var mywindow = window.open('', 'PRINT');
+
+                mywindow.document.write('<html><head><title>FAST - Checklist - Barcode - @(ViewBag.Checklist.Header)</title>');
+                mywindow.document.write('</head><body style="padding:20px 30px 40px 40px;transform: scale(1);">');
+                mywindow.document.write('<div style="width=2000px">');
+                mywindow.document.write('<h2 style="text-align: center;margin-bottom:50px;">List Barcode in @(ViewBag.Checklist.Header)</h2>');
+
+                mywindow.document.write('<div style="display: flex;flex-wrap: wrap;">');
+                $('form').find('input.barcode').each(function () {
+                    var barcode_label = "No Label Found";
+                    var tr = $(this).closest('tr');
+                    tr.find('select').each(function () {
+                        if ($(this).val() == "label") {
+                            var temp = $(this).siblings('input').val();
+                            if (temp.length > 2) {
+                                barcode_label = temp;
+                                return false;
+                            }
+                        }
+                    })
+
+                    mywindow.document.write('<div style="flex-basis: 0;flex-grow: 1;margin-bottom: 30px;position: relative;">');
+                    mywindow.document.write(`
+                        <table style="border-collapse: collapse;border: 1px solid black;page-break-inside: avoid;">
+                            <tr style="border-collapse: collapse;border: 1px solid black;">
+                                <th style="padding: 15px 0;font-size: 23px;">`+barcode_label+`</th>
+                            </tr>
+                            <tr style="border-collapse: collapse;border: 1px solid black;">
+                                <td style="padding:5px;"><img style="" src="@(Url.Action("RenderBarcodeBig","Barcode"))?sample=`+$(this).val()+`"></td>
+                            </tr>
+                        </table>
+                    `);
+
+                    mywindow.document.write('</div>');
+                })
+                mywindow.document.write('</div>');
+
+                mywindow.document.write('</div>');
+                mywindow.document.write('</body></html>');
+
+                mywindow.focus(); // necessary for IE >= 10*/
+
+                mywindow.print();
+
+                mywindow.document.close(); // necessary for IE >= 10
+                setTimeout(
+                function()
+                {
+                    mywindow.close();
+                }, 5000);
+            });
+        });
+    </script>
+}

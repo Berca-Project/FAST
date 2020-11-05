@@ -1,0 +1,877 @@
+﻿@model Fast.Web.Models.LPH.PP.PPLPHModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+@{
+	ViewBag.Title = "Index";
+}
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+
+	<link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="mg-b-5">History List</h4>
+                <p class="mg-b-0 tx-color-03">History Data Management</p>
+            </div>
+            <div class="d-none d-md-block tx-right">
+                @*<button class="btn btn-outline-secondary btn-sm pd-x-15 mg-r-0-f btn-uppercase dtAddButton" onclick="GeneratePDF()">
+                    <span><i class="fa fa-lg fa-file-pdf"></i> PDF</span>
+                </button>*@
+                <button class="btn btn-outline-secondary btn-sm pd-x-15 mg-r-0-f btn-uppercase dtAddButton" onclick="GenerateExcel()">
+                    <span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+                </button>
+                @*<div id="buttonprint" class="dtButton d-inline-block mg-r-2-f"></div>*@
+            </div>
+            <!--
+    <div class="mg-t-20 mg-sm-t-0">
+        <div class="row">
+            <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+                <i data-feather="repeat" class="mg-r-5"></i> Load All
+            </button>
+            <div id="buttonpdf" class="dtButton"></div>
+            <div id="buttonexcel" class="dtButton"></div>
+            <div id="buttonprint" class="dtButton"></div>
+        </div>
+    </div>
+    -->
+
+        </div><!-- End content header -->
+		<br />
+        <div data-label="Filter" class="df-example demo-table dtMarginTop">
+            <div class="row">
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Date</label>
+                </div>
+                <div class="col-md-2 pd-l-0">
+                    <input class="form-control datepicker" id="flDate" type="text" value="@(Session["HistoryPrimary_dateFilter"] == null ? "" : (string)Session["HistoryPrimary_dateFilter"])" />
+                </div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Shift</label>
+                </div>
+                <div class="col-sm-2 pd-l-0">
+                    <input id="shift" class="form-control" type="text" value="@(Session["HistoryPrimary_shift"] == null ? "" : (string)Session["HistoryPrimary_shift"])" />
+                </div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">LPH Type</label>
+                </div>
+                <div class="col-sm-2 pd-l-0">
+                    @{
+                        if (Session["HistoryPrimary_lphtype"] != null && Session["HistoryPrimary_lphtype"] != "")
+                        {
+                            Model.LPHType = (string)Session["HistoryPrimary_lphtype"];
+                        }
+                    }
+                    @Html.DropDownListFor(x => x.LPHType, (IEnumerable<SelectListItem>)ViewBag.LPHTypeList, "- Please Select -", new { @class = "form-control", @id = "lphtype" })
+                </div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Status LPH</label>
+                </div>
+                <div class="col-sm-2 pd-l-0 pd-r-0">
+                    <select class="form-control" id="source" name="source">
+                        <option value="">All Data</option>
+                        <option value="draft" @(Session["HistoryPrimary_source"] != null && Session["HistoryPrimary_source"].ToString() == "draft"? "selected":"")>Drafts Only</option>
+                        <option value="submit" @(Session["HistoryPrimary_source"] != null && Session["HistoryPrimary_source"].ToString() == "submit"? "selected":"")>Submitted Only</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-1 mg-t-20">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">List Data</label>
+                </div>
+                <div class="col-sm-2 mg-t-20 pd-l-0">
+                    <select id="select_source" class="form-control">
+                        <option value="">My Submissions</option>
+                        <option value="MyLocat" @(Session["HistoryPrimary_main_source"] != null && Session["HistoryPrimary_main_source"].ToString() == "MyLocat"? "selected":"")>Submissions in My Location</option>
+                        <option value="GetAll" @(Session["HistoryPrimary_main_source"] != null && Session["HistoryPrimary_main_source"].ToString() == "GetAll"? "selected":"")>All Submissions</option>
+                        <option value="Location" @(Session["HistoryPrimary_main_source"] != null && Session["HistoryPrimary_main_source"].ToString() == "Location"? "selected":"")>Submissions by Filter Location</option>
+                    </select>
+                </div>
+                <div class="col-sm-7 mg-t-20">
+                    <div class="row" id="location_detail" style="display:none">
+                        <div class="col-4 pd-l-5 d-inline-block"><select id="Location1" name="Location1" class="form-control selection-location"></select></div>
+                        <div class="col-4 pd-l-5 d-inline-block"><select id="Location2" name="Location2" class="form-control selection-department"></select></div>
+                        <div class="col-4 pd-l-5 d-inline-block"><select id="Location3" name="Location3" class="form-control selection-subdepartment"></select></div>
+                    </div>
+                </div>
+
+                <button id="btnSearch" class="btn btn pd-x-15 btn-primary btn-uppercase btn-block col-sm-2 mg-t-20">Search</button>
+            </div>
+        </div>
+		<div data-label="History Data" class="df-example demo-table dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="historyList">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>@UIResources.Date</th>
+						<th>@UIResources.Shift</th>
+						<th>LPH Type</th>
+						<th>Created By</th>
+						<th>Location</th>
+						<th>Status</th>
+						<th>Created At</th>
+						<th>Status Changed At</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+@section Scripts{
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/exportaction.js"></script>
+
+	<script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+	<script type="text/javascript">
+        $(document).ready(function () {
+            $('#select_source').change(function () {
+                if ($(this).val() == "Location") {
+                    $('#location_detail').show();
+                } else {
+                    $('#location_detail').hide();
+                    //$('#btnSearch').trigger('click');
+                }
+            })
+
+            $('#Location1,#Location2,#Location3').change(function () {
+                //$('#btnSearch').trigger('click');
+            })
+            $('.datepicker').datepicker({
+                format: 'd-M-yy',
+                //language: 'id-ID'
+			});
+
+            var table = $('#historyList').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+                "pageLength": 25,
+                "destroy": true,
+                "order": [[ 0, "desc" ]],
+				"ajax": {
+					"url": fastApp.BaseUrl + "/HistoryPrimary/GetData",
+					"type": "POST",
+					"datatype": "json"
+				},
+                "drawCallback": function (settings) {
+                    $('#loading_overlay').addClass('d-none');
+                },
+				"columnDefs":
+					[{
+						"targets": [0],
+                        "searchable": true,
+                        "visible": true,
+						"orderable": true
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [7],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [8],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [9],
+						"searchable": true,
+                        "orderable": true,
+                        "className": "tx-center"
+					},
+					],
+				"columns": [
+					{ "data": "ID", "name": "ID","title":"ID", "autoWidth": false },
+					{
+						"data": "Date",
+						"name": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+                    },
+                    { "data": "Shift", "name": "Shift", "autoWidth": true },
+                    { "data": "LPHHeader", "name": "LPHHeader", "title":"LPH Type","autoWidth": true,
+                        render: function (data, type, row) {
+                            console.log("---" + data + "---");
+                            if (data == "LPHPrimaryKretekLineAddback")
+                                return "Kretek Line - Addback";
+                            else if (data == "LPHPrimaryDiet")
+                                 return "Intermediate Line - DIET";
+                            else if (data == "LPHPrimaryCloveInfeedConditioning")
+                                 return "Intermediate Line - Clove Feeding & DCCC";
+                            else if (data == "LPHPrimaryCSFCutDryPacking")
+                                return "Intermediate Line - CSF Cut Dry & Packing";
+                            else if (data == "LPHPrimaryCSFInfeedConditioning")
+                                return "Intermediate Line - CSF Feeding & DCCC";
+                            else if (data == "LPHPrimaryCloveCutDryPacking")
+                                return "Intermediate Line - Clove Cut Dry & Packing";
+                            else if (data == "LPHPrimaryRTC")
+                                return "Intermediate Line - RTC";
+                            else if (data == "LPHPrimaryKitchen")
+                                return "Intermediate Line - Casing Kitchen";
+                            else if (data == "LPHPrimaryWhiteLineOTP")
+                                return "White Line OTP - Process Note";
+                            else if (data == "LPHPrimaryKretekLineFeeding")
+                                return "Kretek Line - Feeding KR & RJ";
+                            else if (data == "LPHPrimaryKretekLineConditioning")
+                                return "Kretek Line - DCCC KR & RJ";
+                            else if (data == "LPHPrimaryKretekLineCuttingDrying")
+                                return "Kretek Line - Cut Dry";
+                            else if (data == "LPHPrimaryKretekLinePacking")
+                                return "Kretek Line - Packing";
+                            else if (data == "LPHPrimaryCresFeedingConditioning")
+                                return "Kretek Line - CRES Feeding & DCCC";
+                            else if (data == "LPHPrimaryCresDryingPacking")
+                                return "Kretek Line - CRES Cut Dry & Packing";
+                            else if (data == "LPHPrimaryWhiteLineFeedingWhite")
+                                return "White Line PMID - Feeding White";
+                            else if (data == "LPHPrimaryWhiteLineDCCC")
+                                return "White Line PMID - DCCC";
+                            else if (data == "LPHPrimaryWhiteLineCuttingFTD")
+                                return "White Line PMID - Cutting + FTD";
+                            else if (data == "LPHPrimaryWhiteLineAddback")
+                                return "White Line PMID - Addback";
+                            else if (data == "LPHPrimaryWhiteLinePackingWhite")
+                                return "White Line PMID - Packing White";
+                            else if (data == "LPHPrimaryWhiteLineFeedingSPM")
+                                return "White Line PMID - Feeding SPM";
+                            else if (data == "LPHPrimaryISWhiteFeeding")
+                                return "White Line PMID - Feeding IS White";
+                            else if (data == "LPHPrimaryISWhiteCutDry")
+                                return "White Line PMID - Cut Dry IS White";
+                            else
+								return data;
+                        }
+                    },
+                    { "data": "ModifiedBy", "name": "ModifiedBy", "title":"Created By","autoWidth": true },
+					{ "data": "Location", "name": "Location", "title": "Location", "autoWidth": true },
+                    { "data": "Status", "name": "Status", "title": "Status", "autoWidth": true },
+                    {
+						"data": "CreatedAt",
+						"name": "CreatedAt",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '-';
+						}
+                    },
+                    {
+						"data": "StatusChangedAt",
+						"name": "StatusChangedAt",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '-';
+						}
+                    },
+				    {
+						"render": function (data, type, full, meta) {
+							if ((full['UserID'] != "@(ViewBag.Me)") || (full['IsCompleted'] || full['IsDeleted'] == 0) && full['Status'] != "Draft") {
+									return '<button class="btn btn-default pd-0-f" onclick="Submitted(\'' + full['LPHID'] + '\')"  title="View"><i class="fa fa-eye"></i></button>';
+							} else {
+								return '<button class="btn btn-default pd-0-f mg-r-10" onclick="Edit(\'' + full['LPHID'] + '\')" title="Edit"><i class="fa fa-edit"></i></button>' +
+									'<button class="btn btn-default pd-0-f" onclick="Delete(\'' + full['LPHID'] + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+							}
+						}
+					}
+				]
+			});
+
+            var buttons = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-file-pdf"></i> PDF',
+						"extend": 'pdf',
+                        "className": 'btn btn-sm pd-x-15 btn-primary btn-uppercase',
+						"title": 'LPH Primary History List',
+						"extension": '.pdf',
+						"exportOptions": {
+							columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+						},
+						"customize": function (doc) {
+                            page: 'all',
+							doc.content[1].table.widths =
+								Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+						}
+					}
+				]
+			}).container().appendTo($('#buttonpdf'));
+
+		    var buttons1 = new $.fn.dataTable.Buttons(table, {
+			    buttons: [
+				    {
+					    "text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+					    "extend": 'excel',
+                        "className": 'btn btn-sm pd-x-15 btn-primary btn-uppercase',
+					    "title": 'LPH Primary History List',
+					    "extension": '.xlsx',
+					    "exportOptions": {
+						    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            page: 'all'
+					    }
+				    }
+			    ]
+		    }).container().appendTo($('#buttonexcel'));
+
+		    var buttons2 = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-print"></i> Print',
+                        "extend": 'print',
+						"title": 'LPH Primary History List',
+						"className": 'btn btn-sm pd-x-15 btn-primary btn-uppercase',
+						"exportOptions": {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            page: 'all'
+						}
+					}
+				]
+			}).container().appendTo($('#buttonprint'));
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+
+            console.log(LocationTree);
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose "></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value='+LocationTree.ProductionCenters[i].LocationID+'>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            $('.selection-location').select2({
+                width: "100%",
+              placeholder: 'Select Location',
+              searchInputPlaceholder: 'Search options'
+            });
+
+            $('.selection-department, .selection-subdepartment').select2({width: "100%"});
+
+            var locat_selected;
+            $(document).on("change",".selection-location",function(){
+                locat_selected = $(this).select2("val");
+                console.log(locat_selected);
+
+                $('.selection-department').select2('destroy');
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        select_depart.append('<optgroup label="'+LocationTree.ProductionCenters[i].Description+'">')
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                        select_depart.append('</optgroup>')
+                    }
+                }
+
+                $('.selection-department').select2({
+                    width: "100%",
+                  placeholder: 'Select Department',
+                  searchInputPlaceholder: 'Search options'
+                });
+                $('.selection-subdepartment').select2();
+            });
+
+            $(document).on("change",".selection-department",function(){
+                var department_selected = $(this).select2("val");
+                console.log(department_selected);
+
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                select_subdepart.append('<optgroup label="' + LocationTree.ProductionCenters[i].Description+ " - " + LocationTree.ProductionCenters[i].Departments[j].Description + '">')
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                                select_subdepart.append('</optgroup>')
+                            }
+                        }
+                    }
+                }
+
+                $('.selection-subdepartment').select2({
+                    width: "100%",
+                  placeholder: 'Select Sub Department',
+                  searchInputPlaceholder: 'Search options'
+                });
+            });
+
+            @if(Session["HistoryPrimary_main_source"] != null && Session["HistoryPrimary_main_source"].ToString() == "Location")
+            {
+                @: $('#location_detail').show();
+
+                if (Session["HistoryPrimary_location1"] != null)
+                {
+                    @: $('.selection-location').val(@(Session["HistoryPrimary_location1"].ToString())).change();
+
+                    if (Session["HistoryPrimary_location2"] != null)
+                    {
+                        @: $('.selection-department').val(@(Session["HistoryPrimary_location2"].ToString())).change();
+
+                        if (Session["HistoryPrimary_location3"] != null)
+                        {
+                            @: $('.selection-subdepartment').val(@(Session["HistoryPrimary_location3"].ToString())).change();
+                        }
+                    }
+                }
+            }
+		});
+
+        $('#btnSearch').on('click', function () {
+			$('#loading_overlay').removeClass('d-none');
+            var dateFilter = $('#flDate').val();
+            var shiftFilter = $('#shift').val() != "" ? $('#shift').val() : "";
+            var lphTypeFilter = $('#lphtype').val();
+			var source = $('#source').val();
+			var main_source = $('#select_source').val();
+            var location1 = $('.selection-location').val();
+            var location2 = $('.selection-department').val();
+            var location3 = $('.selection-subdepartment').val();
+
+
+            var table = $('#historyList').dataTable({
+			"autoWidth": false,
+			"processing": true,
+			"serverSide": true,
+			"filter": true,
+			"orderMulti": false,
+            "pageLength": 25,
+            "destroy": true,
+            "order": [[ 0, "desc" ]],
+			"ajax": {
+                "url": fastApp.BaseUrl + "/HistoryPrimary/GetData",
+                "data": { dateFilter: dateFilter, shift: shiftFilter, lphtype: lphTypeFilter, source: source, main_source: main_source, location1:location1, location2:location2, location3:location3 },
+				"type": "POST",
+				"datatype": "json"
+			},
+                "drawCallback": function (settings) {
+                    $('#loading_overlay').addClass('d-none');
+                },
+				"columnDefs":
+					[{
+						"targets": [0],
+                        "searchable": true,
+                        "visible": true,
+						"orderable": true
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [7],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [8],
+						"searchable": true,
+						"orderable": true
+                    },
+                    {
+						"targets": [9],
+						"searchable": true,
+                        "orderable": true,
+                        "className": "tx-center"
+					},
+					],
+				"columns": [
+					{ "data": "ID", "name": "ID","title":"ID", "autoWidth": false },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+                    },
+                    { "data": "Shift", "name": "Shift", "autoWidth": true },
+                    { "data": "LPHHeader", "title":"LPH Type","autoWidth": true,
+                        render: function (data, type, row) {
+                            console.log("---" + data + "---");
+                            if (data == "LPHPrimaryKretekLineAddback")
+                                return "Kretek Line - Addback";
+                            else if (data == "LPHPrimaryDiet")
+                                 return "Intermediate Line - DIET";
+                            else if (data == "LPHPrimaryCloveInfeedConditioning")
+                                 return "Intermediate Line - Clove Feeding & DCCC";
+                            else if (data == "LPHPrimaryCSFCutDryPacking")
+                                return "Intermediate Line - CSF Cut Dry & Packing";
+                            else if (data == "LPHPrimaryCSFInfeedConditioning")
+                                return "Intermediate Line - CSF Feeding & DCCC";
+                            else if (data == "LPHPrimaryCloveCutDryPacking")
+                                return "Intermediate Line - Clove Cut Dry & Packing";
+                            else if (data == "LPHPrimaryRTC")
+                                return "Intermediate Line - RTC";
+                            else if (data == "LPHPrimaryKitchen")
+                                return "Intermediate Line - Casing Kitchen";
+                            else if (data == "LPHPrimaryWhiteLineOTP")
+                                return "White Line OTP - Process Note";
+                            else if (data == "LPHPrimaryKretekLineFeeding")
+                                return "Kretek Line - Feeding KR & RJ";
+                            else if (data == "LPHPrimaryKretekLineConditioning")
+                                return "Kretek Line - DCCC KR & RJ";
+                            else if (data == "LPHPrimaryKretekLineCuttingDrying")
+                                return "Kretek Line - Cut Dry";
+                            else if (data == "LPHPrimaryKretekLinePacking")
+                                return "Kretek Line - Packing";
+                            else if (data == "LPHPrimaryCresFeedingConditioning")
+                                return "Kretek Line - CRES Feeding & DCCC";
+                            else if (data == "LPHPrimaryCresDryingPacking")
+                                return "Kretek Line - CRES Cut Dry & Packing";
+                            else if (data == "LPHPrimaryWhiteLineFeedingWhite")
+                                return "White Line PMID - Feeding White";
+                            else if (data == "LPHPrimaryWhiteLineDCCC")
+                                return "White Line PMID - DCCC";
+                            else if (data == "LPHPrimaryWhiteLineCuttingFTD")
+                                return "White Line PMID - Cutting + FTD";
+                            else if (data == "LPHPrimaryWhiteLineAddback")
+                                return "White Line PMID - Addback";
+                            else if (data == "LPHPrimaryWhiteLinePackingWhite")
+                                return "White Line PMID - Packing White";
+                            else if (data == "LPHPrimaryWhiteLineFeedingSPM")
+                                return "White Line PMID - Feeding SPM";
+                            else if (data == "LPHPrimaryISWhiteFeeding")
+                                return "White Line PMID - Feeding IS White";
+                            else if (data == "LPHPrimaryISWhiteCutDry")
+                                return "White Line PMID - Cut Dry IS White";
+                            else
+								return data;
+                        }
+                    },
+                    { "data": "ModifiedBy", "name": "ModifiedBy", "title":"Created By","autoWidth": true },
+					{ "data": "Location", "name": "Location", "title": "Location", "autoWidth": true },
+                    { "data": "Status", "name": "Status", "title": "Status", "autoWidth": true },
+                    {
+						"data": "CreatedAt",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '-';
+						}
+                    },
+                    {
+						"data": "StatusChangedAt",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '-';
+						}
+                    },
+				    {
+						"render": function (data, type, full, meta) {
+							if ((full['UserID'] != "@(ViewBag.Me)") || (full['IsCompleted'] || full['IsDeleted'] == 0) && full['Status'] != "Draft") {
+									return '<button class="btn btn-default pd-0-f" onclick="Submitted(\'' + full['LPHID'] + '\')"  title="View"><i class="fa fa-eye"></i></button>';
+							} else {
+								return '<button class="btn btn-default pd-0-f mg-r-10" onclick="Edit(\'' + full['LPHID'] + '\')" title="Edit"><i class="fa fa-edit"></i></button>' +
+									'<button class="btn btn-default pd-0-f" onclick="Delete(\'' + full['LPHID'] + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+							}
+						}
+					}
+				]
+            });
+            var buttons = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-file-pdf"></i> PDF',
+						"extend": 'pdf',
+						"className": 'btn btn-sm pd-x-15 btn-primary btn-uppercase',
+						"title": 'LPH Primary History List',
+						"extension": '.pdf',
+						"exportOptions": {
+							columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+						},
+						"customize": function (doc) {
+							doc.content[1].table.widths =
+								Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+						}
+					}
+				]
+			}).container().appendTo($('#buttonpdf'));
+
+		    var buttons2 = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-print"></i> Print',
+						"extend": 'print',
+						"title": 'LPH Primary History List',
+						"className": 'btn btn-sm pd-x-15 btn-primary btn-uppercase',
+						"exportOptions": {
+							columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+						}
+					}
+				]
+			}).container().appendTo($('#buttonprint'));
+        });
+
+        var Edit = function (LPHID) {
+            $.ajax({
+			url: fastApp.BaseUrl + '/HistoryPrimary/GetPPLPHDetailByLPHID?lphid=' + LPHID,
+			type: 'POST',
+			success: function (result) {
+                console.log(result);
+                var resType = result.Result.LPHType;
+                window.location.href = fastApp.BaseUrl  + '/' + resType + '/Edit?lphid=' + LPHID;
+			}
+		});
+        }
+
+        var Delete = function (ID) {
+		    $("#deleteconfirm").empty();
+		    $("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+		    $("#deleteconfirm").append($('<span>').css('color', 'Red').text(ID));
+		    $("#deleteconfirm").append(" ?");
+		    $("#deleteModal").modal('show');
+		    $("#modal-btn-ok").unbind().one("click", function () {
+			    $("#deleteModal").modal('hide');
+			    DeleteLPH(ID);
+		    });
+		}
+
+		var Submitted = function (LPHID) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/HistoryPrimary/GetPPLPHDetailByLPHID?lphid=' + LPHID,
+				type: 'POST',
+				success: function (result) {
+					console.log(result);
+					var resType = result.Result.LPHType;
+					window.location.href = fastApp.BaseUrl + '/' + resType + '/Submitted?lphid=' + LPHID;
+				}
+			});
+		}
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+        function DeleteLPH(Id) {
+			$('#loading_overlay').removeClass('d-none');
+			$.ajax({
+				url: fastApp.BaseUrl + '/HistoryPrimary/Delete?lphid=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+                    }
+				},
+				complete: function (data) {
+				  $('#loading_overlay').addClass('d-none');
+					setTimeout(function () {
+						location.reload();
+					}, 1000);
+				}
+			});
+        }
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+            var dateFilter = $('#flDate').val();
+            var shiftFilter = $('#shift').val() != "" ? $('#shift').val() : "";
+            var lphTypeFilter = $('#lphtype').val();
+            var source = $('#source').val();
+            var main_source = $('#select_source').val();
+            var location1 = $('.selection-location').val();
+            var location2 = $('.selection-department').val();
+            var location3 = $('.selection-subdepartment').val();
+            window.open(
+              '@Url.Action("ExportExcel", "HistoryPrimary")?dateFilter=' + dateFilter + '&shift=' + shiftFilter + '&lphtype=' + lphTypeFilter + '&source=' + source + '&main_source=' + main_source + '&location1=' + location1 + '&location2=' + location2 + '&location3=' + location3,
+              '_blank'
+            );
+		}
+
+        function GeneratePDF() {
+			var notice = new PNotify({
+				title: "Generating PDF file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			var dateFilter = $('#flDate').val();
+            var shiftFilter = $('#shift').val() != "" ? $('#shift').val() : "";
+            var lphTypeFilter = $('#lphtype').val();
+            var source = $('#source').val();
+            var main_source = $('#select_source').val();
+            var location1 = $('.selection-location').val();
+            var location2 = $('.selection-department').val();
+			var location3 = $('.selection-subdepartment').val();
+
+            window.open(
+              '@Url.Action("ExportPDF", "HistoryPrimary")?dateFilter=' + dateFilter + '&shift=' + shiftFilter + '&lphtype=' + lphTypeFilter + '&source=' + source + '&main_source=' + main_source + '&location1=' + location1 + '&location2=' + location2 + '&location3=' + location3,
+              '_blank'
+            );
+		};
+	</script>
+}
+

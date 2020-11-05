@@ -1,0 +1,1378 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report KPI</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report KPI</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>
+                <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export CSV</button>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group d-flex">
+                                <label class="col-form-label" style="flex:3">Date</label>
+                                <div style="flex:21">
+                                    <div class="input-group col">
+                                        <input type="text" class="datepicker form-control" name="start" />
+                                        <input type="week" class="form-control" name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="datepicker form-control" name="end" />
+                                        <input type="week" class="form-control" name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        <option value="pp">PP - PP White - Karawang</option>
+                                        <option value="pk">PK - PP Kretek - Karawang</option>
+                                        <option value="pj">PJ - PP Kretek - Sukorejo</option>
+                                        <option value="pb">PB - PP White - SIS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Filter Line</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" name="line">
+                                        <option label="Select Line"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <ul id="line-tabs" class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">Volume</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">CRR</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">Yield</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">DIM LASER</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">DIM KDF</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">DIM UMILD</a>
+                        </li>
+                    </ul>
+
+                    <div id="lines" class="carousel" data-pause="true">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">Volume</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" id="collapseExamplebandrol" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info">
+                                                            <tr class="tx-center">
+                                                                <th style="min-width:120px;">Order</th>
+                                                                <th style="min-width:60px;">Material</th>
+                                                                <th style="min-width:180px;">Material Description</th>
+                                                                <th style="min-width:90px;">Order</th>
+                                                                <th style="min-width:140px;">Resource</th>
+                                                                <th style="min-width:140px;">Target Quantity</th>
+                                                                <th style="min-width:140px;">Confirmed Quantity</th>
+                                                                <th style="min-width:90px;">Balance</th>
+                                                                <th style="min-width:100px;">Base Unit</th>
+                                                                <th style="min-width:120px;">Based Start Date</th>
+                                                                <th style="min-width:140px;">Scheduled</th>
+                                                                <th style="min-width:120px;">Basic Finish Date</th>
+                                                                <th style="min-width:140px;">Scheduled</th>
+                                                                <th style="min-width:140px;">Technical Completion</th>
+                                                                <th style="min-width:120px;">Settled Date</th>
+                                                                <th style="min-width:90px;">Created</th>
+                                                                <th style="min-width:90px;">Released</th>
+                                                                <th style="min-width:90px;">GMPS</th>
+                                                                <th style="min-width:90px;">TECO</th>
+                                                                <th style="min-width:90px;">CLSD</th>
+                                                                <th style="min-width:90px;">Deleted</th>
+                                                            </tr>
+                                                            <tr class="summary-body">
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>0</th>
+                                                                <th>0</th>
+                                                                <th>0</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="volume">
+                                                            <tr>
+                                                                <td>100900296</td>
+                                                                <td>FA067814.08
+                                                                <td>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                                                <td>ZGP4</td>
+                                                                <td>MB51PB51</td>
+                                                                <td>43223.04</td>
+                                                                <td>42610.048</td>
+                                                                <td>612.992</td>
+                                                                <td>TH</td>
+                                                                <td>11/26/2019</td>
+                                                                <td>12:00:00 AM</td>
+                                                                <td>12/2/2019</td>
+                                                                <td>1/1/1900  12:00:00 AM</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td>N</td>
+                                                                <td>Y</td>
+                                                                <td>Y</td>
+                                                                <td>N</td>
+                                                                <td>N</td>
+                                                                <td>N</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--VOLUME-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">Volume</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" id="collapseExamplebandrol" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info">
+                                                            <tr>
+                                                                <th style="min-width:90px;">Material</th>
+                                                                <th style="min-width:90px;">Batch</th>
+                                                                <th style="min-width:90px;">Qty (TH)</th>
+                                                                <th style="min-width:100px;">Volume (TH)</th>
+                                                                <th style="min-width:90px;">%</th>
+                                                            </tr>
+                                                            <tr class="summary-body">
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>0</th>
+                                                                <th>0</th>
+                                                                <th>0</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="volume">
+                                                            <tr>
+                                                                <td>FA067814.08</td>
+                                                                <td>PB-CL048</td>
+                                                                <td>2.956</td>
+                                                                <td>42610.048</td>
+                                                                <td>0.01%</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--VOLUME-->
+                                </div>
+                            </div> <!-- VOLUME -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">CRR</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:90px;">Posting Date</th>
+                                                                <th style="min-width:110px;">Machine</th>
+                                                                <th style="min-width:90px;">Machine Type</th>
+                                                                <th style="min-width:240px;">Shift</th>
+                                                                <th style="min-width:280px;">Order</th>
+                                                                <th style="min-width:280px;">PO Lead Material</th>
+                                                                <th style="min-width:280px;">Material Description</th>
+                                                                <th style="min-width:280px;">Quantity</th>
+                                                                <th style="min-width:280px;">Base unit of Measure</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="crr" class="tx-center">
+                                                            <tr>
+                                                                <td>11/25/2019</td>
+                                                                <td>PB61</td>
+                                                                <td>Packer</td>
+                                                                <td>1</td>
+                                                                <td>100897935</td>
+                                                                <td>FC100278.09</td>
+                                                                <td>7AROARJ</td>
+                                                                <td>L&amp;M SUPERIORS (BLUE) AC KS FINE FLAVOR</td>
+                                                                <td>70.05</td>
+                                                                <td>TH</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>11/25/2019</td>
+                                                                <td>PB61</td>
+                                                                <td>Packer</td>
+                                                                <td>1</td>
+                                                                <td>100897935</td>
+                                                                <td>FC100278.09</td>
+                                                                <td>7AROARJ</td>
+                                                                <td>L&amp;M SUPERIORS (BLUE) AC KS FINE FLAVOR</td>
+                                                                <td>70.05</td>
+                                                                <td>TH</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>11/25/2019</td>
+                                                                <td>PB61</td>
+                                                                <td>Packer</td>
+                                                                <td>1</td>
+                                                                <td>100897935</td>
+                                                                <td>FC100278.09</td>
+                                                                <td>7AROARJ</td>
+                                                                <td>L&amp;M SUPERIORS (BLUE) AC KS FINE FLAVOR</td>
+                                                                <td>70.05</td>
+                                                                <td>TH</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>11/25/2019</td>
+                                                                <td>PB61</td>
+                                                                <td>Packer</td>
+                                                                <td>1</td>
+                                                                <td>100897935</td>
+                                                                <td>FC100278.09</td>
+                                                                <td>7AROARJ</td>
+                                                                <td>L&amp;M SUPERIORS (BLUE) AC KS FINE FLAVOR</td>
+                                                                <td>70.05</td>
+                                                                <td>TH</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>11/25/2019</td>
+                                                                <td>PB61</td>
+                                                                <td>Packer</td>
+                                                                <td>1</td>
+                                                                <td>100897935</td>
+                                                                <td>FC100278.09</td>
+                                                                <td>7AROARJ</td>
+                                                                <td>L&amp;M SUPERIORS (BLUE) AC KS FINE FLAVOR</td>
+                                                                <td>70.05</td>
+                                                                <td>TH</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--CRR-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">Daily Stock</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:90px;">CRR</th>
+                                                                <th style="min-width:120px;">Total Reject</th>
+                                                                <th style="min-width:80px;">%</th>
+                                                            </tr>
+                                                            <tr class="summary-body">
+                                                                <th></th>
+                                                                <th>0</th>
+                                                                <th>0</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dailistock" class="tx-center">
+                                                            <tr>
+                                                                <td>LinkUp</td>
+                                                                <td>247.769</td>
+                                                                <td>0.58</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Maker</td>
+                                                                <td>760.858</td>
+                                                                <td>1.73</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Packer</td>
+                                                                <td>315.125</td>
+                                                                <td>0.72</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--DAILY STOCK-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">Daily Stock</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:90px;">CRR</th>
+                                                                <th style="min-width:120px;">Total Reject</th>
+                                                                <th style="min-width:80px;">%</th>
+                                                            </tr>
+                                                            <tr class="summary-body">
+                                                                <th></th>
+                                                                <th>0</th>
+                                                                <th>0</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dailistock" class="tx-center">
+                                                            <tr>
+                                                                <td>LinkUp</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Maker</td>
+                                                                <td>760.858</td>
+                                                                <td>1.74</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Packer</td>
+                                                                <td>315.125</td>
+                                                                <td>0.72</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--DAILY STOCK-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold"></div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:90px;">Order</th>
+                                                                <th style="min-width:120px;">Machine Type</th>
+                                                                <th style="min-width:80px;">Total</th>
+                                                                <th style="min-width:80px;">LU</th>
+                                                                <th style="min-width:80px;">Volume/LU</th>
+                                                                <th style="min-width:80px;">% CRR</th>
+                                                            </tr>
+                                                            <tr class="summary-body">
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>1323.752</th>
+                                                                <th>All</th>
+                                                                <th>42610.05</th>
+                                                                <th>3.01</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dailistock" class="tx-center">
+                                                            <tr>
+                                                                <td>100900296</td>
+                                                                <td>LinkUp</td>
+                                                                <td>247.769</td>
+                                                                <td>MB51PB51</td>
+                                                                <td>42610.05</td>
+                                                                <td>0.56</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>100900296</td>
+                                                                <td>Maker</td>
+                                                                <td>760.858</td>
+                                                                <td>MB51PB51</td>
+                                                                <td>42610.05</td>
+                                                                <td>1.73</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>100900296</td>
+                                                                <td>Packer</td>
+                                                                <td>315.125</td>
+                                                                <td>MB51PB51</td>
+                                                                <td>42610.05</td>
+                                                                <td>0.72</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!---->
+                                </div>
+                            </div> <!-- CRR -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">YIELD</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:180px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:100px;">Material</th>
+                                                                <th style="min-width:110px;">Material</th>
+                                                                <th style="min-width:260px;">Material Description</th>
+                                                                <th style="min-width:180px;">Base Unit Of Measure</th>
+                                                                <th style="min-width:90px;">Category</th>
+                                                                <th style="min-width:180px;">Material Group Desc.</th>
+                                                                <th style="min-width:180px;">Goods Receipt Qty</th>
+                                                                <th style="min-width:180px;">Goods Issue Qty</th>
+                                                                <th style="min-width:90px;">WIP Qty</th>
+                                                                <th style="min-width:160px;">Stock Take Qty</th>
+                                                                <th style="min-width:140px;">Scrap Qty</th>
+                                                                <th style="min-width:140px;">Tot TKG GI</th>
+                                                                <th style="min-width:140px;">Tot TKG GR</th>
+                                                                <th style="min-width:160px;">Tot TKG NonBOM</th>
+                                                                <th style="min-width:160px;">Tot TKG WIP</th>
+                                                                <th style="min-width:90px;">Yield %</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="umild" class="tx-center">
+                                                            <tr>
+                                                                <td>V0J5CC</td>
+                                                                <td>UMI01RJ</td>
+                                                                <td>U MILD SLI 90</td>
+                                                                <td>TH</td>
+                                                                <td>COMPONENT </td>
+                                                                <td>Reject Cigarettes/S</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>1323.75</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>949.13</td>
+                                                                <td></td>
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Yield-->
+                                </div>
+                            </div> <!-- PLANNING CUTTING -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">DIM LASER</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:280px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:120px;">Company Code</th>
+                                                                <th style="min-width:120px;">Issuing Plant</th>
+                                                                <th style="min-width:140px;">Process Order</th>
+                                                                <th style="min-width:100px;">Component</th>
+                                                                <th style="min-width:200px;">Material Desc.</th>
+                                                                <th style="min-width:150px;">Base Unit Of Measure</th>
+                                                                <th style="min-width:140px;">Description</th>
+                                                                <th style="min-width:130px;">Lead material</th>
+                                                                <th style="min-width:180px;">Lead material Desc</th>
+                                                                <th style="min-width:150px;">GR Quantity</th>
+                                                                <th style="min-width:200px;">Base Unit of Measure</th>
+                                                                <th style="min-width:200px;">Std Usg of measure</th>
+                                                                <th style="min-width:200px;">Std Usg Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Goods issue Qty</th>
+                                                                <th style="min-width:200px;">Use Dev Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Goods Issue Value</th>
+                                                                <th style="min-width:200px;">Usg Dev Val w/oWaste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="ucool" class="tx-center">
+                                                            <tr>
+                                                                <td>3066</td>
+                                                                <td>ID04</td>
+                                                                <td>100899648</td>
+                                                                <td>52.A08Q</td>
+                                                                <td>TP1 (240.00/3000/65.0/4) DTP.11JR</td>
+                                                                <td>PC</td>
+                                                                <td>Paper Inner Liner</td>
+                                                                <td>32.FB2C</td>
+                                                                <td>MIC 2.0 150.0 13.0 60.00/3000/65.0 DTP.1</td>
+                                                                <td>1248</td>
+                                                                <td>PC</td>
+                                                                <td>312</td>
+                                                                <td>312</td>
+                                                                <td>0</td>
+                                                                <td>643032000</td>
+                                                                <td>643032000</td>
+                                                                <td>0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>3066</td>
+                                                                <td>ID04</td>
+                                                                <td>100899649</td>
+                                                                <td>52.A008</td>
+                                                                <td>TP1 (240.00/3000/66.0/4) DTP.A408 [.]</td>
+                                                                <td>PCE</td>
+                                                                <td>Paper Inner Liner</td>
+                                                                <td>32.FBHEC</td>
+                                                                <td>MIC 2.0 280.0 13.0 60.00/3000/66.0 DTP.A</td>
+                                                                <td>480</td>
+                                                                <td>PC</td>
+                                                                <td>120</td>
+                                                                <td>120</td>
+                                                                <td>0</td>
+                                                                <td>223717014</td>
+                                                                <td>223717014</td>
+                                                                <td>0</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Dim Laser-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">DIM LASER</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:280px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:140px;">Process Order</th>
+                                                                <th style="min-width:140px;">Lead Material</th>
+                                                                <th style="min-width:90px;">Component</th>
+                                                                <th style="min-width:200px;">Sum of Std Usg Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Sum of Goods issue Qty</th>
+                                                                <th style="min-width:200px;">Sum of Std Usg Val w/oWaste</th>
+                                                                <th style="min-width:200px;">Sum of Goods Issue Value</th>
+                                                                <th style="min-width:200px;">Sum of Usg Dev Val w/oWaste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dim-biru" class="tx-center">
+                                                            <tr>
+                                                                <td>100899648</td>
+                                                                <td>32.FB2C</td>
+                                                                <td>52.A08Q</td>
+                                                                <td>312</td>
+                                                                <td>312</td>
+                                                                <td>64303232000</td>
+                                                                <td>64303232000</td>
+                                                                <td>0</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Dim Laser-->
+                                </div>
+                            </div> <!-- Dim Laser -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">DIM KDF</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:280px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:120px;">Company Code</th>
+                                                                <th style="min-width:120px;">Issuing Plant</th>
+                                                                <th style="min-width:140px;">Process Order</th>
+                                                                <th style="min-width:100px;">Component</th>
+                                                                <th style="min-width:200px;">Material Desc.</th>
+                                                                <th style="min-width:150px;">Base Unit Of Measure</th>
+                                                                <th style="min-width:140px;">Description</th>
+                                                                <th style="min-width:130px;">Lead material</th>
+                                                                <th style="min-width:180px;">Lead material Desc</th>
+                                                                <th style="min-width:150px;">GR Quantity</th>
+                                                                <th style="min-width:200px;">Base Unit of Measure</th>
+                                                                <th style="min-width:200px;">Std Usg of measure</th>
+                                                                <th style="min-width:200px;">Std Usg Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Goods issue Qty</th>
+                                                                <th style="min-width:200px;">Use Dev Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Goods Issue Value</th>
+                                                                <th style="min-width:200px;">Usg Dev Val w/oWaste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="ucool" class="tx-center">
+                                                            <tr>
+                                                                <td>3066</td>
+                                                                <td>ID04</td>
+                                                                <td>100899652</td>
+                                                                <td>20.0001</td>
+                                                                <td>Triacetin</td>
+                                                                <td>KG</td>
+                                                                <td>Filter Add/Act Chrc</td>
+                                                                <td>34.C1LIC</td>
+                                                                <td>SIN STD SLI MED ACT WHI 5.0 Y 30000</td>
+                                                                <td>10604.358</td>
+                                                                <td>TH</td>
+                                                                <td>365.956</td>
+                                                                <td>235.56</td>
+                                                                <td>130.396</td>
+                                                                <td>7088282</td>
+                                                                <td>4562613</td>
+                                                                <td>2525669</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Dim Kdf-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">DIM Kdf</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:280px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:140px;">Description</th>
+                                                                <th style="min-width:90px;">Component</th>
+                                                                <th style="min-width:200px;">Sum of Std Usg Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Sum of Goods issue Qty</th>
+                                                                <th style="min-width:200px;">Sum of Std Usg Val w/oWaste</th>
+                                                                <th style="min-width:200px;">Sum of Goods Issue Value</th>
+                                                                <th style="min-width:200px;">Sum of Usg Dev Val w/oWaste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dim-biru" class="tx-center">
+                                                            <tr>
+                                                                <td>Acetate Tow</td>
+                                                                <td>22.A082</td>
+                                                                <td>5271.63</td>
+                                                                <td>5115</td>
+                                                                <td>343423605</td>
+                                                                <td>333219846</td>
+                                                                <td>10203759</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Dim Kdf-->
+                                </div>
+                            </div> <!-- Monitoring Stock Banderol -->
+
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">DIM Umild</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:280px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:120px;">Company Code</th>
+                                                                <th style="min-width:120px;">Issuing Plant</th>
+                                                                <th style="min-width:140px;">Process Order</th>
+                                                                <th style="min-width:100px;">Component</th>
+                                                                <th style="min-width:200px;">Material Desc.</th>
+                                                                <th style="min-width:150px;">Base Unit Of Measure</th>
+                                                                <th style="min-width:140px;">Description</th>
+                                                                <th style="min-width:130px;">Lead material</th>
+                                                                <th style="min-width:180px;">Lead material Desc</th>
+                                                                <th style="min-width:150px;">GR Quantity</th>
+                                                                <th style="min-width:200px;">Base Unit of Measure</th>
+                                                                <th style="min-width:200px;">Std Usg of measure</th>
+                                                                <th style="min-width:200px;">Std Usg Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Goods issue Qty</th>
+                                                                <th style="min-width:200px;">Use Dev Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Goods Issue Value</th>
+                                                                <th style="min-width:200px;">Usg Dev Val w/oWaste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="ucool" class="tx-center">
+                                                            <tr>
+                                                                <td>1670</td>
+                                                                <td>ID14</td>
+                                                                <td>100900296</td>
+                                                                <td>30.A9YF</td>
+                                                                <td>WOO Per 18-24 - AP18-24 STD REP 24.00/70</td>
+                                                                <td>PC</td>
+                                                                <td>Cigarette Paper</td>
+                                                                <td>FA067814.08</td>
+                                                                <td>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                                                <td>42610.048</td>
+                                                                <td>TH</td>
+                                                                <td>389.584</td>
+                                                                <td>393.058</td>
+                                                                <td>-3.474</td>
+                                                                <td>46750080</td>
+                                                                <td>47166960</td>
+                                                                <td>-416880</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Dim Laser-->
+
+                                    <div class="col-12 mg-b-20">
+                                        <div class="card collect-component" id="Information">
+                                            <div class="card-header bg-primary tx-white tx-center font-weight-bold">DIM Umild</div>
+                                            <div class="card-body">
+                                                <div class="tableWrapper" style="max-height:280px">
+                                                    <table class="table table-bordered table-hover table-striped">
+                                                        <thead class="thead-info tx-center">
+                                                            <tr>
+                                                                <th style="min-width:140px;">Description</th>
+                                                                <th style="min-width:90px;">Component</th>
+                                                                <th style="min-width:200px;">Sum of Std Usg Qty w/oWaste</th>
+                                                                <th style="min-width:200px;">Sum of Goods issue Qty</th>
+                                                                <th style="min-width:200px;">Sum of Std Usg Val w/oWaste</th>
+                                                                <th style="min-width:200px;">Sum of Goods Issue Value</th>
+                                                                <th style="min-width:200px;">Sum of Usg Dev Val w/oWaste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dim-biru" class="tx-center">
+                                                            <tr>
+                                                                <td>Adhesives</td>
+                                                                <td>80.3324</td>
+                                                                <td>75.505</td>
+                                                                <td>76</td>
+                                                                <td>2532705</td>
+                                                                <td>2549309</td>
+                                                                <td>-16604</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!--Dim Umild-->
+                                </div>
+                            </div> <!-- Monitoring Stock Banderol -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- container -->
+    </div><!-- content -->
+    <!-- content -->
+
+
+    @section Scripts{
+        <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+        <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+        <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+        <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+        <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+        <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+        <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+        <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+        <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+        <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+        <script>
+            /* chart.js chart examples */
+
+            // chart colors
+            var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+            var chBar = document.getElementById("chwaste");
+            var chartData = {
+                labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
+                datasets: [{
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: colors[0]
+                },
+                {
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: colors[1]
+                },
+                {
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: colors[2]
+                }]
+            };
+
+            if (chBar) {
+                new Chart(chBar, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                barPercentage: 0.4,
+                                categoryPercentage: 0.5
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: false
+                                }
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                });
+            }
+        </script> @*chrph1*@
+
+
+        <script>
+            $(document).ready(function () {
+                $("#line-tabs li").click(function () {
+                    $(this).siblings().children().removeClass("active");
+                    $(this).children().toggleClass("active");
+                    const index = $(this).index() + 1;
+                    $("#lines .carousel-item.active").removeClass("active");
+                    const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                    $(carouselItem).toggleClass("active");
+                    $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                        const top = $(this).position().top;
+                        $(this).children().css({ "top": top });
+                    });
+                    ieFix();
+                });
+            });
+        </script> @*tabbel wrapper*@
+
+        <script>
+            $("#btnShowHide").click(function () {
+                var x = document.getElementById("collapseExample");
+                if (x.style.display === 'none') {
+                    x.style.display = '';
+                    $('.tableWrapper thead tr').each(function () {
+                        const top = $(this).position().top;
+                        $(this).children().css({
+                            "top": top,
+                            "position": "sticky",
+                            "z-index": "100",
+                        });
+                    });
+                    $(this).text("Hide Table");
+                } else {
+                    x.style.display = 'none';
+                    $(this).text("Show Table");
+                }
+            });
+        </script> @*hide button*@
+
+
+
+        <!------------------------ STICKY ------------------------------------>
+        <script>
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({
+                    "top": top,
+                    "position": "sticky",
+                    "z-index": "100",
+                });
+            });
+        </script>
+
+        <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+        <script>
+            const loc = {
+                pp: [
+                    {
+                        groupname: "White Line PMID",
+                        opts: [
+                            {
+                                opt: "Feeding White",
+                                section: "feedingWhite",
+                            },
+                            {
+                                opt: "DCCC",
+                                section: "wlpDCCC",
+                            },
+                            {
+                                opt: "Cutting FTD",
+                                section: "wlCuttingFTD",
+                            },
+                            {
+                                opt: "Addback",
+                                section: "wlAddback",
+                            },
+                            {
+                                opt: "Packing White",
+                                section: "wlPackingWhite",
+                            },
+                            {
+                                opt: "Feeding SPM",
+                                section: "wlFeedingSPM",
+                            },
+                            {
+                                opt: "Feeding IS White",
+                                section: "wlFeedingISWhite",
+                            },
+                            {
+                                opt: "Cut Dry IS White",
+                                section: "wlCutDryISWhite",
+                            },
+                        ],
+                    },
+                ],
+                pk: [
+                    {
+                        groupname: "Intermediate Line",
+                        opts: [
+                            {
+                                opt: "Clove Feeding &amp; DCCC",
+                                section: "CloveFeedingConditioning",
+                            },
+                            {
+                                opt: "Clove Cut Dry &amp; Packing",
+                                section: "CloveCutDry",
+                            },
+                            {
+                                opt: "CSF Feeding &amp; DCCC",
+                                section: "CSFFeedingDCCC",
+                            },
+                            {
+                                opt: "CSF Cut Dry &amp; Packing",
+                                section: "CSFCutDry",
+                            },
+                            {
+                                opt: "RTC",
+                                section: "RTC",
+                            },
+                            {
+                                opt: "DIET",
+                                section: "diet",
+                            },
+                            {
+                                opt: "Casing Kitchen",
+                                section: "kitchen",
+                            },
+                        ],
+                    },
+                    {
+                        groupname: "Kretek Line",
+                        opts: [
+                            {
+                                opt: "Feeding KR &amp; RJ",
+                                section: "feedingKRRJ",
+                            },
+                            {
+                                opt: "DCCC KR &amp; RJ",
+                                section: "dcccKRRJ",
+                            },
+                            {
+                                opt: "Cut Dry",
+                                section: "KLcutdry",
+                            },
+                            {
+                                opt: "Addback",
+                                section: "KLAddback",
+                            },
+                            {
+                                opt: "Packing",
+                                section: "packing",
+                            },
+                            {
+                                opt: "CRES Feeding &amp; DCCC",
+                                section: "cresFeedingDCCC",
+                            },
+                            {
+                                opt: "CRES Cut Dry &amp; Packing",
+                                section: "cresCutDryDCCC",
+                            },
+                        ],
+                    },
+                ],
+                pj: [
+                    {
+                        groupname: "Intermediate Line",
+                        opts: [
+                            {
+                                opt: "Clove Feeding &amp; DCCC",
+                                section: "CloveFeedingConditioning",
+                            },
+                            {
+                                opt: "Clove Cut Dry &amp; Packing",
+                                section: "CloveCutDry",
+                            },
+                            {
+                                opt: "CSF Feeding &amp; DCCC",
+                                section: "CSFFeedingDCCC",
+                            },
+                            {
+                                opt: "CSF Cut Dry &amp; Packing",
+                                section: "CSFCutDry",
+                            },
+                            {
+                                opt: "RTC",
+                                section: "RTC",
+                            },
+                            {
+                                opt: "DIET",
+                                section: "diet",
+                            },
+                            {
+                                opt: "Casing Kitchen",
+                                section: "kitchen",
+                            },
+                        ],
+                    },
+                    {
+                        groupname: "Kretek Line",
+                        opts: [
+                            {
+                                opt: "Feeding KR &amp; RJ",
+                                section: "feedingKRRJ",
+                            },
+                            {
+                                opt: "DCCC KR &amp; RJ",
+                                section: "dcccKRRJ",
+                            },
+                            {
+                                opt: "Cut Dry",
+                                section: "KLcutdry",
+                            },
+                            {
+                                opt: "Addback",
+                                section: "KLAddback",
+                            },
+                            {
+                                opt: "Packing",
+                                section: "packing",
+                            },
+                            {
+                                opt: "CRES Feeding &amp; DCCC",
+                                section: "cresFeedingDCCC",
+                            },
+                            {
+                                opt: "CRES Cut Dry &amp; Packing",
+                                section: "cresCutDryDCCC",
+                            },
+                        ],
+                    },
+                ],
+                pb: [
+                    {
+                        groupname: "White Line OTP",
+                        opts: [
+                            {
+                                opt: "PP SIS - Process Note",
+                                section: "",
+                            },
+                        ]
+                    }
+                ],
+            }
+            const $tmpDiv = $('<div/>');
+            htmlEncode = (value) => $tmpDiv.text(value).html();
+            htmlDecode = (value) => $tmpDiv.html(value).text();
+            $(document).ready(function () {
+                $(".selectable-section").hide();
+                $("[name=prodCenter]").on("change", function () {
+                    let opt = '<option label="Select Line"></option>';
+                    const val = $(this).val();
+                    if (val != "") for (let i = 0; i < loc[val].length; i++) {
+                        opt += `<optgroup label="${loc[val][i].groupname}">`;
+                        for (let j = 0; j < loc[val][i].opts.length; j++)
+                            opt += `<option value="${loc[val][i].opts[j].opt}">${loc[val][i].opts[j].opt}</option>`;
+                        opt += `</optgroup>`;
+                    }
+                    $("[name=line]").html(opt);
+                })
+            });
+        </script>
+
+        <!------------------------ ACT BTN SEARCH ------------------------------------>
+        <script>
+            $(document).ready(function () {
+                $("#btnSearch").on("click", function () {
+                    const prodCenter = $("[name=prodCenter]").val();
+                    const opt = htmlEncode($("[name=line]").val());
+                    if (prodCenter != "" && opt != "") for (let i = 0; i < loc[prodCenter].length; i++) {
+                        for (let j = 0; j < loc[prodCenter][i].opts.length; j++)
+                            if (loc[prodCenter][i].opts[j].opt == opt && loc[prodCenter][i].opts[j].section != "") {
+                                $(".selectable-section").hide();
+                                $(`#${loc[prodCenter][i].opts[j].section}`).show();
+                            }
+                    } else $(".selectable-section").hide();
+                })
+            });
+        </script>
+
+        <!------------------------ DATEPICKER ------------------------------------>
+        <script>
+            $(document).ready(function () {
+                $('.datepicker').datepicker({
+                    calendarWeeks: true,
+                    enableOnReadonly: true,
+                    todayHighlight: true,
+                    format: 'dd-M-yyyy',
+                    language: 'id-ID',
+                    weekStart: 1,
+                    endDate: new Date(),
+                });
+                $(".datepicker[name='start']").on('changeDate', function (selected) {
+                    $("[name='end']").datepicker('setStartDate', selected.date);
+                    $("[name='start']").datepicker('hide');
+                    $("[name='end']").focus();
+                    $("[name='weekStart']").val(moment(selected.date).format("YYYY-[W]WW"));
+                });
+                $(".datepicker[name='end']").on('changeDate', function (selected) {
+                    $("[name='start']").datepicker('setEndDate', selected.date);
+                    if ($("[name='start']").val() == "") {
+                        $("[name='end']").datepicker('hide');
+                        $("[name='start']").focus();
+                    }
+                    $("[name='weekEnd']").val(moment(selected.date).format("YYYY-[W]WW"));
+                });
+                const max = moment().day(0).startOf('isoweek').format('YYYY-[W]WW');
+                $("[name='weekStart']").prop("max", max);
+                $("[name='weekEnd']").prop("max", max);
+                $("[name='weekStart']").on('change', function () {
+                    const val = $(this).val();
+                    const selected = moment().day(0).year(val.substr(0, 4)).isoWeek(val.substr(6, 2));
+                    $("[name='weekEnd']").prop("min", selected.format("YYYY-[W]WW"));
+                    $("[name='weekStart']").datepicker('hide');
+                    $("[name='weekEnd']").focus();
+                    $("[name='start']").datepicker('update', selected.startOf('isoweek').format('DD-MMM-YYYY'));
+                });
+                $("[name='weekEnd']").on('change', function () {
+                    const val = $(this).val();
+                    const selected = moment().day(0).year(val.substr(0, 4)).isoWeek(val.substr(6, 2));
+                    $("[name='weekStart']").prop("max", selected.format("YYYY-[W]WW"));
+                    if ($("[name='weekStart']").val() == "") {
+                        $("[name='weekEnd']").datepicker('hide');
+                        $("[name='weekStart']").focus();
+                    }
+                    $("[name='end']").datepicker('update', selected.startOf('isoweek').format('DD-MMM-YYYY'));
+                });
+            });
+        </script>
+    }

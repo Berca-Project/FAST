@@ -1,0 +1,1148 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Volume &amp; Claimable &amp; Maintenance</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Volume &amp; Claimable &amp; Maintenance</h4>
+            </div>
+            <div class="d-none d-md-block">
+                @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                    <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                    <button id="btnSave" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group d-flex">
+                                <label class="col-2" style="flex:1">Date</label>
+                                <div style="flex:3">
+                                    <div class="input-group col-12">
+                                        <input type="week" class="form-control" name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="week" class="form-control" name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Country</label>
+                                <div class="col-6">
+                                    <select class="form-control select2" name="country">
+                                        <option label="Select Country"></option>
+                                        <option value="id">ID - Indonesia</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Prod. Center</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" data-mock-width="150px" name="prodCenter">
+                                        <option label="Select Prod. Center"></option>
+                                        <option value="pi">PI - PMID Karawang</option>
+                                        <option value="pk">PK - SKM Karawang</option>
+                                        <option value="pb">PB - SIS Sukorejo</option>
+                                        <option value="pj">PJ - SKM Sukorejo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand</label>
+                                <div class="col-9">
+                                    <select class="form-control select2" data-mock-width="310px" name="brand">
+                                        <option label="Select Brand"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Volume & Claimable & Maintenance </div>
+                    <div class="card-body row">
+                        <div class="col-12 row" id="collapseExamplesumvolume" style="display:none;">
+                            <div class="content col-8">
+                                <canvas id="chsumvolume" height="100"></canvas>
+                            </div>
+
+                            <div class="divider-text divider-vertical" style="height:180px; margin:2em 5em 0em 2em;"></div>
+
+                            <div class="card col-3 pd-t-10 mg-t-20" style="height:320px; padding: 20px 20px 20px 20px;">
+                                <label style="font-weight:bold;">Legend</label>
+                                <div class="mg-b-0 mg-l-10 d-flex">
+                                    <div class="d-flex align-items-center mg-l-10 ">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#007bff; "></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; Volume (Th)</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mg-l-10 ">
+                                        <span class="d-block wd-15 ht-15" style="background-color:#5bd276;"></span>
+                                        <span class="tx-sans tx-uppercase tx-10 tx-medium tx-color-03">&nbsp; %</span>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+
+                        <div class="col-12 tx-center">
+                            <button class="align-self-center btn btn-outline-info" type="button" id="btnShowHidesumvolume" style="margin: auto 0 15px 0;">Show Chart</button>
+                        </div>
+
+                        <div class="tableWrapper" style=" min-height:300px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th rowspan="2" style="min-width:90px;">Order</th>
+                                        <th rowspan="2" style="min-width:90px;">Material</th>
+                                        <th rowspan="2" style="min-width:260px;">Material Description</th>
+                                        <th rowspan="2" style="min-width:90px;">Order</th>
+                                        <th rowspan="2" style="min-width:90px;">Resource</th>
+                                        <th rowspan="2" style="min-width:90px;">Target Qty</th>
+                                        <th rowspan="2" style="min-width:130px;">Confirmed Qty</th>
+                                        <th rowspan="2" style="min-width:90px;">Balance</th>
+                                        <th rowspan="2" style="min-width:160px;">Base UoM</th>
+                                        <th rowspan="2" style="min-width:140px;">Basic Start date</th>
+                                        <th rowspan="2" style="min-width:100px;">Scheduled Start</th>
+                                        <th rowspan="2" style="min-width:140px;">Basic Finish date</th>
+                                        <th rowspan="2" style="min-width:100px;">Scheduled Finish</th>
+                                        <th rowspan="2" style="min-width:160px;">Technical completion</th>
+                                        <th rowspan="2" style="min-width:130px;">Settled Date</th>
+                                        <th rowspan="2" style="min-width:90px;">Created</th>
+                                        <th rowspan="2" style="min-width:90px;">Released</th>
+                                        <th rowspan="2" style="min-width:90px;">GMPS</th>
+                                        <th rowspan="2" style="min-width:90px;">TECO</th>
+                                        <th rowspan="2" style="min-width:90px;">CLSD</th>
+                                        <th rowspan="2" style="min-width:90px;">Deleted</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="yield" class="tx-center">
+                                    <tr>
+                                        <td style=min-width:50px>100884891</td>
+                                        <td style=min-width:50px>FA067814.08</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB51PB51</td>
+                                        <td style=min-width:50px>24410.52</td>
+                                        <td style=min-width:50px>24230.02</td>
+                                        <td style=min-width:50px>180.50700000000001</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/23/2019</td>
+                                        <td style=min-width:50px>6:16:16</td>
+                                        <td style=min-width:50px>09/26/2019</td>
+                                        <td style=min-width:50px>8:00:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100884892</td>
+                                        <td style=min-width:50px>FA067814.08</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB57PB57</td>
+                                        <td style=min-width:50px>24143.08</td>
+                                        <td style=min-width:50px>23737.38</td>
+                                        <td style=min-width:50px>405.70600000000002</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/23/2019</td>
+                                        <td style=min-width:50px>6:16:57</td>
+                                        <td style=min-width:50px>09/26/2019</td>
+                                        <td style=min-width:50px>8:00:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100884893</td>
+                                        <td style=min-width:50px>FA068324.04</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 12 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB59PB59</td>
+                                        <td style=min-width:50px>18112.78</td>
+                                        <td style=min-width:50px>17949.70</td>
+                                        <td style=min-width:50px>163.08799999999999</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/23/2019</td>
+                                        <td style=min-width:50px>6:08:06</td>
+                                        <td style=min-width:50px>09/26/2019</td>
+                                        <td style=min-width:50px>8:00:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100885479</td>
+                                        <td style=min-width:50px>FA067814.08</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB51PB51</td>
+                                        <td style=min-width:50px>12405.21</td>
+                                        <td style=min-width:50px>24057.44</td>
+                                        <td style=min-width:50px>-11652.23</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/26/2019</td>
+                                        <td style=min-width:50px>10:36:51</td>
+                                        <td style=min-width:50px>09/28/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100885580</td>
+                                        <td style=min-width:50px>FA067814.08</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB57PB57</td>
+                                        <td style=min-width:50px>12346.99</td>
+                                        <td style=min-width:50px>22831.30</td>
+                                        <td style=min-width:50px>-10484.30</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/26/2019</td>
+                                        <td style=min-width:50px>10:37:51</td>
+                                        <td style=min-width:50px>09/28/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100885581</td>
+                                        <td style=min-width:50px>FA068324.04</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 12 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB59PB59</td>
+                                        <td style=min-width:50px>8919.82</td>
+                                        <td style=min-width:50px>17614.44</td>
+                                        <td style=min-width:50px>-8694.62</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/26/2019</td>
+                                        <td style=min-width:50px>10:38:46</td>
+                                        <td style=min-width:50px>09/28/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100885748</td>
+                                        <td style=min-width:50px>FA067814.08</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB51PB51</td>
+                                        <td style=min-width:50px>15676.42</td>
+                                        <td style=min-width:50px>5595.79</td>
+                                        <td style=min-width:50px>10080.62</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/28/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px>09/30/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100885749</td>
+                                        <td style=min-width:50px>FA067814.08</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 16 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB57PB57</td>
+                                        <td style=min-width:50px>16450.56</td>
+                                        <td style=min-width:50px>5533.09</td>
+                                        <td style=min-width:50px>10917.47</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/28/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px>09/30/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                    <tr>
+                                        <td style=min-width:50px>100885750</td>
+                                        <td style=min-width:50px>FA068324.04</td>
+                                        <td style=min-width:50px>SAMPOERNA U MILD LTK BOX 12 SLI</td>
+                                        <td style=min-width:50px>ZGP4</td>
+                                        <td style=min-width:50px>MB59PB59</td>
+                                        <td style=min-width:50px>12047.62</td>
+                                        <td style=min-width:50px>4280.41</td>
+                                        <td style=min-width:50px>7767.20</td>
+                                        <td style=min-width:50px>TH</td>
+                                        <td style=min-width:50px>09/28/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px>09/30/2019</td>
+                                        <td style=min-width:50px>5:59:00</td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px></td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>Y</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                        <td style=min-width:50px>N</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div class="tableWrapper col-12" id="collapseExamplesumvolume" style="margin-top:30px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Material</th>
+                                        <th style="min-width:90px;">Batch</th>
+                                        <th style="min-width:90px;">Qty (TH)</th>
+                                        <th style="min-width:110px;">Volume (TH)</th>
+                                        <th style="min-width:90px;">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sumvolume" class="tx-center">
+                                    <tr>
+                                        <td>FA068324.04</td>
+                                        <td>PB-CL039</td>
+                                        <td>18648</td>
+                                        <td>39844.548</td>
+                                        <td>0.05%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>FA067814.08</td>
+                                        <td>PB-CL039</td>
+                                        <td>44720</td>
+                                        <td>105985.008</td>
+                                        <td>0.04%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td></td>
+                                        <td>63.404</td>
+                                        <td>145859.556</td>
+                                        <td>0.04%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--rph1-->
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script>
+        /* chart.js chart examples */
+
+        // chart colors
+        var colors = ['#007bff', '#5bd276', '#444444', '#c3e6cb', '#dc3545', '#6c757d'];
+
+        var chBar = document.getElementById("chsumvolume");
+        var chartData = {
+            labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+            datasets: [{
+                data: [847, 854, 822, 557, 777, 873, 871],
+                backgroundColor: colors[0]
+            },
+            {
+                data: [53.77, 53.77, 53.77, 53.77, 53.77, 53.77, 53.77],
+                backgroundColor: colors[1]
+            }]
+        };
+
+        if (chBar) {
+            new Chart(chBar, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            barPercentage: 0.4,
+                            categoryPercentage: 0.5
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        }
+    </script> @*chvolume*@
+
+
+    <!------------------------ STICKY ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#line-tabs li").click(function () {
+                $(this).siblings().children().removeClass("active");
+                $(this).children().toggleClass("active");
+                const index = $(this).index() + 1;
+                $("#lines .carousel-item.active").removeClass("active");
+                const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                $(carouselItem).toggleClass("active");
+                $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({ "top": top });
+                });
+                ieFix();
+            });
+        });
+    </script> @*tabbel wrapper*@
+
+    <script>
+        $("#btnShowHidesumvolume").click(function () {
+            var x = document.getElementById("collapseExamplesumvolume");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $(this).text("Hide Chart");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Chart");
+            }
+        });
+    </script> @*hide button*@
+
+
+    <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+    <script>
+        const loc = {
+            pi: [
+                "[FA000963.01] MARLBORO MNT KS SOF 20",
+                "[FA000963.03] MARLBORO MNT KS SOF 20",
+            ],
+            pk: [
+                "[FA044121.18] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045300.06] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA045796.17] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA048259.10] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA069010.04] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA071690.00] - PHILIP MORRIS BOLD LTK BOX 12",
+            ],
+            pb: [
+                "[FG102151.01] - RYO CRAFTSMAN EXPRESSO P17 15.0",
+                "[FA071650.01] - SAMPOERNA U BOLD LTK BOX 12",
+                "[FA067815.06] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA068324.04] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.08] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.03] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.09] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068849.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FG102194.01] - RYO CRAFTSMAN SAILORS RUM P21 25",
+                "[FG102194.00] - RYO CRAFTSMAN SAILORS RUM P21 25",
+                "[FG102195.01] - RYO CRAFTSMAN BRUNSWICK BLEND P21 25",
+                "[FG102196.01] - RYO CRAFTSMAN SAILORS RUM P21 15",
+                "[FG102196.00] - RYO CRAFTSMAN SAILORS RUM P21 15",
+                "[FG102195.00] - RYO CRAFTSMAN BRUNSWICK BLEND P21 25",
+                "[FG102200.01] - RYO CHOICE FULL RED P21 25.0",
+                "[FG102201.01] - RYO CRAFTSMAN EXPRESSO P21 15.0",
+                "[FG102198.00] - RYO CHOICE ORIGINAL BLUE P21 25",
+                "[FG102200.00] - RYO CHOICE FULL RED P21 25.0",
+                "[FG102198.01] - RYO CHOICE ORIGINAL BLUE P21 25",
+                "[FG102201.00] - RYO CRAFTSMAN EXPRESSO P21 15.0",
+                "[FG102203.00] - RYO LONGBEACH RICH P21 25",
+                "[FG102199.01] - RYO CHOICE RICH GOLD P21 25.0",
+                "[FG102197.01] - RYO CRAFTSMAN BRUNSWICK BLEND P21 15",
+                "[FG102203.01] - RYO LONGBEACH RICH P21 25",
+                "[FG102197.00] - RYO CRAFTSMAN BRUNSWICK BLEND P21 15",
+                "[FG102202.01] - RYO CRAFTSMAN EXPRESSO P21 25.0",
+                "[FG102202.00] - RYO CRAFTSMAN EXPRESSO P21 25.0",
+                "[FG102199.00] - RYO CHOICE RICH GOLD P21 25.0",
+                "[FG102205.00] - RYO PETER JACKSON BLUE P21 15",
+                "[FG102204.00] - RYO LONGBEACH ORIGINAL YELLOW P21 25",
+                "[FG102205.01] - RYO PETER JACKSON BLUE P21 15",
+                "[FG102206.00] - RYO PETER JACKSON BLUE P21 25",
+                "[FG102204.01] - RYO LONGBEACH ORIGINAL YELLOW P21 25",
+                "[FG102206.01] - RYO PETER JACKSON BLUE P21 25",
+                "[FG102331.01] - RYO BOND STREET GOLD P21 15.0",
+                "[FG102329.01] - RYO BOND STREET RED P21 15.0",
+                "[FG102330.01] - RYO BOND STREET BLUE P21 15.0",
+                "[FG102371.00] - RYO BOND STREET RED P21 25.0",
+                "[FG102371.01] - RYO BOND STREET RED  25.0",
+                "[FG102372.00] - RYO BOND STREET BLUE P21 25.0",
+                "[FG102372.01] - RYO BOND STREET BLUE P21 25.0",
+                "[FG102373.01] - RYO BOND STREET GOLD P21 25.0",
+                "[FG102373.00] - RYO BOND STREET GOLD P21 25.0",
+                "[FG102318.00] - RYO MARLBORO P31 25.0",
+                "[FG102210.01] - RYO CRAFTSMAN ORIGINAL BATCH P11 30",
+                "[FG102209.01] - RYO CRAFTSMAN SAILORS RUM P11 30.0",
+                "[FG102329.00] - RYO BOND STREET RED P21 15.0",
+                "[FG102330.00] - RYO BOND STREET BLUE P21 15.0",
+                "[FG102336.00] - RYO AITO NOIR P31 30.0",
+                "[FG102337.00] - RYO MARLBORO P31 30.0",
+                "[FG102210.00] - RYO CRAFTSMAN ORIGINAL BATCH P11 30",
+                "[FG102328.00] - RYO LONGBEACH BYCRAFTS P11 30.0",
+                "[FG102209.00] - RYO CRAFTSMAN SAILORS RUM P11 30.0",
+                "[FG102331.00] - RYO BOND STREET GOLD P21 15.0",
+                "[FG102334.00] - RYO CRAFTSMAN FINE CUT P11 30.0",
+                "[FG102334.01] - RYO CRAFTSMAN FINE CUT P11 30.0",
+                "[FG102375.00] - RYO MARLBORO P31 25.0",
+                "[FC100365.07] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FC100309.03] - CIGRILL L&M RED LABEL KS BOX 12",
+                "[FA067814.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FC100319.15] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FC100689.00] - CIGRILL CRAFTSMAN NATURAL KS BOX 12",
+                "[FC100310.03] - CIGRILL L&M BLUE LABEL KS BOX 12",
+                "[FC100365.08] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FG102191.00] - RYO CHOICE ORIGINAL BLUE P21 15.0",
+                "[FG102192.01] - RYO CHOICE RICH GOLD P21 15.0",
+                "[FG102191.01] - RYO CHOICE ORIGINAL BLUE P21 15.0",
+                "[FG102193.00] - RYO CHOICE FULL RED P21 15.0",
+                "[FG102192.00] - RYO CHOICE RICH GOLD P21 15.0",
+                "[FG102193.01] - RYO CHOICE FULL RED P21 15.0",
+                "[FC100319.16] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FG102384.01] - RYO LONGBEACH ORIGINAL YELLOW P22 45.0",
+                "[FG102384.00] - RYO LONGBEACH ORIGINAL YELLOW P22 45.0",
+                "[FG102385.00] - RYO LONGBEACH RICH P22 45.0",
+                "[FG102385.01] - RYO LONGBEACH RICH P22 45.0",
+                "[FC100278.09] - CIGRILL L&M CIGARILOS KS BOX 12",
+                "[FG102151.00] - RYO CRAFTSMAN EXPRESSO P17 15.0",
+                "[FG102176.00] - RYO PETER JACKSON BLUE P17 15.0",
+                "[FC100307.09] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 12",
+                "[FC100365.10] - CIGRILL CHESTERFIELD CIGARILOS KS BOX 20",
+                "[FC100319.17] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FG102177.00] - RYO PETER JACKSON BLUE P17 25.0",
+                "[FG102120.01] - RYO CRAFTSMAN BRUNSWICK BLEND P17 15.0",
+                "[FG102106.01] - RYO CRAFTSMAN SAILORS RUM P17 25.0",
+                "[FG102104.01] - RYO CRAFTSMAN BRUNSWICK BLEND P17 25.0",
+                "[FG102166.00] - RYO CHOICE RICH GOLD P17 25.0",
+                "[FG102119.01] - RYO CRAFTSMAN SAILORS RUM P17 15.0",
+                "[FG102165.00] - RYO CHOICE ORIGINAL BLUE P17 25.0",
+                "[FG102150.01] - RYO CRAFTSMAN EXPRESSO P17 25.0",
+                "[FG102175.00] - RYO LONGBEACH ORIGINAL YELLOW P17 25.0",
+                "[FG102174.00] - RYO LONGBEACH RICH P17 25.0",
+                "[FG102167.00] - RYO CHOICE FULL RED P17 25.0",
+                "[FG102168.00] - RYO CHOICE ORIGINAL BLUE P17 15.0",
+                "[FG102170.00] - RYO CHOICE FULL RED P17 15.0",
+                "[FC100319.18] - CIGRILL CHESTERFIELD SUPBRIGH KS BOX 17",
+                "[FA071197.01] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FG100848.03] - RYO LONGBEACH ORIGINAL YELLOW POU 55",
+                "[FA067815.01] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA067814.06] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA071196.00] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.04] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA067815.04] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA068849.01] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068849.02] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA071197.00] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA071649.00] - SAMPOERNA U BOLD LTK BOX 12",
+                "[FA067814.10] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.05] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067815.07] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+
+            ],
+            pj: [
+                "[FA067629.04] - DJI SAM SOE NF LS SOF 12",
+                "[FA073805.00] - SAMPOERNA HIJAU SPECIAL NF LS SOF 12",
+                "[FA073804.00] - SAMPOERNA HIJAU ORIGINAL NF LS SOF 12",
+                "[FA070756.01] - SAMPOERNA HIJAU NF LS SOF 12",
+                "[FA071130.01] - DJI SAM SOE NF LS SOF 12",
+                "[FA049104.02] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA045796.11] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA050466.03] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA072334.00] - DJI SAM SOE LTK TIN 12 MAG",
+                "[FA073632.00] - SAMPOERNA U MNT KS BOX 20",
+                "[FA073634.00] - SAMPOERNA A KS BOX 20",
+                "[FA073635.00] - SAMPOERNA A MNT KS BOX 20",
+                "[FA044773.07] - SAMPOERNA HIJAU ORIGINAL NF LS SOF 12",
+                "[FA050597.06] - DJI SAM SOE NF LS SOF 12",
+                "[FA034649.12] - SAMPOERNA HIJAU NF LS SOF 12",
+                "[FA054807.05] - SAMPOERNA HIJAU SPECIAL NF LS SOF 12",
+                "[FA044182.08] - MARLBORO ULTRA LIGHTS KS BOX 20",
+                "[FA044428.08] - MARLBORO FILTER KS BOX 20",
+                "[FA073563.00] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA043509.08] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA073564.00] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044314.07] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA073565.00] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA070976.01] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA071127.03] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA048259.09] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA048258.10] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA073509.00] - SAMPOERNA A MILD LTK BOX 50 SLI",
+                "[FA068849.03] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA069779.03] - SAMPOERNA HIJAU NF LS SOF 10",
+                "[FA035621.19] - DJI SAM SOE SUPER PREMIUM NF LS SHO 12",
+                "[FA071115.05] - PANAMAS KUNING NF LS SOF 12",
+                "[FA067629.03] - DJI SAM SOE NF LS SOF 12",
+                "[FA072610.00] - SAMPOERNA A SPLASHTR MIX LTK BOX 16 SLI",
+                "[FA072611.00] - SAMPOERNA A SPLASHSU MIX LTK BOX 16 SLI",
+                "[FA061183.04] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.03] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA052576.18] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA061183.05] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069772.03] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.02] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA068715.07] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069748.06] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069772.02] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA010784.19] - DJI SAM SOE NF LS SOF 16",
+                "[FA064382.05] - DJI SAM SOE NF LS SOF 12",
+                "[FA068324.03] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067814.08] - SAMPOERNA U MILD LTK BOX 16 SLI",
+                "[FA068324.04] - SAMPOERNA U MILD LTK BOX 12 SLI",
+                "[FA067815.06] - SAMPOERNA U COOL MNT LTK BOX 16 SLI",
+                "[FA029605.10] - MARLBORO MENTHOL MNT KS BOX 20",
+                "[FA044121.24] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA048258.09] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA045796.17] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA045300.06] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA048259.08] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA045795.17] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA071271.02] - DJI SAM SOE MILD LTK OCT 20 SLI",
+                "[FA069010.04] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA062333.10] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA061184.04] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA073151.01] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA048258.08] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.03] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA044121.20] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045795.14] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA048258.07] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA031149.06] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA044504.06] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA048258.06] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.05] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.02] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA069393.00] - SAMPOERNA A PLATINUM LTK BOX 16 SLI",
+                "[FA069010.00] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA041433.05] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044504.05] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA045300.02] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA053179.02] - U BOLD LTK OCT 12 MAG",
+                "[FA048258.03] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA061184.01] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA041433.04] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA044504.04] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA061184.00] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA048258.01] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.00] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA050466.00] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA030853.03] - KRATON DALEM KRETEK NF LS SOF 12",
+                "[FA030853.02] - KRATON DALEM KRETEK NF LS SOF 12",
+                "[FA073563.01] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA073564.01] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA043509.09] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA073565.01] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA044314.08] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA071271.03] - DJI SAM SOE MILD LTK OCT 20 SLI",
+                "[FA045795.18] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA045300.07] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA073151.06] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA045796.18] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA062333.11] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA061184.06] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA072610.01] - SAMPOERNA A SPLASHTR MIX LTK BOX 16 SLI",
+                "[FA072611.01] - SAMPOERNA A SPLASHSU MIX LTK BOX 16 SLI",
+                "[FA044121.26] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA035621.21] - DJI SAM SOE SUPER PREMIUM NF LS SHO 12",
+                "[FA067629.05] - DJI SAM SOE NF LS SOF 12",
+                "[FA010784.21] - DJI SAM SOE NF LS SOF 16",
+                "[FA048258.11] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA052576.17] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA073151.02] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.04] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.03] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA073151.05] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA062333.02] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA060147.00] - SAMPOERNA A KLIK MNT KS BOX 20 SLI",
+                "[FA052943.00] - MARLBORO FUSION KS BOX 20",
+                "[FA066705.00] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA066704.00] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA068877.00] - MARLBORO MILD TOUCH LTK BOX 16 SLI",
+                "[FA052565.00] - MARLBORO FUSION (C) KS BOX 20",
+                "[FA066530.00] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA061183.12] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA071530.05] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA069772.10] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.10] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA068774.00] - DJI SAM SOE MILD LTK BOX 12 SLI",
+                "[FA069393.02] - SAMPOERNA A PLATINUM LTK BOX 16 SLI",
+                "[FA050607.00] - DJI SAM SOE RED LTK OCT 12 MAG",
+                "[FA069010.01] - MARLBORO FILTER BLACK LTK BOX 12",
+                "[FA069744.00] - MARLBORO MILD BLACK KS BOX 20 SLI",
+                "[FA050615.00] - MARLBORO FLAVOR PLUS KS BOX 20",
+                "[FA049647.14] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA056040.00] - SAMPOERNA KLIK KS BOX 20 SLI",
+                "[FA050583.00] - PHILIP MORRIS WHITE (1MG) KS RCB 20",
+                "[FA066531.00] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA050613.00] - MARLBORO REFINE KS BOS 20",
+                "[FA066530.01] - SAMPOERNA LTK OCT 20 SLI",
+                "[FA069783.00] - SAMPOERNA MNT KS BOX 10 SLI",
+                "[FA069782.00] - SAMPOERNA KS BOX 10 SLI",
+                "[FA044504.03] - SAMPOERNA A ULTRA MILD LTK BOX 16 SLI",
+                "[FA066531.01] - SAMPOERNA MNT LTK OCT 20 SLI",
+                "[FA069074.01] - SAMPOERNA A REGULAR KS BOX 20 SLI",
+                "[FA067816.03] - SAMPOERNA U BOLD LTK OCT 12 MAG",
+                "[FA062631.00] - L&M MIXX KS BOX 20",
+                "[FA062632.00] - L&M GREEN MIXX MNT KS BOX 20",
+                "[FA058600.00] - SAMPOERNA HIJAU FILTER LTK OCT 12 MAG",
+                "[FA057763.00] - SAMPOERNA A KLIK KS BOX 20 SLI",
+                "[FA068351.00] - SAMPOERNA A ABSOLSEN LTK BOX 16 SLI",
+                "[FA071720.00] - DJI SAM SOE MILD LTK BOX 50 SLI",
+                "[FA069732.01] - MARLBORO MILD BLACK LTK BOX 16 SLI",
+                "[FG100848.03] - RYO LONGBEACH ORIGINAL YELLOW POU 55",
+                "[FA058183.00] - SAMPOERNA A MILD KS BOX 20 SLI",
+                "[FA067816.02] - SAMPOERNA U BOLD LTK OCT 12 MAG",
+                "[FA065417.00] - SAMPOERNA A ABSOLSEN LTK RCS 20 SLI",
+                "[FA049646.13] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.27] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.35] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.12] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.33] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.35] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.27] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.33] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.34] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA050602.01] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA071719.00] - MARLBORO FILTER BLACK LTK BOX 50",
+                "[FA043582.04] - DJI SAM SOE PURE TASTE LTK BOX 12 SLI",
+                "[FA042526.05] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA049104.01] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA050599.00] - SAMPOERNA A VOLUTION 100 TIN 20 SSL",
+                "[FA049505.08] - SAMPOERNA KS BOX 20 SLI",
+                "[FA053959.00] - MARLBORO CLOVE MIX KS BOX 20",
+                "[FA055165.00] - MARLBORO FLAVOR PLUS KS BOS 20",
+                "[FA056983.00] - MARLBORO CLOVE MIX (2.0) KS BOX 20",
+                "[FA049170.00] - MARLBORO FRESH FUSION MNT KS BOX 20",
+                "[FA050484.00] - SAMPOERNA A MILD MNT LTK BOS 16 SLI",
+                "[FA050840.00] - FORTUNE KRETEK KS BOX 20",
+                "[FA049646.26] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050602.00] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA050601.00] - SAMPOERNA A BLUE LTK BOX 16 SLI",
+                "[FA050863.01] - SAMPOERNA KS BOX 20 SLI",
+                "[FA044121.10] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA050939.00] - MARLBORO REFINED KS BOX 20",
+                "[FA049171.00] - MARLBORO FUSION KS BOX 20",
+                "[FA051598.00] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA053457.00] - MARLBORO SPICE KS BOX 20",
+                "[FA050789.00] - FORTUNE KRETEK MINT MNT KS BOX 20",
+                "[FA050770.00] - MARLBORO KRETEK MNT KS BOX 20",
+                "[FA050858.00] - SAMPOERNA NEW RED FLAVOR KS BOX 20 SLI",
+                "[FA050940.00] - MARLBORO REFINED KS BOS 20",
+                "[FA053959.01] - MARLBORO CLOVE MIX KS BOX 20",
+                "[FA049647.19] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.36] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA067202.00] - SAMPOERNA KLIK MNT LTK OCT 20 SLI",
+                "[FA049678.01] - MARLBORO X-FUSION KS BOX 20",
+                "[FA069697.00] - SAMPOERNA A MILD LTK OPK 16 SLI",
+                "[FA065407.01] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA044123.11] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA057592.00] - L&M M-FUSION MNT KS BOX 20",
+                "[FA029426.13] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA061036.00] - SAMPOERNA U (WHITE) KS BOX 20 SLI",
+                "[FA064563.00] - DJI SAM SOE BLUE LTK OCT 20 SLI",
+                "[FA065407.00] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA029426.11] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA044314.03] - SAMPOERNA HIJAU FILTER LTK BOX 16 SLI",
+                "[FA045373.04] - SAMPOERNA A VOLUTION 100 LSB 16 SSL",
+                "[FA029426.12] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA029426.14] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA041433.03] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA045300.00] - DJI SAM SOE MILD LTK BOX 16 SLI",
+                "[FA045372.06] - SAMPOERNA A VOLUTION MNT 100 LSB 16 SSL",
+                "[FA041433.06] - DJI SAM SOE LIGHTS LTK OCT 12 MAG",
+                "[FA045373.06] - SAMPOERNA A VOLUTION 100 LSB 16 SSL",
+                "[FA019622.00] - SAMPOERNA A MILD MNT KS BOX 20 SLI",
+                "[FA045372.04] - SAMPOERNA A VOLUTION MNT 100 LSB 16 SSL",
+                "[FA045796.07] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA049646.14] - SAMPOERNA KS BOX 20 SLI",
+                "[FA044121.17] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA050857.00] - SAMPOERNA TROPICAL MNT KS BOX 20 SLI",
+                "[FA029426.10] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA049646.34] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050435.00] - SAMPOERNA A VOLUTION KS BOX 20",
+                "[FA050582.00] - MARLBORO (RED FWD) 100 BOX 20",
+                "[FA053212.00] - MARLBORO FUSION KS BOX 20",
+                "[FA049646.30] - SAMPOERNA KS BOX 20 SLI",
+                "[FA050863.00] - SAMPOERNA KS BOX 20 SLI",
+                "[FA056040.01] - SAMPOERNA KLIK KS BOX 20 SLI",
+                "[FA045796.05] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA049646.10] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049646.31] - SAMPOERNA KS BOX 20 SLI",
+                "[FA057591.00] - L&M FUSION KS BOX 20",
+                "[FA048258.04] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA048258.02] - SAMPOERNA A VOLUTION MNT 100 DHX 20 SSL",
+                "[FA049646.29] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.25] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.32] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.11] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.31] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.20] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA048259.03] - SAMPOERNA A VOLUTION 100 DHX 20 SSL",
+                "[FA049646.20] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.12] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA043509.04] - A ULTRA MENTHOL MNT LTK BOX 16 SLI",
+                "[FA049506.07] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049646.25] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.28] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.30] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.04] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA050466.02] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA049647.32] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA058184.00] - SAMPOERNA A MILD KS BOX 20 SLI",
+                "[FA065392.00] - MARLBORO MILD LTK RCS 20 SLI",
+                "[FA049646.19] - SAMPOERNA KS BOX 20 SLI",
+                "[FA049647.26] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA049647.13] - SAMPOERNA MNT KS BOX 20 SLI",
+                "[FA061184.05] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA071530.04] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA061183.11] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.09] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.09] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA044121.25] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA071127.04] - SAMPOERNA HIJAU NF LS BOX 12",
+                "[FA010784.20] - DJI SAM SOE NF LS SOF 16",
+                "[FA074380.00] - PHILIP MORRIS BOLD LTK BOX 16",
+                "[FA074381.00] - SAMPOERNA A FILTER LTK BOX 16",
+                "[FA074277.00] - SAMPOERNA A KS BOX 20 SLI",
+                "[FA074279.00] - SAMPOERNA A MNT KS BOX 20 SLI",
+                "[FA074278.00] - SAMPOERNA U MNT KS BOX 20 SLI",
+                "[FA071530.03] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA050466.04] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA045795.12] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA049104.00] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA049104.03] - SAMPOERNA A MILD LTK BOX 12 SLI",
+                "[FA044121.18] - SAMPOERNA A MILD LTK BOX 16 SLI",
+                "[FA062333.04] - SAMPOERNA A MILD MNT LTK BOX 16 SLI",
+                "[FA074125.00] - DJI SAM SOE NF LS SOF 16",
+                "[FA069772.07] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA069773.07] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA061183.09] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA061183.08] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.06] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.06] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA071530.02] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[FA045796.16] - DJI SAM SOE LTK OCT 12 MAG",
+                "[FA069773.05] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA061183.07] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069772.05] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA073954.00] - PANAMAS KUNING NF LS BOX 12",
+                "[FA073904.00] - PANAMAS KUNING NF LS BOX 12",
+                "[FA061183.06] - MARLBORO (RED FWD) KS BOX 20",
+                "[FA069773.04] - MARLBORO GOLD (3.0 ORIGINAL) KS BOX 20",
+                "[FA069772.04] - MARLBORO ICE BURST MNT KS BOX 20",
+                "[FA071530.01] - MARLBORO FILTER BLACK LTK RCS 20",
+                "[34.C24J] - HCD RIG NPO",
+                "[34.C24JC] - HCD RIG NPO",
+                "[34.C28B] - HCD RIG NPO",
+                "[34.C2LV] - HCD RIG NPO",
+                "[34.C2LVC] - HCD RIG NPO",
+                "[33.B0QW] - MONO STD",
+                "[33.B0YV] - HAT STD",
+                "[34.C1LIC] - C1LIC",
+            ],
+        }
+        $(document).ready(function () {
+            $("[name=prodCenter]").on("change", function () {
+                let opt = '<option label="Select Brand"></option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < loc[val].length; i++)
+                    opt += `<option value="${loc[val][i]}">${loc[val][i]}</option>`;
+                $("[name=brand]").html(opt);
+            })
+        });
+    </script>
+
+    <!------------------------ SELECT 2 ---------------------------------->
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.select2[data-mock-width]').on("select2:open", function () {
+                $(".select2-dropdown.select2-dropdown--below").css("min-width", $(this).data("mock-width"));
+            });
+        });
+    </script>
+
+
+    <!------------------------ DATEPICKER ------------------------------------>
+    <script>
+        $(document).ready(function () {
+            $('.input-daterange').datepicker({
+                calendarWeeks: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                //format: 'D, dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                $("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                $("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+        });
+    </script>
+}

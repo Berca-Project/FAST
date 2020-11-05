@@ -1,0 +1,265 @@
+
+// template and bootstrap override variables
+@import "../variables";
+@import "../bootstrap/variables";
+
+// template and bootstrap mixins
+@import "../mixins";
+@import "../bootstrap/mixins";
+
+// bootstrap
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
+
+// Skins
+$skin-brand-01:    lighten($color-brand-01, 15%);
+$skin-brand-02:    lighten($color-brand-02, 10%);
+$skin-text-02:     rgba(#fff, .85);
+$skin-text-03:     rgba(#fff, .5);
+
+///// HEADER /////
+.navbar-header {
+  background-color: $color-brand-02;
+  border-bottom-color: transparent;
+
+  .df-logo {
+    &,&:hover,&:focus {
+      color: #fff;
+      font-weight: $font-weight-semibold;
+
+      span { color: $skin-brand-01; }
+    }
+  }
+
+  .burger-menu {
+    color: rgba(#fff, .5);
+    @include hover-focus() { color: #fff; }
+  }
+
+  .nav-item {
+    &.with-sub {
+      .nav-link {
+        @include media-breakpoint-up(lg) {
+          &::after { border-color: rgba(#fff, .7); }
+          @include hover-focus() {
+            &::after { border-color: $skin-brand-01; }
+          }
+        }
+      }
+    }
+
+    &.active {
+      .nav-link {
+        @include media-breakpoint-up(lg) { color: $skin-brand-01; }
+      }
+
+      &.with-sub {
+        .nav-link {
+          &::after {
+            @include media-breakpoint-up(lg) { border-color: $skin-brand-01; }
+          }
+        }
+      }
+    }
+  }
+
+  .nav-link {
+    @include media-breakpoint-up(lg) {
+      color: rgba(#fff, .7);
+      @include hover-focus() { color: $skin-brand-01; }
+    }
+  }
+
+  .navbar-menu-sub {
+    border-top-color: transparent;
+    margin-top: 15px;
+
+    @include media-breakpoint-up(lg) {
+      margin-top: 1px;
+      box-shadow: 0 0 8px rgba($gray-900, .06);
+    }
+
+    &::before { opacity: 0; }
+  }
+
+  .navbar-right {
+    .search-link {
+      color: rgba(#fff, .7);
+      @include hover-focus() { color: #fff; }
+    }
+  }
+
+  .dropdown-notification,
+  .dropdown-message {
+    .dropdown-link {
+      color: rgba(#fff, .7);
+      @include hover-focus() { color: #fff; }
+    }
+
+    .dropdown-menu {
+      margin-top: 19.5px;
+      &::before { opacity: 0; }
+    }
+  }
+
+  .dropdown-profile .dropdown-link {
+    @include hover-focus() {
+      .avatar img {
+        background-color: rgba(#fff, .2);
+      }
+    }
+  }
+
+  .dropdown-menu {
+    border-width: 0;
+    box-shadow: 0 0 8px 2px rgba($gray-900, .1);
+  }
+
+  .btn-social {
+    color: rgba(#fff, .5);
+    @include hover-focus() { color: #fff; }
+  }
+
+  .btn-buy {
+    background-color: $color-brand-01;
+    color: #fff;
+  }
+}
+
+.navbar-search-header {
+  background-color: $skin-brand-02;
+  border-bottom-width: 0;
+
+  .form-control { color: #fff; }
+  .btn { color: #fff; }
+
+  .link-03 {
+    color: rgba(#fff, .5);
+    @include hover-focus() { color: #fff; }
+  }
+}
+
+.navbar-menu-wrapper {
+  background-color: #fff;
+  @include media-breakpoint-up(lg) { background-color: transparent; }
+}
+
+.navbar-menu-header {
+  background-color: $skin-brand-02;
+
+  a:last-child {
+    color: rgba(#fff, .3);
+
+    @include hover-focus() {
+      color: rgba(#fff, .6);
+    }
+  }
+}
+
+// Aside
+.aside.minimize {
+  .nav-aside .nav-label + .nav-item::before {
+    border-top-color: rgba(#fff, .12);
+  }
+}
+
+.aside-header {
+  background-color: $color-brand-02;
+  border-right-color: transparent;
+
+  .burger-menu {
+    color: rgba(#fff, .5);
+    @include hover-focus() { color: #fff; }
+  }
+}
+
+.aside-logo {
+  &,&:hover,&:focus {
+    color: #fff;
+    span {
+      color: lighten($color-brand-01, 15%);
+    }
+  }
+}
+
+.aside-menu-link {
+  color: rgba(#fff, .5);
+  @include hover-focus() { color: #fff; }
+}
+
+.aside-body {
+  border-top-color: transparent;
+  background-color: lighten($color-brand-02, 5%);
+}
+
+.aside-loggedin-user {
+  h6 {
+    color: #fff;
+    font-weight: $font-weight-medium;
+  }
+
+  p { color: rgba(#fff, .5); }
+
+  a {
+    define(['exports', 'module', '../utils', '../exception'], function (exports, module, _utils, _exception) {
+  'use strict';
+
+  // istanbul ignore next
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+  var _Exception = _interopRequireDefault(_exception);
+
+  module.exports = function (instance) {
+    instance.registerHelper('each', function (context, options) {
+      if (!options) {
+        throw new _Exception['default']('Must pass iterator to #each');
+      }
+
+      var fn = options.fn,
+          inverse = options.inverse,
+          i = 0,
+          ret = '',
+          data = undefined,
+          contextPath = undefined;
+
+      if (options.data && options.ids) {
+        contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
+      }
+
+      if (_utils.isFunction(context)) {
+        context = context.call(this);
+      }
+
+      if (options.data) {
+        data = _utils.createFrame(options.data);
+      }
+
+      function execIteration(field, index, last) {
+        if (data) {
+          data.key = field;
+          data.index = index;
+          data.first = index === 0;
+          data.last = !!last;
+
+          if (contextPath) {
+            data.contextPath = contextPath + field;
+          }
+        }
+
+        ret = ret + fn(context[field], {
+          data: data,
+          blockParams: _utils.blockParams([context[field], field], [contextPath + field, null])
+        });
+      }
+
+      if (context && typeof context === 'object') {
+        if (_utils.isArray(context)) {
+          for (var j = context.length; i < j; i++) {
+            if (i in context) {
+              execIteration(i, i, i === context.length - 1);
+            }
+          }
+        } else {
+          var prio

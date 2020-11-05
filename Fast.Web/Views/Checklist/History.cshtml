@@ -1,0 +1,164 @@
+﻿@model Fast.Web.Models.ChecklistSubmitModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: inherit;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        table.dataTable thead th, table.dataTable thead td {
+            vertical-align: middle;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">My Submission</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">My Submission</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="df-example demo-table">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered" id="do_datatable">
+                                <thead class="thead-primary font-weight-bold">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Checklist Menu Title</th>
+                                        <th>Author / PIC</th>
+                                        <th width="70px">Date</th>
+                                        <th>Time</th>
+                                        <th>Freq Subm.</th>
+                                        <th>Status</th>
+                                        <th>Comment</th>
+                                        <th width="100px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Histories != null)
+                                    {
+                                        var number = 1;
+                                        var counter = 0;
+                                        var temp = "";
+                                        foreach (Fast.Web.Models.ChecklistSubmitModel checklist in ViewBag.Histories)
+                                        {
+                                            try
+                                            {
+                                                string submitter = "none";
+                                                string submitterName = "Unregistered User";
+                                                try
+                                                {
+                                                    if (checklist.Submiter.ID != 0)
+                                                    {
+                                                        submitter = checklist.Submiter.EmployeeID.Trim();
+                                                        submitterName = "[" + checklist.Submiter.EmployeeID.Trim() + "] " + checklist.Submiter.FullName;
+                                                    }
+
+                                                    if (temp != checklist.Checklist.ID + "_" + checklist.CompleteDate.ToString("ddMMyyyy") + "_" + submitter + "_" + checklist.Shift)
+                                                    {
+                                                        counter = 0;
+                                                    }
+                                                    temp = checklist.Checklist.ID + "_" + checklist.CompleteDate.ToString("ddMMyyyy") + "_" + submitter + "_" + checklist.Shift;
+                                                    counter++;
+                                                } catch(Exception f)
+                                                {
+                                                    continue;
+                                                }
+                                                
+                                                Int32 unixTimestamp = (Int32)(Convert.ToDateTime(checklist.ModifiedDate).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+                                                <tr>
+                                                    <td>@(number++)</td>
+                                                    <td>@checklist.Checklist.MenuTitle</td>
+                                                    <!--<td><a href="@Url.Action("EditValue/"+checklist.ID+"_"+ViewBag.ReturnTo,"Checklist")">@unixTimestamp</a></td>-->
+                                                    <td>@submitterName</td>
+                                                    <td>@checklist.CompleteDate.ToString("dd-MMM-yy")</td>
+                                                    <td>@checklist.CompleteDate.ToString("HH:mm")</td>
+                                                    <td>@counter</td>
+                                                    <td>@checklist.Status</td>
+                                                    <td>@checklist.Comment</td>
+                                                    <td class="text-center">
+                                                        @if (checklist.IsEditable)
+                                                        {
+                                                            <a class="btn-default tx-black mg-r-10" title="Edit Submission" href="@Url.Action("EditValue/"+checklist.ID+"_"+ViewBag.ReturnTo,"Checklist")"><i class="fa fa-edit"></i></a>
+                                                            <a class="btn-default tx-black" title="Delete Submission" href="@Url.Action("DeleteSubmission/"+checklist.ID+"_"+ViewBag.ReturnTo,"Checklist")" onclick="return confirm('Do you really want to delete this item?')"><i class="fa fa-times"></i></a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a class="btn-default tx-black" title="View Submission" href="@Url.Action("ViewOnly/"+checklist.ID+"_"+ViewBag.ReturnTo,"Checklist")"><i class="fa fa-eye"></i></a>
+                                                        }
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                continue;
+                                            }
+
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#do_datatable').DataTable({
+                //responsive: true,
+                order: [[0, "desc"]],
+                //ordering: false,
+                language: {
+                    searchPlaceholder: 'Search...',
+                    sSearch: '',
+                    lengthMenu: '_MENU_ items/page',
+                },
+                columnDefs: [
+                    {
+                        "orderable": false, "targets": '_all'
+                    },
+                    {
+                        "targets": [0],
+                        "visible": false
+                    }]
+            });
+            $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+        });
+    </script>
+}

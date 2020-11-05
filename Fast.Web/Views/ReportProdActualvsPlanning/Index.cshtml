@@ -1,0 +1,855 @@
+﻿@model Fast.Web.Models.Report.ReportProdActualPlanningModel
+@using Fast.Web.Resources;
+
+@{
+	ViewBag.Title = "Index";
+}
+
+@section CSS_lib{
+	<link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+	<style>
+		.flex-input {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		.flex-break {
+			flex-basis: 100%;
+			height: 0;
+		}
+
+		.tableWrapper {
+			position: relative;
+			overflow: auto;
+			max-height: 150px;
+			transform: translateZ(0);
+		}
+
+			.tableWrapper table {
+				border-collapse: separate;
+				width: 100%;
+				border: none;
+			}
+
+			.tableWrapper thead th, .tableWrapper thead td {
+				position: -webkit-sticky;
+				position: sticky;
+				background: #066fcb;
+				z-index: 100;
+			}
+
+			.tableWrapper table tfoot td {
+				position: -webkit-sticky;
+				position: sticky;
+				bottom: 0;
+				z-index: 100;
+				overflow: hidden;
+			}
+
+			.tableWrapper .input td {
+				background: white;
+			}
+
+			.tableWrapper .summary-body td, .tableWrapper .summary-body th {
+				font-weight: bold;
+				background-color: #d8eafe;
+				color: #000;
+			}
+
+			.tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+				padding: unset;
+				border: 0;
+			}
+
+		.fa, .fas {
+			padding: 5px;
+			cursor: pointer;
+		}
+
+		.nav-link {
+			cursor: pointer;
+		}
+
+		.modal-body {
+			position: relative;
+			margin-top: 10px;
+		}
+
+			.modal-body .close {
+				padding: 5px;
+				position: absolute;
+				top: -5px;
+				right: 5px;
+				font-size: 15px;
+				color: black;
+				z-index: 1000;
+			}
+
+		.stepper {
+			position: relative;
+		}
+
+			.stepper:before {
+				top: 15px;
+				bottom: 0;
+				position: absolute;
+				content: " ";
+				width: 100%;
+				height: 1px;
+				background: #f1f1f1;
+				z-index: 0;
+			}
+
+		.stepper-step {
+			text-align: center;
+			position: relative;
+		}
+
+			.stepper-step.active .stepper-btn {
+				background: #37b6fa;
+				color: white;
+				font-weight: 500;
+				border: 0
+			}
+
+		.stepper-btn {
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			padding: 6px 0;
+			font-size: 12px;
+			line-height: 1.428571429;
+			border-radius: 15px;
+			background: #e6e6e6;
+			color: #9c9c9c;
+		}
+
+		.wizard-button {
+			margin: 5px;
+		}
+
+			.wizard-button.active {
+				filter: brightness(0.75);
+			}
+
+		.select2-container--default .select2-selection--single {
+			height: 25px;
+		}
+
+			.select2-container--default .select2-selection--single .select2-selection__arrow {
+				display: none;
+			}
+
+			.select2-container--default .select2-selection--single .select2-selection__rendered {
+				font-size: 13px;
+				padding: 5px;
+			}
+
+		.select2-search--dropdown {
+			padding: 1px;
+		}
+
+		.select2-container--default .select2-selection--multiple {
+			min-height: 23px;
+			border-radius: 0.25rem;
+		}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+				font-size: 13px;
+				padding: 0 0 0 5px;
+			}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__choice {
+				line-height: 16px;
+			}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+				line-height: 15px;
+			}
+
+
+		.select2-container--default .select2-search--dropdown .select2-search__field {
+			padding: 3px 5px;
+		}
+
+		.select2-results {
+			font-size: 13px;
+		}
+
+		.select2-results__option {
+			padding: 3px;
+		}
+
+			.select2-results__option[aria-selected=true] {
+				display: none;
+			}
+	</style>
+}
+
+<div class="content content-fixed lph-form">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+			<div>
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb breadcrumb-style1 mg-b-10">
+						<li class="breadcrumb-item"><a href="#">Report</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Plan vs Actual Report</li>
+					</ol>
+				</nav>
+				<h4 class="mg-b-0 tx-spacing--1">Plan vs Actual Report</h4>
+			</div>
+			<div class="d-none d-md-block">
+				<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+					<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+				</button>
+				<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcelRawData()">
+					<span><i class="fa fa-lg fa-file-excel"></i> Export Raw Data</span>
+				</button>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12 mg-b-20">
+				<div class="card collect-component" id="Information">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+					<div class="card-body flex-input">
+
+						<div style="flex:1;">
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Granularity</label>
+								<div class="col-9 d-flex" style="margin-top:5px">
+									<div class="custom-control custom-radio col-sm-4">
+										<input type="radio" class="custom-control-input" id="rbShiftly" name="rbGranularity" checked>
+										<label class="custom-control-label" for="rbShiftly">Shiftly</label>
+									</div>
+									<div class="custom-control custom-radio col-sm-4">
+										<input type="radio" class="custom-control-input" id="rbDaily" name="rbGranularity">
+										<label class="custom-control-label" for="rbDaily">Daily</label>
+									</div>
+									<div class="custom-control custom-radio col-sm-4">
+										<input type="radio" class="custom-control-input" id="rbWeekly" name="rbGranularity">
+										<label class="custom-control-label" for="rbWeekly">Weekly</label>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Prod Center</label>
+								<div class="col-9">
+									@Html.DropDownListFor(x => x.LocationIDList, (MultiSelectList)ViewBag.ProductionCenterList, new { @multiple = "multiple", @class = "form-control select2", @id = "ddlProdCenter", @style = "width: 100%" })
+								</div>
+							</div>
+						</div>
+
+						<div class="divider-text divider-vertical"></div>
+
+						<div style="flex:1">
+							<div class="form-group row" id="date-view">
+								<label class="col-3 col-form-label">Date</label>
+								<div class="col-8">
+									<div class="input-daterange input-group" id="datepicker">
+										<input type="text" class="form-control" name="start" id="startDate" />
+										<label>&nbsp; to &nbsp;</label>
+										<input type="text" class="form-control" name="end" id="endDate" />
+									</div>
+								</div>
+							</div>
+							<div class="form-group row" id="week-view" style="display:none;">
+								<label class="col-3 col-form-label">Week</label>
+								<div class="col-8">
+									<div class="input-group">
+										<input type="week" class="form-control" name="weekStart" id="startWeek">
+										<label>&nbsp; to &nbsp;</label>
+										<input type="week" class="form-control" name="weekEnd" id="endWeek" />
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Product</label>
+								<div class="col-8">
+									@Html.DropDownListFor(x => x.Product, (IEnumerable<SelectListItem>)ViewBag.ProductList, new { @class = "form-control", @id = "ddlProduct" })
+								</div>
+							</div>
+						</div>
+
+						<div class="divider-text divider-vertical"></div>
+
+						<div class="flex-1" style="max-width:300px;">
+							<div class="form-group row">
+								<label class="col-4 col-form-label">Type</label>
+								<div class="col-8 d-flex" style="margin-top:5px">
+									<div class="custom-control custom-radio col-sm-6">
+										<input type="radio" class="custom-control-input" id="byBrand" name="rbType" checked>
+										<label class="custom-control-label" for="byBrand">By Brand</label>
+									</div>
+									<div class="custom-control custom-radio col-sm-6">
+										<input type="radio" class="custom-control-input" id="byLU" name="rbType">
+										<label class="custom-control-label" for="byLU">By LU</label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="divider-text divider-vertical"></div>
+						<div class="flex-1" style="max-width:70px; margin-left:10px">
+							<div class="form-group row">
+								<button class="btn btn-sm  btn-primary btn-block btn-uppercase pd-y-3" id="btnSearch"><i data-feather="search"></i></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!--FILTER-->
+
+			<div class="col-12 mg-b-20 selectable-section" id="reportArea">
+				<div class="card collect-component" id="Information">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Plan &amp; Actual</div>
+					<div class="card-body">
+						<div class="tableWrapper col-12" style="min-height:500px;" id="reportTable">
+						</div>
+					</div>
+				</div>
+			</div>  <!--Plan & Act Shifty -->
+
+		</div><!-- row -->
+	</div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+	<script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+	<script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+	<script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+	<script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+	<script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+	<script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+	<script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+	<script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+	<script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+	<script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+	<!------------------------ STICKY ------------------------------------>
+	<script>
+		$('.tableWrapper thead tr').each(function () {
+			const top = $(this).position().top;
+			$(this).children().css({
+				"top": top,
+				"position": "sticky",
+				"z-index": "100",
+			});
+		});
+	</script>
+
+	<!------------------------ BUTTON SEARCH ------------------------------------>
+	<script>
+		$(document).ready(function () {
+			$(".selectable-section").hide();
+
+			$("#btnSearch").on("click", function () {
+				if ($('#ddlProdCenter').val() == null || $('#ddlProdCenter').val() == '0') {
+					alert('Select location first')
+					return false;
+				}
+
+				if ($("input[id='rbShiftly']") && $("input[id='rbShiftly']:checked").val() && ($('#startDate').val() == '' || $('#endDate').val() == '')) {
+					alert('Select start and end date first')
+					return false;
+				}
+
+				if ($("input[id='rbDaily']") && $("input[id='rbDaily']:checked").val() && ($('#startDate').val() == '' || $('#endDate').val() == '')) {
+					alert('Select start and end date first')
+					return false;
+				}
+
+				if ($("input[id='rbWeekly']") && $("input[id='rbWeekly']:checked").val() && ($('#startWeek').val() == '' || $('#endWeek').val() == '')) {
+					alert('Select start and end week first')
+					return false;
+				}
+
+				$(".selectable-section").hide();
+				var startWeek = $('#startWeek').val();
+				var endWeek = $('#endWeek').val();
+				var StartDateFilter = $('#startDate').val();
+				var EndDateFilter = $('#endDate').val();
+				var locationIDList = $('#ddlProdCenter').val();
+				var productType = $('#ddlProduct').val();
+				var granularity = 'Shiftly';
+				if ($("input[id='rbDaily']:checked").val()) {
+					granularity = 'Daily';
+				}
+				if ($("input[id='rbWeekly']:checked").val()) {
+					granularity = 'Weekly';
+				}
+
+                $('#loading_overlay').removeClass('d-none');
+				if ($("input[id='byBrand']:checked").val()) {
+					$.ajax({
+						type: "post",
+						url: fastApp.BaseUrl + "/ReportProdActualvsPlanning/GetReportDataByBrand",
+						data: { startDate: StartDateFilter, endDate: EndDateFilter, startWeek, endWeek, locationIDList, productType, granularity },
+						datatype: "json",
+						traditional: true,
+						success: function (data) {
+							if (data.Granularity == 'Shiftly') {
+								RenderShiftlyReportByBrand(data);
+							} else if (data.Granularity == 'Daily') {
+								RenderDailyReportByBrand(data);
+							} else {
+								RenderWeeklyReportByBrand(data);
+                            }
+
+                            $('#loading_overlay').addClass('d-none');
+						}
+					});
+				} else {
+					$.ajax({
+						type: "post",
+						url: fastApp.BaseUrl + "/ReportProdActualvsPlanning/GetReportDataByLU",
+						data: { startDate: StartDateFilter, endDate: EndDateFilter, startWeek, endWeek, locationIDList, productType, granularity },
+						datatype: "json",
+						traditional: true,
+						success: function (data) {
+							if (data.Granularity == 'Shiftly') {
+								RenderShiftlyReportByLU(data);
+							} else if (data.Granularity == 'Daily') {
+								RenderDailyReportByLU(data);
+							} else {
+								RenderWeeklyReportByLU(data);
+                            }
+
+                            $('#loading_overlay').addClass('d-none');
+						}
+					});
+				}
+			});
+
+			$("#rbWeekly").on("change", function () {
+				$("#date-view").hide();
+				$("#week-view").hide();
+				if ($("input[id='rbWeekly']:checked").val()) {
+					$("#week-view").show();
+					$('#startDate').val('');
+					$('#endDate').val('');
+				}
+				else {
+					$("#date-view").show();
+				}
+			});
+
+			$("#rbDaily").on("change", function () {
+				$("#date-view").hide();
+				$("#week-view").hide();
+				if ($("input[id='rbWeekly']:checked").val())
+					$("#week-view").show();
+				else {
+					$('#selectedWeek').val('');
+					$("#date-view").show();
+				}
+			});
+
+			$("#rbShiftly").on("change", function () {
+				$("#date-view").hide();
+				$("#week-view").hide();
+				if ($("input[id='rbWeekly']:checked").val())
+					$("#week-view").show();
+				else {
+					$('#selectedWeek').val('');
+					$("#date-view").show();
+				}
+			});
+		});
+
+		function RenderShiftlyReportByBrand(data) {
+			var tableHeader = "<table class='table table-bordered table-hover table-striped'><thead class='thead-info tx-center'><tr>";
+			tableHeader = tableHeader + "<th rowspan='2' style='min-width:100px;'>Item Code</th><th rowspan='2' style='min-width:350px;'>Description</th><th rowspan='2' style='min-width:140px;'>Type</th><th rowspan='2' style='min-width:100px;'>UOM</th>";
+			for (var i = 0; i < data.dateList.length; i++) {
+				tableHeader = tableHeader + '<th colspan="3" style="min-width:260px;">' + data.dateList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th rowspan="2" style="min-width:90px;">Total</th><th rowspan="2" style="min-width:110px;">Remarks</th></tr>';
+			tableHeader = tableHeader + '<tr>';
+			for (var i = 0; i < data.dateList.length; i++) {
+				tableHeader = tableHeader + '<th style="min-width:90px;">Shift 1</th><th style="min-width:90px;">Shift 2</th><th style="min-width:90px;">Shift 3</th>';
+			}
+			tableHeader = tableHeader + '</tr></thead>';
+			var tableBody = '<tbody class="tx-center">';
+			for (var i = 0; i < data.dataList.length; i++) {
+				tableBody = tableBody + '<tr>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ItemCode + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Description + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Type + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].UOM + '</td>';
+				for (var x = 0; x < data.dateList.length; x++) {
+					if ((i + 1) % 3 == 0) {
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift1Str + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift2Str + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift3Str + '</td>';
+					} else {
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift1 + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift2 + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift3 + '</td>';
+					}
+				}
+				if ((i + 1) % 3 == 0) {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].TotalStr + '</td>';
+				} else {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Total + '</td>';
+				}
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Remark + '</td>';
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#reportTable').html(tableHeader + tableBody);
+			$('#reportArea').show();
+		}
+
+		function RenderDailyReportByBrand(data) {
+			var tableHeader = "<table class='table table-bordered table-hover table-striped'><thead class='thead-info tx-center'><tr>";
+			tableHeader = tableHeader + "<th style='min-width:100px;'>Item Code</th><th style='min-width:350px;'>Description</th><th style='min-width:140px;'>Type</th><th style='min-width:100px;'>UOM</th>";
+			for (var i = 0; i < data.dateList.length; i++) {
+				tableHeader = tableHeader + '<th style="min-width:80px;">' + data.dateList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th style="min-width:90px;">Total</th><th style="min-width:110px;">Remarks</th></tr>';
+			tableHeader = tableHeader + '</thead>';
+			var tableBody = '<tbody class="tx-center">';
+			for (var i = 0; i < data.dataList.length; i++) {
+				tableBody = tableBody + '<tr>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ItemCode + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Description + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Type + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].UOM + '</td>';
+				for (var x = 0; x < data.dateList.length; x++) {
+					if ((i + 1) % 3 == 0) {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShiftStr + '</td>';
+					} else {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShift + '</td>';
+					}
+				}
+				if ((i + 1) % 3 == 0) {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].TotalStr + '</td>';
+				} else {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Total + '</td>';
+				}
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Remark + '</td>';
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#reportTable').html(tableHeader + tableBody);
+			$('#reportArea').show();
+		}
+
+		function RenderWeeklyReportByBrand(data) {
+			var tableHeader = "<table class='table table-bordered table-hover table-striped'><thead class='thead-info tx-center'><tr>";
+			tableHeader = tableHeader + "<th style='min-width:100px;'>Item Code</th><th style='min-width:350px;'>Description</th><th style='min-width:140px;'>Type</th><th style='min-width:100px;'>UOM</th>";
+			for (var i = 0; i < data.weekList.length; i++) {
+				tableHeader = tableHeader + '<th> Week - ' + data.weekList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th style="min-width:90px;">Total</th><th style="min-width:110px;">Remarks</th></tr></thead>';			
+
+			var tableBody = '<tbody class="tx-center">';
+			for (var i = 0; i < data.dataList.length; i++) {
+				tableBody = tableBody + '<tr>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ItemCode + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Description + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Type + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].UOM + '</td>';
+				for (var x = 0; x < data.weekList.length; x++) {
+					if ((i + 1) % 3 == 0) {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShiftStr + '</td>';
+					} else {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShift + '</td>';
+					}
+				}
+				if ((i + 1) % 3 == 0) {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].TotalStr + '</td>';
+				} else {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Total + '</td>';
+				}
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Remark + '</td>';
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#reportTable').html(tableHeader + tableBody);
+			$('#reportArea').show();
+		}
+
+		function RenderShiftlyReportByLU(data) {
+			var tableHeader = "<table class='table table-bordered table-hover table-striped'><thead class='thead-info tx-center'><tr>";
+			tableHeader = tableHeader + "<th rowspan='2' style='min-width:250px;'>Production Center</th><th rowspan='2' style='min-width:100px;'>LU</th><th rowspan='2' style='min-width:100px;'>Market</th><th rowspan='2' style='min-width:100px;'>Item Code</th><th rowspan='2' style='min-width:350px;'>Description</th><th rowspan='2' style='min-width:140px;'>Type</th><th rowspan='2' style='min-width:100px;'>UOM</th>";
+			for (var i = 0; i < data.dateList.length; i++) {
+				tableHeader = tableHeader + '<th colspan="3" style="min-width:260px;">' + data.dateList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th rowspan="2" style="min-width:90px;">Total</th><th rowspan="2" style="min-width:110px;">Remarks</th></tr>';
+			tableHeader = tableHeader + '<tr>';
+			for (var i = 0; i < data.dateList.length; i++) {
+				tableHeader = tableHeader + '<th style="min-width:90px;">Shift 1</th><th style="min-width:90px;">Shift 2</th><th style="min-width:90px;">Shift 3</th>';
+			}
+			tableHeader = tableHeader + '</tr></thead>';
+			var tableBody = '<tbody class="tx-center">';
+			for (var i = 0; i < data.dataList.length; i++) {
+				tableBody = tableBody + '<tr>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Location + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].LU + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Market + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ItemCode + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Description + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Type + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].UOM + '</td>';
+				for (var x = 0; x < data.dateList.length; x++) {
+					if ((i + 1) % 3 == 0) {
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift1Str + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift2Str + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift3Str + '</td>';
+					} else {
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift1 + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift2 + '</td>';
+						tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ShiftList[x].Shift3 + '</td>';
+					}
+				}
+				if ((i + 1) % 3 == 0) {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].TotalStr + '</td>';
+				} else {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Total + '</td>';
+				}
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Remark + '</td>';
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#reportTable').html(tableHeader + tableBody);
+			$('#reportArea').show();
+		}
+
+		function RenderDailyReportByLU(data) {
+			var tableHeader = "<table class='table table-bordered table-hover table-striped'><thead class='thead-info tx-center'><tr>";
+			tableHeader = tableHeader + "<th style='min-width:250px;'>Production Center</th><th style='min-width:100px;'>LU</th><th style='min-width:100px;'>Market</th><th style='min-width:100px;'>Item Code</th><th style='min-width:350px;'>Description</th><th style='min-width:140px;'>Type</th><th style='min-width:100px;'>UOM</th>";
+			for (var i = 0; i < data.dateList.length; i++) {
+				tableHeader = tableHeader + '<th style="min-width:80px;">' + data.dateList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th style="min-width:90px;">Total</th><th style="min-width:110px;">Remarks</th></tr></thead>';
+			var tableBody = '<tbody class="tx-center">';
+			for (var i = 0; i < data.dataList.length; i++) {
+				tableBody = tableBody + '<tr>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Location + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].LU + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Market + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ItemCode + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Description + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Type + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].UOM + '</td>';
+				for (var x = 0; x < data.dateList.length; x++) {
+					if ((i + 1) % 3 == 0) {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShiftStr + '</td>';
+					} else {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShift + '</td>';
+					}
+				}
+				if ((i + 1) % 3 == 0) {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].TotalStr + '</td>';
+				} else {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Total + '</td>';
+				}
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Remark + '</td>';
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#reportTable').html(tableHeader + tableBody);
+			$('#reportArea').show();
+		}
+
+		function RenderWeeklyReportByLU(data) {
+			var tableHeader = "<table class='table table-bordered table-hover table-striped'><thead class='thead-info tx-center'><tr>";
+			tableHeader = tableHeader + "<th style='min-width:180px;'>Production Center</th><th style='min-width:50px;'>LU</th><th style='min-width:50px;'>Market</th><th style='min-width:100px;'>Item Code</th><th style='min-width:320px;'>Description</th><th tyle='min-width:140px;'>Type</th><th style='min-width:100px;'>UOM</th>";
+			for (var i = 0; i < data.weekList.length; i++) {
+				tableHeader = tableHeader + '<th> Week - ' + data.weekList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th style="min-width:90px;">Total</th><th style="min-width:110px;">Remarks</th></tr></thead>';		
+
+			var tableBody = '<tbody class="tx-center">';
+			for (var i = 0; i < data.dataList.length; i++) {
+				tableBody = tableBody + '<tr>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Location + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].LU + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Market + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].ItemCode + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Description + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Type + '</td>';
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].UOM + '</td>';
+				for (var x = 0; x < data.weekList.length; x++) {
+					if ((i + 1) % 3 == 0) {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShiftStr + '</td>';
+					} else {
+						tableBody = tableBody + '<td style=min-width:100px>' + data.dataList[i].ShiftList[x].AllShift + '</td>';
+					}
+				}
+				if ((i + 1) % 3 == 0) {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].TotalStr + '</td>';
+				} else {
+					tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Total + '</td>';
+				}
+				tableBody = tableBody + '<td style=min-width:50px>' + data.dataList[i].Remark + '</td>';
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#reportTable').html(tableHeader + tableBody);
+			$('#reportArea').show();
+		}
+	</script>
+
+	<!------------------------ GENERATE EXCEL ------------------------------------>
+	<script>
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function GenerateExcel() {
+			if ($('#ddlProdCenter').val() == null || $('#ddlProdCenter').val() == '0') {
+				alert('Select location first')
+				return false;
+			}
+
+			if ($("input[id='rbShiftly']") && $("input[id='rbShiftly']:checked").val() && ($('#startDate').val() == '' || $('#endDate').val() == '')) {
+				alert('Select start and end date first')
+				return false;
+			}
+
+			if ($("input[id='rbDaily']") && $("input[id='rbDaily']:checked").val() && ($('#startDate').val() == '' || $('#endDate').val() == '')) {
+				alert('Select start and end date first')
+				return false;
+			}
+
+			if ($("input[id='rbWeekly']") && $("input[id='rbWeekly']:checked").val() && ($('#startWeek').val() == '' || $('#endWeek').val() == '')) {
+				alert('Select start and end week first')
+				return false;
+			}
+
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			var startWeek = $('#startWeek').val();
+			var endWeek = $('#endWeek').val();
+			var StartDateFilter = $('#startDate').val();
+			var EndDateFilter = $('#endDate').val();
+			var locationList = $('#ddlProdCenter').val();
+			var productType = $('#ddlProduct').val();
+			var granularity = 'Shiftly';
+			if ($("input[id='rbDaily']:checked").val()) {
+				granularity = 'Daily';
+			}
+			if ($("input[id='rbWeekly']:checked").val()) {
+				granularity = 'Weekly';
+			}
+
+			if ($("input[id='byBrand']:checked").val()) {
+				location.href = '@Url.Action("ExportExcelByBrand", "ReportProdActualvsPlanning")?startDate=' + StartDateFilter + '&EndDate=' + EndDateFilter + '&startWeek=' + startWeek + '&endWeek=' + endWeek + '&locationIDList=' + locationList + '&productType=' + productType + '&granularity=' + granularity;
+			} else {
+				location.href = '@Url.Action("ExportExcelByLU", "ReportProdActualvsPlanning")?startDate=' + StartDateFilter + '&EndDate=' + EndDateFilter + '&startWeek=' + startWeek + '&endWeek=' + endWeek + '&locationIDList=' + locationList + '&productType=' + productType + '&granularity=' + granularity;
+			}
+		};
+
+		function GenerateExcelRawData() {
+			if ($('#ddlProdCenter').val() == null || $('#ddlProdCenter').val() == '0') {
+				alert('Select location first')
+				return false;
+			}
+
+			if ($("input[id='rbShiftly']") && $("input[id='rbShiftly']:checked").val() && ($('#startDate').val() == '' || $('#endDate').val() == '')) {
+				alert('Select start and end date first')
+				return false;
+			}
+
+			if ($("input[id='rbDaily']") && $("input[id='rbDaily']:checked").val() && ($('#startDate').val() == '' || $('#endDate').val() == '')) {
+				alert('Select start and end date first')
+				return false;
+			}
+
+			if ($("input[id='rbWeekly']") && $("input[id='rbWeekly']:checked").val() && ($('#startWeek').val() == '' || $('#endWeek').val() == '')) {
+				alert('Select start and end week first')
+				return false;
+			}
+
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+
+			var startWeek = $('#startWeek').val();
+			var endWeek = $('#endWeek').val();
+			var StartDateFilter = $('#startDate').val();
+			var EndDateFilter = $('#endDate').val();
+			var locationList = $('#ddlProdCenter').val();
+			var productType = $('#ddlProduct').val();
+			var granularity = 'Shiftly';
+			if ($("input[id='rbDaily']:checked").val()) {
+				granularity = 'Daily';
+			}
+			if ($("input[id='rbWeekly']:checked").val()) {
+				granularity = 'Weekly';
+			}
+
+			location.href = '@Url.Action("ExportExcelRawData", "ReportProdActualvsPlanning")?startDate=' + StartDateFilter + '&EndDate=' + EndDateFilter + '&startWeek=' + startWeek + '&endWeek=' + endWeek + '&locationIDList=' + locationList + '&productType=' + productType + '&granularity=' + granularity;
+		};
+	</script>
+
+	<!------------------------ DATEPICKER ------------------------------------>
+	<script>
+		$(document).ready(function () {
+			$('.input-daterange').datepicker({
+				calendarWeeks: true,
+				enableOnReadonly: true,
+				todayHighlight: true,
+				format: 'dd-M-yy',
+				language: 'id-ID',
+			});
+			$(".input-daterange [name='start']").on('changeDate', function (selected) {
+				$("[name='end']").datepicker('setStartDate', selected.date);
+			});
+			$(".input-daterange [name='end']").on('changeDate', function (selected) {
+				$("[name='start']").datepicker('setEndDate', selected.date);
+			});
+			$("[name='weekStart']").on('input', function () {
+				$("[name='weekEnd']").prop('min', $(this).val());
+			});
+			$("[name='weekEnd']").on('input', function () {
+				$("[name='weekStart']").prop('max', $(this).val());
+			});
+		});
+	</script>
+
+	<!------------------------ SELECT 2 ------------------------------------>
+	<script>
+		$(document).ready(function () {
+			$('.select2').each(function (i, e) {
+				const param = {
+					allowClear: true,
+					placeholder: 'Choose one',
+					searchInputPlaceholder: 'Search options'
+				};
+				if ($(e).attr("multiple") == "multiple") {
+					param.placeholder = 'Choose one or more';
+					param.allowClear = false;
+				}
+				$(e).select2(param);
+			});
+		});
+	</script>
+}

@@ -1,0 +1,683 @@
+﻿@model Fast.Web.Models.EmployeeOvertimeModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+
+}
+@section Styles{
+	<style>
+		.dataTables_scrollHead table, .dataTables_scrollBody table {
+			width: 2500px !important;
+		}
+
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.EmployeeOvertimeList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.EmployeeOvertimeMasterData</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					@if (Model.Access.hasPrint)
+					{
+						@*<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GeneratePDF()">
+								<span><i class="fa fa-lg fa-file-pdf"></i> PDF</span>
+							</button>*@
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+					}
+					@*<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+							<i data-feather="repeat" class="mg-r-5"></i> Load All
+						</button>*@
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalUploadCategory" onclick="UpdateCategory()">
+						<i data-feather="repeat" class="mg-r-5"></i> Change Category
+					</button>
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+			<div class="row">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.StartDate</label>
+				</div>
+				<div class="col-md-2"><input class="form-control hasDatepicker" id="startDate" type="text" placeholder="dd-MMM-yy" autocomplete="off" /></div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.EndDate</label>
+				</div>
+				<div class="col-md-2"><input class="form-control hasDatepicker" id="endDate" type="text" placeholder="dd-MMM-yy" autocomplete="off" /></div>
+				<div class="col-sm-2">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProductionCenter</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+				</div>
+				<div class="col-sm-2">
+					<button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">Search</button>
+				</div>
+			</div>
+		</div>
+		<div class="dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="employeeTable">
+				<thead>
+					<tr>
+						<th>@UIResources.ID</th>
+						<th>@UIResources.EmployeeID</th>
+						<th>@UIResources.FullName</th>
+						<th>@UIResources.PositionDesc</th>
+						<th>@UIResources.DepartmentDesc</th>
+						<th>@UIResources.Location</th>
+						<th>@UIResources.CostCenter</th>
+						<th>@UIResources.Date</th>
+						<th>@UIResources.ClockIn</th>
+						<th>@UIResources.ClockOut</th>
+						<th>@UIResources.ActualIn</th>
+						<th>@UIResources.ActualOut</th>
+						<th>@UIResources.Overtime</th>
+						<th>@UIResources.Category</th>
+						<th>@UIResources.Comments</th>
+						<th>@UIResources.Action</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditEmpOvertime" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content" id="OpenDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalUploadCategory" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+		<div class="modal-content" id="UpdateGtDialog">
+
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<style>
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+
+	<script type="text/javascript">
+		var locationId = 0;
+		var locationType = 'productioncenter';
+
+        $('#btnSearch').on('click', function () {
+			var startDateFilter = $('#startDate').val();
+            var endDateFilter = $('#endDate').val();
+
+			locationId = $('#ddlProdCenter1').val();
+			locationType = 'productioncenter';
+
+			if ($('#startDate').val() == '') {
+				alert('Please select the start date first');
+			} else if ($('#endDate').val() == '') {
+				alert('Please select the end date first');
+			} else {
+				$('#employeeTable').dataTable({
+					"scrollX": true,
+					"autoWidth": false,
+					"processing": true,
+					"language": {
+						processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+					},
+					"serverSide": true,
+					"filter": true,
+					"orderMulti": false,
+					"pageLength": 10,
+					"destroy": true,
+					"ajax": {
+						"url": fastApp.BaseUrl + "/EmployeeOvertime/GetAllByParam",
+						"data": { startDateParam: startDateFilter, endDateParam: endDateFilter, locID: locationId, locType: locationType },
+						"type": "POST",
+						"datatype": "json"
+					},
+
+					"columnDefs":
+						[{
+							"targets": [0],
+							"searchable": false,
+							"visible": false,
+							"orderable": false
+						},
+						{
+							"targets": [1],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [2],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [3],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [4],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [5],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [6],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [7],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [8],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [9],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [10],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [11],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [12],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [13],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [14],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [15],
+							"searchable": false,
+							"orderable": false
+						}
+						],
+
+					"columns": [
+						{ "data": "ID", "name": "ID", "autoWidth": false },
+						{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+						{ "data": "FullName", "name": "FullName", "autoWidth": true },
+						{ "data": "PositionDesc", "name": "PositionDesc", "autoWidth": true },
+						{ "data": "DepartmentDesc", "name": "DepartmentDesc", "autoWidth": true },
+						{ "data": "Location", "name": "Location", "autoWidth": true },
+						{ "data": "CostCenter", "name": "CostCenter", "autoWidth": true },
+						{
+							"data": "Date",
+							render: function (data, type, row) {
+								if (data)
+									return moment(data).format("DD-MMM-YYYY");
+								else
+									return '';
+							}
+						},
+						{ "data": "ClockIn", "name": "ClockIn", "autoWidth": true },
+						{ "data": "ClockOut", "name": "ClockOut", "autoWidth": true },
+						{ "data": "ActualIn", "name": "ActualIn", "autoWidth": true },
+						{ "data": "ActualOut", "name": "ActualOut", "autoWidth": true },
+						{ "data": "Overtime", "name": "Overtime", "autoWidth": true },
+						{ "data": "OvertimeCategory", "name": "OvertimeCategory", "autoWidth": true },
+						{ "data": "Comments", "name": "Comments", "autoWidth": true },
+						{
+							"render": function (data, type, full, meta) {
+								if (@Model.Access.hasWriteStr) {
+									return '<button class="btn-menu btn-default" onclick="EditAction(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditEmpOvertime" title="Edit"><i class="fa fa-edit"></i></button>';
+								} else
+									return '-';
+							}
+						}
+					]
+				});
+			}
+        });
+
+		$('#loadAll').on('click', function () {
+			var table = $('#employeeTable').dataTable({
+				"scrollX": true,
+				"autoWidth": false,
+				"processing": true,
+				"language": {
+					searchPlaceholder: "Ended by ENTER..",
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/EmployeeOvertime/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [3],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [6],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [9],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [10],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [11],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [13],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [14],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [15],
+						"searchable": false,
+						"orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "FullName", "name": "FullName", "autoWidth": true },
+					{ "data": "PositionDesc", "name": "PositionDesc", "autoWidth": true },
+					{ "data": "DepartmentDesc", "name": "DepartmentDesc", "autoWidth": true },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{ "data": "CostCenter", "name": "CostCenter", "autoWidth": true },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YYYY");
+							else
+								return '';
+						}
+					},
+					{ "data": "ClockIn", "name": "ClockIn", "autoWidth": true },
+					{ "data": "ClockOut", "name": "ClockOut", "autoWidth": true },
+					{ "data": "ActualIn", "name": "ActualIn", "autoWidth": true },
+					{ "data": "ActualOut", "name": "ActualOut", "autoWidth": true },
+					{ "data": "Overtime", "name": "Overtime", "autoWidth": true },
+					{ "data": "OvertimeCategory", "name": "OvertimeCategory", "autoWidth": true },
+					{ "data": "Comments", "name": "Comments", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							if (@Model.Access.hasWriteStr) {
+								return '<button class="btn-menu btn-default" onclick="EditAction(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditEmpOvertime" title="Edit"><i class="fa fa-edit"></i></button>';
+							} else
+								return '-';
+						}
+					}
+				]
+			});
+
+			$('#employeeTable_filter input').unbind();
+		    $('#employeeTable_filter input').bind('keyup', function(e) {
+				if(e.keyCode == 13) {
+					table.fnFilter(this.value);
+				}
+			});
+		});
+
+        $(document).ready(function () {
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+			});
+
+			var startDate = "@ViewBag.StartDate";
+			var endDate = "@ViewBag.EndDate";
+
+			if (startDate != "" && endDate != "") {
+				$('#startDate').val(startDate);
+				$('#endDate').val(endDate);
+
+				$('#employeeTable').dataTable({
+					"scrollX": true,
+					"autoWidth": false,
+					"processing": true,
+					"language": {
+						processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+					},
+					"serverSide": true,
+					"filter": true,
+					"orderMulti": false,
+					"pageLength": 10,
+					"destroy": true,
+					"ajax": {
+						"url": fastApp.BaseUrl + "/EmployeeOvertime/GetAllByParam",
+						"data": { startDateParam: startDate, endDateParam: endDate, locID: 0 },
+						"type": "POST",
+						"datatype": "json"
+					},
+
+					"columnDefs":
+						[{
+							"targets": [0],
+							"searchable": false,
+							"visible": false,
+							"orderable": false
+						},
+						{
+							"targets": [1],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [2],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [3],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [4],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [5],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [6],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [7],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [8],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [9],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [10],
+							"searchable": true,
+							"orderable": false
+						},
+						{
+							"targets": [11],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [12],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [13],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [14],
+							"searchable": false,
+							"orderable": false
+						},
+						{
+							"targets": [15],
+							"searchable": false,
+							"orderable": false
+						}
+						],
+
+					"columns": [
+						{ "data": "ID", "name": "ID", "autoWidth": false },
+						{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+						{ "data": "FullName", "name": "FullName", "autoWidth": true },
+						{ "data": "PositionDesc", "name": "PositionDesc", "autoWidth": true },
+						{ "data": "DepartmentDesc", "name": "DepartmentDesc", "autoWidth": true },
+						{ "data": "Location", "name": "Location", "autoWidth": true },
+						{ "data": "CostCenter", "name": "CostCenter", "autoWidth": true },
+						{
+							"data": "Date",
+							render: function (data, type, row) {
+								if (data)
+									return moment(data).format("DD-MMM-YYYY");
+								else
+									return '';
+							}
+						},
+						{ "data": "ClockIn", "name": "ClockIn", "autoWidth": true },
+						{ "data": "ClockOut", "name": "ClockOut", "autoWidth": true },
+						{ "data": "ActualIn", "name": "ActualIn", "autoWidth": true },
+						{ "data": "ActualOut", "name": "ActualOut", "autoWidth": true },
+						{ "data": "Overtime", "name": "Overtime", "autoWidth": true },
+						{ "data": "OvertimeCategory", "name": "OvertimeCategory", "autoWidth": true },
+						{ "data": "Comments", "name": "Comments", "autoWidth": true },
+						{
+							"render": function (data, type, full, meta) {
+								if (@Model.Access.hasWriteStr) {
+									return '<button class="btn-menu btn-default" onclick="EditAction(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditEmpOvertime" title="Edit"><i class="fa fa-edit"></i></button>';
+								} else
+									return '-';
+							}
+						}
+					]
+				});
+			}
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		var result = "@ViewBag.Result";
+		var error = "@ViewBag.ErrorMessage";
+
+		if (result != "") {
+			if (result == "True") {
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: "@UIResources.EditSucceed",
+					width: "400px",
+					type: 'success',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright,
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+			else {
+				if (error == "") {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: "@UIResources.EditFailed",
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		}
+
+		function GeneratePDF() {
+			var notice = new PNotify({
+				title: "Generating PDF file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("GeneratePDF", "EmployeeOvertime")?startDateParam=' +  $('#startDate').val() + '&endDateParam=' + $('#endDate').val();
+		};
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			locationId = $('#ddlProdCenter1').val();
+			locationType = 'productioncenter';
+
+			location.href = '@Url.Action("GenerateExcel", "EmployeeOvertime")?startDateParam=' +  $('#startDate').val() + '&endDateParam=' + $('#endDate').val() + '&locID=' + locationId + '&locType=' + locationType;
+		};
+
+		function EditAction(id) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/EmployeeOvertime/Edit?id=" + id + '&startDate=' +  $('#startDate').val() + '&endDate=' + $('#endDate').val());
+		};
+
+        function UpdateCategory() {
+            $("#UpdateGtDialog").load(fastApp.BaseUrl + "/EmployeeOvertime/UpdateCategory");
+		};
+
+	</script>
+}
+

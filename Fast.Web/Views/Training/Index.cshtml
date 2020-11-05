@@ -1,0 +1,226 @@
+﻿@model Fast.Web.Models.TrainingModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+}
+
+@section Styles{
+	<style>
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.TrainingList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.TrainingMasterData</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GeneratePDF()">
+						<span><i class="fa fa-lg fa-file-pdf"></i> PDF</span>
+					</button>
+					<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+						<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+					</button>
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div class="dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="trainingTable">
+				<thead>
+					<tr>
+						<th>@UIResources.ID</th>
+						<th>@UIResources.EmployeeID</th>
+						<th>@UIResources.FullName</th>
+						<th>@UIResources.TrainingTitle</th>
+						<th>@UIResources.MachineType</th>						
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditTraining" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content" id="OpenDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+            var table = $('#trainingTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"language": {
+					searchPlaceholder: "Ended by ENTER..",
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Training/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "FullName", "name": "FullName", "autoWidth": true },
+					{ "data": "TrainingTitle", "name": "TrainingTitle", "autoWidth": true },
+					{ "data": "MachineType", "name": "MachineType", "autoWidth": true },
+				]
+			});
+
+			$('#trainingTable_filter input').unbind();
+		    $('#trainingTable_filter input').bind('keyup', function(e) {
+				if(e.keyCode == 13) {
+					table.fnFilter(this.value);
+				}
+			});
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		var result = "@ViewBag.Result";
+		var error = "@ViewBag.ErrorMessage";
+
+		if (result != "") {
+			if (result == "True") {
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: "@UIResources.EditSucceed",
+					width: "400px",
+					type: 'success',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright,
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+			else {
+				if (error == "") {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: "@UIResources.EditFailed",
+						width: "400px",
+						type: 'error',						
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',						
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		}
+
+		function EditAction(id) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/Training/Edit/" + id);
+		};
+
+		function GeneratePDF() {
+			var notice = new PNotify({
+				title: "Generating PDF file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("GeneratePDF", "Training")';
+		};
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("GenerateExcel", "Training")';
+		};
+	</script>
+}
+

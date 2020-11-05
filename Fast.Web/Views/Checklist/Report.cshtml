@@ -1,0 +1,122 @@
+﻿@model Fast.Web.Models.ChecklistReportSummaryModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/morris.js/morris.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report for @(Model.Checklist.MenuTitle)</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-2">Menu Title</div>
+                                    <div class="col-10">: @Model.Checklist.MenuTitle</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">Header</div>
+                                    <div class="col-10">: @Model.Checklist.Header</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">Creator</div>
+                                    <div class="col-10">: @(Model.Checklist.Creator == null ? "-" : Model.Checklist.Creator.FullName)</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">This Checklist should be submitted <b>@Model.Checklist.FrequencyAmount</b> times every <b>@Model.Checklist.FrequencyDivider @Model.Checklist.FrequencyUnit</b></div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <canvas id="chartPie"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12" id="bar_chart"></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-3"><a class="btn d-block btn-primary" href="@Url.Action("ReportAdherence", "Checklist")/@Model.Checklist.ID">Adherence Report</a></div>
+                        <div class="col-3"><a class="btn d-block btn-primary" href="@Url.Action("ReportByHeader", "Checklist")/@Model.Checklist.ID">Report By Header</a></div>
+                        <div class="col-3"><a class="btn d-block btn-primary" href="@Url.Action("ReportByLocation", "Checklist")/@Model.Checklist.ID">Report By Location</a></div>
+                        <div class="col-3"><a class="btn d-block btn-primary" href="@Url.Action("ReportRawData", "Checklist")/@Model.Checklist.ID">Raw Data</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- row -->
+</div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/raphael/raphael.min.js"></script>
+    <script src="~/Content/dashforge/lib/morris.js/morris.min.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var datapie = {
+                //labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                labels: [
+                    @foreach (KeyValuePair<string, int> entry in ViewBag.Summary){
+                        @:'@(Html.Raw(entry.Key)) (@(entry.Value))',
+                    }
+                ],
+                datasets: [{
+                    //data: [20, 20, 30, 5, 25],
+                    data: [
+                        @foreach (KeyValuePair<string, int> entry in ViewBag.Summary){
+                            @:@(entry.Value),
+                        }
+                    ],
+                  backgroundColor: ['#e73e34', '#ec7435','#f6ed94','#78bb41','#048ec9','#8f6189']
+                }]
+              };
+
+              var optionpie = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    //display: false,
+                    position: 'left',
+                    align: 'start'
+                },
+                animation: {
+                  animateScale: true,
+                  animateRotate: true
+                }
+              };
+
+            var ctx8 = document.getElementById('chartPie');
+            var myPieChart = new Chart(ctx8, {
+                type: 'doughnut',
+                data: datapie,
+                options: optionpie
+            });
+        });
+    </script>
+}

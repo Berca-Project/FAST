@@ -1,0 +1,171 @@
+﻿@model List<Fast.Web.Models.ChecklistComponentModel>
+@using Fast.Web.Resources;
+
+@{
+    App.dictionary = new Dictionary<string, string> {
+        { "container_full"    ,"Container Full Width" },
+        { "container_divider" ,"Container Divider" },
+        { "group"             ,"Group" },
+        { "button_ok"         ,"Button OK" },
+        { "button_nok"        ,"Button NOK" },
+        { "input_text"        ,"Input Text" },
+        { "input_number"      ,"Input Number" },
+        { "input_date"        ,"Input Date" },
+        { "input_checkbox"    ,"Input Checkbox" },
+        { "label"             ,"Label" },
+        { "images"            ,"Images" }
+    };
+
+    App.counter = -1;
+}
+
+@helper TreeView(List<Fast.Web.Models.ChecklistComponentModel> components, long parent)
+{
+    /*
+    var temp_components = components.FindAll(x => x.Parent == parent);
+
+    foreach (var item in temp_components)
+    {
+        item.ComponentType = item.ComponentType.Trim();
+        var sub_components = components.FindAll(x => x.Parent == item.ID);
+        App.counter++;
+
+        <input name="[@App.counter].ChecklistComponentID" type="hidden" value="@item.ID">
+
+        if (item.ComponentType == "container_full")
+        {
+            <div class="card mg-b-10">
+                <div class="card-body d-flex pd-10">
+                    @if (sub_components.Count > 0)
+                    {
+                        @TreeView(components, item.ID)
+                    }
+                </div>
+            </div>
+        }
+        else if (item.ComponentType == "container_divider")
+        {
+            <div class="flex-1 pd-5">
+                @if (sub_components.Count > 0)
+                {
+                    @TreeView(components, item.ID)
+                }
+            </div>
+        }
+        else if (item.ComponentType == "group")
+        {
+            <div class="form-group">
+                @if (sub_components.Count > 0)
+                {
+                    @TreeView(components, item.ID)
+                }
+            </div>
+        }
+        else if (item.ComponentType == "label")
+        {
+            <label class="d-block">@item.ComponentName</label>
+        }
+        else if (item.ComponentType == "images")
+        {
+            <img src="~/upload/@(item.ComponentName)" class="img-fluid">
+        }
+        else if (item.ComponentType == "button_ok")
+        {
+            <button type="button" class="btn btn-light mg-b-10">OK</button>
+        }
+        else if (item.ComponentType == "button_nok")
+        {
+            <button type="button" class="btn btn-light mg-b-10">NOT OK</button>
+        }
+        else if (item.ComponentType == "input_text")
+        {
+            <input name="[@App.counter].ValueType" type="hidden" value="text">
+            <input name="[@App.counter].Value" type="text" class="form-control mg-b-10" placeholder="">
+        }
+        else if (item.ComponentType == "input_number")
+        {
+            <input name="[@App.counter].ValueType" type="hidden" value="number">
+            <input name="[@App.counter].Value" type="number" class="form-control mg-b-10" placeholder="">
+        }
+        else if (item.ComponentType == "input_date")
+        {
+            <input name="[@App.counter].ValueType" type="hidden" value="date">
+            <input name="[@App.counter].Value" type="text" class="form-control hasDatepicker mg-b-10" placeholder="">
+        }
+        else if (item.ComponentType == "input_checkbox")
+        {
+            <input name="[@App.counter].ValueType" type="hidden" value="checkbox">
+            <div class="custom-control custom-checkbox mg-b-10">
+                <input type="checkbox" class="custom-control-input" id="customCheck@(item.ID)" name="[@App.counter].Value">
+                <label class="custom-control-label" for="customCheck@(item.ID)">@item.ComponentName</label>
+            </div>
+        }
+        else
+        {
+            <button type="button" class="btn btn-danger">NOT DEFINED : @item.ComponentType</button>
+        }
+    }
+    */
+}
+
+@section Styles{
+    <style>
+    </style>
+}
+
+<div class="content content-fixed">
+    <div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Generator")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Generator")">Generated</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@ViewBag.Checklist.MenuTitle</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">@ViewBag.Checklist.Header</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+
+                @using (Html.BeginForm("Generated", "Generator", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="card mg-b-10">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Shift</label>
+                                    <input type="text" class="form-control" placeholder="" name="[0].Shift">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Date</label>
+                                    <input type="text" class="form-control hasDatepicker" placeholder="" name="[0].date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @TreeView(Model, 0)
+
+                    <button type="submit" class="btn btn-primary float-right mg-t-20">Save <i data-feather="save" class="wd-10 mg-l-5"></i></button>
+                }
+
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/jquery-sortable/js/jquery-sortable-min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.hasDatepicker').datepicker();
+        });
+    </script>
+}

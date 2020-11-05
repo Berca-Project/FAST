@@ -1,0 +1,2874 @@
+﻿@model Fast.Web.Models.LPH.PP.PPLPHEditModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+
+@{
+	ViewBag.Title = "Index";
+	var selected = "";
+}
+
+@section CSS_lib{
+	<link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+	<style>
+		.select2-container--default .select2-selection--single .select2-selection__clear {
+			position: absolute;
+			right: 0;
+		}
+
+		.flex-input {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		.flex-break {
+			flex-basis: 100%;
+			height: 0;
+		}
+
+		.tableWrapper {
+			position: relative;
+			overflow: auto;
+			max-height: 150px;
+			transform: translateZ(0);
+		}
+
+			.tableWrapper table {
+				border-collapse: separate;
+				width: 100%;
+				border: none;
+			}
+
+			.tableWrapper thead th, .tableWrapper thead td {
+				position: -webkit-sticky;
+				position: sticky;
+				background: #066fcb;
+				z-index: 100;
+			}
+
+			.tableWrapper tbody td {
+				word-break:break-all;
+			}
+
+			.tableWrapper table tfoot td {
+				position: -webkit-sticky;
+				position: sticky;
+				bottom: 0;
+				z-index: 100;
+				overflow: hidden;
+			}
+
+			.tableWrapper .input td {
+				background: white;
+			}
+
+			.tableWrapper .summary-body td, .tableWrapper .summary-body th {
+				font-weight: bold;
+				background-color: #d8eafe;
+				color: #000;
+			}
+
+			.tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+				padding: unset;
+				border: 0;
+			}
+
+		.fa, .fas {
+			padding: 5px;
+			cursor: pointer;
+		}
+
+		.nav-link {
+			cursor: pointer;
+		}
+
+		.modal-body {
+			position: relative;
+			margin-top: 10px;
+		}
+
+			.modal-body .close {
+				padding: 5px;
+				position: absolute;
+				top: -5px;
+				right: 5px;
+				font-size: 15px;
+				color: black;
+				z-index: 1000;
+			}
+
+		.stepper {
+			position: relative;
+		}
+
+			.stepper:before {
+				top: 15px;
+				bottom: 0;
+				position: absolute;
+				content: " ";
+				width: 100%;
+				height: 1px;
+				background: #f1f1f1;
+				z-index: 0;
+			}
+
+		.stepper-step {
+			text-align: center;
+			position: relative;
+		}
+
+			.stepper-step.active .stepper-btn {
+				background: #37b6fa;
+				color: white;
+				font-weight: 500;
+				border: 0
+			}
+
+		.stepper-btn {
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			padding: 6px 0;
+			font-size: 12px;
+			line-height: 1.428571429;
+			border-radius: 15px;
+			background: #e6e6e6;
+			color: #9c9c9c;
+		}
+
+		.wizard-button {
+			margin: 5px;
+		}
+
+			.wizard-button.active {
+				filter: brightness(0.75);
+			}
+
+		.select2-container--default .select2-selection--single {
+			height: 25px;
+		}
+
+			.select2-container--default .select2-selection--single .select2-selection__arrow {
+				display: none;
+			}
+
+			.select2-container--default .select2-selection--single .select2-selection__rendered {
+				font-size: 13px;
+				padding: 5px;
+			}
+
+		.select2-search--dropdown {
+			padding: 1px;
+		}
+
+		.select2-container--default .select2-search--dropdown .select2-search__field {
+			padding: 3px 5px;
+		}
+
+		.select2-results {
+			font-size: 13px;
+		}
+
+		.select2-results__option {
+			padding: 3px;
+		}
+
+		.select2-container--default .select2-selection--multiple {
+			min-height: 25px;
+			border-radius: 0.25rem;
+		}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+				font-size: 13px;
+				padding: 0 0 0 5px;
+			}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__choice {
+				line-height: 16px;
+			}
+
+			.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+				line-height: 15px;
+			}
+
+		.select2-container--default .select2-search--inline .select2-search__field {
+			margin-top: 0;
+			padding: 0;
+			line-height: 23px;
+		}
+
+		table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+			background-color: transparent
+		}
+	</style>
+}
+
+
+<div class="content content-fixed lph-form">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+			<div>
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb breadcrumb-style1 mg-b-10">
+						<li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Diet</li>
+					</ol>
+				</nav>
+				<h4 class="mg-b-0 tx-spacing--1">LPH Diet <span class='tx-success'>@(Model.ViewType == "submitted_prev" ? "(Previous Shift)" : "")</span></h4>
+			</div>
+			<div class="d-none d-md-block">
+				<button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+				<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+				@if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+				{
+					@: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+				}
+				<button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+				<button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+				<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 mg-b-20">
+				<div class="card collect-component" id="Information">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+					<div class="card-body d-flex">
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Date*</label>
+								<div class="col-9">
+									<input type="text" class="form-control information-datepicker mandatory" value="@(Model.Header == null?"":Model.Header.Date.ToString("ddd, dd-MMM-yy"))" name="Date">
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-3 col-form-label">Week*</label>
+								<div class="col-9">
+									<input type="text" class="form-control number mandatory" value="@(Model.Header == null?1:Model.Header.Week)" name="Week">
+								</div>
+							</div>
+
+						</div>
+						<div class="divider-text divider-vertical"></div>
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-3 col-form-label" style="padding-right:0px;">Prodtech*</label>
+								<div class="col-8">
+									<select class="form-control select2 mandatory" name="Prodtech" multiple @(Model.ViewType == "approval" ? "disabled" : "")>
+										@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+										{
+											selected = "";
+											if (Model.Header != null)
+											{
+												if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+												{
+													if (employee.EmployeeID == Model.Header.ProdTech)
+													{
+														selected = "selected";
+													}
+												}
+												else
+												{
+													if (employee.EmployeeID == ViewBag.AccountEmployeeID)
+													{
+														selected = "selected";
+													}
+												}
+											}
+
+											<option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+										}
+									</select>
+								</div>
+							</div>
+							@*<div class="form-group row">
+									<label class="col-4 col-form-label">Prodtech 2</label>
+									<div class="col-8">
+										<select class="form-control select2" name="Prodtech2">
+											<option value="">Select Prodtech</option>
+											@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+											{
+												selected = "";
+												if (Model.Header != null)
+												{
+													if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+													{
+														if (employee.EmployeeID == Model.Header.ProdTech)
+														{
+															selected = "selected";
+														}
+													}
+												}
+
+												<option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+											}
+										</select>
+									</div>
+								</div>*@
+						</div>
+						<div class="divider-text"></div>
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-4 col-form-label">Supervisor*</label>
+								<div class="col-8">
+									<select class="form-control select2 mandatory" name="TeamLeader" @(Model.ViewType == "approval" ? "disabled" : "")>
+										@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+										{
+											selected = "";
+											if (Model.Header != null)
+											{
+												if (Model.Header.TeamLeader != null && Model.Header.TeamLeader.Trim() != "")
+												{
+													if (employee.EmployeeID == Model.Header.TeamLeader)
+													{
+														selected = "selected";
+													}
+												}
+												else
+												{
+													if (employee.EmployeeID == ViewBag.AccountSpvEmployeeID)
+													{
+														selected = "selected";
+													}
+												}
+											}
+
+											<option value="@(employee.EmployeeID)" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+										}
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="divider-text divider-vertical"></div>
+						<div class="flex-1">
+							<div class="form-group row">
+								<label class="col-4 col-form-label">Shift / Group*</label>
+								<div class="col-3">
+									<input type="text" class="form-control number mandatory" value="@(Model.Header == null?1:Model.Header.Shift)" name="Shift">
+								</div>
+								<label class="col-1 col-form-label tx-center">/</label>
+								<div class="col-3">
+									<input type="text" class="form-control mandatory" value="@(Model.Header == null?"A":Model.Header.Group)" name="Group">
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-4 col-form-label">Start / Stop</label>
+								<div class="col-3">
+									<div class="input-group">
+										<input name="Start" type="text" class="form-control time" value="@(Model.Header == null?1:Model.Header.Start)">
+									</div>
+								</div>
+								<label class="col-1 col-form-label">/</label>
+								<div class="col-3">
+									<div class="input-group">
+										<input name="Stop" type="text" class="form-control time" value="@(Model.Header == null?1:Model.Header.Stop)">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!--INFORMATION-->
+
+			<div class="col-12 mg-b-20">
+				<div class="card">
+					<ul id="line-tabs" class="show-on-preview nav nav-tabs">
+						<li class="nav-item">
+							<a class="nav-link active">Impregnation</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link">Reordering</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link">Packing</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link">Waste</a>
+						</li>
+					</ul>
+
+					<div id="lines" class="carousel" data-pause="true">
+						<div class="carousel-inner">
+							<div class="carousel-item active">
+								<div class="row">
+
+									<div class="col-12 mg-b-20">
+										<div class="card">
+											<div class="card-header bg-primary tx-white tx-center font-weight-bold">Impregnation</div>
+											<div class="card-body">
+												<div class="tableWrapper no-ie-fix" style="max-height: 300px">
+													<table class="table table-bordered table-hover table-striped">
+														<thead class="thead-info">
+															<tr>
+																<th rowspan="2">No.OPS</th>
+																<th rowspan="2" style="min-width:80px">Batch To</th>
+																<th rowspan="2" style="min-width:90px">Silo Origin</th>
+																<th colspan="1" class="tx-center">Weighcon</th>
+																<th rowspan="2" style="min-width:110px">MC Input (%)</th>
+																<th rowspan="2" style="min-width:100px">Start Batch</th>
+																<th rowspan="2" style="min-width:100px">Stop Batch</th>
+																<th rowspan="2" style="min-width:130px">Cycle Time</th>
+																<th rowspan="2" style="min-width:120px">Temp.V23 (&deg;C)</th>
+																<th colspan="3" class="tx-center">CO2 (kg)</th>
+																<th rowspan="2" class="tx-center">Pressure (bar)</th>
+																<th rowspan="2" style="min-width: 80px;">Action</th>
+															</tr>
+															<tr>
+																<th style="min-width:140px">Qty Weighter Real</th>
+																<th style="min-width:80px">Start</th>
+																<th style="min-width:80px">Stop</th>
+																<th style="min-width:80px">Usage</th>
+															</tr>
+															<tr class="summary-body">
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+															</tr>
+														</thead>
+														<tbody id="impregnation">
+														</tbody>
+														<tfoot>
+															<tr class="input input-wrapper">
+																<td><input type="text" class="form-control" name="ImpregnationNoOps"></td>
+																<td><input type="text" class="form-control number-positive" name="ImpregnationBatchTo"></td>
+																<td><input type="text" class="form-control" name="ImpregnationSiloOrigin"></td>
+																<td><input type="text" class="form-control number" name="ImpregnationWeightCon"></td>
+																<td><input type="text" class="form-control number" name="ImpregnationMCInput"></td>
+
+																<td><input type="text" class="form-control time" onblur="countDuration2('ImpregnationStartBatch', 'ImpregnationStopBatch', 'ImpregnationCycleTime')" name="ImpregnationStartBatch"></td>
+																<td><input type="text" class="form-control time" onblur="countDuration2('ImpregnationStartBatch', 'ImpregnationStopBatch', 'ImpregnationCycleTime')" name="ImpregnationStopBatch"></td>
+																<td><input type="text" class="form-control disabled" disabled name="ImpregnationCycleTime"></td>
+																<td><input type="text" class="form-control number" name="ImpregnationTempV23"></td>
+																<td><input type="text" class="form-control" onblur="countUsage('ImpregnationCO2Start', 'ImpregnationCO2Stop', 'ImpregnationCO2Usage')" name="ImpregnationCO2Start"></td>
+
+																<td><input type="text" class="form-control" onblur="countUsage('ImpregnationCO2Start', 'ImpregnationCO2Stop', 'ImpregnationCO2Usage')" name="ImpregnationCO2Stop"></td>
+																<td><input type="text" class="form-control disabled" disabled name="ImpregnationCO2Usage"></td>
+																<td><input type="text" class="form-control number" name="ImpregnationPressure"></td>
+
+																<td class="tx-center"><i onclick="javascript:addToTable(this)" data-target-table="impregnation" class="fa fa-plus-circle"></i></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div> <!--IMPREGRNATION-->
+									<div class="col-12 mg-b-20">
+										<div class="card">
+											<div class="card-header bg-primary tx-white tx-center font-weight-bold">
+												Handover Logbook
+											</div>
+
+											<div class="card-body">
+												@*
+													<div class="flex-input collect-component" id="HandoverLogbook">
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">Safety</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	Level resiko Safety trigger
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="H" name="Lrst" />&nbsp;H</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="M" name="Lrst" />&nbsp;M</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="L" name="Lrst" checked />&nbsp;L</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlsafetyComment" class="form-control" placeholder="Comments"></textarea>
+																</div>
+															</div>
+
+														</div>
+														<div class="divider-text divider-vertical"></div>
+														<div class="mg-b-10" style="flex:1">
+
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">Quality</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	Level resiko Quality trigger
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="H" name="Lrqt" />&nbsp;H</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="M" name="Lrqt" />&nbsp;M</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="L" name="Lrqt" checked />&nbsp;L</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlqualityComment" class="form-control" placeholder="Comments"></textarea>
+																</div>
+															</div>
+														</div>
+														<div class="flex-break"></div>
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">Centerlines</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Jumlah Centerline yang out of limit
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="Hlcenterlineschecked">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Pastikan CL deviation log lengkap
+																</label>
+																<div class="col-3">
+																	<input type="text" name="Hlcenterlinesofl" class="form-control">
+																</div>
+															</div>
+														</div>
+														<div class="divider-text divider-vertical"></div>
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">CIL / Planned Stop   </label>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Jumlah CIL yang pending
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="Hlcenterlineschecked">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Planned Stop - Durasi Terplanning
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="Hlcenterlinesofl">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Planned Stop - Durasi Aktual
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="HlensureCLDeviation">
+																</div>
+															</div>
+														</div>
+														<div class="divider-text divider-vertical"></div>
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">Defect handling</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Jumlah Defect yang ditemukan
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="HlnumofDefectsFound">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Jumlah Defect yang diperbaiki
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="HlnumofDefectsFixed">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Pastikan semua defect yang ditemukan di dokumentasikan di DH Log
+																</label>
+																<div class="col-3">
+																	<input type="text" name="HlensureReportedDHL" class="form-control">
+																</div>
+															</div>
+														</div>
+														<div class="divider-text divider-vertical"></div>
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">Breakdown Elimination</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Jumlah Breakdowns
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="HlnumofBreakdown">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Total Durasi Breakdown
+																</label>
+																<div class="col-3">
+																	<input type="text" class="form-control number" name="HltotBreakdown">
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-9 col-form-label">
+																	Pastikan PM Card(s) lengkap untuk setiap BD
+																</label>
+																<div class="col-3">
+																	<input type="text" name="HlensurePMCard" class="form-control">
+																</div>
+															</div>
+														</div>
+														<div class="flex-break"></div>
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">Incidents</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	1. NTRM
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="Yes" name="Ntrm" />&nbsp;Yes</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="No" name="Ntrm" />&nbsp;No</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="N/A" name="Ntrm" checked />&nbsp;N/A</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlntrmComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	2. Spesification materials yang salah (Casing, Tobacco, Flavor, etc)
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="Yes" name="Spesification" />&nbsp;Yes</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="No" name="Spesification" />&nbsp;No</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="N/A" name="Spesification" checked />&nbsp;N/A</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlspecificationComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+																</div>
+															</div>
+														</div>
+														<div class="divider-text divider-vertical"></div>
+														<div class="mg-b-10" style="flex:1">
+															<div class="form-group row">
+																<label class="col col-form-label font-weight-bold">&nbsp;</label>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	3. Batch on inspect/hold di PriMat
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="Yes" name="BatchOn" />&nbsp;Yes</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="No" name="BatchOn" />&nbsp;No</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="N/A" name="BatchOn" checked />&nbsp;N/A</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlbatchOnComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	4. Ada batch dengan OV out of spec
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="Yes" name="BatchOV" />&nbsp;Yes</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="No" name="BatchOV" />&nbsp;No</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="N/A" name="BatchOV" checked />&nbsp;N/A</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlbatchOvComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+																</div>
+															</div>
+															<div class="form-group row">
+																<label class="col-4 col-form-label">
+																	5. Ada batch dengan functional issue ditemukan di Secondary process
+																</label>
+																<div class="col-4 d-flex">
+																	<div class="flex-1">
+																		<label><input type="radio" value="Yes" name="BatchFunc" />&nbsp;Yes</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="No" name="BatchFunc" />&nbsp;No</label>
+																	</div>
+																	<div class="flex-1">
+																		<label><input type="radio" value="N/A" name="BatchFunc" checked />&nbsp;N/A</label>
+																	</div>
+																</div>
+																<div class="col-4">
+																	<textarea type="text" name="HlbatchFuncComment" class="form-control" placeholder="Action yang dilakukan"></textarea>
+																</div>
+															</div>
+														</div>
+													</div>
+													<hr />
+												*@
+												<div class="flex-input">
+													<div style="flex:1;margin-bottom:20px;">
+														<div class="tableWrapper" style="max-height: 210px;">
+															<table class="table table-bordered table-hover table-striped">
+																<thead class="thead-info">
+																	<tr class="tx-center">
+																		<th style="min-width:120px;">Proses (Blend)</th>
+																		<th style="min-width:120px;">Target Produksi (Output/Ops)</th>
+                                                                        <th style="min-width:120px;">Produksi Aktual (Output/Ops)</th>
+																		<th style="min-width:120px;">Informasi Changeover</th>
+																		<th width="80px">Action</th>
+																	</tr>
+																	<tr class="summary-body hidden">
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																	</tr>
+																</thead>
+																<tbody id="logbook1">
+																</tbody>
+																<tfoot>
+																	<tr class="input input-wrapper">
+																		<td><input type="text" class="form-control" name="Process"></td>
+																		<td><input type="text" class="form-control number" name="TargetProduksi"></td>
+																		<td><input type="text" class="form-control number" name="ProduksiAktual"></td>
+																		<td><input type="text" class="form-control" name="InformasiChangeover"></td>
+																		<td class="tx-center"><i data-target-table="logbook1" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+																	</tr>
+																</tfoot>
+															</table>
+														</div>
+													</div>
+													<div class="divider-text divider-vertical"></div>
+													<div style="flex:1;margin-bottom:20px;">
+														<div class="tableWrapper" style="max-height: 210px;flex:1">
+															<table class="table table-bordered table-hover table-striped">
+																<thead class="thead-info">
+																	<tr class="tx-center">
+																		<th style="min-width:200px;max-width:200px;">Losses</th>
+																		<th>Initial Root Cause (Deskripsikan issue yang terjadi) / Action yang diambil &amp; hasil</th>
+																		<th width="80px">Action</th>
+																	</tr>
+																	<tr class="summary-body hidden">
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																	</tr>
+																</thead>
+																<tbody id="logbook2">
+																</tbody>
+																<tfoot>
+																	<tr class="input input-wrapper">
+																		<td><input type="text" class="form-control" name="Losses"></td>
+																		<td><input type="text" class="form-control" name="InitialCause"></td>
+																		<td class="tx-center"><i data-target-table="logbook2" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+																	</tr>
+																</tfoot>
+															</table>
+														</div>
+													</div>
+													<div class="flex-break"></div>
+													<div style="flex:1;margin-bottom:20px;">
+														<div class="tableWrapper" style="max-height: 210px;flex:1">
+															<table class="table table-bordered table-hover table-striped">
+																<thead class="thead-info">
+																	<tr class="tx-center">
+																		<th colspan="3">Action yang dilakukan di shift berjalan</th>
+																		<th rowspan="2" width="80px">Action</th>
+																	</tr>
+																	<tr class="tx-center">
+																		<th>Action Taken</th>
+																		<th style="min-width:50px;max-width:50px;">Owner</th>
+																		<th style="min-width:40px;max-width:40px;">Status</th>
+																	</tr>
+																	<tr class="summary-body hidden">
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																	</tr>
+																</thead>
+																<tbody id="thisAction">
+																</tbody>
+																<tfoot>
+																	<tr class="input input-wrapper">
+																		<td><input type="text" class="form-control" name="ThisAction"></td>
+																		<td>
+																			@*<input type="text" class="form-control" name="ThisOwner">*@
+																			<select class="form-control select2" name="ThisOwner">
+																				<option value="">Select Owner</option>
+																				@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+																				{
+																					selected = "";
+																					if (Model.Header != null)
+																					{
+																						if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+																						{
+																							if (employee.EmployeeID == Model.Header.ProdTech)
+																							{
+																								selected = "selected";
+																							}
+																						}
+																					}
+
+																					<option value="[@(employee.EmployeeID)] @employee.FullName" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+																				}
+																			</select>
+																		</td>
+																		<td>
+																			@*<input type="text" class="form-control" name="ThisStatus">*@
+																			<select class="form-control select2" name="ThisStatus">
+																				<option value="">Select Status</option>
+																				<option value="ONPROGRESS">ONPROGRESS</option>
+																				<option value="DONE">DONE</option>
+																			</select>
+																		</td>
+																		<td class="tx-center"><i data-target-table="thisAction" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+																	</tr>
+																</tfoot>
+															</table>
+														</div>
+													</div>
+													<div class="divider-text divider-vertical"></div>
+													<div style="flex:1;margin-bottom:20px;">
+														<div class="tableWrapper" style="max-height: 210px;flex:1">
+															<table class="table table-bordered table-hover table-striped">
+																<thead class="thead-info">
+																	<tr class="tx-center">
+																		<th colspan="3" style="min-width:300px;">Action yang dipropose untuk shift selanjutnya</th>
+																		<th rowspan="2" width="80px">Action</th>
+																	</tr>
+																	<tr class="tx-center">
+																		<th>Action Taken</th>
+																		<th style="min-width:50px;max-width:50px;">Owner</th>
+																		<th style="min-width:40px;max-width:40px;">Start Time</th>
+																	</tr>
+																	<tr class="summary-body hidden">
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																		<td></td>
+																	</tr>
+																</thead>
+																<tbody id="nextAction">
+																</tbody>
+																<tfoot>
+																	<tr class="input input-wrapper">
+																		<td><input type="text" class="form-control" name="NextAction"></td>
+																		<td>
+																			@*<input type="text" class="form-control" name="NextOwner">*@
+																			<select class="form-control select2" name="NextOwner">
+																				<option value="">Select Owner</option>
+																				@foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+																				{
+																					selected = "";
+																					if (Model.Header != null)
+																					{
+																						if (Model.Header.ProdTech != null && Model.Header.ProdTech.Trim() != "")
+																						{
+																							if (employee.EmployeeID == Model.Header.ProdTech)
+																							{
+																								selected = "selected";
+																							}
+																						}
+																					}
+
+																					<option value="[@(employee.EmployeeID)] @employee.FullName" @selected>[@(employee.EmployeeID)] @employee.FullName</option>
+																				}
+																			</select>
+																		</td>
+																		<td><input type="text" class="form-control time" name="NextStartTime"></td>
+																		<td class="tx-center"><i data-target-table="nextAction" class="fa fa-plus-circle" onclick="javascript: addToTable(this)"></i></td>
+																	</tr>
+																</tfoot>
+															</table>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div> <!-- HANDOVER LOGBOOK -->
+
+								</div>
+							</div> <!-- impregnation -->
+
+							<div class="carousel-item">
+								<div class="row">
+
+									<div class="col-12 mg-b-20">
+										<div class="card">
+											<div class="card-header bg-primary tx-white tx-center font-weight-bold">Reordering</div>
+											<div class="card-body">
+												<div class="tableWrapper no-ie-fix" style="max-height: 300px">
+													<table class="table table-bordered table-hover table-striped">
+														<thead class="thead-info">
+															<tr>
+																<th rowspan="2" style="min-width:100px">Blend Code</th>
+																<th rowspan="2" style="min-width:100px">No OPS</th>
+																<th rowspan="2" style="min-width:100px">No Silo Asal</th>
+																<th rowspan="2" style="min-width:100px">Start Batch</th>
+																<th rowspan="2" style="min-width:90px">Stop Batch</th>
+																<th rowspan="2" style="min-width:100px">Duration</th>
+																<th rowspan="2" style="min-width:120px">Flowrate (Kg/h)</th>
+																<th rowspan="2" style="min-width:120px">Pressure PG</th>
+																<th rowspan="2" style="min-width:120px">Temp. Loop.</th>
+																<th rowspan="2" style="min-width:130px">Temp. Oxidizer</th>
+																<th rowspan="2" style="min-width:90px">MC After RC80</th>
+																<th rowspan="2" style="min-width:90px">CCV</th>
+																<th colspan="3" class="tx-center">Gas CNG</th>
+																<th colspan="3" class="tx-center">Steam</th>
+																<th rowspan="2" style="min-width:90px"></th>
+															</tr>
+															<tr>
+																<th style="min-width:70px">Start</th>
+																<th style="min-width:70px">Stop</th>
+																<th style="min-width:70px">Usage</th>
+
+																<th style="min-width:70px">Start</th>
+																<th style="min-width:70px">Stop</th>
+																<th style="min-width:70px">Usage</th>
+															</tr>
+															<tr class="summary-body">
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+															</tr>
+														</thead>
+														<tbody id="reordering">
+														</tbody>
+														<tfoot>
+															<tr class="input input-wrapper">
+																<td><input type="text" class="form-control" name="ReorderingBlendCode"></td>
+																<td><input type="text" class="form-control" name="ReorderingNoOps"></td>
+																<td><input type="text" class="form-control" name="ReorderingSiloOrigin"></td>
+																<td><input type="text" class="form-control time" onblur="countDuration2('ReorderingStartBatch', 'ReorderingStopBatch', 'ReorderingDuration')" name="ReorderingStartBatch"></td>
+																<td><input type="text" class="form-control time" onblur="countDuration2('ReorderingStartBatch', 'ReorderingStopBatch', 'ReorderingDuration')" name="ReorderingStopBatch"></td>
+																<td><input type="text" class="form-control disabled" name="ReorderingDuration" disabled></td>
+
+																<td><input type="text" class="form-control number" name="ReorderingFlowrate"></td>
+																<td><input type="text" class="form-control number" name="ReorderingPressurePG"></td>
+																<td><input type="text" class="form-control number" name="ReorderingTempLoop"></td>
+																<td><input type="text" class="form-control number" name="ReorderingTempOxidizer"></td>
+																<td><input type="text" class="form-control number" name="ReorderingMCAfterRC80"></td>
+
+																<td><input type="text" class="form-control" name="ReorderingCCV"></td>
+																<td><input type="text" class="form-control" onblur="countUsage('ReorderingGasCNGStart', 'ReorderingGasCNGStop', 'ReorderingGasCNGUsage')" name="ReorderingGasCNGStart"></td>
+																<td><input type="text" class="form-control" onblur="countUsage('ReorderingGasCNGStart', 'ReorderingGasCNGStop', 'ReorderingGasCNGUsage')" name="ReorderingGasCNGStop"></td>
+																<td><input type="text" class="form-control disabled" disabled name="ReorderingGasCNGUsage"></td>
+																<td><input type="text" class="form-control" onblur="countUsage('ReorderingSteamStart', 'ReorderingSteamStop', 'ReorderingSteamUsage')" name="ReorderingSteamStart"></td>
+
+																<td><input type="text" class="form-control" onblur="countUsage('ReorderingSteamStart', 'ReorderingSteamStop', 'ReorderingSteamUsage')" name="ReorderingSteamStop"></td>
+																<td><input type="text" class="form-control disabled" disabled name="ReorderingSteamUsage"></td>
+																<td class="tx-center"><i onclick="javascript: addToTable(this)" data-target-table="reordering" class="fa fa-plus-circle"></i></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div> <!--REORDERING-->
+
+								</div>
+							</div> <!-- reordering -->
+
+							<div class="carousel-item">
+								<div class="row">
+
+									<div class="col-12 mg-b-20">
+										<div class="card">
+											<div class="card-header bg-primary tx-white tx-center font-weight-bold">Packing</div>
+											<div class="card-body">
+												<div class="tableWrapper no-ie-fix" style="max-height: 300px">
+													<table class="table table-bordered table-hover table-striped">
+														<thead class="thead-info">
+															<tr>
+																<th rowspan="2" style="min-width:100px">Blend Code</th>
+																<th rowspan="2" style="min-width:120px">No Silo Asal</th>
+																<th rowspan="2" style="min-width:110px">Start Packing</th>
+																<th rowspan="2" style="min-width:110px">Stop Packing</th>
+																<th rowspan="2" style="min-width:100px">Duration</th>
+																<th rowspan="2" style="min-width:100px">Jenis Box</th>
+																<th rowspan="2" style="min-width:80px">Visual</th>
+																<th rowspan="2" style="min-width:120px">Qty (Box)</th>
+																<th rowspan="2" style="min-width:120px">Qty (Kg)</th>
+																<th colspan="5" class="tx-center">Sampling Timbang Ulang</th>
+																<th rowspan="2" style="min-width:80px"></th>
+															</tr>
+															<tr>
+																<th style="min-width:70px">No</th>
+																<th style="min-width:90px">No Box</th>
+																<th style="min-width:130px">Quantity Label</th>
+																<th style="min-width:130px">Timbang Ulang</th>
+																<th style="min-width:90px">Error</th>
+															</tr>
+															<tr class="summary-body">
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+															</tr>
+														</thead>
+														<tbody id="packing">
+														</tbody>
+														<tfoot>
+															<tr class="input input-wrapper">
+																<td><input type="text" class="form-control" name="PackingBlendCode"></td>
+																<td><input type="text" class="form-control" name="PackingSiloOrigin"></td>
+																<td><input type="text" class="form-control time" onblur="countDuration2('PackingStartPacking', 'PackingStopPacking', 'PackingDuration')" name="PackingStartPacking"></td>
+																<td><input type="text" class="form-control time" onblur="countDuration2('PackingStartPacking', 'PackingStopPacking', 'PackingDuration')" name="PackingStopPacking"></td>
+																<td><input type="text" class="form-control disabled" name="PackingDuration" disabled></td>
+																<td><input type="text" class="form-control" name="PackingJenisBox"></td>
+																<td>
+																	@*<input type="text" class="form-control" name="PackingVisual">*@
+																	<select class="form-control select2" name="PackingVisual">
+																		<option value="Ok">Ok</option>
+																		<option value="Not Ok">Not Ok</option>
+																	</select>
+																</td>
+																<td><input type="text" class="form-control number" onblur="javascript:countBoxToKg('PackingQtyBox','PackingQtyKg')" name="PackingQtyBox"></td>
+																<td><input type="text" class="form-control number disabled" disabled name="PackingQtyKg"></td>
+																<td><input type="text" class="form-control number" name="PackingSamplingNo"></td>
+																<td><input type="text" class="form-control number" name="PackingSamplingNoBox"></td>
+																<td><input type="text" class="form-control number" onblur="javascript:countError('PackingSamplingQty','PackingSamplingTimbang','PackingSamplingError')" name="PackingSamplingQty"></td>
+																<td><input type="text" class="form-control number" onblur="javascript:countError('PackingSamplingQty','PackingSamplingTimbang','PackingSamplingError')" name="PackingSamplingTimbang"></td>
+																<td><input type="text" class="form-control number disabled" disabled name="PackingSamplingError"></td>
+																<td class="tx-center"><i onclick="javascript: addToTable(this)" data-target-table="packing" class="fa fa-plus-circle"></i></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div> <!--PACKING-->
+
+								</div>
+							</div> <!-- packing -->
+
+							<div class="carousel-item">
+								<div class="row">
+									<div class="col-12 mg-b-20">
+										<div class="card">
+											<div class="card-header bg-primary tx-white tx-center font-weight-bold">Waste</div>
+											<div class="card-body">
+												<div class="tableWrapper no-ie-fix" style="max-height: 300px">
+													<table class="table table-bordered table-hover table-striped">
+														<thead class="thead-info">
+															<tr>
+																<th rowspan="2" style="min-width:100px">Blend</th>
+																<th colspan="2">OPS</th>
+																<th rowspan="2" style="min-width:100px">RM</th>
+																<th rowspan="2" style="min-width:100px">Addback</th>
+																<th rowspan="2" style="min-width:100px">Packing Box</th>
+																<th rowspan="2" style="min-width:100px">Packing Kg</th>
+																<th rowspan="2" style="min-width:90px">Yield</th>
+																<th rowspan="2" style="min-width:120px">Index Final OV</th>
+																<th colspan="6" class="tx-center">Waste</th>
+																<th colspan="4" class="tx-center">CO2</th>
+																<th rowspan="2" style="min-width:80px">Consumption CO2</th>
+																<th style="min-width:120px">Total GAS</th>
+																<th rowspan="2" style="min-width:120px">TOTAL STEAM</th>
+																<th rowspan="2" style="min-width:120px">PRIMAT</th>
+																<th rowspan="2" style="min-width:80px">Action</th>
+															</tr>
+															<tr>
+																<th style="min-width:100px">No. SKJ</th>
+																<th style="min-width:100px">No. PJ</th>
+																<th style="min-width:100px">CVIB 0069</th>
+																<th style="min-width:100px">CSFR 0022</th>
+																<th style="min-width:100px">DSCL 0034</th>
+																<th style="min-width:100px">CVIB 0070</th>
+																<th style="min-width:100px">RV 0054</th>
+																<th style="min-width:100px">RC80 Dry</th>
+																<th style="min-width:100px">Awal</th>
+																<th style="min-width:100px">Terima</th>
+																<th style="min-width:100px">Akhir</th>
+																<th style="min-width:100px">Pakai</th>
+																<th>CNG / Solar</th>
+															</tr>
+															<tr class="summary-body">
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>0</td>
+																<td>0</td>
+																<td></td>
+																<td>0</td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+															</tr>
+														</thead>
+														<tbody id="waste">
+														</tbody>
+														<tfoot>
+															<tr class="input input-wrapper">
+																<td><input type="text" class="form-control" name="WasteBlend"></td>
+																<td><input type="text" class="form-control" name="WasteNoSKJ"></td>
+																<td><input type="text" class="form-control" name="WasteNoPJ"></td>
+																<td><input type="text" class="form-control number" onblur="countYield()" name="WasteRM"></td>
+																<td><input type="text" class="form-control number" onblur="countYield()" name="WasteAddback"></td>
+																<td><input type="text" class="form-control number" onblur="javascript: countBoxToKg('WastePackingBox', 'WastePackingKg');countCO2Consumption('WasteCO2Pakai', 'WastePackingKg', 'WasteConsumptionCO2'); countYield();" name="WastePackingBox"></td>
+																<td><input type="text" class="form-control number disabled" disabled name="WastePackingKg"></td>
+																<td><input type="number" onkeypress="validateNumber(event)" class="form-control disabled" name="WasteYield" disabled></td>
+																<td><input type="text" class="form-control number" name="WasteIndexFinalOV"></td>
+																<td><input type="text" class="form-control number" name="WasteCVIB0069"></td>
+																<td><input type="text" class="form-control number" name="WasteCSFR0022"></td>
+																<td><input type="text" class="form-control number" name="WasteDSCL0034"></td>
+																<td><input type="text" class="form-control number" name="WasteCVIB0070"></td>
+																<td><input type="text" class="form-control number" name="WasteRV0054"></td>
+																<td><input type="text" class="form-control number" name="WasteRC80Dry"></td>
+																<td><input type="text" class="form-control number" onblur="javascript: countCO2Used('WasteCO2Awal', 'WasteCO2Terima', 'WasteCO2Akhir', 'WasteCO2Pakai');countCO2Consumption('WasteCO2Pakai', 'WastePackingKg', 'WasteConsumptionCO2');" name="WasteCO2Awal"></td>
+																<td><input type="text" class="form-control number" onblur="javascript: countCO2Used('WasteCO2Awal', 'WasteCO2Terima', 'WasteCO2Akhir', 'WasteCO2Pakai');countCO2Consumption('WasteCO2Pakai', 'WastePackingKg', 'WasteConsumptionCO2');" name="WasteCO2Terima"></td>
+																<td><input type="text" class="form-control number" onblur="javascript: countCO2Used('WasteCO2Awal', 'WasteCO2Terima', 'WasteCO2Akhir', 'WasteCO2Pakai');countCO2Consumption('WasteCO2Pakai', 'WastePackingKg', 'WasteConsumptionCO2');" name="WasteCO2Akhir"></td>
+																<td><input type="text" class="form-control number disabled" disabled name="WasteCO2Pakai"></td>
+																<td><input type="text" class="form-control number disabled" disabled name="WasteConsumptionCO2"></td>
+																<td><input type="text" class="form-control number" name="WasteTotalGAS"></td>
+																<td><input type="text" class="form-control number" name="WasteTotalSTEAM"></td>
+																<td>
+																	<select class="form-control select2" name="WastePRIMAT">
+																		<option value="Passed">Passed</option>
+																		<option value="Inspection">Inspection</option>
+																		<option value="Hold">Hold</option>
+																	</select>
+																</td>
+																<td class="tx-center"><i onclick="javascript: addToTable(this)" data-target-table="waste" class="fa fa-plus-circle"></i></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div> <!-- WASTE -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-12 mg-b-20 d-none" id="approvalSegment">
+				<div class="card">
+					<div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+					<div class="card-body">
+						<table class="table table-bordered table-hover table-striped" id="dtApproval">
+							<thead class="thead-info">
+								<tr>
+									<th>Name</th>
+									<th>Role</th>
+									<th>Actions</th>
+									@*<th>Approver</th>*@
+									<th style="width:15%;">Date &amp; Time</th>
+									<th style="width:40%;">Comment</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div> <!--APPROVAL SEGMENT-->
+
+			<div class="col-12 mg-b-20 d-none" id="approvalForm">
+				<div class="d-none d-md-block float-right">
+					<button id="btnApprove" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="check" class="wd-10 mg-r-5"></i> Approve</button>
+					<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" data-toggle="modal" data-target="#comment-modal"><i data-feather="slash" class="wd-10 mg-r-5"></i> Revise</button>
+				</div>
+			</div>
+
+		</div><!-- row -->
+	</div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="comment-modal" role="dialog">
+	<div class="modal-dialog" style="max-width:50%;">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="detail-header" style="font-size:1rem;font-weight:bold;">Comment</div>
+				<hr>
+				<textarea type="text" id="comment_value" class="form-control" style="height:75px"></textarea>
+				<hr>
+				<div style="min-height:30px">
+					<button type="button" class="btn btn-xs btn-primary mg-l-5" style="float:right" id="btnReject">Revise</button>
+					<button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="detail-modal" role="dialog">
+	<div class="modal-dialog" style="max-width:90%;">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="detail-header" style="font-size:2rem;font-weight:bold;"></div>
+				<hr>
+				<div class="detail-body lph-form" style="min-width:unset !important; margin: 10px 20px;"></div>
+				<hr>
+				<div style="min-height:30px">
+					<button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@* chanif: untuk selin index, rubah model ke variabel js untuk prefilling *@
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+
+@section Scripts{
+
+	<script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+	<script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+	<script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+	<script>
+        @*
+            v2.6.6
+            - ieFix()
+                - add support for horizontal scroll
+			- wizard
+				- fix bug for button next;
+            v2.6.5
+            - generateTable()
+                - add asc desc configuration
+            v2.6.4
+            - toInt()
+                - handle convert if string isNaN
+            - pushUnique()
+				- push only unique item
+            - ieFix()
+				- turn this to specific element
+                - change width() to outerWidth()
+            v2.6.3
+            - ieFix()
+                - remove . on hasClass checker
+            - configInput()
+                - select2 add param allowClear: true
+            - turnToPreviewPage()
+                - turn to preview mode
+        *@
+        const TableMode = {
+            NORMAL: 'normal',
+            SPREAD: 'spread'
+        }
+        Array.prototype.absorb = function (d) { this.push.apply(this, d); };
+        Array.prototype.truncate = function () { this.length = 0; };
+        Array.prototype.pushUnique = function (d) { if (this.indexOf(d) === -1) this.push(d); };
+        const $tmpDiv = $('<div/>');
+        function htmlEncode(value){
+	        return $tmpDiv.text(value).html();
+        }
+        function htmlDecode(value){
+	        return $tmpDiv.html(value).text();
+        }
+        function deepCloneObject(d) {
+            return Object.assign({}, d);
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+        function getValue(e) {
+            let val = $(e).val();
+            if ($(e).prop("type") == "checkbox")
+                val = $(e).prop("checked");
+            if (Array.isArray(val))
+                val = val.join('___');
+            return htmlEncode(val);
+        }
+        function setValue(node, val) {
+            const type = $(node).prop("type");
+            if (type == "radio") {
+                $(node).filter(function(){ return $(this).val() == val }).prop("checked", true)
+            } else if (type == "checkbox") {
+                $(node).prop('checked', val == "true");
+            } else {
+                $(node).val(val);
+            }
+            if ($(node).hasClass("select2"))
+                $(node).trigger('change');
+        }
+        function fulfillTime(a) {
+            switch (a.length) {
+                //case 0: return "00:00";
+                case 1: return a + "0:00";
+                case 3: return a + "00";
+                case 4: return a + "0";
+            }
+            return a;
+        }
+        function toFloat(a) {
+            return parseFloat((a == null || a == "" || isNaN(a)) ? 0 : a);
+        }
+        function toInt(a) {
+            return parseInt((a == null || a == "" || isNaN(a)) ? 0 : a);
+        }
+        function isEmptyOrSpaces(str) {
+            return str === null || str.match(/^ *$/) !== null;
+        }
+        function countDuration(start, end) {
+            try {
+                end = fulfillTime(end).split(':');
+                start = fulfillTime(start).split(':');
+                if (start[1] == undefined || end[1] == undefined) return 0;
+                var d = new Date();
+                var startDate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var endDate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+                if (startDate > endDate)
+                    endDate = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, end[0], end[1]);
+                var diffTime = endDate - startDate;
+                return Math.ceil(diffTime / 60000);
+            } catch (err) {
+                console.log(err);
+            }
+            return 0;
+        }
+        function configInput() {
+            $('.select2').each(function (i, e) {
+                const param = {
+                    allowClear: true,
+                    placeholder: 'Choose one',
+                    searchInputPlaceholder: 'Search options'
+                };
+                if ($(e).attr("multiple") == "multiple") {
+                    param.placeholder = 'Choose one or more';
+                    param.allowClear = false;
+                }
+                $(e).select2(param);
+            });
+            $('.time').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "00:00");
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+                $(field).blur(function () {
+                    $(this).val(fulfillTime($(this).val()));
+                });
+            });
+            $('.number, .number-positive').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+            $('.datepicker').toArray().forEach(function (field) {
+                //$(field).attr("placeholder", "01-Jan-19");
+                $(field).datepicker({
+                    todayHighlight: true,
+                    format: 'dd-M-yy',
+                    language: 'id-ID'
+                });
+            });
+            $('.information-datepicker').toArray().forEach(function (field) {
+                $(field).datepicker({
+                    todayHighlight: true,
+                    format: 'D, dd-M-yy',
+                    maxDate: 2,
+                    minDate: -2
+                });
+            });
+            $(".input-wrapper [required]").focus(function () {
+                showRequiredField(this);
+            });
+            $(".input-wrapper [required]").blur(function () {
+                hideRequiredField(this);
+            });
+        }
+        @****** ***** ***** ***** ***** Table ***** ***** ***** ***** ******@
+        function tableOnScroll() {
+            $(this).find("tfoot tr.input").css("transform", `translateX(-${$(this).scrollLeft()}px)`);
+        }
+        function ieFix() {
+            if (navigator.userAgent.search("Edge") >= 0) {
+                $(".tableWrapper:has(tfoot)").not(".no-ie-fix").each(function () {
+                    $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom":"0" });
+                    $(this).find("table").css({ "margin-bottom": "32px" });
+                    $(this).css({ "overflow-y": "scroll" });
+                    const ths = $(this).find("thead tr.summary-body").find("th, td");
+                    $(this).find("tfoot tr.input td").each(function (i, td) {
+                        $(td).css({ "min-width": Math.floor($($(ths)[i]).outerWidth()), "position": "static" });
+                    });
+                    $(this).off('scroll', tableOnScroll).on('scroll', tableOnScroll);
+                });
+            }
+        }
+        function findInArray(id, arr) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i].id == id) return i;
+            }
+            return -1;
+        }
+        function deleteFromArray(id, arr) {
+            arr.splice(findInArray(id, arr), 1);
+            return arr;
+        }
+        function setPreview(button) {
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const index = findInArray(id, configAle[targetTable].data);
+                const data = configAle[targetTable].data[index];
+                let inputWrapper = $("#" + targetTable).closest(".tableWrapper").siblings(".input-wrapper").clone();
+                $(inputWrapper).css("display","flex");
+                const header = $(button).closest(".card-body").siblings(".card-header").text();
+                const modal = $("#detail-modal");
+
+                $(inputWrapper).find("input, select, textarea").each(function (i, input) {
+                    if ($(input).prop("nodeName") == "SELECT") {
+                        $(input).parent().html(`<input value="${data[$(input).prop("name")]}" disabled class="form-control"/>`);
+                    } else {
+                        setValue($(input), data[$(input).prop("name")]);
+                        $(input).prop("disabled", true);
+                        $(input).prop("placeholder", "");
+                    }
+                });
+                $(inputWrapper).find(".tableWrapper tbody").each(function (i, tbody) {
+                    const subtable = $(tbody).prop("id");
+                    $(tbody).html(generateTable(data[subtable], subtable));
+                    console.log(subtable);
+                    if (configAle[subtable].countSummary != undefined) {
+                        configAle[subtable].data.absorb(configAle[targetTable].data[index][subtable]);
+                        const rowData = configAle[subtable].countSummary();
+                        configAle[subtable].data.truncate();
+                        const table = $(tbody).closest('table');
+                        const summaryTds = $(table).find('.summary-body').children();
+                        $(table).find('.input td').each(function (i, td) {
+                            const name = $(td).children().attr("name");
+                            if (rowData.hasOwnProperty(name))
+                                $(summaryTds[i]).html(rowData[name]);
+                        });
+                    }
+                });
+                $(inputWrapper).find(`#get-pss-data, .button-area, .tableWrapper tr.input`).remove();
+                $(inputWrapper).find(".tableWrapper tr").each(function () {
+                    $(this).children().last().remove();
+                });
+                if (configAle[targetTable].onPreview != undefined) {
+                    inputWrapper = configAle[targetTable].onPreview(data, inputWrapper);
+                }
+                $(modal).find(".detail-body").html(inputWrapper);
+                $(modal).find(".detail-header").html(`${header} Detail`);
+                $(modal).modal("show");
+            }
+        }
+        function generateRow(data, targetTable) {
+            let r = "";
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                $(`#${targetTable}`).siblings("thead").find("tr.summary-body").find("td, th").each(function () {
+                    const name = $(this).data("name");
+                    if (name != "Action") r += `<td>${data[name]}</td>`;
+                });
+            } else {
+                $(`#${targetTable}`).siblings("tfoot").find("tr.input").find("input, select, textarea").each(function () {
+                    const name = $(this).prop("name");
+                    r += `<td>${data[name]}</td>`;
+                });
+            }
+
+            r += `<td class="tx-center">`;
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                r += `<i onClick="javascript:setPreview(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fas fa-eye"></i>`;
+            }
+            r += `<i onClick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit"></i>`;
+            r += `<i onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-trash"></i>`;
+            r += `</td >`;
+
+            if (configAle[targetTable].onGenRow != undefined) {
+                r = configAle[targetTable].onGenRow(r);
+                if (r == null) return "";
+            }
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            if (configAle[targetTable].isDesc) for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            } else for (var i = 0; i < arr.length; i++) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function editData(button) {
+            const targetTable = $(button).data("target-table");
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                const id = $(button).data("id");
+                if (configAle[targetTable].onEdit != undefined) {
+                    if (configAle[targetTable].onEdit(button)) {
+                        return;
+                    }
+                }
+                $(table).data("edited", true);
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    const index = findInArray(id, configAle[targetTable].data);
+                    const data = configAle[targetTable].data[index];
+                    const inputWrapper = $(button).closest(".tableWrapper").siblings(".input-wrapper");
+                    const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                    const notInputs = $(tableWrapper).find("input, select, textarea");
+                    const allInputs = $(inputWrapper).find("input, select, textarea");
+                    $(allInputs).not($(notInputs)).each(function (i, input) {
+                        setValue($(input), data[$(input).prop("name")]);
+                    });
+                    $(tableWrapper).find("tbody").each(function (i, tbody) {
+                        const subtable = $(tbody).prop("id");
+                        configAle[subtable].data.absorb(data[subtable]);
+                        startupSetup(subtable);
+                    });
+                    $(inputWrapper).find("#get-pss-data").hide();
+                    let newbuttons = "";
+                    newbuttons += `<button class="btn btn-lg pd-x-15 btn-primary cancel" onClick="javascript:cancelEdit(this)" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Cancel</button>&nbsp;`;
+                    newbuttons += `<button class="btn btn-lg pd-x-15 btn-primary save" onClick="javascript:normalData(this)" data-id="${id}" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Save</button>`;
+                    $(inputWrapper).find(".button-area").html(newbuttons);
+                } else {
+                    const tds = $(button).closest("tr").children('td');
+                    const inputTr = $(table).find('tr.input');
+                    const inputTds = $(inputTr).children('td');
+                    const tdsCount = $(tds).length;
+
+                    $(button).closest("tr").addClass("input-wrapper");
+                    $(tds).each(function (i, e) {
+                        const el = $(inputTds[i]).children()[0];
+                        if (i != tdsCount - 1) {
+                            const html = $(e).text();
+                            const newInput = $(el).clone();
+                            if (!$(el).hasClass("disabled"))
+                                $(newInput).prop("disabled", false);
+
+                            $(el).prop("disabled", true);
+                            setValue(newInput, html);
+                            $(e).html(newInput);
+                        } else {
+                            $(el).attr("onClick", "");
+                            $(e).find(".fa.fa-edit").hide();
+                            $(e).find(".fa.fa-trash").hide();
+                            $(e).append(`<i onClick="javascript:normalData(this)" data-id="${id}" data-target-table="${targetTable}" class="fa fa-save save"></i>`);
+                            $(e).append(`<i onClick="javascript:revertEdit(this)" data-id="${id}" data-target-table="${targetTable}" class="fa fa-times cancel"></i>`);
+                        }
+                    });
+                    configInput();
+                    ieFix();
+                }
+            }
+        }
+        function revertEdit(button) {
+            const targetTable = $(button).data("target-table");
+            if (configAle[targetTable].onCancel != undefined) {
+                if (configAle[targetTable].onCancel()) {
+                    return;
+                }
+            }
+            releaseDisabledInput($(button).closest("table"));
+            startupSetup(targetTable);
+        }
+        function cancelEdit(button) {
+            const targetTable = $(button).data("target-table");
+            if (configAle[targetTable].onCancel != undefined) {
+                if (configAle[targetTable].onCancel()) {
+                    return;
+                }
+            }
+            const inputWrapper = $(button).closest(".input-wrapper");
+            const tableWrapper = $(inputWrapper).find(".tableWrapper");
+            const allInputs = $(inputWrapper).find("input, select, textarea");
+            $(button).closest(".button-area").html(`<button class="btn btn-lg pd-x-15 btn-primary" onClick="javascript:addToTable(this)" data-target-table="${targetTable}" style="padding: 0.391rem 0.5rem;">Add To Table</button>`);
+            $(allInputs).each(function () { setValue(this, "") });
+            $(inputWrapper).siblings(".tableWrapper").find("table").data("edited", false);
+            $(inputWrapper).find("#get-pss-data").show();
+            $(tableWrapper).find("table").each(function (i, table) {
+                releaseDisabledInput(table);
+                const subtable = $(table).find("tbody").prop("id");
+                configAle[subtable].data.truncate();
+                startupSetup(subtable);
+            });
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    if($(el).attr("onClick") == "")
+                        $(el).attr("onClick", "javascript:addToTable(this)");
+                }
+            });
+        }
+        function startupSetup(target) {
+            $("#" + target).closest("table").prop("cellspacing", "1");
+            const table = generateTable(configAle[target].data, target);
+            $("#" + target).html(table);
+            countSummary(target);
+            ieFix();
+        }
+        function showRequiredField(input) {
+            $(input).data("toggle", "popover");
+            $(input).data("placement", "top");
+            $(input).css("box-shadow", "0px 0px 7.5px red");
+            if ($(input).data("content") == undefined) {
+                $(input).data("content", "Value can't be empty!");
+            }
+            $(input).popover("show");
+        }
+        function hideRequiredField(input) {
+            $(input).css("box-shadow", "");
+            $(input).popover("hide");
+        }
+        function addToTable(button) {
+            const targetTable = $(button).data("target-table");
+            const inputWrapper = $(button).closest(".input-wrapper");
+            const tableWrapper = $(inputWrapper).find(".tableWrapper");
+            const notInputs = $(tableWrapper).find("input, select, textarea");
+            const allInputs = $(inputWrapper).find("input, select, textarea");
+            const inputs = $(allInputs).not($(notInputs));
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(inputs).each(function (tdIndex, input) {
+                if ($(input).prop("required") && isEmptyOrSpaces($(input).val())) {
+                    showRequiredField(input);
+                    setTimeout(function () { $(input).popover("hide"); }, 10000);
+                    shouldReturn = true;
+                    return false;
+                }
+                if ($(input).attr("name") != undefined) {
+                    const name = $(input).attr("name");
+                    const val = getValue(input);
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+
+            if (configAle[targetTable].onAdd != undefined) {
+                newdata = configAle[targetTable].onAdd(newdata);
+                if (newdata == null) return;
+            }
+            $(inputs).each(function (i, input) { setValue($(input), "") });
+            if (configAle[targetTable].mode != undefined &&
+                configAle[targetTable].mode == TableMode.SPREAD) {
+                $(tableWrapper).find("tbody").each(function (i, tbody) {
+                    const tableName = $(tbody).prop("id");
+                    newdata[tableName] = configAle[tableName].data.slice();
+                    configAle[tableName].data.truncate();
+                    startupSetup(tableName);
+                });
+                cancelEdit(button);
+            }
+
+            configAle[targetTable].data.push(newdata);
+            startupSetup(targetTable);
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const table = $('#' + targetTable).closest('table');
+                const summaryTds = $(table).find('.summary-body').children();
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    $(summaryTds).each(function (i, td) {
+                        const name = $(td).data("name");
+                        if (rowData.hasOwnProperty(name))
+                            $(summaryTds[i]).html(rowData[name]);
+                    });
+                } else {
+                    $(table).find('.input td').each(function (i, td) {
+                        const name = $(td).children().attr("name");
+                        if (rowData.hasOwnProperty(name))
+                            $(summaryTds[i]).html(rowData[name]);
+                    });
+                }
+            }
+        }
+        function deleteData(button) {
+            const table = $(button).closest("table");
+            if (!$(table).data("edited")) {
+                if (confirm("Are you sure?")) {
+                    const id = $(button).data("id");
+                    const targetTable = $(button).data("target-table");
+                    releaseDisabledInput(table);
+                    if (configAle[targetTable].onDelete != undefined) {
+                        if (configAle[targetTable].onDelete(id)) {
+                            return;
+                        }
+                    }
+                    deleteFromArray(id, configAle[targetTable].data);
+                    startupSetup(targetTable);
+                }
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const cardBody = $(button).closest(".card-body");
+                const table = $(cardBody).find(`table:has(tbody#${targetTable})`);
+                const index = findInArray(id, configAle[targetTable].data);
+
+                var newdata = {
+                    id: uuidv4()
+                };
+                let shouldReturn = false;
+                const inputWrapper = $(button).closest(".input-wrapper");
+                const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                const notInputs = $(tableWrapper).find("input, select, textarea");
+                const allInputs = $(inputWrapper).find("input, select, textarea");
+                $(allInputs).not($(notInputs)).each(function () {
+                    if ($(this).prop("required") && isEmptyOrSpaces($(this).val())) {
+                        showRequiredField(this);
+                        setTimeout(function () { $(this).popover("hide"); }, 10000);
+                        shouldReturn = true;
+                        return false;
+                    }
+                    const name = $(this).prop("name");
+                    const val = getValue(this);
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                });
+
+                if (configAle[targetTable].mode != undefined &&
+                    configAle[targetTable].mode == TableMode.SPREAD) {
+                    $(tableWrapper).find("tbody").each(function (i, tbody) {
+                        const tableName = $(tbody).prop("id");
+                        newdata[tableName] = configAle[tableName].data.slice();
+                        configAle[tableName].data.truncate();
+                        startupSetup(tableName);
+                    });;
+                    cancelEdit(button);
+                }
+
+                if (shouldReturn) return;
+
+                if (configAle[targetTable].onSave != undefined) {
+                    newdata = configAle[targetTable].onSave(newdata);
+                    if (newdata == null) return;
+                }
+
+                configAle[targetTable].data[index] = newdata;
+
+                if (configAle[targetTable].mode == undefined ||
+                    configAle[targetTable].mode == TableMode.NORMAL) {
+                    releaseDisabledInput(table);
+                }
+
+                startupSetup(targetTable);
+            }
+        }
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input[type=text], input[type=number], select, textarea, input[type=radio]:checked, input[type=checkbox]').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+
+
+                    let type = "NonNumeric";
+                    if ($(e).is(".number, .number-positive")) type = "Numeric";
+                    values.push({
+                        Value: getValue(e),
+                        ValueType: type,
+                    });
+                });
+            });
+            return [components, values];
+        }
+        function collectAllData(config) {
+            let collectorArray = [];
+            for (var tableId in config) {
+                let tableColumnType = {};
+                let inputs = $(`#${tableId} ~ tfoot tr.input`).find("input, select, textarea");
+                if (configAle[tableId].mode != undefined &&
+                    configAle[tableId].mode == TableMode.SPREAD) {
+                    const inputWrapper = $(`#${tableId}`).parents(".tableWrapper").siblings(".input-wrapper");
+                    const tableWrapper = $(inputWrapper).find(".tableWrapper");
+                    const notInputs = $(tableWrapper).find("input, select, textarea");
+                    const allInputs = $(inputWrapper).find("input, select, textarea");
+                    inputs = $(allInputs).not($(notInputs));
+                }
+                $(inputs).each(function () {
+                    tableColumnType[$(this).prop("name")] =
+                        $(this).is(".number, .number-positive") ? "number" : "text";
+                });
+                const data = config[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    if (config[tableId].onCollectDataRow != undefined) {
+                        data[i] = config[tableId].onCollectDataRow(data[i]);
+                    }
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let type = "NonNumeric";
+                            if (tableColumnType[prop] == "number") type = "Numeric";
+                            let val = data[i][prop];
+                            if (val instanceof Object) val = JSON.stringify(val);
+                            let newInsertData = {
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: val,
+                                ValueType: type,
+                                RowNumber: i
+                            };
+                            if (config[tableId].onCollectDataSingle != undefined) {
+                                newInsertData = config[tableId].onCollectDataSingle(newInsertData);
+                            }
+                            collectorArray.push(newInsertData);
+                        }
+                    }
+                }
+            }
+            return collectorArray;
+        }
+        function notEmptyValidation(name, val) {
+            if (val == "") {
+                alert("Value can't be empty");
+                return true;
+            }
+            return false;
+        }
+        function turnToPreviewPage() {
+            $('.collect-component').find("input, select, textarea").prop("disabled", true);
+            for (var tableId in configAle) {
+                const table = $(`#${tableId}`).parents("table");
+                if (configAle[tableId].mode != undefined &&
+                    configAle[tableId].mode == TableMode.SPREAD) {
+                    $(table).parents(".tableWrapper").siblings().hide();
+                    $(table).find("tbody").find(".fa-edit, .fa-trash").hide();
+                } else {
+                    $(table).find("tr.input").hide();
+                    $(table).find("thead").find("tr:first-child, tr:last-child").find("th:last-child, td:last-child").hide();
+                    $(table).find("tbody").find("td:last-child").hide();
+                }
+            }
+            $("#line-tabs").hide();
+            if (!$("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                $("#wasteAuto").find("div:first-child").hide();
+                $("#wasteAuto").find(".tableWrapper").removeClass("col-9").addClass("col-12");
+            }
+            $(".show-on-preview").show();
+        }
+        function placeData(model, handleImageFunction) {
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                let val = model.CompoVal[i].Value.Value;
+                val = decodeURIComponent(val ? val : "");
+                if (type == "ImageURL") {
+                    handleImageFunction(val);
+                } else {
+                    const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                    const parent = tn[0];
+                    tn.shift();
+                    const child = tn.join("-");
+                    const node = $("#" + parent + " " + type + "[name=" + child + "]");
+                    if ($(node).hasClass("select2")) {
+                        if ($(node).attr("multiple") == "multiple")
+                            val = val.split('___');
+                        setValue(node, val);
+                        $(node).trigger('change');
+                    } else setValue(node, val);
+                }
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        const val = model.Extras[i].Value;
+                        data[model.Extras[i].FieldName] = decodeURIComponent(val ? val : "");
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                    }
+                }
+                if (configAle[table].onPlaceData != undefined) {
+                    data = configAle[table].onPlaceData(data);
+                    if (data == null) continue;
+                }
+                configAle[table].data.push(data);
+            }
+            if ($("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                configAle.wasteBodyManual.data.truncate();
+                configAle.wasteBodyManual.data.absorb(configAle.waste.data);
+                configAle.waste.data.truncate();
+                $('#wastetapauto').removeClass("active");
+                $('#wastetapmanual').addClass("active");
+                $('#wasteAuto').css({ 'display': 'none' });
+                $('#wasteManual').css({ 'display': '' });
+            }
+            for (let targetTable in configAle) {
+                configAle[targetTable].data.reverse();
+                startupSetup(targetTable);
+            }
+        }
+        $(document).ready(function () {
+            ieFix();
+            configInput();
+            $(window).on('resize', ieFix);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        });
+        @****** ***** ***** ***** ***** /Table/ ***** ***** ***** ***** ******@
+
+        @****** ***** ***** ***** ***** Wizard ***** ***** ***** ***** ******@
+        function wizardButtonSetSelection(button) {
+            selected = $(button).text();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).closest(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        $(document).ready(function () {
+            $(".wizard-modal .next").click(function () {
+                wizardButtonNext(this);
+            });
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).closest(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        @****** ***** ***** ***** ***** /Wizard/ ***** ***** ***** ***** ******@
+
+        @****** ***** ***** ***** *****  Timbangan  ***** ***** ***** ***** ******@
+        function getTimbangan() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+            $.ajax({
+                url: url,
+                dataType :"jsonp",
+                jsonp: false,
+                jsonpCallback: "callback",
+                success : function(data){
+                    $('#WasteWeight').text(toFloat(data.Weight));
+                },
+                error : function(httpReq,status,exception){
+                    console.log("Timbangan not found");
+                }
+            });
+        }
+        @****** ***** ***** ***** ***** /Timbangan/ ***** ***** ***** ***** ******@
+	</script>
+
+	<script>
+		var logbook1Data = [];
+		var logbook2Data = [];
+		var thisActionData = [];
+		var nextActionData = [];
+		var impregnationData = [];
+		var reorderingData = [];
+		var packingData = [];
+		var wasteData = [];
+
+		const configAle = {
+			waste: {
+				data: wasteData,
+				onValidate: notEmptyValidation,
+				countSummary() {
+					let rowData = {
+						WasteRM: 0,
+						WasteAddback: 0,
+						WastePackingKg: 0,
+						WasteCO2Pakai: 0,
+						WasteConsumptionCO2: 0,
+						WastePRIMAT: "0%, 0%, 0%",
+					};
+					let PrimatPassed = 0, PrimatInspection = 0, PrimatHold = 0;
+					for (var i = 0; i < wasteData.length; i++) {
+						rowData.WasteRM += toFloat(wasteData[i].WasteRM);
+						rowData.WasteAddback += toFloat(wasteData[i].WasteAddback);
+						rowData.WastePackingKg += toFloat(wasteData[i].WastePackingKg);
+
+						rowData.WasteCO2Pakai += toFloat(wasteData[i].WasteCO2Pakai);
+						//rowData.WasteConsumptionCO2 += toFloat(wasteData[i].WasteConsumptionCO2);
+						switch (wasteData[i].WastePRIMAT) {
+							case "Passed":
+								PrimatPassed++;
+								break;
+							case "Inspection":
+								PrimatInspection++;
+								break;
+							case "Hold":
+								PrimatHold++;
+								break;
+						};
+					}
+					rowData.WasteRM = rowData.WasteRM.toFixed(2);
+					rowData.WasteAddback = rowData.WasteAddback.toFixed(2);
+					rowData.WastePackingKg = rowData.WastePackingKg.toFixed(2);
+
+					rowData.WasteConsumptionCO2 = (rowData.WasteCO2Pakai / rowData.WastePackingKg).toFixed(2);
+					rowData.WasteCO2Pakai = rowData.WasteCO2Pakai.toFixed(2);
+
+					rowData.WastePRIMAT = ((PrimatPassed / wasteData.length) * 100).toFixed(1) + "%, " + ((PrimatInspection / wasteData.length) * 100).toFixed(1) + "%, " + ((PrimatHold / wasteData.length) * 100).toFixed(1) + "%";
+					PrimatPassed = 0, PrimatInspection = 0, PrimatHold = 0;
+					return rowData;
+				},
+			},
+			packing: {
+				data: packingData,
+				//onValidate: notEmptyValidation,
+				countSummary() {
+					let rowData = {
+						PackingDuration: 0,
+						PackingQtyBox: 0,
+						PackingQtyKg: 0,
+						PackingSamplingError: 0,
+					};
+					for (var i = 0; i < packingData.length; i++) {
+						rowData.PackingDuration += toFloat(packingData[i].PackingDuration);
+						rowData.PackingQtyBox += toFloat(packingData[i].PackingQtyBox);
+						rowData.PackingQtyKg += toFloat(packingData[i].PackingQtyKg);
+						rowData.PackingSamplingError += toFloat(packingData[i].PackingSamplingError);
+					}
+					rowData.PackingDuration = rowData.PackingDuration.toFixed(2);
+					rowData.PackingQtyBox = rowData.PackingQtyBox.toFixed(2);
+					rowData.PackingQtyKg = rowData.PackingQtyKg.toFixed(2);
+					rowData.PackingSamplingError = toFloat(rowData.PackingSamplingError / packingData.length).toFixed(2);
+					return rowData;
+				},
+			},
+			reordering: {
+				data: reorderingData,
+				onValidate: notEmptyValidation,
+				countSummary() {
+					let rowData = {
+						ReorderingDuration: 0,
+						ReorderingMCAfterRC80: 0,
+						ReorderingCCV: 0,
+						ReorderingGasCNGUsage: 0,
+						ReorderingSteamUsage: 0,
+					};
+					for (var i = 0; i < reorderingData.length; i++) {
+						rowData.ReorderingDuration += toFloat(reorderingData[i].ReorderingDuration);
+						rowData.ReorderingMCAfterRC80 += toFloat(reorderingData[i].ReorderingMCAfterRC80);
+						rowData.ReorderingCCV += toFloat(reorderingData[i].ReorderingCCV);
+						rowData.ReorderingGasCNGUsage += toFloat(reorderingData[i].ReorderingGasCNGUsage);
+						rowData.ReorderingSteamUsage += toFloat(reorderingData[i].ReorderingSteamUsage);
+					}
+					rowData.ReorderingDuration = rowData.ReorderingDuration.toFixed(2);
+					rowData.ReorderingMCAfterRC80 = rowData.ReorderingMCAfterRC80.toFixed(2);
+					rowData.ReorderingCCV = rowData.ReorderingCCV.toFixed(2);
+					rowData.ReorderingGasCNGUsage = rowData.ReorderingGasCNGUsage.toFixed(2);
+					rowData.ReorderingSteamUsage = rowData.ReorderingSteamUsage.toFixed(2);
+					return rowData;
+				},
+			},
+			impregnation: {
+				data: impregnationData,
+				onAdd(newData) {
+					let allEmpty = true;
+					for (var prop in newData) {
+						if (Object.prototype.hasOwnProperty.call(newData, prop) && prop != "id") {
+							allEmpty &= newData[prop] == "";
+						}
+					}
+					if (allEmpty) {
+						alert("Value can't be empty");
+						return null;
+					}
+					impregnationData.push(newData);
+					startupSetup("impregnation");
+					$("[name=ImpregnationBatchTo]").val(toInt(newData.ImpregnationBatchTo) + 1);
+					return null;
+				},
+				countSummary() {
+					let rowData = {
+						ImpregnationWeightCon: 0,
+						ImpregnationCycleTime: 0,
+						ImpregnationCO2Usage: 0,
+						ImpregnationNUsage: 0,
+						ImpregnationBatchTo: 0,
+					};
+					for (var i = 0; i < impregnationData.length; i++) {
+						rowData.ImpregnationWeightCon += toFloat(impregnationData[i].ImpregnationWeightCon);
+						rowData.ImpregnationCycleTime += toFloat(impregnationData[i].ImpregnationCycleTime);
+						rowData.ImpregnationCO2Usage += toFloat(impregnationData[i].ImpregnationCO2Usage);
+						rowData.ImpregnationNUsage += toFloat(impregnationData[i].ImpregnationNUsage);
+					}
+					rowData.ImpregnationWeightCon = rowData.ImpregnationWeightCon.toFixed(2);
+					rowData.ImpregnationCycleTime = rowData.ImpregnationCycleTime.toFixed(2);
+					rowData.ImpregnationCO2Usage = rowData.ImpregnationCO2Usage.toFixed(2);
+					rowData.ImpregnationBatchTo = impregnationData.length;
+					return rowData;
+				},
+			},
+			logbook1: {
+				data: logbook1Data,
+				onValidate: notEmptyValidation,
+			},
+			logbook2: {
+				data: logbook2Data,
+				onValidate: notEmptyValidation,
+			},
+			thisAction: {
+				data: thisActionData,
+				onValidate: notEmptyValidation,
+			},
+			nextAction: {
+				data: nextActionData,
+				onValidate: notEmptyValidation,
+			},
+		}
+	</script>
+	<script>
+
+		function countCO2Consumption(pakaiView, kgView, consumptionView) {
+			const pakai = toFloat($(`[name=${pakaiView}]`).val());
+			const kg = toFloat($(`[name=${kgView}]`).val());
+			let resultConsumption = 0;
+			if (pakai != "" && pakai != "0" && kg != "0" && kg != "")
+				resultConsumption = pakai / kg;
+			$(`[name=${consumptionView}]`).val(resultConsumption.toFixed(2));
+		}
+		function countCO2Used(awalView, terimaView, akhirView, pakaiView) {
+			const awal = toFloat($(`[name=${awalView}]`).val());
+			const terima = toFloat($(`[name=${terimaView}]`).val());
+			const akhir = toFloat($(`[name=${akhirView}]`).val());
+			console.log("awal :" + awal + " terima: " + terima + " akhir :" + akhir);
+			let resultPakai = awal + terima - akhir;
+			console.log("resultPakai :" + resultPakai);
+			$(`[name=${pakaiView}]`).val(resultPakai.toFixed(2));
+		}
+		function countBoxToKg(boxView, kgView) {
+			const box = toFloat($(`[name=${boxView}]`).val());
+			let resultKG = 0;
+			if (box != "" && box != "0")
+				resultKG = box * 60;
+			$(`[name=${kgView}]`).val(resultKG.toFixed(2));
+		}
+		function countError(labelView, timbangView, errorView) {
+			const label = $(`[name=${labelView}]`).val();
+			const timbangUlang = $(`[name=${timbangView}]`).val();
+			let error = 0;
+			if (label != "" && label != "0" && timbangUlang != "" && timbangUlang != "0")
+				error = ((timbangUlang - label) / label) * 100;
+			$(`[name=${errorView}]`).val(error.toFixed(2));
+		}
+		function countYield() {
+			const rm = toFloat($(`input[name=WasteRM]`).val());
+			const addback = toFloat($(`input[name=WasteAddback]`).val());
+			const packingKg = toFloat($(`input[name=WastePackingKg]`).val());
+			const wasteYield = (packingKg / (rm + addback)) * 100;
+			$(`[name=WasteYield]`).val(wasteYield.toFixed(2));
+		}
+		function countUsage(startView, endView, durationView) {
+			const start = toFloat($(`input[name=${startView}]`).val());
+			const end = toFloat($(`input[name=${endView}]`).val());
+			const usage = start - end;
+			$(`[name=${durationView}]`).val(usage);
+		}
+		function countDuration2(startView, endView, durationView) {
+			const start = $(`input[name=${startView}]`).val();
+			const end = $(`input[name=${endView}]`).val();
+			const duration = countDuration(start, end);
+			$(`[name=${durationView}]`).val(duration);
+		}
+
+		$(document).ready(function () {
+			const start = $("[name=Start").val();
+			$("[name=Start").val(fulfillTime(start));
+			const stop = $("[name=Stop").val();
+			$("[name=Stop").val(fulfillTime(stop));
+		});
+	</script>
+
+	<script>
+        // chanif: buat variabel LPHID untuk simpan ID, sebagai acuan untuk autosave & prev. timerID buat simpan variabel timer (biar bisa di-stop ketika submit)
+        var LPHID = 0;
+         @if (Model.ViewType != "index")
+         {
+             @: LPHID = @(Model.LPH.ID);
+         }
+        var timerID;
+        var isSaveManual = 0;
+
+         // chanif: simpan tak masukkan fungsi sendiri, efisiensi coding
+        function saveLPH(URL, isSubmit, comment, successMsg, errorMsg) {
+            // chanif: aku gak paham gunanya apa
+            let config = Object.assign({}, configAle);
+            if ($("#SelectedWasteWrapper input[name=ManualSelected]").prop("checked")) {
+                config.waste = config.wasteBodyManual;
+            }
+            delete config.wasteBodyManual;
+            console.log(config);
+
+            // chanif: autosave mati ketika submit
+            console.log("simpan . . .");
+            if (isSubmit == 1)
+                clearInterval(timerID);
+
+            const extras = collectAllData(config);
+            const comVal = collectAllComponent();
+            const components = comVal[0];
+            const values = comVal[1];
+
+            /*
+            console.log("components");
+            console.log(components);
+            console.log("values");
+            console.log(values);
+            console.log("extras");
+            console.log(extras);
+            */
+
+			var datajson = JSON.stringify({
+				id: LPHID,
+				isSubmit: isSubmit,
+				comment: comment,
+				detailsExtras: extras,
+				detailComponent: components,
+				detailValue: values
+			});
+
+            // chanif: simpan data. bedakan URL untuk tiap fungsi
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: datajson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (isSaveManual == 1) {
+                        isSaveManual = 0;
+                            $('#loading_overlay').addClass('d-none');
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: successMsg,
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright'
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+                    } else if (isSubmit == 1) {
+                            $('#loading_overlay').addClass('d-none');
+
+					        if (result.Status == 'True') {
+						        var notice = new PNotify({
+							        title: "@UIResources.Confirmation",
+							        text: successMsg,
+							        width: "400px",
+							        type: 'success',
+							        addclass: 'stack-bottomright'
+						        });
+
+						        notice.get().click(function () {
+							        notice.remove();
+                                });
+                                //Redirect
+                                if (URL == "@Url.Action("Edit", "LPHPrimaryDiet")") {
+                                    window.location.href = "@(Url.Action("Index", "HistoryPrimary"))";
+                                } else if (URL == "@Url.Action("Approval", "LPHPrimaryDiet")") {
+                                    window.location.href = "@(Url.Action("Index", "ApprovalPrimary"))";
+                                } else if (URL == "@Url.Action("Rejected", "LPHPrimaryDiet")") {
+                                    window.location.href = "@(Url.Action("Index", "ApprovalPrimary"))";
+                                } else {
+                                    location.reload();
+                                }
+					        }
+					        else {
+						        var notice = new PNotify({
+							        title: "@UIResources.ErrorMessage",
+							        text: errorMsg,
+							        width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+							        hide: false,
+							        buttons: {
+								        sticker: false
+							        }
+						        });
+
+						        notice.get().click(function () {
+								    notice.remove();
+							    });
+						    }
+                      } else {
+                          if (result.Status == 'True') {
+                              if (typeof result.LPHID === 'undefined') {
+                                  console.log("edit done");
+                                  $('#loading_overlay').addClass('d-none');
+	                                var notice = new PNotify({
+	                                    title: "@UIResources.Confirmation",
+	                                    text: "@UIResources.EditSucceed",
+	                                    width: "400px",
+	                                    type: 'success',
+	                                    addclass: 'stack-bottomright'
+	                                });
+	                                setTimeout(function(){
+	                                    notice.remove();
+	                                }, 3000);
+                              } else {
+                                  console.log("create done");
+                                  $('#btnSave').removeClass('d-none');
+                                  $('#btnReset').removeClass('d-none');
+                                  LPHID = result.LPHID;
+                                  console.log(LPHID);
+                              }
+                          }
+                          else {
+
+                                // chanif: tetap munculkan error kalau gagal save ketika autosave
+                                var notice = new PNotify({
+	                                title: "@UIResources.ErrorMessage",
+	                                text: errorMsg,
+	                                width: "400px",
+                                    type: 'error',
+                                    addclass: 'stack-bottomright',
+	                                hide: false,
+	                                buttons: {
+		                                sticker: false
+	                                }
+                                });
+
+                                notice.get().click(function () {
+	                                notice.remove();
+                                });
+	                      }
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            @if (Model.ViewType == "index"){
+            } else if (Model.ViewType == "index_restore"){
+                @: $('#btnSave').removeClass('d-none');
+                @: $('#btnReset').removeClass('d-none');
+            } else if (Model.ViewType == "edit"){
+                @: $('#approvalSegment').removeClass('d-none');
+                @: $('#btnSave').removeClass('d-none');
+            } else if (Model.ViewType == "approval"){
+                @: $('#approvalSegment').removeClass('d-none');
+                @: $('#approvalForm').removeClass('d-none');
+            } else {
+                @: $('#approvalSegment').removeClass('d-none');
+                @: $('#btnHistory').addClass('d-none');
+                @: $('#goPrev').addClass('d-none');
+
+                @*@: //chanif: matikan semua input
+                @: $(document).find('input,select,textarea').each(function(){
+                @:     $(this).attr('disabled', 'disabled');
+                @: });
+
+                @: //chanif: matikan semua button tambah/edit/delete. delay 1 detik nunggu load semua
+                @: setTimeout(function (){
+                @:     $(document).find('i,span').each(function(){
+                @:         $(this).prop("onclick", null).off("click");
+                @:     });
+                @: }, 1000);
+
+                @: //chanif: jangan munculkan modal ketika button di-klik
+                @: $(document).find('button').each(function(){
+                @:     $(this).attr("data-toggle", null);
+                @:     $(this).attr("data-target", null);
+                @: });*@
+            }
+
+
+            function checkMandatory() {
+                var mandatory = $(".mandatory");
+                //const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                            $(e.target).siblings(".select2-container").css('border', 'none');
+                            $(e.target).siblings(".select2-container").css('border-radius', '0');
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    } else if ($(mandatory[i])[0].value === "") {
+                        $(mandatory[i])[0].style.borderColor = "red";
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('click', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+
+                        status = false;
+                    }
+                }
+                return status;
+            }
+            $("#btnSave").click(function () {
+                if (checkMandatory()) {
+                    $('#loading_overlay').removeClass('d-none');
+                    saveLPH("@Url.Action("Edit", "LPHPrimaryDiet")", 1, "", "@UIResources.CreateSucceed", "@UIResources.CreateFailed");
+                }else {
+                    var notice = new PNotify({
+						    title: "Warning",
+						    text: "Submit failed, input field with red border can't be empty",
+						    width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+						    hide: false,
+						    buttons: {
+							    sticker: false
+						    }
+                    });
+                    setTimeout(function(){
+                            notice.remove();
+                    }, 8000);
+                }
+            });
+
+            $("#btnSave2").click(function () {
+                $('#loading_overlay').removeClass('d-none');
+                isSaveManual = 1;
+                saveLPH("@Url.Action("Edit", "LPHPrimaryDiet")", 0, "", "Data Saved Successfully!", "@UIResources.CreateFailed");
+            });
+            $('#btnReset').click(function () {
+                var redirect = confirm("All unsubmitted changes will be lost. Do you really want to reset?");
+                if (redirect) {
+                    DeleteLPH(LPHID);
+                }
+            });
+            function DeleteLPH(Id) {
+                $('#loading_overlay').removeClass('d-none');
+                $.ajax({
+                    url: fastApp.BaseUrl + '/HistoryPrimary/Delete?lphid=' + Id,
+                    type: 'POST',
+                    success: function (result) {
+                        if (result.Status) {
+                            var notice = new PNotify({
+                            title: "@UIResources.Confirmation",
+                            text: 'Reset LPH Successfully',
+                            width: "400px",
+                            type: 'success',
+                            addclass: 'stack-bottomright'
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                        else {
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "@UIResources.DeleteFailed",
+                                width: "400px",
+                                type: 'error',
+                                hide: false,
+                                addclass: 'stack-bottomright',
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    complete: function (data) {
+                        $('#loading_overlay').addClass('d-none');
+                        setTimeout(function () {
+                            window.location.href = "@(Url.Action("Index", "LPHPrimaryDiet"))";
+                        }, 1000);
+                    }
+                });
+            }
+
+            $('#btnHistory').on('click', function (e) {
+                location.href = '@Url.Action("Index", "HistoryPrimary")';
+            });
+
+            $('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "LPHPrimaryDiet")",
+                  data: JSON.stringify({
+                      LPHID: LPHID,
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "LPHPrimaryDiet"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No submission in the previous shift",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+                  }
+                });
+            })
+
+            $('#btnReject').click(function (e) {
+                $("#comment-modal").modal("hide");
+                var comment = $('#comment_value').val();
+                $('#loading_overlay').removeClass('d-none');
+                saveLPH("@Url.Action("Rejected", "LPHPrimaryDiet")", 1, comment, "@UIResources.RejectSucceed", "@UIResources.ApprovalFailed");
+            });
+
+            $('#btnApprove').click(function () {
+                var comment = "";
+                $('#loading_overlay').removeClass('d-none');
+                saveLPH("@Url.Action("Approval", "LPHPrimaryDiet")", 1, comment, "@UIResources.ApprovalSucceed", "@UIResources.ApprovalFailed");
+            });
+        });
+
+	</script>
+
+	@* chanif: jika index kasih autosave. selain index, kasih prefiling *@
+	@if (Model.ViewType == "index")
+	{
+		<script>
+            $(document).ready(function () {
+
+                // chanif: ketika page sudah selesai load, langsung simpan
+                $(window).load(function()
+                {
+                    saveLPH("@Url.Action("Create", "LPHPrimaryDiet")", 0, "", "", "");
+
+                    // chanif: lalu autosave tiap 3 menit
+                    setInterval(function () {
+                        $('#loading_overlay').removeClass('d-none');
+                        saveLPH("@Url.Action("Edit", "LPHPrimaryDiet")", 0, "", "", "");
+                    }, 10 * 60 * 1000);
+                });
+            });
+		</script>
+	}
+	else
+	{
+		if (Model.ViewType == "index_restore" || Model.ViewType == "edit")
+		{
+			<script>
+                $(document).ready(function () {
+                    $(window).load(function()
+                    {
+                        // chanif: autosave tiap 3 menit
+                        setInterval(function () {
+                            $('#loading_overlay').removeClass('d-none');
+                            saveLPH("@Url.Action("Edit", "LPHPrimaryDiet")", 0, "", "", "");
+                        }, 10 * 60 * 1000);
+                    });
+                });
+			</script>
+		}
+
+		<script>
+			/******************** PREFILLED ******************/
+
+			$(document).ready(function () {
+
+				var model = JSON.parse($("#jsonModel").attr("data-json"));
+
+				placeData(model);
+			});
+
+			/****************** END PREFILLED ****************/
+		</script>
+	}
+
+
+	@if (Model.ViewType == "submitted" || Model.ViewType == "submitted_prev")
+	{
+		<script>
+			$(document).ready(function () {
+				turnToPreviewPage();
+			});
+		</script>
+	}
+
+	@* chanif: munculkan approval selain di index & edit *@
+	@if (Model.ViewType != "index" && Model.ViewType != "index_restore")
+	{
+		<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+		<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+		<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+		<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+		<script>
+			$(document).ready(function () {
+				$('#dtApproval').dataTable({
+					"autoWidth": false,
+					"processing": true,
+					"serverSide": true,
+					"info": false,
+					"filter": false,
+					"bLengthChange": false,
+					"orderMulti": false,
+					"pageLength": 10,
+					"destroy": true,
+					"order": [[3, "asc"]],
+					"ajax": {
+						"url": fastApp.BaseUrl + '/LPHPrimaryDiet/GetApproverList?lphid=' + LPHID,
+						"type": "POST",
+						"datatype": "json"
+					},
+
+					"columnDefs":
+						[{
+							"targets": [0],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [1],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [2],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [3],
+							"searchable": true,
+							"orderable": true
+						},
+						{
+							"targets": [4],
+							"searchable": true,
+							"orderable": true
+						},
+							//{
+							//    "targets": [5],
+							//    "searchable": true,
+							//    "orderable": true
+							//},
+
+						],
+
+					"columns": [
+
+						{ "data": "User", "name": "User", "title": "Name", "autoWidth": false },
+						{ "data": "Role", "name": "Role", "title": "Role", "autoWidth": false },
+						{ "data": "Status", "name": "Status", "title": "Status", "autoWidth": false },
+						//{ "data": "Approver", "name": "Approver", "title": "Approver", "autoWidth": false },
+						{
+							"data": "ModifiedDate",
+							render: function (data, type, row) {
+								if (data)
+									return moment(data).format("DD-MMM-YY HH:mm");
+								else
+									return '';
+							}
+						},
+						{ "data": "Notes", "name": "Notes", "title": "Comment", "autoWidth": false }
+					],
+					"fnRowCallback": function (nRow, data, iDisplayIndex, iDisplayIndexFull) {
+						$('td', nRow).css('background-color', data['Color']);
+						$('#dtApproval_paginate')[0].style.display = "none";
+					}
+				});
+			});
+		</script>
+	}
+
+	<script>
+		$(document).ready(function () {
+			$("#line-tabs li").click(function () {
+				$(this).siblings().children().removeClass("active");
+				$(this).children().toggleClass("active");
+				const index = $(this).index() + 1;
+				$("#lines .carousel-item.active").removeClass("active");
+				const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+				$(carouselItem).toggleClass("active");
+				$(carouselItem).find('.tableWrapper thead tr').each(function () {
+					const top = $(this).position().top;
+					$(this).children().css({ "top": top });
+				});
+				ieFix();
+			});
+		});
+
+	</script>
+}

@@ -1,0 +1,585 @@
+﻿@model Fast.Web.Models.ChecklistModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+
+@{
+    List<SelectListItem> FrequencyUnit = new List<SelectListItem>()
+    {
+        new SelectListItem() {Text="Minute", Value="Minute" },
+        new SelectListItem() {Text="Hour", Value="Hour" },
+        new SelectListItem() {Text="Shift", Value="Shift" },
+        new SelectListItem() {Text="Day", Value="Day" },
+        new SelectListItem() {Text="Week", Value="Week" },
+        new SelectListItem() {Text="Month", Value="Month" },
+    };
+}
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+        .wizard > .content > .title.current {
+            display: none;
+        }
+
+        .wizard > .content {
+            padding-top: 35px;
+        }
+
+        .label-header:after {
+            content: ":";
+            position: absolute;
+            top: 9px;
+            right: 5px;
+        }
+
+        .bootstrap-tagsinput {
+            margin-top: 5px;
+        }
+
+            .bootstrap-tagsinput .tag {
+                margin-bottom: 2px;
+            }
+
+        .select2-container{
+            width: 100% !important;
+        }
+
+        .select2-results__option[aria-selected=true] {
+            display: none;
+        }
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item"><a href="#">Create</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Header</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">@UIResources.Ch_DefineChecklistHeader</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                @using (Html.BeginForm("Create", "Checklist", FormMethod.Post, new { @class="preventDoubleSubmission", @autocomplete = "false", encType = "multipart/form-data" }))
+                {
+                    <div id="wizard">
+                        <h3>@UIResources.Ch_MainInformation</h3>
+                        <section>
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Menu Title</label>
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.MenuTitle, null, new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Header</label>
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.Header, null, new { @class = "form-control", @required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-2">Icon</div>
+                                <div class="col-sm-10">
+                                    <div class="custom-file">
+                                        @Html.TextBoxFor(p => p.IconFile, null, new { type = "file", @class = "custom-file-input" })
+                                        <label class="custom-file-label" for="IconFile">@UIResources.Ch_UploadIcon</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-2 mg-b-10">Locations</div>
+                                <div class="col-sm-10">
+                                    <div class="row mg-l-0 mg-r-0">
+                                        <div class="col-4 mg-b-10 p-0"><select name="Location1" class="form-control selection-location" multiple="multiple" required></select></div>
+                                        <div class="col-4 mg-b-10 p-0"><select name="Location2" class="form-control selection-department" multiple="multiple"></select></div>
+                                        <div class="col-4 mg-b-10 p-0"><select name="Location3" class="form-control selection-subdepartment" multiple="multiple"></select></div>
+                                        <!-- <button type="button" class="col-1 offset-2 btn btn-xs btn-info selection-add"><i class="fas fa-plus"></i></button> -->
+                                    </div>
+                                    <div class="form-text text-muted">If location is empty, checklist will be visible in all locations.</div>
+                                </div>
+                            </div>
+                        </section>
+                        <h3>Header Form</h3>
+                        <section>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-2">@UIResources.Ch_ColumnNumber</div>
+                                <div class="col-sm-1">
+                                    @Html.TextBoxFor(x => x.ColumnHeader, null, new { @class = "form-control", @type = "number", @required = "required", @onkeypress="validateNumber(event)" })
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary" id="generate">@UIResources.Process</button>
+                                </div>
+                            </div>
+                            <div id="generated" class="mg-t-20"></div>
+                        </section>
+                        <h3>@UIResources.Ch_SubmissionFrequency</h3>
+                        <section>
+                            <p class="mg-b-40">Data in this form below will affect the results of the <b>adherence report</b> calculation.</p>
+                            <div class="form-group row">
+                                <div class="col-form-label col-sm-3">This Checklist should be submitted </div>
+                                <div class="col-sm-1">
+                                    @Html.TextBoxFor(x => x.FrequencyAmount, new { @Value = "3", @class = "form-control", @type = "number", @required = "required", @onkeypress = "validateNumber(event)" })
+                                </div>
+                                <div class="col-form-label col-sm-2">times every </div>
+                                <div class="col-sm-1">
+                                    @Html.TextBoxFor(p => p.FrequencyDivider, new { @Value = "1", @class = "form-control", @type = "number", @onkeypress = "validateNumber(event)" })
+                                </div>
+                                <div class="col-sm-1">
+                                    @Html.DropDownListFor(p => p.FrequencyUnit, new SelectList(FrequencyUnit, "Value", "Text", "Day"), new { @Value = "Hour", @class = "form-control" })
+                                </div>
+                            </div>
+                        </section>
+                        <h3>Approval Flow</h3>
+                        <section>
+                            <p class="mg-b-20"><b>Default First &amp; Second Approver</b> will be set according to information obtained from <b><i>"PeopleSoft"</i></b>. You can add/modify/delete it as needed.</p>
+                            <div class="form-group row mg-t-10">
+                                <div class="col-form-label col-sm-3">Role</div>
+                                <div class="col-form-label col-sm-4">User</div>
+                                <div class="col-form-label col-sm-1">Approve</div>
+                                <div class="col-form-label col-sm-1">Revise</div>
+                                <div class="col-form-label col-sm-1">Edit</div>
+                                <div class="col-form-label col-sm-1">Reject</div>
+                            </div>
+                            <div class="form-group row input-approval">
+                                <div class="col-sm-3 pd-r-0">
+                                    <select class="form-control selection-role" name="approver[]" required>
+                                        @foreach (var option in ViewBag.JobTitleList)
+                                        {
+                                        <option value="@option.Value" @(option.Value == "Default First Approver" ? "selected" : "")>@option.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-sm-4 pd-r-0">
+                                    <select class="form-control selection-user" name="approver[]" required>
+                                        <option value="0" selected>According to Approver from Peoplesoft</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Approve" />
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Revise" />
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Edit" />
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Reject" />
+                                </div>
+                                <div class="col-sm-1 text-right">
+                                    <button type="button" class="btn remove-approval btn-danger"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="form-group row input-approval">
+                                <div class="col-sm-3 pd-r-0">
+                                    <select class="form-control selection-role" name="approver[]" required>
+                                        @foreach (var option in ViewBag.JobTitleList)
+                                        {
+                                            <option value="@option.Value" @(option.Value == "Default Second Approver" ? "selected" : "")>@option.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-sm-4 pd-r-0">
+                                    <select class="form-control selection-user" name="approver[]" required>
+                                        <option value="0" selected>According to Approver from Peoplesoft</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Approve" />
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Revise" />
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Edit" />
+                                </div>
+                                <div class="col-sm-1 pd-r-0">
+                                    <input name="approver[]" type="text" class="form-control" value="Reject" />
+                                </div>
+                                <div class="col-sm-1 text-right">
+                                    <button type='button' class='btn btn-info add-approval'><i class='fas fa-plus'></i></button>
+                                </div>
+                            </div>
+
+                            <div class="mg-b-40"></div>
+                        </section>
+                    </div>
+
+                }
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+<div id="jsonJobTitleUsers" data-json='@JsonConvert.SerializeObject(ViewBag.JobTitleUsers)' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/parsleyjs/parsley.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery-steps/build/jquery.steps.min.js"></script>
+    <script src="~/Content/dashforge/lib/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+
+    <script type="text/javascript">
+        var temp_tr = "";
+
+        $(document).ready(function () {
+            var temp_row = $('.input-approval').clone();
+
+            $("form").on("change", "input[type='file']", function () {
+                $(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+            });
+
+            $('#wizard').steps({
+                headerTag: 'h3',
+                bodyTag: 'section',
+                autoFocus: true,
+                titleTemplate: '<span class="number">#index#</span> <span class="title">#title#</span>',
+                onFinished: function (event, currentIndex) {
+                    var valid = true;
+                    var roles = []
+                    $('.selection-role, .selection-user').each(function () {
+                        var e = $(this).parsley();
+                        if (e.isValid()) {
+                            /*
+                            var role_val = $(this).val();
+                            if (roles.includes(role_val)) {
+                                alert('You can not select 2 same role. If you need to add 2 (or more) user from sama Role, you can multi select the user instead');
+                                valid = false;
+                                return false;
+                            }
+                                
+                            roles.push(role_val);
+                            */
+                            e.reset();
+                        } else {
+                            e.validate();
+                            valid = false;
+                            return false;
+                        }
+                    })
+
+                    if (valid) {
+                        $("form").submit();
+                    }
+                },
+                onStepChanging: function (event, currentIndex, newIndex) {
+                    if (currentIndex < newIndex) {
+                        // Step 1 form validation
+                        if (currentIndex === 0) {
+                            var a = $('#MenuTitle').parsley();
+                            var b = $('#Header').parsley();
+                            var c = $('.selection-location').parsley();
+
+                            if (a.isValid() && b.isValid()) {
+                                return true;
+                            } else {
+                                a.validate();
+                                b.validate();
+                                //c.validate();
+                            }
+                        } else if (currentIndex === 1) {
+                            var d = $('#ColumnHeader').parsley();
+                            if (d.isValid()) {
+                                return true;
+                            } else { d.validate(); }
+                        } else {
+                            return true;
+                        }
+
+
+                        // Always allow step back to the previous step even if the current step is not valid.
+                    } else { return true; }
+                }
+            });
+
+            $('.select2').select2({
+                placeholder: 'Choose locations',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.select2-approver').select2({
+                placeholder: 'Choose additional approver',
+                searchInputPlaceholder: 'Search employee'
+            });
+            $('#Approver1').val("@(ViewBag.Approver1)").trigger('change');
+            $('#Approver2').val("@(ViewBag.Approver2)").trigger('change');
+            $('#AdditionalApprover').val("").trigger('change');
+
+            $('#generate').click(function () {
+                var d = $('#ColumnHeader').parsley();
+                if (d.isValid()) {
+                    var column = parseInt($('#ColumnHeader').val());
+
+                    if (column < 2) {
+                        $('#ColumnHeader').val(1);
+                        column = 1;
+                    }
+                    var table = "<table class='table table-bordered'><tr class='rowflag'>";
+                    for (var i = 0; i < column; i++) {
+                        table += `<td style="width:` + (90 / column).toFixed(2) + `%"><div class="row pos-relative">
+                                            <div class="col-5 label-header">
+                                                <input type="hidden" name="Components[]" value="11001100" />
+                                                <input type="text" name="Components[]" class="form-control" placeholder="Label" />
+                                            </div>
+                                            <div class="col-5 pd-r-3 pd-l-0"><select class="form-control main-selection" name="Components[]">
+                                                <option value="input_text">Input Text</option>
+                                                <option value="input_number">Input Number</option>
+                                                <option value="input_date">Input Date</option>
+                                                <option value="input_time">Input Time</option>
+                                                <option value="input_checkbox">Input Checkbox</option>
+                                                <option value="input_file">Input Image Upload</option>
+                                                <option value="input_option">Input Option</option>
+                                                <option value="input_user">Input User</option>
+                                                <option value="input_location">Input Location</option>
+                                                <option value="input_reference">Input Reference</option>
+                                                <option value="image">Image</option>
+                                                <option value="blank">Blank</option>
+                                            </select></div>
+                                            <div class="col-2 pd-l-0"><select class="form-control isrequired pd-r-1 pd-l-4" name="Components[]">
+                                                <option value="True" selected>Required</option>
+                                                <option value="False">Optional</option>
+                                            </select></div></div></td>`;
+                    }
+                    table += "<td class='wd-100 text-center'><button type='button' class='btn btn-xs btn-info add'><i class='fas fa-plus'></i></button></td>";
+                    table += "</tr></table>";
+
+                    $('#generated').html(table);
+                    temp_tr = $('.rowflag').clone();
+                } else { d.validate(); }
+            })
+
+            $(document).on("click", "button.add-approval", function () {
+                var tr = $(this).closest('.input-approval');
+                tr.after(`
+                <div class="form-group row input-approval">
+                    <div class="col-sm-3 pd-r-0">
+                        <select class="form-control selection-role" name="approver[]" required>
+                            <option value="">Selet Job Title</option>
+                            @foreach (var option in ViewBag.JobTitleList)
+                            {
+                                <option value="@option.Value">@option.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-4 pd-r-0">
+                        <select class="form-control selection-user" name="approver[]" required>
+                        </select>
+                    </div>
+                    <div class="col-sm-1 pd-r-0">
+                        <input name="approver[]" type="text" class="form-control" value="Approve" />
+                    </div>
+                    <div class="col-sm-1 pd-r-0">
+                        <input name="approver[]" type="text" class="form-control" value="Revise" />
+                    </div>
+                    <div class="col-sm-1 pd-r-0">
+                        <input name="approver[]" type="text" class="form-control" value="Edit" />
+                    </div>
+                    <div class="col-sm-1 pd-r-0">
+                        <input name="approver[]" type="text" class="form-control" value="Reject" />
+                    </div>
+                    <div class="col-sm-1 text-right">
+                        <button type='button' class='btn btn-info add-approval'><i class='fas fa-plus'></i></button>
+                    </div>
+                </div>`);
+
+                $('.selection-role').select2({
+                  placeholder: 'Select Job Title',
+                  searchInputPlaceholder: 'Search job title'
+                });
+
+                 $('.selection-user').select2({
+                  placeholder: 'Select User',
+                  searchInputPlaceholder: 'Search user'
+                });
+
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).addClass('remove-approval').addClass('btn-danger');
+                $(this).removeClass('add-approval').removeClass('btn-info');
+            });
+            $(document).on("click", "button.remove-approval", function () {
+                $(this).closest('.input-approval').remove();
+            });
+
+
+            $(document).on("click", "button.add", function () {
+                var tr = $(this).closest('tr');
+                var clone = temp_tr.clone();
+                tr.after(clone);
+
+                $(this).html("<i class='fas fa-minus'>");
+                $(this).addClass('remove').addClass('btn-danger');
+                $(this).removeClass('add').removeClass('btn-info');
+            });
+            $(document).on("click", "button.remove", function () {
+                $(this).closest('tr').remove();
+            });
+            $(document).on('change', 'select.main-selection', function () {
+                $(this).next(".subchild").remove();
+                $(this).next(".bootstrap-tagsinput").next('input').remove();
+                $(this).next(".bootstrap-tagsinput").next('.bootstrap-tagsinput').remove();
+                $(this).next(".bootstrap-tagsinput").remove();
+
+                if ($(this).find(":selected").val() == 'input_option') {
+                    $(this).after('<input type="text" name="Components[]" class="form-control tags-input subchild" data-role="tagsinput" placeholder="Comma separated" />');
+                    $('.tags-input').tagsinput();
+                } else if ($(this).find(":selected").val() == 'input_reference') {
+                    $(this).after(`@(Html.DropDownList("Components[]", (IEnumerable<SelectListItem>)ViewBag.ReferenceList, new { @class = "form-control subchild", @required="required", @id="" }))`);
+                } else if ($(this).find(":selected").val() == 'image') {
+                    var unique = Math.floor(Math.random() * 100);
+
+                    $(this).after(`<div class="custom-file subchild">
+                        <input type="file" class="custom-file-input" name="upload`+ unique + `" id="upload`+ unique + `" accept="image/*">
+                        <label class="custom-file-label" for="upload`+ unique + `">Upload your images here</label>
+                    </div>`);
+                }
+            });
+
+            $('#approver_count').on('change', function () {
+                if (this.value == 3) {
+                    $('#optional_approver').show();
+                } else {
+                    $('#optional_approver').hide();
+                    $('#AdditionalApprover').val('').trigger('change');
+                }
+            });
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose "></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value='+LocationTree.ProductionCenters[i].LocationID+'>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            $('.selection-location').select2({
+              placeholder: 'All Locations',
+              searchInputPlaceholder: 'Search options'
+            });
+            $('.selection-department, .selection-subdepartment').select2();
+
+            var locat_selected;
+            $(document).on("change",".selection-location",function(){
+                locat_selected = $(this).select2("val");
+                console.log(locat_selected);
+
+                $('.selection-department').select2('destroy');
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        select_depart.append('<optgroup label="'+LocationTree.ProductionCenters[i].Description+'">')
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                        select_depart.append('</optgroup>')
+                    }
+                }
+
+                $('.selection-department').select2({
+                  placeholder: 'All Departments',
+                  searchInputPlaceholder: 'Search options'
+                });
+                $('.selection-subdepartment').select2();
+            });
+
+            $(document).on("change",".selection-department",function(){
+                var department_selected = $(this).select2("val");
+                console.log(department_selected);
+
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                select_subdepart.append('<optgroup label="' + LocationTree.ProductionCenters[i].Description+ " - " + LocationTree.ProductionCenters[i].Departments[j].Description + '">')
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                                select_subdepart.append('</optgroup>')
+                            }
+                        }
+                    }
+                }
+
+                $('.selection-subdepartment').select2({
+                  placeholder: 'All Sub Departments',
+                  searchInputPlaceholder: 'Search options'
+                });
+            });
+
+
+            $('.selection-role, .selection-user').select2({
+                  placeholder: 'Select Group',
+                  searchInputPlaceholder: 'Search options'
+            });
+
+            var RoleUsers = JSON.parse($("#jsonJobTitleUsers").attr("data-json"));
+            //console.log(RoleUsers)
+
+            $(document).on("change",".selection-role",function(){
+                var role_selected = $(this).select2("val");
+                var select_user = $(this).closest('.row').find('.selection-user');
+
+                select_user.select2();
+                select_user.select2('destroy');
+                select_user.empty();
+
+                if (role_selected == "Default First Approver" || role_selected == "Default Second Approver") {
+                    select_user.append('<option value="0" selected>According to Approver from Peoplesoft</option>')
+                } else {
+                    select_user.append('<option value="">Please select user</option>');
+
+                    for (var i = 0; i < RoleUsers[role_selected].length; i++) {
+                        select_user.append('<option value='+RoleUsers[role_selected][i].EmployeeID+'>[' + $.trim(RoleUsers[role_selected][i].EmployeeID) + '] '+RoleUsers[role_selected][i].FullName+'</option>')
+                    }
+
+
+                    /*
+			        $.ajax({
+				        type: "post",
+				        url: "",
+				        data: { id: role_selected },
+				        datatype: "json",
+				        traditional: true,
+                        success: function (data) {
+                            select_user.append('<option value="0" selected>All Users in This Group</option>');
+					        for (var i = 0; i < data.length; i++) {
+                                select_user.append('<option value=' + data[i] + '>' + data[i] + '</option>');
+					        }
+                        }
+                    });
+                    */
+                }
+
+                select_user.select2({
+                  placeholder: 'Select User',
+                  searchInputPlaceholder: 'Search user'
+                });
+            });
+        });
+    </script>
+}

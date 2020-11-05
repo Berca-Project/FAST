@@ -1,0 +1,136 @@
+﻿@model Fast.Web.Models.MppAllocationModel
+@using Fast.Web.Resources;
+
+@section Styles{
+	<link href="~/Content/dashforge/assets/css/dashforge.css" rel="stylesheet" />
+	<link href="~/Content/dashforge/assets/css/dashforge.dashboard.css" rel="stylesheet" />
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">MPP Allocation & Status (@ViewBag.MachineCode)</h4>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					<button type="button" class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="AddUser('@(ViewBag.MachineCode)')" data-toggle="modal" data-target="#modalAddMpp" title="Add Worker"><i class="fa fa-user-plus">&nbsp;Add Worker</i></button>
+				</div>
+			</div>
+		</div>
+		<br />
+		<div class="table-responsive">
+			<table class="table-bordered table-striped mb-none border-bottom-0 table-fast" width="100%">
+				<thead>
+					<tr>
+						<th colspan="2" class="align-middle text-center">Machine Allocation</th>
+						<th colspan="4" class="align-middle text-center">MPP status</th>
+						<th rowspan="2">Action</th>
+					</tr>
+					<tr>
+						<th>Role</th>
+						<th>Allocation</th>
+						<th>Employee ID</th>
+						<th>Employee</th>
+						<th>Job Position</th>
+						<th>Status MPP</th>
+					</tr>
+				</thead>
+				<tbody>
+					@{int x = 0;}
+					@foreach (var item in Model.AllocationList)
+					{
+						<tr>
+							<td class="align-middle text-left">@item.MachineCategory</td>
+							<td class="align-middle text-left" width="100px">@item.Value</td>
+							<td class="align-middle text-left">@Model.MppList[x].EmployeeID</td>
+							<td class="align-middle text-left">@Model.MppList[x].EmployeeName</td>
+							<td class="align-middle text-left">@Model.MppList[x].JobTitle</td>
+							<td class="align-middle text-left">@Model.MppList[x].StatusMPP</td>
+							<td class="align-middle text-left" width="68px">
+								@if (@Model.MppList[x].EmployeeName != "" && @Model.MppList[x].EmployeeName != null && @Model.MppList[x].JobTitle != "" && @Model.MppList[x].JobTitle != null)
+								{
+									<button class="btn-menu btn-default" style="margin-left:0px !important" onclick="EditAction('@Model.MppList[x].ID')" data-toggle="modal" data-target="#modalEditMpp" title="Edit MPP"><i class="fa fa-edit"></i></button>
+								}
+							</td>
+						</tr>
+
+						x++;
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditMpp" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+		<div class="modal-content" id="EditDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddMpp" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+		<div class="modal-content" id="AddDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<script src="~/Content/theme/lib/jquery-treegrid/js/jquery.treegrid.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			if (result != "") {
+				if (result == "True") {
+					var message = "@ViewBag.Message";
+
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: message,
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var error = "@ViewBag.ErrorMessage";
+
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		});
+
+		function EditAction(id) {
+			$("#EditDialog").load(fastApp.BaseUrl + "/Mpp/Edit?id=" + id + "&locID=" + '@ViewBag.LocationID' + "&locType=" + '@ViewBag.LocationType');
+		};
+
+        function AddUser(code) {
+			$("#AddDialog").load(fastApp.BaseUrl + "/Mpp/AddUser?machineCode=" + code + "&date=" + '@ViewBag.MppDate' + "&locID=" + '@ViewBag.LocationID' + "&locType=" + '@ViewBag.LocationType' + "&isNextDay=" + '@ViewBag.IsNextDay' + "&shift=" + '@ViewBag.Shift');
+        };
+	</script>
+}
+
+

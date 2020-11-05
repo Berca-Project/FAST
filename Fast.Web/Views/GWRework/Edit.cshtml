@@ -1,0 +1,2605 @@
+﻿@model Fast.Web.Models.LPH.LPHEditModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = "Index";
+    var myspecial = ViewBag.Special;
+
+}
+
+@* chanif: tambah css untuk select2 *@
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .fas {
+            cursor: pointer;
+        }
+
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        /* chanif: tolong tambahkan css dari sini sampai bawah untuk memperbaiki tampilan select2 */
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">GW Rework</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH GW Rework</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#photo-modal" id="image_1" onclick="infoId(this)"><i data-feather="camera" class="wd-10 mg-r-5"></i> Photo</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" id="btnSaveDraft"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+                <button id="btnSave" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+                <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary " id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="GeneralInfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" name="DateInfo" class="form-control information-datepicker mandatory" id="txtDateInfo" value="">
+                                </div>
+                                <label class="col-2 col-form-label tx-right pd-r-0-f">Week</label>
+                                <div class="col-2">
+                                    <input type="text" name="WeekNumber" class="form-control" id="txtWeekNumber" disabled value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Machine *</label>
+                                <div class="col-4">
+                                    <select class="form-control select2 mandatory" name="MachInfo" id="machInfo">
+                                        <option value="">Select Machine</option>
+                                        @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                        {
+                                            <option value="@(machine.Code)">@(machine.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand *</label>
+                                <div class="col-9">
+                                    <select class="form-control select2 mandatory" name="BrandInfo" id="brandInfo">
+                                        <option value="">Select Brand</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCode)
+                                        {
+                                            <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Gw Name *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="GwGeneral" id="gwGeneral">
+                                        <option value="">Select GW</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.GeneralWorker)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="TeamLeader" id="teamLeader">
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">PO Number</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="PONumber">
+                                        <option value="">Select PO Number</option>
+                                        @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                        {
+                                            <option value="@(wpp.PONumber)">@(wpp.PONumber)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Shift / Group *</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control mandatory" name="Shift" id="shift" value="">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    @*<input type="text" class="form-control mandatory" name="Group" id="group" value="">*@
+                                    <select class="form-control select2 mandatory" name="Group" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.referenceGroup)
+                                        {
+                                            <option value="@(detail.Code)">@(detail.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Start / Stop *</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStart" name="Start" class="form-control date mandatory" value="">
+                                    </div>
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStop" name="Stop" class="form-control date mandatory" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div id="HandoverLogbook" class="card collect-component">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="tableWrapper" style="max-height: 210px">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr class="tx-center">
+                                    <th style="min-width:120px;">Stops and Location</th>
+                                    <th style="min-width:100px;"># of Stops</th>
+                                    <th style="min-width:120px;">Initial Root Cause (Describe the issue) / Action Taken &amp; Impact</th>
+                                    <th style="min-width:120px;">Action Taken in your shift</th>
+                                    <th width="80px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logbook">
+                            </tbody>
+                            <tfoot>
+                                <tr class="input">
+                                    <td><input type="text" class="form-control" name="StopAndLocation"></td>
+                                    <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="NOfStop"></td>
+                                    <td><input type="text" class="form-control" name="InitialCause"></td>
+                                    <td><input type="text" class="form-control" name="ActionTaken"></td>
+                                    <td class="tx-center"><i data-target="logbook" class="fa fa-plus-circle add-to-table"></i></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="tableWrapper" style="max-height: 210px">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-info">
+                                <tr class="tx-center">
+                                    <th style="width:50%;">Action proposed for next shift</th>
+                                    <th style="min-width:90px;">Owner</th>
+                                    <th style="min-width:70px;">Start Time</th>
+                                    <th style="min-width:70px;">End Time</th>
+                                    <th style="min-width:60px;">Duration (Min)</th>
+                                    <th style="min-width:100px;">Status</th>
+                                    <th width="80px">Action</th>
+                                </tr>
+                                <tr class="summary-body">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>0</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody id="action">
+                            </tbody>
+                            <tfoot>
+                                <tr class="input">
+                                    <td><input type="text" class="form-control" name="NextAction"></td>
+                                    <td><input type="text" class="form-control" name="NextOwner"></td>
+                                    <td><input type="text" class="form-control date" name="NextStart" id="start" onblur="javascript:countDuration('start','end','duration')"></td>
+                                    <td><input type="text" class="form-control date" name="NextEnd" id="end" onblur="javascript:countDuration('start','end','duration')"></td>
+                                    <td><input type="text" class="form-control disabled" disabled value="0" name="NextDurasi" id="duration"></td>
+                                    <td>
+                                        <select class="form-control select2" name="Status">
+                                            <option label="Choose one"></option>
+                                            <option value="ONPROGRESS">ONPROGRESS</option>
+                                            <option value="DONE">DONE</option>
+                                        </select>
+                                    </td>
+                                    <td class="tx-center"><i data-target="action" class="fa fa-plus-circle add-to-table"></i></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    @*</div>*@
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-3 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_1_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_1" class="input-img rounded mx-auto d-block" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" width="auto">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_1_show">
+                                </div>
+                                <div class="col-12">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Barcode CBL</i></label>
+                                        <i onclick="printImage('image_1_show','image_1')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+
+                </div>
+            </div> <!-- CAPTURE BY WEBCAM -->
+
+            <div class="col-9 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Stock WIP TB</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped" id="dtStockWIP">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 10%">Machine No.</th>
+                                        <th>Initial Stock</th>
+                                        <th>Total Retrival</th>
+                                        <th>Rework</th>
+                                        <th>Last Stock</th>
+                                        <th>Rework Activity</th>
+                                        <th>Remark</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockwip">
+                                </tbody>
+
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="MachineNoVal">
+                                                <option value="">Select Machine</option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)" >@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="InitialVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TotalVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ReworkVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="LastVal"></td>
+                                        <td><input type="text" class="form-control" name="ReworkActVal"></td>
+                                        <td><input type="text" class="form-control" name="RemarkVal"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="stockwip"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- STOCK WIP -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Claim</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped" id="dtClaim">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 15%">Machine No.</th>
+                                        <th class="tx-center">Early Remaining</th>
+                                        <th class="tx-center">Total Retrieval</th>
+                                        <th class="tx-center">Send to Claimable Room</th>
+                                        <th class="tx-center">Final Remaining</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td id="machNo_0"></td>
+                                        <td id="earlyA_0">0</td>
+                                        <td id="totalA_0">0</td>
+                                        <td id="sendA_0">0</td>
+                                        <td id="finalA_0">0</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="claim">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            @*<input type="text" class="form-control" name="MachineNoVal">*@
+                                            <select class="form-control select2" name="MachineNoVal">
+                                                <option value="">Select Machine</option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)" >@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="EarlyAVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TotalAVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="SendAVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="FinalAVal"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="claim"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- CLAIM -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Retrieval from Machine</div>
+                    <div class="card-body d-flex">
+                        <div class="tableWrapper col-12" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped" id="dtRetrieval">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>Machine No</th>
+                                        <th>Rootcause</th>
+                                        <th width="8%">TB</th>
+                                        <th width="8%">Claim A</th>
+                                        <th width="8%">Claim B</th>
+                                        <th width="8%">Claim C</th>
+                                        <th>Remark</th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="retrieval">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="MachineNoVal">
+                                                <option value="">Select Machine</option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)">@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2" name="RootcauseVal">
+                                                <option label="Choose one"></option>
+                                                <option value="IPC">IPC</option>
+                                                <option value="End Labeller">End Labeller</option>
+                                                <option value="Before Baller">Before Baller</option>
+                                                <option value="After Baller">After Baller</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ClaimAVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ClaimBVal"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ClaimCVal"></td>
+                                        <td><input type="text" class="form-control" name="RemarkVal"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="retrieval"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div> <!-- RETRIEVAL FROM MACHINE -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Initial stock (pack)</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 15%">Machine</th>
+                                        <th class="tx-center">Brand</th>
+                                        <th class="tx-center">TB+</th>
+                                        <th class="tx-center">TB-</th>
+                                        <th class="tx-center">Claim</th>
+                                        <th class="tx-center">Bandrol Lepas</th>
+                                        <th class="tx-center">Unclaimable</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="Initialstock">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="machineInitialstock">
+                                                <option label="Choose one"></option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)" >@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2" name="BrandInitialstock">
+                                                <option value="">Select Brand</option>
+                                                @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCode)
+                                                {
+                                                    <option value="[@(brand.Code)] @brand.Description">[@(brand.Code)] @brand.Description</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBplusInitialstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBminInitialstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ClaimInitialstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="BandrolLepasInitialstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="UnclaimableInitialstock"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="Initialstock"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Initialstock -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Retrieval from Machine (pack)</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 15%">Machine</th>
+                                        <th class="tx-center">Brand</th>
+                                        <th class="tx-center">TB+</th>
+                                        <th class="tx-center">TB-</th>
+                                        <th class="tx-center">IPC Sampling</th>
+                                        <th class="tx-center">Claim</th>
+                                        <th class="tx-center">Bandrol Lepas</th>
+                                        <th class="tx-center">Unclaimable</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="RetrievalfromMachine">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="machineInitialstock">
+                                                <option label="Choose one"></option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)" >@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2" name="BrandRetrievalfromMachine">
+                                                <option value="">Select Brand</option>
+                                                @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCode)
+                                                {
+                                                    <option value="[@(brand.Code)] @brand.Description">[@(brand.Code)] @brand.Description</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBplusRetrievalfromMachine"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBminRetrievalfromMachine"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="IPCSamplingRetrievalfromMachine"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ClaimRetrievalfromMachine"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="BandrolLepasRetrievalfromMachine"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="UnclaimableRetrievalfromMachine"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="RetrievalfromMachine"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Retrieval from Machine (pack) -->
+
+            <div class="col-8 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Rework (pack)</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th class="tx-center" style="min-width:100px">Machine</th>
+                                        <th class="tx-center">Brand</th>
+                                        <th class="tx-center">TB+</th>
+                                        <th class="tx-center">TB-</th>
+                                        <th class="tx-center">Bandrol Lepas</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="ReworkTabel">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="machineRework">
+                                                <option label="Choose one"></option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)" >@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2" name="BrandRework">
+                                                <option value="">Select Brand</option>
+                                                @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCode)
+                                                {
+                                                    <option value="[@(brand.Code)] @brand.Description">[@(brand.Code)] @brand.Description</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBplusRework"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBminRework"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="BandrolLepasRework"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="ReworkTabel"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Rework -->
+
+            <div class="col-2 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Sent to Claimable Room</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th class="tx-center">Claim</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="SenttoClaimable">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="ClaimSenttoClaimable"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="SenttoClaimable"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Sent to Claimable Room -->
+
+            <div class="col-2 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Tax Claimed</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th class="tx-center">Claim</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="TaxClaimed">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="ClaimTaxClaimed"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="TaxClaimed"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Tax Claimed -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Final stock (pack)</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:210px">
+
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 15%">Machine</th>
+                                        <th class="tx-center">Brand</th>
+                                        <th class="tx-center">TB+</th>
+                                        <th class="tx-center">TB-</th>
+                                        <th class="tx-center">Claim</th>
+                                        <th class="tx-center">Bandrol Lepas</th>
+                                        <th class="tx-center">Unclaimable</th>
+                                        <th style="width: 10%"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="Finalstock">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="machineFinalstock">
+                                                <option label="Choose one"></option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.retrieval)
+                                                {
+                                                    <option value="@(machine.Code)" >@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control select2" name="BrandFinalstock">
+                                                <option value="">Select Brand</option>
+                                                @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.BrandCode)
+                                                {
+                                                    <option value="[@(brand.Code)] @brand.Description">[@(brand.Code)] @brand.Description</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBplusFinalstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="TBminFinalstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="ClaimFinalstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="BandrolLepasFinalstock"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" name="UnclaimableFinalstock"></td>
+                                        <td class="tx-center"><i class="fa fa-plus-circle add-to-table" data-target="Finalstock"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Finalstock -->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped" id="dtApproval">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog" style="min-width:90%;height:auto;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <h5><label id="next-1">Take Picture For 'Barcode CBL'</label></h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <video autoplay="true" width="500" height="300" id="videoElement"> </video><br />
+                                        <button id="snapHat">Capture Image </button><br />
+                                    </center>
+                                </div>
+                                <div class="col-md-6">
+                                    <center>
+                                        <canvas id="snapshot" style="max-width: 500px;max-height: 300px !important"></canvas><br />
+                                        <p id="demo"></p>
+
+                                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                                    </center>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right">Add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Scripts/webcam_help/main.js"></script>
+    <script src="~/Scripts/webcam_help/MRZ_417_230119.js"></script>
+
+
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+
+    <script>
+        var selected = null;
+        $(document).ready(function () {
+            var lphID = @(Model.LPH.ID);
+            $('#dtApproval').dataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "filter": false,
+                "bLengthChange": false,
+                "orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+                "order": [[3, "asc"]],
+                "ajax": {
+                    "url": fastApp.BaseUrl + '/GWRework/GetApproverList?lphid=' + lphID,
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columnDefs":
+                    [{
+                        "targets": [0],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [1],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [2],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [3],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [4],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                        //{
+                        //       "targets": [5],
+                        //       "searchable": true,
+                        //       "orderable": true
+                        //   },
+
+                    ],
+
+                "columns": [
+
+                    { "data": "User", "name": "User", "title": "Name", "autoWidth": false },
+                    { "data": "Role", "name": "Role", "title": "Role", "autoWidth": false },
+                    { "data": "Status", "name": "Status", "title": "Status", "autoWidth": false },
+                    //{ "data": "Approver", "name": "Approver", "title": "Approver", "autoWidth": false },
+                    {
+                        "data": "ModifiedDate",
+                        render: function (data, type, row) {
+                            if (data)
+                                return moment(data).format("DD-MMM-YY HH:mm");
+                            else
+                                return '';
+                        }
+                    },
+                    { "data": "Notes", "name": "Notes", "title": "Notes", "autoWidth": false }
+                ],
+                "fnRowCallback": function (nRow, data, iDisplayIndex, iDisplayIndexFull) {
+                    $('td', nRow).css('background-color', data['Color']);
+                    $('#dtApproval_paginate')[0].style.display = "none";
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+          $('#btnHistory').on('click', function (e) {
+		     location.href = '@Url.Action("Index", "History")';
+          });
+          $('.datepicker').datepicker({
+                format: 'D,d-M-yy',
+                //language: 'id-id'
+		  });
+        $('.information-datepicker').toArray().forEach(function (field) {
+            $(field).datepicker({
+                todayHighlight: true,
+                format: 'D, dd-M-yy',
+                startDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+                //maxDate: 2,
+                //minDate: -2,
+            });
+        });
+
+
+        //$('#txtDateInfo').val(moment().format("ddd, DD-MMM-YY"));
+        //$('#txtWeekNumber').val(moment().week());
+    </script>
+
+    <script>
+        $("#dtStockWIP [name=MachineNoVal]").on('select2:select', function (e) {
+            getLastStock(this);
+        });
+
+        function getLastStock(input) {
+            var machine = $(input).val();
+            if (machine != "") {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetLastStock", "GWRework")",
+                    data: JSON.stringify({
+                        machine: machine,
+                        LPHID: @(Model.LPH.ID)
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        $(input).closest("tr").find('[name=InitialVal]').val(result.stock);
+                    }
+                });
+            }
+        }
+          function basicFunction() {
+
+            /*  chanif: $('.select2').start diganti jadi $('.select2').select2 */
+            $('.select2').select2({
+		allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+
+
+            $(document).find('.input-time').each(function () {
+                var cleave = new Cleave($(this), {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            })
+        }
+        function ieFix() {
+            //if (navigator.userAgent.search("Edge") >= 0) {
+            //    $(".tableWrapper:has(tfoot)").each(function () {
+            //        $(this).find("table").prop("cellspacing", "1");
+            //        if (!$(this).hasClass("no-ie-fix")) {
+            //            $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom":"0" });
+            //            $(this).find("table").css({ "margin-bottom": "32px" });
+            //            $(this).css({ "overflow-y": "scroll" });
+            //            const ths = $(this).find("thead tr.summary-body").find("th, td");
+            //            $(this).find("tfoot tr.input td").each(function (i, td) {
+            //                $(td).css({ "min-width": Math.floor($($(ths)[i]).outerWidth()), "position": "static" });
+            //            });
+            //        }
+            //    });
+            //}
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            $(`#${targetTable} ~ tfoot tr.input td`).children("input, select").each(function () {
+                const name = $(this).prop("name");
+                r += `<td data-name="${name}">${data[name]}</td>`;
+            });
+
+
+            let useEdit = true;
+            let useDelete = true;
+            let additionalButtons = "";
+            if (configAle[targetTable].rowConfig !== undefined) {
+                if (configAle[targetTable].rowConfig.withEdit !== undefined)
+                    useEdit = configAle[targetTable].rowConfig.withEdit;
+                if (configAle[targetTable].rowConfig.withDelete !== undefined)
+                    useDelete = configAle[targetTable].rowConfig.withDelete;
+                if (configAle[targetTable].rowConfig.additionalButtons != undefined)
+                    additionalButtons = configAle[targetTable].rowConfig.additionalButtons(data);
+            }
+            r += `<td class="tx-center">`;
+            r += additionalButtons;
+            if (useEdit) r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            if (useDelete) r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const table = $(button).parents("table");
+            if (!$(table).data("edited")) {
+                $(table).data("edited", true);
+
+                const tds = $(button).parents("tr").children('td');
+                const inputTr = $(table).find('tr.input');
+                const inputTds = $(inputTr).children('td');
+                const tdsCount = $(tds).length;
+
+                $(tds).each(function (i, e) {
+                    const el = $(inputTds[i]).children()[0];
+                    if (i != tdsCount - 1) {
+                        const html = $(e).html();
+                        const newInput = $(el).clone();
+                        if ($(el).hasClass('select2'))
+                            $(el).val(null).trigger("change");
+                        else
+                            $(el).val("");
+                        if (!$(el).hasClass("disabled"))
+                            $(newInput).prop("disabled", false);
+
+                        $(el).prop("disabled", true);
+                        $(newInput).val(html);
+                        $(e).html(newInput);
+                        if ($(el).hasClass('select2')) {
+                        $(newInput).select2('destroy');
+                            $(newInput).removeAttr('data-select2-id');
+                            $(newInput).select2({
+		                allowClear: true,
+                                placeholder: 'Choose one',
+                                searchInputPlaceholder: 'Search options'
+                            });
+                        }
+                    } else {
+                        $(el).off("click");
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:normalData(this)");
+                        $(edit).removeClass("fa-edit");
+                        $(edit).addClass("fa-save");
+                    }
+                });
+            }
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            basicFunction();
+            ieFix();
+            $("#dtStockWIP [name=MachineNoVal]").on('select2:select', function (e) {
+                getLastStock(this);
+            });
+        }
+        function basicFunction() {
+            $('.select2').select2({
+		        allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+	            placeholder: 'Choose one or more',
+	            searchInputPlaceholder: 'Search options'
+            });
+
+            $(document).find('.input-time').each(function () {
+                var cleave = new Cleave($(this), {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            })
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    var ev = $._data(el, 'events');
+                    if (!(ev && ev.click))
+                        $(el).on("click", addToTable);
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target, data) {
+            $(target).html(generateTable(data, target));
+            countSummary(target);
+        }
+        $(document).ready(function () {
+            $('.select2').select2({
+		allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $(".add-to-table").on("click", addToTable);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        function addToTable(button) {
+            const targetTable = $(this).data("target");
+            const tds = $(this).parents("tr").children("td");
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(tds).each(function (tdIndex, td) {
+                const input = $(td).children();
+                if (input.attr("name") != undefined) {
+                    const name = input.attr("name");
+                    const val = input.val();
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            if ((input[0].nodeName.toLowerCase() === 'select')) {
+                                $(input[0]).siblings(".select2-container").css('border', '1px solid red');
+                                $(input[0]).siblings(".select2-container").css('border-radius', '0.25rem');
+                                $(input[0]).on('select2:select', function (e) {
+                                    $(input[0]).siblings(".select2-container").css('border', 'none');
+                                    $(input[0]).siblings(".select2-container").css('border-radius', '0');
+                                });
+                            } else if (input[0].value === "") {
+                                input[0].style.borderColor = "red";
+                                $(input[0]).on('click', function (e) {
+                                    input[0].style.borderColor = "rgb(192, 204, 218)";
+                                });
+                            }
+                            return false;
+                        }
+                    }
+                    if (input[0].type.toLowerCase() == "number") {
+                        var myRegexp = /^00+$/g;
+                        var match = myRegexp.exec(val);
+                        if (match != null) {
+                            alert("Please input a valid number");
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+            $(tds).each(function (i, td) {
+                const node = $(td).children();
+                $(node).val("");
+                if ($(node).hasClass("select2"))
+                    $(node).trigger('change');
+            });
+
+            if (configAle[targetTable].onAdd != undefined) {
+                if (configAle[targetTable].onAdd(newdata)) {
+                    return;
+                }
+            }
+            configAle[targetTable].data.push(newdata);
+            $("#" + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+            countSummary(targetTable);
+            ieFix();
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const summaryTds = $('#' + targetTable).parents('table').find('.summary-body').children();
+                $('#' + targetTable).parents('table').find('.input td').each(function (i, td) {
+                    const name = $(td).children().attr("name");
+                    if (rowData.hasOwnProperty(name))
+                        $(summaryTds[i]).html(rowData[name]);
+                });
+            }
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const table = $(button).parents("table");
+                releaseDisabledInput(table);
+                if (configAle[targetTable].onDelete != undefined) {
+                    if (configAle[targetTable].onDelete(id)) {
+                        return;
+                    }
+                }
+                deleteFromArray(id, configAle[targetTable].data);
+                $('#' + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                const table = $(button).parents("table");
+
+                if (configAle[targetTable].onSave != undefined) {
+                    if (configAle[targetTable].onSave(id)) {
+                        return;
+                    }
+                }
+                const index = findInArray(id, configAle[targetTable].data);
+                let shouldReturn = false;
+                var newdata = {
+                    id: uuidv4()
+                };
+                $(tds).each(function (tdIndex, e) {
+                    if (tdIndex != tdsCount - 1) {
+                        const name = $(e).data("name");
+                        const val = $($(e).children()[0]).val();
+                        if (configAle[targetTable].onValidate != undefined) {
+                            if (configAle[targetTable].onValidate(name, val)) {
+                                shouldReturn = true;
+                                return false;
+                            }
+                        }
+                        newdata[name] = val;
+                    } else {
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:editData(this)");
+                        $(edit).removeClass("fa-save");
+                        $(edit).addClass("fa-edit");
+                    }
+                });
+                if (shouldReturn) return;
+
+                configAle[targetTable].data[index] = newdata;
+                const row = generateRow(configAle[targetTable].data[index], targetTable);
+                $(button).parents("tr").html(row);
+
+                releaseDisabledInput(table);
+                countSummary(targetTable);
+                ieFix();
+                $('input[name=BrandInitialstock]').val($('#brandInfo option:selected').text());
+                $('input[name=BrandRetrievalfromMachine]').val($('#brandInfo option:selected').text());
+                $('input[name=BrandFinalstock]').val($('#brandInfo option:selected').text());
+                $('input[name=BrandRework]').val($('#brandInfo option:selected').text());
+            }
+        }
+        function countDuration(start, end, duration) {
+            var end = $('#' + end).val();
+            var start = $('#' + start).val();
+
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                if (startdate > enddate) {
+                    enddate = new Date(enddate);
+                    enddate.setDate(enddate.getDate() + 1);
+                }
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                if (diffMinutes == NaN) {
+                    $('#' + duration).val(0);
+                } else {
+                    $('#' + duration).val(diffMinutes);
+                }
+            }
+        };
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input, select, textarea').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+
+                    values.push({
+                        Value: $(e).val(),
+                        ValueType: $(e).attr('type') == "number" ? "Numeric" : "NonNumeric",
+                    });
+                });
+            });
+            return [components, values];
+        }
+
+        function collectAllData() {
+            let collectorArray = [];
+            for (var tableId in configAle) {
+                let tableColumnType = {};
+                $(`#${tableId} ~ tfoot tr.input td input`).each(function () {
+                    tableColumnType[$(this).prop("name")] = $(this).prop("type");
+                });
+                const data = configAle[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    if (configAle[tableId].onCollectDataRow != undefined) {
+                        data[i] = configAle[tableId].onCollectDataRow(data[i]);
+                    }
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let newInsertData = {
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: data[i][prop],
+                                ValueType: tableColumnType[prop] == "number" ? "Numeric" : "NonNumeric",
+                                RowNumber: i
+                            };
+                            if (configAle[tableId].onCollectDataSingle != undefined) {
+                                newInsertData = configAle[tableId].onCollectDataSingle(newInsertData);
+                            }
+                            collectorArray.push(newInsertData);
+                        }
+                    }
+                }
+            }
+            console.log(collectorArray);
+            return collectorArray;
+        }
+    </script>
+    <script>
+
+        /*
+             * name = id dari tbody;
+             * data = array untuk menyimpan data;
+             * countSummary = dipanggil saat menghitung summary, return object dengan property sesuai dengan name pada `tfoot tr.input`;
+             * onAdd(newData) = dipanggil sebelum menambah data, return boolean apakah harus ditambahkan atau tidak;
+             * onDelete(idOfDeletedObject) = dipanggil sebelum menghapus data, return boolean apakah harus dihapus atau tidak;
+             * onSave(idOfUpdatedObject) = dipanggil sebelum mengubah data, return boolean apakah harus diubah atau tidak;
+             * onValidate(nameOfInput, valueOfInput) = validasi nilai saat tambah dan save, return boolean apakah harus diterus atau tidak;
+             *
+             * rowConfig = config untuk generate baris tabel;
+             * - withEdit = menampilkan edit, default true;
+             * - withDelete = menampilkan delete, default true;
+             * - additionalButtons(data) = fungsi untuk yang akan mengembalikan button tambahan untuk tiap baris, return element html dalam string;
+             */
+
+        var logbookData = [];
+        var InitialstockData = [];
+        var RetrievalfromMachineData = [];
+        var ReworkTabelData = [];
+        var SenttoClaimableData = [];
+        var TaxClaimedData = [];
+        var FinalstockData = [];
+        var stockWIPData = [];
+        var claimData = [];
+        var retrievalData = [];
+        var actionData = [];
+
+        const configAle = {
+            Initialstock: {
+                data: InitialstockData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            RetrievalfromMachine: {
+                data: RetrievalfromMachineData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            ReworkTabel: {
+                data: ReworkTabelData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            SenttoClaimable: {
+                data: SenttoClaimableData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            TaxClaimed: {
+                data: TaxClaimedData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            Finalstock: {
+                data: FinalstockData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            logbook: {
+                data: logbookData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            action: {
+                data: actionData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                countSummary: function () {
+                    let rowData = {};
+                    let NextDurasi = 0;
+                    for (var i = 0; i < actionData.length; i++) {
+                        NextDurasi += parseInt(actionData[i].NextDurasi);
+                    }
+                    rowData.NextDurasi = NextDurasi;
+                    return rowData;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            stockwip: {
+                data: stockWIPData,
+                countSummary: function () {
+                    let rowData = {};
+                    let InitialVal = 0;
+                    let TotalVal = 0;
+                    let ReworkVal = 0;
+                    let LastVal = 0;
+                    for (var i = 0; i < stockWIPData.length; i++) {
+                        InitialVal += parseInt(stockWIPData[i].InitialVal);
+                        TotalVal += parseInt(stockWIPData[i].TotalVal);
+                        ReworkVal += parseInt(stockWIPData[i].ReworkVal);
+                        LastVal += parseInt(stockWIPData[i].LastVal);
+                    }
+                    rowData.InitialVal = InitialVal;
+                    rowData.TotalVal = TotalVal;
+                    rowData.ReworkVal = ReworkVal;
+                    rowData.LastVal = LastVal;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            claim: {
+                data: claimData,
+                countSummary: function () {
+                    let rowData = {};
+                    let EarlyAVal = 0;
+
+                    let TotalAVal = 0;
+
+                    let SendAVal = 0;
+
+                    let FinalAVal = 0;
+
+                    for (var i = 0; i < claimData.length; i++) {
+                        EarlyAVal += parseInt(claimData[i].EarlyAVal);
+
+                        TotalAVal += parseInt(claimData[i].TotalAVal);
+
+                        SendAVal += parseInt(claimData[i].SendAVal);
+
+                        FinalAVal += parseInt(claimData[i].FinalAVal);
+                    }
+                    rowData.EarlyAVal = EarlyAVal;
+
+                    rowData.TotalAVal = TotalAVal;
+
+                    rowData.SendAVal = SendAVal;
+
+                    rowData.FinalAVal = FinalAVal;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            retrieval: {
+                data: retrievalData,
+                countSummary: function () {
+                    let rowData = {};
+                    let TBVal = 0;
+                    let ClaimAVal = 0;
+                    let ClaimBVal = 0;
+                    let ClaimCVal = 0;
+                    for (var i = 0; i < retrievalData.length; i++) {
+                        TBVal += parseInt(retrievalData[i].TBVal);
+                        ClaimAVal += parseInt(retrievalData[i].ClaimAVal);
+                        ClaimBVal += parseInt(retrievalData[i].ClaimBVal);
+                        ClaimCVal += parseInt(retrievalData[i].ClaimCVal);
+                    }
+                    rowData.TBVal = TBVal;
+                    rowData.ClaimAVal = ClaimAVal;
+                    rowData.ClaimBVal = ClaimBVal;
+                    rowData.ClaimCVal = ClaimCVal;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+        }
+
+    </script>
+
+    <script>
+        $(function () {
+            'use strict'
+            /******************** PREFILLED ******************/
+            var model = JSON.parse($("#jsonModel").attr("data-json"));
+            console.log(model);
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                let val = model.CompoVal[i].Value.Value;
+                val = decodeURIComponent(val ? val : "");
+                if (type == "ImageURL") {
+                    $("#image_1_hide").html('<img class="input-img rounded mx-auto d-block" id="image_1" src="' + fastApp.BaseUrl + '/Uploads/lph/gwrework/' + val + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" width="160px" />');
+                } else {
+                    const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                    const type = model.CompoVal[i].Component.ComponentType.trim();
+                    const parent = tn[0];
+                    tn.shift();
+                    const child = tn.join("-");
+                    const val = model.CompoVal[i].Value.Value;
+                    let node = $("#" + parent + " " + type + "[name=" + child + "]");
+                    $(node).val(decodeURIComponent(val ? val : ""));
+                    if (child == 'Group' && type == 'INPUT' && parent == 'GeneralInfo') {
+                        node = $("#" + parent + " " + "SELECT" + "[name=" + child + "]");
+                        $(node).val(val);
+                    }
+                    if ($(node).hasClass("select2")) $(node).trigger('change');
+                    if ($(node).data('datepicker')) {
+					    var date = temp_val.substr(5, 9).split("-");
+					    var months = moment.monthsShort();
+					    date[1]=months.indexOf(date[1])+1;
+					    if(date[1]<10){
+						    date[1]='0'+date[1];
+					    }                        
+					    temp_val = '20'+date[2]+'-'+date[1]+'-'+date[0];
+                        $(node).datepicker('setDate', new Date(temp_val)).datepicker('fill');
+                    }
+                }
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        const val = model.Extras[i].Value;
+                        data[model.Extras[i].FieldName] = decodeURIComponent(val ? val : "");
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                    }
+                }
+                configAle[table].data.push(data);
+            }
+            for (let prop in configAle) {
+                configAle[prop].data.reverse();
+                $("#" + prop).html(generateTable(configAle[prop].data, prop));
+                countSummary(prop);
+                ieFix();
+            }
+
+        });
+
+
+        /****************** END PREFILLED ****************/
+    </script>
+    <script>
+        var collectorComponent = [];
+        var collectorValue = [];
+
+
+        function collectImageComponent() {
+            var imageUrl1 = {};
+            imageUrl1.ComponentType="Image";
+            imageUrl1.ComponentName = "Barcode CBL";
+            collectorComponent.push(imageUrl1);
+        }
+        function collectImageValue() {
+            var imageUrl1 =  $('#image_1_show').find('#image_1').first().attr('src');
+            var imageVal1 = {};
+            imageVal1.Value = imageUrl1;
+            imageVal1.ValueType = "ImageURL";
+            collectorValue.push(imageVal1);
+        }
+
+		$('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "GWRework")",
+                  data: JSON.stringify({
+                      LPHID: @(Model.LPH.ID),
+					  machine: $('#machInfo').val()
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "GWRework"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No previous submissions found",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+            })
+
+            function checkMandatory() {
+                var mandatory = $(".mandatory");
+                const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                            $(e.target).siblings(".select2-container").css('border', 'none');
+                            $(e.target).siblings(".select2-container").css('border-radius', '0');
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    } else if ($(mandatory[i])[0].value === "") {
+                        window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                        $(mandatory[i])[0].style.borderColor = "red";
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('click', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        $(mandatory[i]).on('focus', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    }
+                }
+                return status;
+            }
+
+
+        function saveLPH(isSubmit, Special) {
+            var collectorArray = collectAllData(); // for LPH Extras
+            var collector = collectAllComponent();
+            collectorComponent = collector[0];
+            collectorValue = collector[1];
+            var collectorApproval = [];
+
+            var detailSubmission = {
+                StartTime: $('#inputTimeStart').val(),
+                EndTime: $('#inputTimeStop').val(),
+                Shift: $('#shift').val(),
+            }
+            collectImageComponent();
+            collectImageValue();
+                  $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("Edit", "GWRework")",
+                      data: JSON.stringify({
+                          id: @(Model.LPH.ID),
+                          isSubmit: isSubmit,
+                          Special: Special,
+                      detailExtras: collectorArray, detailSubmission: detailSubmission, detailComponent: collectorComponent,
+                      detailValue: collectorValue
+
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+                      console.log(result.Status);
+                      if (result.Status == 'True') {
+                          if (isSubmit == 1) {
+                              var notice = new PNotify({
+							    title: "@UIResources.Confirmation",
+							    text: "@UIResources.EditSucceed",
+							    width: "400px",
+							    type: 'success',
+							    addclass: 'stack-bottomright'
+						    });
+
+						    notice.get().click(function () {
+							    notice.remove();
+                            });
+
+                            setTimeout(function () {
+                                location.reload();
+                            }, 3000);
+                          }
+                          else {
+                            var notice = new PNotify({
+							    title: "@UIResources.Confirmation",
+							    text: "@UIResources.EditSucceed",
+							    width: "400px",
+							    type: 'success',
+							    addclass: 'stack-bottomright'
+						    });
+
+                            setTimeout(function(){
+                                notice.remove();
+                            }, 3000);
+                          }
+
+					}
+                      else {
+
+                          if (result.Msg == 'Invalid')
+                              alert("Tab is expired, another tab with same LPHID has been opened. You cannot save until you reload page first to continue");
+
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.EditFailed",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    },
+                      error: function (request, status, error) {
+                            window.location.reload(true);
+                      },
+                        complete: function() {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                });
+        }
+
+        $(window).load(function(){
+            setInterval(function () {
+                $('#loading_overlay').removeClass('d-none');
+                saveLPH(0,@myspecial);
+            }, 10 * 60 * 1000);
+        });
+
+        $('#btnSaveDraft').click(function (e) {
+            $('#loading_overlay').removeClass('d-none');
+            saveLPH(0,@myspecial);
+        });
+
+            $('#btnSave').click(function () {
+                if (checkMandatory()) {
+                    $('#loading_overlay').removeClass('d-none');
+                    saveLPH(1,@myspecial);
+                }else {
+                    var notice = new PNotify({
+						    title: "Warning",
+						    text: "Submit failed, input field with red border, and photo can't be empty",
+						    width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+						    hide: false,
+						    buttons: {
+							    sticker: false
+						    }
+                    });
+                    setTimeout(function(){
+                            notice.remove();
+                    }, 8000);
+                }
+            });
+
+         $('#btnReset').click(function () {
+                var redirect = confirm("All unsubmitted changes will be lost. Do you really want to reset?");
+                if (redirect) {
+                    @*window.location.href = "@(Url.Action("Index", "GWRework"))/?reset=true";*@
+                DeleteLPH(@(Model.LPH.ID));
+            }
+        });
+
+
+        function DeleteLPH(Id) {
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                url: fastApp.BaseUrl + '/History/Delete?lphid=' + Id,
+                type: 'POST',
+                success: function (result) {
+                    if (result.Status) {
+                        var notice = new PNotify({
+                            title: "@UIResources.Confirmation",
+                            text: 'Reset LPH Successfully',
+                            width: "400px",
+                            type: 'success',
+                            addclass: 'stack-bottomright'
+                        });
+
+                        notice.get().click(function () {
+                            notice.remove();
+                        });
+                    }
+                    else {
+                        var notice = new PNotify({
+                            title: "@UIResources.ErrorMessage",
+                            text: "@UIResources.DeleteFailed",
+                            width: "400px",
+                            type: 'error',
+                            hide: false,
+                            addclass: 'stack-bottomright',
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+
+                        notice.get().click(function () {
+                            notice.remove();
+                        });
+                    }
+                    $('#loading_overlay').addClass('d-none');
+                },
+                complete: function (data) {
+                    $('#loading_overlay').addClass('d-none');
+                    setTimeout(function () {
+                        window.location.href = "@(Url.Action("Index", "GWRework"))";
+                    }, 1000);
+                }
+            });
+        }
+    </script>
+
+    <script>
+        var selectedPhotoCategory = null;
+        var selected = null;
+
+        var isUrlLink = false;
+        var isImg = [];
+        var imgContent = [];
+        var imageIndex = 0;
+        var max = 1;
+
+        function defaultDisplay() {
+            for (var i = 0; i < max; i++) {
+                $("#image_" + (i + 1) + "_show").hide();
+                $("#image_" + (i + 1) + "_hide").show();
+            }
+        }
+
+        function switchDisplay() {
+            for (var i = 0; i < max; i++) {
+                if (isImg[i] == true) {
+                    $("#image_" + (i + 1) + "_show").show();
+                    $("#image_" + (i + 1) + "_hide").hide();
+                }
+            }
+        }
+
+
+        function infoId(e) {
+            console.log(e.id);
+
+            for (var i = 0; i < max; i++) {
+                if (e.id == "image_" + (i + 1) + "") {
+                    isImg[i] = true;
+                } else {
+                    isImg[i] = false;
+                }
+            }
+        }
+
+        function renderImage(link, state) {
+
+            if (link == null || link == "") {
+                isUrlLink = false;
+            }
+            else {
+
+                isUrlLink = true;
+                console.log("link " + link);
+                console.log("state: " + state);
+
+                for (var i = 0; i < max; i++) {
+                    if (state == "image_" + (i + 1) + "") {
+                        imgContent[i] = link;
+                        document.getElementById("image_" + (i + 1) + "_show").innerHTML = '<img class="input-img rounded mx-auto d-block" src=' + imgContent[i] + ' id="image_' + (i + 1) + '" data-toggle="modal" width="160px" data-target="#photo-modal" width="auto" />';
+                    }
+                }
+
+            }
+        }
+
+        $("#t_splacing").click(function () {
+            isImg[0] = true;
+        });
+
+        $(document).ready(function () {
+            defaultDisplay();
+
+            $('#photo-modal').on('next', function (e, i, info) {
+                info.shouldHide = true;
+                if (isUrlLink == true) switchDisplay();
+                else defaultDisplay();
+            });
+            $('#photo-modal').on('hide', function (e) {
+            });
+        });
+    </script>
+
+
+    <script>
+        // Video Part
+        var video = document.querySelector("#videoElement");
+        var hdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var hhdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var vgaConstraints = {
+            video: {
+                mandatory: {
+                    maxWidth: 160,
+                    maxHeight: 120
+                }
+            }
+        };
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            document.getElementById("demo").innerHTML = "";
+
+            try {
+                navigator.getUserMedia(hhdConstraints, handleVideo, videoError);
+            } catch (error) {
+                navigator.getUserMedia(hdConstraints, handleVideo, videoError);
+            }
+        }
+
+        function handleVideo(stream) {
+            try {
+                this.srcObject = stream;
+            } catch (error) {
+                this.src = window.URL.createObjectURL(stream);
+            }
+        }
+
+        function videoError(e) {
+            // do something
+        }</script>
+
+    <script>
+        // Capture Image Part
+        var player = document.getElementById('videoElement');
+        var snapshotCanvas = document.getElementById('snapshot');
+        var captureButton = document.getElementById('capture');
+        var captureButton3 = document.getElementById('capture3');
+        var textBottom = document.getElementById('saveText');
+
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        var txfname = "img_text";
+        var XdatStr = 'date';
+
+        textBottom.addEventListener('click', function () {
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            XdateStr = dateStr;
+            txfname = 'IMG_' + dateStr;
+
+            saveTextAsFile(txfname);
+            pcanvas2blob().then(download2X);
+
+            document.getElementById("demo").innerHTML = "saved ";
+
+        });
+
+        captureButton.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Reading PDF417.";
+
+            var VH = 1080;
+            var VW = 1920;
+
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var buf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, buf);
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var b = _pdf417JS(buf, VH, VW, 1024);
+
+            var heapBu = new Uint8Array(Module.HEAPU8.buffer, buf, 1028);
+            var vanz = bin2Strung(heapBu);
+
+
+            if (b <= 0) {
+                vanz = "No Read.";
+            }
+
+            Module._free(buf);
+            document.getElementById("demo").innerHTML = vanz;
+
+        });
+
+        captureButton3.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = " OCRing MRZ. ";
+
+            var VH = 1080;
+            var VW = 1920;
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4; //1280*720*4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var bluf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, bluf);
+
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var c = _DLreadJS(bluf, VH, VW, 1024);
+
+            var heapBuc = new Uint8Array(Module.HEAPU8.buffer, bluf, 1028);
+            var vanc = bin2Strung(heapBuc);
+
+            if (c <= 0) {
+                vanc = "No Read.";
+            }
+            Module._free(bluf);
+            document.getElementById("demo").innerHTML = vanc;
+        });
+
+        snapHat.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Image captured";
+
+            takeASnap();
+            //.then(download);
+        });
+
+        var state = "";
+        function takeASnap() {
+
+            canvas.width = 1280;//video.videoWidth; // set its size to the one of the video
+            canvas.height = 720;// video.videoHeight;
+            ctx.drawImage(video, 0, 0, 1280, 720); // the video
+
+            var jpegUrl = ctx.canvas.toDataURL("image/jpeg"); // get base64 output - no longer using toBlob
+
+            for (var i = 0; i < max; i++) {
+                if (isImg[i] == true) {
+                    state = "image_" + (i + 1) + "";
+                }
+            }
+
+            renderImage(jpegUrl, state);
+        }
+
+        function pcanvas2blob() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+            });
+        }
+
+        function download2X(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            a.download = 'IMG_' + XdateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function download(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+
+            a.download = 'IMG_' + dateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+
+        function download_png(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            a.download = 'IMG_' + dateStr + '.png';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function canvaSnap() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/png'); // request a Blob from the canvas
+            });
+        }
+
+        function saveTextAsFile(txt_name) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var res = ocr_text.replace(/<br>/g, "\r\n");
+            var res2 = res.replace(/&lt;/g, '<');
+
+            var blab = new Blob([res2], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+
+            a.click();
+        }
+
+        function saveImageAndText(fname) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var blab = new Blob([ocr_text], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+            a.click();
+        }</script>
+
+    <script>
+        function bin2Strung(array) {
+            var result = "";
+            var max = 2048;
+            for (var i = 0; i < max; i++) {
+                var v = String.fromCharCode(array[i]);
+
+                if (array[i] == 10) {
+                    result += "<br/>";
+                }
+                else {
+                    if (array[i] == 60) {
+                        //result += "&#60";
+                        result += "&lt";
+                    }
+                    else {
+                        result += String.fromCharCode(array[i]);
+                    }
+                }
+                if (array[i] == 0) {
+                    i = max;
+                }
+            }
+            return result;
+        }
+
+        function myFunction() {
+            document.getElementById("demo").innerHTML = "Doing My Best!";
+        }</script>
+    <script>
+        function detectBrowser() {
+            var ua = navigator.userAgent, tem,
+                M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+            if (/trident/i.test(M[1])) {
+                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                return 'IE ' + (tem[1] || '');
+            }
+            if (M[1] === 'Chrome') {
+                tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
+                if (tem != null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+            }
+            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
+            if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+            return M.join(' ');
+        };
+        if (detectBrowser().indexOf("Chrome") < 0) {
+            $('input[type=number]').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 2,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+        }
+    </script>
+    <script>
+        function printImage(element, child) {
+            let imagedata = $('#' + element).find('#' + child).attr('src');
+            if (imagedata == null) {
+                imagedata = $('#' + child+'_hide').find('#' + child).attr('src');
+            }
+            if (imagedata.length > 200) {
+                let dataimage = new Image();
+                let windowOpen = window.open("");
+                dataimage.src = imagedata;
+                windowOpen.document.write(dataimage.outerHTML);
+                console.log(imagedata);
+                return;
+            } else {
+                pwin = window.open(imagedata, "_blank");
+            }
+
+        }
+    </script>
+
+}

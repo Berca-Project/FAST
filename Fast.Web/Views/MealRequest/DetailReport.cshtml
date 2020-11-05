@@ -1,0 +1,317 @@
+﻿@model Fast.Web.Models.MealRequestModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+}
+
+@section Styles{
+	<style>
+		.dataTables_scrollHead table, .dataTables_scrollBody table {
+			width: 2000px !important;
+		}
+
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+
+		.marginRadio {
+			margin-top: 10px;
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.DetailReportForMeal</h4>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					@if (Model.Access.hasPrint)
+					{
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+					}
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+			<div class="row row-sm mg-b-10">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.StartDate</label>
+				</div>
+				<div class="col-md-2">
+					<input class="form-control hasDatepicker" id="startDate" type="text" placeholder="dd-MMM-yy" autocomplete="off" />
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.EndDate</label>
+				</div>
+				<div class="col-md-2">
+					<input class="form-control hasDatepicker" id="endDate" type="text" placeholder="dd-MMM-yy" autocomplete="off" />
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Location</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.ProductionCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter" })
+				</div>
+			</div>
+			<div class="row row-sm mg-b-10">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Request</label>
+				</div>
+				<div class="col-md-2 d-flex marginRadio">
+					<div class="custom-control custom-checkbox col-sm-6">
+						<input type="checkbox" class="custom-control-input" id="cbMPP">
+						<label class="custom-control-label" for="cbMPP">MPP</label>
+					</div>
+					<div class="custom-control custom-checkbox col-sm-6">
+						<input type="checkbox" class="custom-control-input" id="cbForm" checked>
+						<label class="custom-control-label" for="cbForm">Form</label>
+					</div>
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-2">
+					<button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">Search</button>
+				</div>
+			</div>
+		</div>
+		<div data-label="Data List" class="df-example demo-table dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="mealRequestTable">
+				<thead>
+					<tr>
+						<th>@UIResources.ID</th>
+						<th>@UIResources.Location</th>
+						<th>@UIResources.Canteen</th>
+						<th>@UIResources.CostCenter</th>
+						<th>@UIResources.Name</th>
+						<th>@UIResources.Date</th>
+						<th>@UIResources.Shift</th>
+						<th>@UIResources.Qty</th>
+						<th>@UIResources.Type</th>
+						<th>@UIResources.PIC</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script type="text/javascript">
+
+		$('#btnSearch').on('click', function () {
+			var startDateFilter = $('#startDate').val();
+			var endDateFilter = $('#endDate').val();
+			var locationFilter = $('#ddlProdCenter').val();
+			var requestFilter = 'Form';
+			if ($('#startDate').val() == '' || $('#endDate').val() == '') {
+				alert('Please select the start and end date first');
+				return false;
+			}
+
+			if ($('#cbMPP').prop("checked") && $('#cbForm').prop("checked")) {
+				requestFilter = 'All';
+			} else if ($('#cbMPP').prop("checked")) {
+				requestFilter = 'MPP';
+			} else if ($('#cbForm').prop("checked")) {
+				requestFilter = 'Form';
+			} else {
+				alert('Please select the request type first');
+				return false;
+			}
+
+			$('#mealRequestTable').DataTable({
+				"autoWidth": false,
+				"processing": true,
+				"language": {
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/MealRequest/GetAllDetailReport",
+					"data": { startDate: startDateFilter, endDate: endDateFilter, location: locationFilter, request: requestFilter },
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"visible": false,
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [8],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [9],
+						"searchable": true,
+						"orderable": true
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "ProductionCenter", "name": "ProductionCenter", "autoWidth": true },
+					{ "data": "Canteen", "name": "Canteen", "autoWidth": true },
+					{ "data": "CostCenter", "name": "CostCenter", "autoWidth": true },
+					{ "data": "Guest", "name": "Name", "autoWidth": true },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					},
+					{ "data": "Shift", "name": "Shift", "autoWidth": true },
+					{ "data": "TotalGuest", "name": "TotalGuest", "autoWidth": true },
+					{ "data": "GuestType", "name": "GuestType", "autoWidth": true },
+					{ "data": "PIC", "name": "PIC", "autoWidth": true }
+				]
+			});
+		});
+
+		$(document).ready(function () {
+			$('.hasDatepicker').datepicker({
+				format: 'd-M-yy',
+				todayHighlight: true
+			});
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		var result = "@ViewBag.Result";
+		if (result != "") {
+			if (result == "True") {
+				var message = "@ViewBag.Message";
+
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: message,
+					width: "400px",
+					type: 'success',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright,
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+			else {
+				var error = "@ViewBag.ErrorMessage";
+
+				var notice = new PNotify({
+					title: "@UIResources.ErrorMessage",
+					text: error,
+					width: "400px",
+					type: 'error',
+					addclass: 'stack-bottomright',
+					delay: 2000
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+		}
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			if ($('#startDate').val() == '' || $('#endDate').val() == '') {
+				alert('Please select the start and end date first');
+				return false;
+			}
+
+			var requestFilter = 'Form';
+			if ($('#cbMPP').prop("checked") && $('#cbForm').prop("checked")) {
+				requestFilter = 'All';
+			} else if ($('#cbMPP').prop("checked")) {
+				requestFilter = 'MPP';
+			} else if ($('#cbForm').prop("checked")) {
+				requestFilter = 'Form';
+			} else {
+				alert('Please select the request type first');
+				return false;
+			}
+
+			location.href = '@Url.Action("GenerateExcelDetailReport", "MealRequest")?startDate=' +  $('#startDate').val() + '&endDate=' + $('#endDate').val() + '&location=' + $('#ddlProdCenter').val() + '&request=' + requestFilter;
+		};
+
+	</script>
+}
+

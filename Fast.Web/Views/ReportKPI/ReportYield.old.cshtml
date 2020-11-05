@@ -1,0 +1,116 @@
+﻿@model Fast.Web.Models.Report.ReportKPIFormModel
+@using Fast.Web.Resources;
+
+<!-- Specific Page Vendor CSS -->
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<style>
+    .fixedHeight {
+        font-size: 14px;
+        max-height: 300px;
+        margin-bottom: 10px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+</style>
+
+@using (Html.BeginForm("FormUpload", "ReportKPI", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm", @encType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+        <div class="media align-items-center">
+            <span class="tx-color-03 d-none d-sm-block"><i class="fa fa-upload fa-3x"></i></span>
+            <div class="media-body mg-sm-l-20">
+                <h4 class="tx-18 tx-sm-20 mg-b-2">Upload KPI Data</h4>
+                <p class="tx-13 tx-color-03 mg-b-0">Upload Production Volume, DIM, Yield, &amp; CRR data</p>
+            </div>
+        </div><!-- media -->
+    </div><!-- modal-header -->
+    <div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+        <div class="row row-sm mg-b-10">
+            <div class="col-4">
+                <label class="col-form-label mg-b-5 tx-color-03">Data</label>
+            </div>
+            <div class="col-8">
+                @Html.DropDownListFor(x => x.Type, (IEnumerable<SelectListItem>)ViewBag.DataType, new { @class = "form-control", @id = "dataType" })
+            </div>
+            <div class="col-4">
+                <label class="col-form-label mg-b-5 tx-color-03">Download Example</label>
+            </div>
+
+            <div class="col-8">
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton btn-block" data-dismiss="modal" id="btnGenerate">
+                    <i data-feather="download" class="mg-r-5"></i> @UIResources.Download
+                </button>
+            </div>
+            <div class="col-12">
+                <br />
+            </div>
+
+            <div class="col-12 d-none" id="YearWeek">
+                <div class="row">
+                    <div class="col-2">
+                        <label class="col-form-label mg-b-5 tx-color-03">Year</label>
+                    </div>
+                    <div class="col-3">
+                        @Html.TextBoxFor(x => x.Year, null, new { @type="number", @class = "form-control", @id = "year", @onkeypress = "return blockSpecialChar(event)" })
+                    </div>
+                    <div class="col-2 offset-2">
+                        <label class="col-form-label mg-b-5 tx-color-03">Week</label>
+                    </div>
+                    <div class="col-3">
+                        @Html.TextBoxFor(x => x.Week, null, new { @type="number", @class = "form-control", @id = "week", @onkeypress = "return blockSpecialChar(event)" })
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 dtMarginTop">
+                <div class="form-control-static">
+                    <span class="btn btn-success fileinput-button btn-block">
+                        @Html.TextBoxFor(x => x.Excel, null, new { @type = "file", @accept = ".xls, .xlsx", @id = "customFile" })
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer pd-x-20 pd-y-15">
+        <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="Validate()" id="btnSubmit">@UIResources.Upload</button>
+    </div>
+}
+
+<script src="~/Content/theme/js/jquery-1.10.0.min.js"></script>
+<script src="~/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#btnGenerate').on('click', function (e) {
+            e.preventDefault();
+
+            var DataType = $("#dataType").val();
+            var url = fastApp.BaseUrl + '/Uploads/report/KPI/'+DataType+'.xls';
+            window.location.href = url;
+        });
+
+        $('#dataType').on('change', function (e) {
+            var DataType = $("#dataType").val();
+            if (DataType == "Yield" || DataType == "DIM" || DataType == "CRR") {
+                $('#YearWeek').removeClass('d-none');
+            } else {
+                $('#YearWeek').addClass('d-none');
+            }
+        });
+    });
+
+    function Validate() {
+        var DataType = $("#dataType").val();
+        if (DataType == "Yield" && ($('#year').val() == "" || $('#week').val() == "")) {
+            alert("Please fill the year & week for Yield data");
+            return (false);
+        }
+
+        $("#btnSubmit").attr("disabled", true);
+        $("#btnCancel").attr("disabled", true);
+
+        document.getElementById('AddModalForm').submit();
+        return (true);
+    }
+</script>

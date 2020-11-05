@@ -1,0 +1,191 @@
+﻿@using Fast.Web.Resources;
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+	<link href="~/Content/theme/lib/monthpicker/MonthPicker.css" rel="stylesheet" />
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">Overtime Report</h4>
+				<p class="mg-b-0 tx-color-03">Overtime Data Management</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+			<div class="row">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Country</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownList("country", (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry" })
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProdCenter</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownList("prodcenter", (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter" })
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Department</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownList("department", (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment" })
+				</div>
+			</div><br />
+			<div class="row">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Month / Year</label>
+				</div>
+				<div class="col-md-2"><input id="filterDate" type="text" /></div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-2">
+					<button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block" onclick="Filter()">Search</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-label="Overtime Data" class="df-example demo-table dtMarginTop" id="overtimeArea">
+		<div id="overtimeTable">
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<script src="~/Content/theme/lib/monthpicker/MonthPicker.js"></script>
+	<script>
+        var d = new Date();
+        var n = d.getFullYear();
+
+		$(document).ready(function () {
+			$('#loading_overlay').addClass('d-none');
+			$("#filterDate").MonthPicker({
+				Button: '<button>...</button>',
+                StartYear: n
+			});
+		});
+
+		$('#ddlProdCenter').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Mpp/GetDepartmentByProdCenterID",
+					data: { id: $('#ddlProdCenter').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartment').html(ddlTemp);
+						$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+		$('#ddlDepartment').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Mpp/GetSubDepartmentByDepartmentID",
+					data: { id: $('#ddlDepartment').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartment').html(ddlTemp);
+					}
+				});
+		});
+
+		function Filter() {
+			var locationId = 0;
+			var locationType = 'country';
+
+			if ($('#ddlProdCenter').val() == '0') {
+				locationId = 1;
+				locationType = 'country';
+			} else if ($('#ddlDepartment').val() == '0') {
+				locationId = $('#ddlProdCenter').val();
+				locationType = 'productioncenter';
+			} else {
+				locationId = $('#ddlDepartment').val();
+				locationType = 'department';
+			}
+
+			$('#loading_overlay').removeClass('d-none');			
+
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/MPP/OvertimeAjax",
+				data: { locID: locationId, locType: locationType, filterDate: $('#filterDate').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					RenderOvertime(data);
+
+					 $('#loading_overlay').addClass('d-none');
+				}
+			});
+		};
+
+		function RenderOvertime(data) {
+			var tableHeader = "<table class='table table-bordered table-striped mb-none border-bottom-0 table-fast' style='width:50%'><thead class='thead-primary font-weight-bold'><tr>";
+			tableHeader = tableHeader + "<th rowspan='2' class='align-middle text-center'>Category</th>";
+			for (var i = 0; i < data.MonthList.length; i++) {
+				tableHeader = tableHeader + '<th colspan="2" class="text-center">' + data.MonthList[i] + '</th>';
+			}
+			tableHeader = tableHeader + '<th colspan="2" class="text-center">Total ' + data.YearYTD + '</th></tr>';
+			tableHeader = tableHeader + '<tr>';
+			for (var i = 0; i < data.MonthList.length; i++) {
+				tableHeader = tableHeader + '<th>Hour</th><th>%</th>';
+			}
+			tableHeader = tableHeader + '<th>Hour</th><th>%</th></tr></thead>';
+			var tableBody = '<tbody>';
+			for (var i = 0; i < data.CategoryList.length; i++) {
+				tableBody = tableBody + '<tr><td>' + data.CategoryList[i] + '</td>';
+				for (var x = 0; x < data.MonthList.length; x++) {
+					for (var y = 0; y < data.OvertimeList.length; y++) {
+						if (data.OvertimeList[y].Month == data.MonthList[x]) {
+							for (var z = 0; z < data.OvertimeList[y].Children.length; z++) {
+								if (data.OvertimeList[y].Children[z].OvertimeCategory == data.CategoryList[i]) {
+									tableBody = tableBody + '<td>' + data.OvertimeList[y].Children[z].TotalOvertime + '</td><td>' + data.OvertimeList[y].Children[z].PercentageStr + ' %</td>';
+									break;
+								}
+							}
+							break;
+						}
+					}	
+				}
+				for (var y = 0; y < data.OvertimeList.length; y++) {
+					if (data.OvertimeList[y].Month == 'year') {
+						for (var z = 0; z < data.OvertimeList[y].Children.length; z++) {
+							if (data.OvertimeList[y].Children[z].OvertimeCategory == data.CategoryList[i]) {
+								tableBody = tableBody + '<td>' + data.OvertimeList[y].Children[z].TotalOvertime + '</td><td>' + data.OvertimeList[y].Children[z].PercentageStr + ' %</td>';
+								break;
+							}
+						}
+						break;
+					}
+				}
+				tableBody = tableBody + '</tr>';
+			}
+			var tableBody = tableBody + '</tbody></table>';
+			$('#overtimeTable').html(tableHeader + tableBody);
+		}
+	</script>
+}

@@ -1,0 +1,128 @@
+﻿@section Styles{
+
+    <link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <style>
+        .dtButton {
+            margin-right: 8px;
+        }
+
+        .dtAddButton {
+            margin-right: 15px;
+        }
+
+        .dtMarginTop {
+            margin-top: 20px;
+        }
+
+        th {
+            padding: 4px 10px !important;
+            color: #fff;
+            background-color: #0168fa !important;
+        }
+
+        td {
+            padding: 4px 10px !important;
+            line-height: 1.5;
+            vertical-align: middle !important;
+        }
+
+        .btnx {
+            display: inline-block;
+            font-weight: 400;
+            color: #001737;
+            text-align: center;
+            vertical-align: middle;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            padding: 0px !important;
+            margin-left: 20px !important;
+        }
+    </style>
+}
+
+<div class="content content-fixed bd-b">
+    <div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div>
+            <h4>Barcode</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Input text: </label>
+                    <input type="text" id="txtSample" class="form-control" />
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-sm btn-info" id="btnGenerate">Generate</button>
+                    <button class="btn btn-sm btn-primary" id="btnPrint" onclick="printDiv('bcResult')">Print</button>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Result: </label><br />
+                    <div id="bcResult"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+    <script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+    <script type="text/javascript">
+
+		$(document).ready(function () {
+
+            $('#btnGenerate').on('click', function () {
+
+                var res = $('#txtSample').val();
+
+                var link = '@Url.Action("RenderBarcode", "Barcode")?sample=' + res;
+                document.getElementById("bcResult").innerHTML = '<img src=' + link +' />';
+
+            });
+
+        });
+
+        function printDiv(divName) {
+
+             var printContents = document.getElementById(divName).innerHTML;
+             var originalContents = document.body.innerHTML;
+
+             document.body.innerHTML = printContents;
+             window.print();
+
+             document.body.innerHTML = originalContents;
+
+        }
+
+    </script>
+}
+
+
+
+
+

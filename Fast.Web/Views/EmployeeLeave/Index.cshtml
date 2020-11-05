@@ -1,0 +1,461 @@
+﻿@model Fast.Web.Models.EmployeeLeaveModel
+@using Fast.Web.Resources;
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+
+}
+@section Styles{
+	<style>
+		.dataTables_scrollHead table, .dataTables_scrollBody table {
+			width: 2500px !important;
+		}
+
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.EmployeeLeaveList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.EmployeeLeaveMasterData</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					@if (Model.Access.hasPrint)
+					{
+						@*<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GeneratePDF()">
+							<span><i class="fa fa-lg fa-file-pdf"></i> PDF</span>
+						</button>*@
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+					}
+					@*<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+						<i data-feather="repeat" class="mg-r-5"></i> Load All
+					</button>*@
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+            <div class="row">
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.StartDate</label>
+                </div>
+                <div class="col-md-2"><input class="form-control hasDatepicker" id="startDate" type="text" placeholder="dd-MMM-yy" /></div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.EndDate</label>
+                </div>
+                <div class="col-md-2"><input class="form-control hasDatepicker" id="endDate" type="text" placeholder="dd-MMM-yy" /></div>
+                <div class="col-sm-1">
+                </div>
+                <div class="col-sm-1">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProdCenter</label>
+                </div>
+                <div class="col-sm-2">
+                    @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+                </div>
+
+                <div class="col-sm-2">
+                    <button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">Search</button>
+                </div>
+            </div>
+		</div>
+		<div class="dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="employeeTable">
+				<thead>
+                    <tr>
+                        <th>@UIResources.ID</th>
+                        <th>@UIResources.EmployeeID</th>
+                        <th>@UIResources.FullName</th>
+                        <th>@UIResources.Location</th>
+                        <th>@UIResources.StartDate</th>
+                        <th>@UIResources.EndDate</th>
+                        <th>@UIResources.Comments</th>
+                        <th>@UIResources.AllHalfDay</th>
+                        <th>Start HalfDay</th>
+                        <th>Start PagiSiang</th>
+                        <th>End HalfDay</th>
+                        <th>Eend PagiSiang</th>
+                        <th>@UIResources.LeaveType</th>
+                        <th>@UIResources.EmployeeType</th>
+                        <th>@UIResources.TimesheetLastModified</th>
+                    </tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<style>
+		.dataTables_scrollBody thead tr {
+			visibility: collapse
+		}
+	</style>
+
+	<script type="text/javascript">
+		var locationId = 0;
+		var locationType = 'productioncenter';
+
+        $('#btnSearch').on('click', function () {
+			var startDateFilter = $('#startDate').val();
+			var endDateFilter = $('#endDate').val();
+
+            locationId = $('#ddlProdCenter1').val();
+			locationType = 'productioncenter';
+
+            $('#employeeTable').dataTable({
+                "scrollX": true,
+				"autoWidth": false,
+				"processing": true,
+				"language": {					
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/EmployeeLeave/GetAllByParam",
+					"data": { startDateParam: startDateFilter, endDateParam: endDateFilter, locID: locationId, locType: locationType },
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [3],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [6],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [9],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [10],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [11],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [13],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [14],
+						"searchable": false,
+						"orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "FullName", "name": "FullName", "autoWidth": true },					
+					{ "data": "Location", "name": "Location", "autoWidth": true },					
+					{
+						"data": "StartDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "EndDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					},
+					{ "data": "Comments", "name": "Comments", "autoWidth": true },				
+					{ "data": "AllDayHalf", "name": "AllDayHalf", "autoWidth": true },
+					{ "data": "StartDateHalfDay", "name": "StartDateHalfDay", "autoWidth": true },
+					{ "data": "StartDatePagiSiang", "name": "StartDatePagiSiang", "autoWidth": true },
+					{ "data": "EndDateHalfDay", "name": "EndDateHalfDay", "autoWidth": true },
+					{ "data": "EndDatePagiSiang", "name": "EndDatePagiSiang", "autoWidth": true },		
+					{ "data": "LeaveType", "name": "LeaveType", "autoWidth": true },
+					{ "data": "EmployeeType", "name": "EmployeeType", "autoWidth": true },
+					{
+						"data": "TimesheetLastModified",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					}
+				]
+			});
+        });
+
+		$('#loadAll').on('click', function () {
+			var table = $('#employeeTable').dataTable({
+                "scrollX": true,
+				"autoWidth": false,
+				"processing": true,
+				"language": {
+					searchPlaceholder: "Ended by ENTER..",
+					processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+				},
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/EmployeeLeave/GetAll",					
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [3],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [6],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [8],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [9],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [10],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [11],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [12],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [13],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [14],
+						"searchable": false,
+						"orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "FullName", "name": "FullName", "autoWidth": true },					
+					{ "data": "Location", "name": "Location", "autoWidth": true },					
+					{
+						"data": "StartDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "EndDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					},
+					{ "data": "Comments", "name": "Comments", "autoWidth": true },					
+					{ "data": "AllDayHalf", "name": "AllDayHalf", "autoWidth": true },
+					{ "data": "StartDateHalfDay", "name": "StartDateHalfDay", "autoWidth": true },
+					{ "data": "StartDatePagiSiang", "name": "StartDatePagiSiang", "autoWidth": true },
+					{ "data": "EndDateHalfDay", "name": "EndDateHalfDay", "autoWidth": true },
+					{ "data": "EndDatePagiSiang", "name": "EndDatePagiSiang", "autoWidth": true },	
+					{ "data": "LeaveType", "name": "LeaveType", "autoWidth": true },
+					{ "data": "EmployeeType", "name": "EmployeeType", "autoWidth": true },
+					{
+						"data": "TimesheetLastModified",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY");
+							else
+								return '';
+						}
+					}
+				]
+			});
+
+			$('#employeeTable_filter input').unbind();
+		    $('#employeeTable_filter input').bind('keyup', function(e) {
+				if(e.keyCode == 13) {
+					table.fnFilter(this.value);
+				}
+			});
+		});
+
+        $(document).ready(function () {
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+            });
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function GeneratePDF() {
+			var notice = new PNotify({
+				title: "Generating PDF file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("GeneratePDF", "EmployeeLeave")?startDateParam=' +  $('#startDate').val() + '&endDateParam=' + $('#endDate').val();
+		};
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+            locationId = $('#ddlProdCenter1').val();
+			locationType = 'productioncenter';
+
+			location.href = '@Url.Action("GenerateExcel", "EmployeeLeave")?startDateParam=' +  $('#startDate').val() + '&endDateParam=' + $('#endDate').val() + '&locID=' + locationId + '&locType=' + locationType;
+		};
+	</script>
+}
+

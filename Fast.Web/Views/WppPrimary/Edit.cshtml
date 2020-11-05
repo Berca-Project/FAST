@@ -1,0 +1,156 @@
+﻿@model Fast.Web.Models.WppPrimModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Edit", "WppPrimary", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.IsDeleted, new { @Id = "IsDeleted" })
+	@Html.HiddenFor(x => x.Location, new { @Id = "Location" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.EditWppPrimary</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+<div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+	<div class="form-row">
+		<div class="col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.ProdCenter</label>
+		</div>
+		<div class="form-group col-md-3">
+			@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenterEdit" })
+		</div>
+		<div class="col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.Department</label>
+		</div>
+		<div class="form-group col-md-3">
+			@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartmentEdit" })
+		</div>
+		<div class="col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.SubDepart</label>
+		</div>
+		<div class="form-group col-md-3">
+			@Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartmentEdit" })
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.Blend</label>
+		</div>
+		<div class="form-group col-md-3">
+			@Html.DropDownListFor(p => p.BlendID, (IEnumerable<SelectListItem>)ViewBag.BlendList, new { @class = "form-control", @id = "ddlBlendEdit" })
+		</div>
+		<div class="col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.PONumber</label>
+		</div>
+		<div class="form-group col-md-3">
+			@Html.TextBoxFor(x => x.PONumber, null, new { @class = "form-control", @id = "tbPONumberEdit" })
+		</div>
+		<div class="form-group col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.BatchSAP</label>
+		</div>
+		<div class="col-md-3">
+			@Html.TextBoxFor(x => x.BatchSAP, null, new { @class = "form-control", @id = "tbBatchSAPEdit" })
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.Date</label>
+		</div>
+		<div class="form-group col-md-3">
+			@Html.TextBoxFor(x => x.Date, "{0:dd-MMM-yy}", new { @class = "form-control", @id = "wppdateedit" })
+		</div>
+		<div class="form-group col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.Others</label>
+		</div>
+		<div class="col-md-3">
+			@Html.TextBoxFor(x => x.Others, null, new { @class = "form-control", @id = "tbOthersEdit" })
+		</div>
+		<div class="form-group col-md-1 mg-t-10">
+			<label style="font-size:smaller">@UIResources.OldBatch</label>
+		</div>
+		<div class="col-md-3">
+			@Html.TextBoxFor(x => x.BatchLama, null, new { @class = "form-control", @id = "tbBatchLamaEdit" })
+		</div>
+	</div>
+</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+        $(document).ready(function () {
+
+			$('#wppdateedit').datepicker({
+				format: 'd-M-yy',
+				changeMonth: true,
+				changeYear: true
+			});
+
+			$('#ddlCountryEdit').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/WppPrimary/GetProductionCenterByCountryID",
+					data: { id: $('#ddlCountryEdit').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlProdCenterEdit'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlProdCenterEdit').html(ddlTemp);
+						$('#ddlDepartmentEdit').html("<select id='ddlDepartmentEdit'><option value='0'>- Please Select -</option></select>");
+						$('#ddlSubDepartmentEdit').html("<select id='ddlSubDepartmentEdit'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlProdCenterEdit').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/WppPrimary/GetDepartmentByProdCenterID",
+					data: { id: $('#ddlProdCenterEdit').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartmentEdit'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartmentEdit').html(ddlTemp);
+						$('#ddlSubDepartmentEdit').html("<select id='ddlSubDepartmentEdit'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlDepartmentEdit').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/WppPrimary/GetSubDepartmentByDepartmentID",
+					data: { id: $('#ddlDepartmentEdit').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartmentEdit'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartmentEdit').html(ddlTemp);
+					}
+				});
+			});
+		});
+</script>
+

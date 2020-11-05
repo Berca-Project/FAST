@@ -1,0 +1,463 @@
+﻿@model Fast.Web.Models.JobTitleTreeModel
+@using Fast.Web.Resources;
+@section CSS_lib{
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/styles.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/jquery.treegrid.css" />
+	<link rel="stylesheet" href="~/Content/theme/lib/jquery-treegrid/css/default.min.css" />
+}
+@section Styles{
+
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.RoleList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.RoleManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					@if (Model.Access.hasPrint)
+					{
+						<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+							<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+						</button>
+						<div id="buttonprint" class="dtButton"></div>
+					}
+					@if (Model.Access.IsAdmin)
+					{
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddJobTitle" onclick="AddTitleActions()">
+							<i data-feather="plus" class="mg-r-5"></i> ADD TITLE
+						</button>
+					}
+					@if (Model.Access.hasWrite)
+					{
+						<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalManageRole" onclick="ManageActions()">
+							<i data-feather="plus" class="mg-r-5"></i> MANAGE
+						</button>
+					}
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Example" class="df-example demo-table dtMarginTop">
+			<table class="tree table-bordered">
+				<thead>
+					<tr class="headerTree">
+						<th>@UIResources.RoleOrSecurity</th>
+						<th>@UIResources.JobTitle</th>
+						@if (Model.Access.hasWrite)
+						{
+							<th>@UIResources.Action</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var parent in Model.Parents)
+					{
+						<tr class="treegrid-@parent.Name" title="parent">
+							<td>@parent.Name</td>
+							@if (parent.Children.Count > 0)
+							{
+								<td>@parent.Children[0].Title</td>
+								if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditActions(@parent.Children[0].ID)" data-toggle="modal" data-target="#modalEditJobTitle" title="Edit"><i class="fa fa-edit"></i></button>
+										@*<button class="btn-menu btn-default" onclick="DeleteActions(@parent.Children[0].ID, '@parent.Children[0].Title')" data-toggle="modal" data-target="#deleteModal" title="Delete"><i class="fa fa-trash-alt"></i></button>*@
+									</td>
+								}
+							}
+							else
+							{
+								<td>-</td>
+								if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditMasterActions('@parent.Name')" data-toggle="modal" data-target="#modalEditJobTitle" title="Edit"><i class="fa fa-edit"></i></button>
+										@*<button class="btn-menu btn-default" onclick="DeleteRoleActions('@parent.Name', '@parent.Description')" data-toggle="modal" data-target="#deleteModalRole" title="Delete"><i class="fa fa-trash-alt"></i></button>*@
+									</td>
+								}
+							}
+						</tr>
+						int x = 0;
+						foreach (var child in parent.Children)
+						{
+							if (x == 0) { x++; continue; }
+
+							<tr class="treegrid-@child.ID treegrid-parent-@parent.Name">
+								<td></td>
+								<td>@child.Title</td>
+								@if (Model.Access.hasWrite)
+								{
+									<td>
+										<button class="btn-menu btn-default" onclick="EditActions(@child.ID)" data-toggle="modal" data-target="#modalEditJobTitle" title="Edit"><i class="fa fa-edit"></i></button>
+										@*<button class="btn-menu btn-default" onclick="DeleteActions(@child.ID, '@child.Title')" data-toggle="modal" data-target="#deleteModal" title="Delete"><i class="fa fa-trash-alt"></i></button>*@
+									</td>
+								}
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+		<div data-label="Example" class="df-example demo-table dtMarginTop" id="hiddenTable">
+			<table class="table table-bordered table-striped mb-none border-bottom-0" id="roleTable">
+				<thead>
+					<tr>
+						<th>@UIResources.ID</th>
+						<th>@UIResources.RoleOrSecurity</th>
+						<th>@UIResources.JobTitle</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditJobTitle" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-1000" role="document">
+		<div class="modal-content" id="OpenDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddJobTitle" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-1000" role="document">
+		<div class="modal-content" id="AddTitleDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalManageRole" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content" id="ManageDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalDeleteJobTitle" tabindex="-2" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content" id="DeleteDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModalRole" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm-role"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel-role">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok-role">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+
+@section Scripts{
+	<script src="~/Content/theme/lib/jquery-treegrid/js/jquery.treegrid.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/exportaction.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			var table = $('#roleTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Role/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": false
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "RoleName", "name": "RoleName", "autoWidth": true },
+					{ "data": "Title", "name": "Title", "autoWidth": true },
+				]
+			});
+
+			var buttons2 = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-print"></i> Print',
+						"extend": 'print',
+						"title": 'Master Role List',
+						"className": 'btn btn-sm pd-x-15 btn-white btn-uppercase',
+						"exportOptions": {
+							columns: [ 1, 2]
+						},
+						"titleAttr": 'PRINT',
+                        "action": exportaction
+					}
+				]
+			}).container().appendTo($('#buttonprint'));
+
+			$("#hiddenTable").hide();
+
+			$('.tree').treegrid({
+				"autoRowHeight": false,
+				"rownumbers": false
+			});
+
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			if (result != "") {
+				if (result == "True") {
+					var message = "@ViewBag.Message";
+
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: message,
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var error = "@ViewBag.ErrorMessage";
+
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		});
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "Role")';
+		};
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function EditActions(id) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/Role/Edit/" + id);
+		};
+
+		function AddTitleActions(id) {
+			$("#AddTitleDialog").load(fastApp.BaseUrl + "/Role/AddTitle");
+		};
+
+		function EditMasterActions(name) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/Role/EditMaster?name=" + name);
+		};
+
+		function ManageActions(id) {
+			$("#ManageDialog").load(fastApp.BaseUrl + "/Role/Manage");
+		};
+
+		function DeleteActions(ID, Title) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Title));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteJobTitle(ID);
+			});
+		}
+
+		function DeleteJobTitle(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Role/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/Role/Index';
+					}, 1000);
+				}
+			});
+		}
+
+		function DeleteRoleActions(Name, Description) {
+			$("#deleteconfirm-role").empty();
+			$("#deleteconfirm-role").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm-role").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm-role").append(" ?");
+			$("#deleteModalRole").modal('show');
+			$("#modal-btn-ok-role").unbind().one("click", function () {
+				$("#deleteModalRole").modal('hide');
+				DeleteRole(Name);
+			});
+		}
+
+		function DeleteRole(Name) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Role/DeleteRole?name=' + Name,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status == 'True') {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteRoleFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/Role/Index';
+					}, 1000);
+				}
+			});
+		}
+	</script>
+}
+

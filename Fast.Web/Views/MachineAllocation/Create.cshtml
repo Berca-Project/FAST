@@ -1,0 +1,186 @@
+﻿@model Fast.Web.Models.MachineAllocationModel
+@using Fast.Web.Resources;
+
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link href="~/Content/theme/css/jquery-ui-1.9.2.css" rel="stylesheet" />
+
+<style>
+	.fixedHeight {
+		font-size: 14px;
+		max-height: 300px;
+		margin-bottom: 10px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.ui-helper-hidden-accessible {
+		display: none;
+	}
+</style>
+
+@using (Html.BeginForm("Create", "MachineAllocation", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-plus-square" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewMachineAllocation</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-2">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Machine</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.MachineCode, null, new { @class = "form-control", @id = "tbMachineCode", @placeholder = "Type machine code here...", @required = "required", @onkeypress="return blockSpecialChar(event)" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-2" style="display:none">
+				@Html.TextBoxFor(x => x.MachineID, null, new { @class = "form-control", @id = "tbMachineID" })
+			</div>
+			<div class="col-10">
+				<p id="empty-message"></p>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-2">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Role</label>
+			</div>
+			<div class="col-10">
+				@Html.DropDownListFor(x => x.MachineCategory, (IEnumerable<SelectListItem>)ViewBag.MachineCategoryList, new { @class = "form-control", @id = "ddlMachineCategory" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-2">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Value</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.Value, null, new { @class = "form-control", @id = "tbValue", @required = "required" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script src="~/Content/theme/js/jquery-1.10.0.min.js"></script>
+<script src="~/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#empty-message").text("");
+
+		$("#tbMachineCode").autocomplete({
+			delay: 750,
+			source: function (request, response) {
+				$.ajax({
+					url: fastApp.BaseUrl + '/MachineAllocation/AutoComplete/',
+					data: "{ 'prefix': '" + request.term + "'}",
+					dataType: "json",
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.length == 0) {
+							$("#empty-message").css('color', 'red');
+							$("#empty-message").text("Data does not exist in Machine List");
+						} else {
+							$("#empty-message").text("");
+							response($.map(data, function (item) {
+								return item.Code + " - " + item.LegalEntity + " - " + item.Location + " - " +  $.trim(item.ID);
+							}))
+						}
+					},
+					error: function (response) {
+						alert(response.responseText);
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					}
+				});
+			},
+			select: function (e, i) {
+				var res = i.item.label.split(" - ");
+				if (res[3]) {
+					$("#tbMachineID").val(res[3]);
+				}
+			},
+			minLength: 1
+		});
+
+		$("#tbMachineCode").autocomplete("widget").addClass("fixedHeight");
+
+		$('#tbMachineCode').keyup(function () {
+			if ($("#tbMachineCode").val() == '') {
+				$("#empty-message").text("");
+			}
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		var result = "@ViewBag.Result";
+		var error = "@ViewBag.ErrorMessage";
+
+		if (result != "") {
+			if (result == "True") {
+				var notice = new PNotify({
+					title: "@UIResources.Confirmation",
+					text: "@UIResources.CreateSucceed",
+					width: "400px",
+					type: 'success',
+					addclass: 'stack-bottomright',
+					stack: stack_bottomright
+				});
+
+				notice.get().click(function () {
+					notice.remove();
+				});
+			}
+			else {
+				if (error == "") {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: "@UIResources.CreateFailed",
+						width: "400px",
+						type: 'error',
+						hide: false,
+						addclass: 'stack-bottomright',
+						buttons: {
+							sticker: false
+						}
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						hide: false,
+						addclass: 'stack-bottomright',
+						buttons: {
+							sticker: false
+						}
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+		}
+	});
+</script>

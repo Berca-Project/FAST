@@ -1,0 +1,40 @@
+﻿<div class="content content-fixed bd-b">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">Super Admin Access</h4>
+				<p class="mg-b-0 tx-color-03">Execute query to database</p>
+			</div>
+		</div>
+		<div data-label="TreeViewNode" class="df-example demo-table dtMarginTop">
+			<div class="form-group">
+				<div class="col-sm-6">
+					<input type="password" class="form-control" placeholder="Input Password" id="password" autofocus>
+				</div>
+				<div class="col-sm-6 mg-t-10">
+					<textarea class="form-control" rows="10" placeholder="Input query" id="query"></textarea>					
+				</div>
+				<div class="col-sm-6 mg-t-10">
+					<button class="btn btn-primary" type="button" onclick="OnSubmit()">Execute</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">	
+	function OnSubmit() {
+		$.ajax({
+			url: fastApp.BaseUrl + '/Super/Execute?sql=' + $("#query").val() + '&password=' + $("#password").val(),
+			type: 'POST',
+			success: function (result) {
+				if (result.Status) {
+					alert('Query executed successfully');
+				}
+				else {
+					alert('Query execution was failed');
+				}
+			}
+		});
+	}
+</script>

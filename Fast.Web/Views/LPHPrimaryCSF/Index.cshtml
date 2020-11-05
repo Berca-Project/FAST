@@ -1,0 +1,659 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Styles{
+<style>
+    .tableWrapper {
+        overflow-y: auto;
+        max-height: 150px;
+    }
+
+        .tableWrapper table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .tableWrapper thead th, .tableWrapper thead td {
+            position: sticky;
+            background: #066fcb;
+            z-index: 100;
+            border: none;
+        }
+
+        .tableWrapper table tfoot td {
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .tableWrapper .input td {
+            background: white;
+        }
+
+        .tableWrapper .summary-body td {
+            font-weight: bold;
+            background-color: #d8eafe;
+            color: #000;
+        }
+
+    .fa {
+        padding: 5px; cursor: pointer;
+    }
+</style>
+}
+
+<!-- content -->
+
+<div class="content content-fixed lph-form">
+  <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+    <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+            <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+            <li class="breadcrumb-item active" aria-current="page">CSF</li>
+          </ol>
+        </nav>
+        <h4 class="mg-b-0 tx-spacing--1">LPH CSF</h4>
+      </div>
+      <div class="d-none d-md-block">
+          <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+          <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnHistory"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+          @if (Model.ViewType == "index" || Model.ViewType == "index_restore" || Model.ViewType == "edit")
+          {
+              @: <button class="btn btn-sm pd-x-15 btn-uppercase btn-white" id="btnSave2"><i data-feather="save" class="wd-10 mg-r-5"></i>Save</button>
+          }
+          <button class="btn btn-sm pd-x-15 btn-uppercase btn-primary d-none" id="btnSave"><i data-feather="save" class="wd-10 mg-r-5"></i> Submit</button>
+          <button class="btn btn-sm pd-x-15 btn-uppercase btn-secondary d-none" id="btnReset"><i data-feather="refresh-cw" class="wd-10 mg-r-5"></i> Reset</button>
+          <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 mg-b-20">
+        <div class="card">
+          <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+          <div class="card-body d-flex">
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Date</label>
+                <div class="col-5">
+                  <input type="text" class="form-control" disabled value="Thu / 05-Sep-19">
+                </div>
+                <label class="col-2 col-form-label tx-right">Week</label>
+                <div class="col-2">
+                  <input type="text" class="form-control" disabled value="22">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Machine</label>
+                <div class="col-4">
+                  <input type="text" class="form-control" disabled value="F52">
+                </div>
+              </div>
+              @*<div class="form-group row">
+                <label class="col-3 col-form-label">Brand</label>
+                <div class="col-9">
+                  <input type="text" class="form-control" disabled value="A Mild-16 / FA044121.09">
+                </div>
+              </div>*@
+            </div>
+            <div class="divider-text divider-vertical"></div>
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Prodtech</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled value="80404805 - Agung Dwi Prasetyo">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Foreman</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-3 col-form-label">Mekanik</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled value="80011429 - Jono">
+                </div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Electric</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Supervisor</label>
+                <div class="col-8">
+                  <input type="text" class="form-control" disabled value="80011827 - Djasmadi">
+                </div>
+              </div>
+            </div>
+            <div class="divider-text divider-vertical"></div>
+            <div class="flex-1">
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Shift / Group</label>
+                <div class="col-3">
+                  <input type="text" class="form-control" disabled value="3">
+                </div>
+                <label class="col-1 col-form-label tx-center">/</label>
+                <div class="col-3">
+                  <input type="text" class="form-control" disabled value="C">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-4 col-form-label">Start / Stop</label>
+                <div class="col-3">
+                  <div class="input-group">
+                    <input id="inputTimeStart" class="form-control" value="22:00">
+                  </div>
+                </div>
+                <label class="col-1 col-form-label">/</label>
+                <div class="col-3">
+                  <div class="input-group">
+                    <input id="inputTimeStop" class="form-control" value="06:00">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!--INFORMATION-->
+
+      <div class="col-12 mg-b-20">
+        <div class="card">
+          <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+            Machine Problems
+          </div>
+          <div class="card-body">
+            <div class="tableWrapper" style="max-height: 210px">
+              <table class="table table-bordered table-hover table-striped">
+                <thead class="thead-info">
+                  <tr>
+                    <th>Downtime</th>
+                    <th>Problem</th>
+                    <th>Description</th>
+                    <th style="width:6%;">Start</th>
+                    <th style="width:6%;">End</th>
+                    <th style="width:6%;">Duration</th>
+                    <th>PIC</th>
+                    <th>Status</th>
+                    <th>Action Plan</th>
+                    <th></th>
+                  </tr>
+                  <tr class="summary-body">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>180 Min</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </thead>
+                <tbody id="machine-problem">
+                    <tr>
+                        <td>301 Minor Stop</td>
+                        <td>Bobbin Putus</td>
+                        <td>Mesin AUS</td>
+                        <td>12:00</td>
+                        <td>13:00</td>
+                        <td>60 Min</td>
+                        <td>Hengki</td>
+                        <td>Done</td>
+                        <td>CBM</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>301 Minor Stop</td>
+                        <td>Bobbin Putus</td>
+                        <td>Mesin AUS</td>
+                        <td>12:00</td>
+                        <td>13:00</td>
+                        <td>60 Min</td>
+                        <td>Hengki</td>
+                        <td>Done</td>
+                        <td>CBM</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>301 Minor Stop</td>
+                        <td>Bobbin Putus</td>
+                        <td>Mesin AUS</td>
+                        <td>12:00</td>
+                        <td>13:00</td>
+                        <td>60 Min</td>
+                        <td>Hengki</td>
+                        <td>Done</td>
+                        <td>CBM</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="machine-problem" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+                <tfoot>
+                  <tr class="input">
+                    <td>
+                        <select class="form-control select2">
+                            <option label="Choose one"></option>
+                            <option value="301">301 Minor Stop</option>
+                            <option value="302">302 Proces Adjustment</option>
+                            <option value="401">401 Breakdown</option>
+                            <option value="501">501 Distruption of Material Flow</option>
+                            <option value="601">601 Cleaning</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control" disabled="" value="0 Min"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td>
+                      <select class="form-control select2">
+                        <option label="Choose one"></option>
+                        <option value="1">Done</option>
+                        <option value="2">On Progres</option>
+                        <option value="3">Pending</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select class="form-control select2">
+                        <option label="Choose one"></option>
+                        <option value="301">SLAC</option>
+                        <option value="302">CBM</option>
+                        <option value="303">PM</option>
+                      </select>
+                    </td>
+                    <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-problem" class="fa fa-plus-circle"></i></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> <!-- PROBLEM MESIN -->
+
+      <div class="col-12 mg-b-20">
+        <div class="card">
+          <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance</div>
+          <div class="card-body">
+            <div class="tableWrapper" style="max-height: 300px">
+              <table class="table table-bordered table-hover table-striped">
+                <thead class="thead-info">
+                  <tr>
+                    <!-- <th rowspan="2" style="font-size: 12px" class="tx-center" width="70px">No</th> -->
+                    <th rowspan="2" style="font-size: 12px;width: 6%" class="tx-center">No. Ops</th>
+                    <th rowspan="2" style="font-size: 12px;width: 6%" class="tx-center">Asal Silo</th>
+                    <th rowspan="2" style="font-size: 12px;width: 7%" class="tx-center">Tujuan Silo</th>
+                    <th rowspan="2" style="font-size: 12px;width: 8%" class="tx-center">Total Weigher</th>
+                    <th rowspan="2" style="font-size: 12px" class="tx-center">Thickness roll</th>
+                    <th rowspan="2" style="font-size: 12px" class="tx-center">Out. microwave</th>
+                    <th colspan="2" style="font-size: 12px" class="tx-center">Weigher microwave</th>
+                    <th colspan="2" style="font-size: 12px" class="tx-center">Total Flavour</th>
+                    <th rowspan="2" style="font-size: 12px" class="tx-center">Out. Flavour</th>
+                    <th rowspan="2" style="font-size: 12px" class="tx-center">Final</th>
+                    <th rowspan="2" style="font-size: 12px" class="tx-center"></th>
+                  </tr>
+
+                  <tr>
+                    <th style="font-size: 12px" class="tx-center">Line (1-2)</th>
+                    <th style="font-size: 12px" class="tx-center">Line (3-4)</th>
+                    <th style="font-size: 12px" class="tx-center">Line 1-2</th>
+                    <th style="font-size: 12px" class="tx-center">Line 3-4</th>
+                  </tr>
+                  <tr class="summary-body">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>1463.5</td>
+                    <td></td>
+                    <td></td>
+                    <td>857.30</td>
+                    <td>872.10</td>
+                    <td>36.7</td>
+                    <td>51.2</td>
+                    <td></td>
+                    <td>1729.40</td>
+                    <td class="tx-center">
+                    </td>
+                  </tr>
+                </thead>
+                <tbody id="machine-performance">
+                    <tr>
+                        <td>1019092304</td>
+                        <td>60001</td>
+                        <td>4128</td>
+                        <td>1463.5</td>
+                        <td>0.3</td>
+                        <td>13.89</td>
+
+                        <td>857.30</td>
+                        <td>872.10</td>
+                        <td>36.7</td>
+                        <td>51.2</td>
+                        <td>14.23</td>
+                        <td>1729.40</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1019092406</td>
+                        <td>60001</td>
+                        <td>4127</td>
+                        <td>1633.6</td>
+                        <td>0.3</td>
+                        <td>13.89</td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="input">
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg"></td>
+                    <td><input type="text" class="form-control" placeholder="mm"></td>
+                    <td><input type="text" class="form-control" placeholder="%"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg"></td>
+                    <td><input type="text" class="form-control" placeholder="%"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg"></td>
+                    <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="machine-performance" class="fa fa-plus-circle"></i></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> <!-- MACHINE PERFORMANCE --> 
+
+      <div class="col-4 mg-b-20">
+        <div class="card">
+          <div class="card-header bg-primary tx-white tx-center font-weight-bold">Packing Line</div>
+          <div class="card-body">
+            <div class="tableWrapper" style="max-height: 210px">
+
+              <table class="table table-bordered table-hover table-striped">
+                <thead class="thead-info">
+                  <tr>
+                    <th style="font-size: 12px;width:120px;" class="tx-center">No OPS Packing</th>
+                    <th style="font-size: 12px" class="tx-center">Total Box</th>
+                    <th style="font-size: 12px" class="tx-center">QTY per box</th>
+                    <th style="font-size: 12px;width:80px;" class="tx-center"></th>
+                  </tr>
+                  <tr class="summary-body">
+                    <td></td>
+                    <td>136</td>
+                    <td>1360</td>
+                    <td class="tx-center">
+                    </td>
+                  </tr>
+                </thead>
+                <tbody id="packing-line">
+                    <tr>
+                        <td>1019092304</td>
+                        <td>70</td>
+                        <td>700</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="packing-line" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1019092406</td>
+                        <td>66</td>
+                        <td>660</td>
+                        <td class="tx-center">
+                            <div class="btn-group">
+                                <i onclick="javascript:toEdit(this)" data-target="packing-line" class="fa fa-edit"></i>
+                                <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
+                <tfoot>
+                  <tr class="input">
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control" placeholder="Kg" disabled=""></td>
+                    <td class="tx-center"><i onclick="javascript:addRow(this)" data-target="packing-line" class="fa fa-plus-circle"></i></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> <!-- PACKING LINE -->
+
+      <div class="col-8 mg-b-20">
+        <div class="card">
+          <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval Segment</div>
+          <div class="card-body">
+            <table class="table table-bordered table-hover table-striped">
+              <thead class="thead-info">
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                  <th style="width:150px;">Date</th>
+                  <th style="width:40%;">Comment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Bagas</td>
+                  <td>Requester</td>
+                  <td>Submit to Supervisor</td>
+                  <td>05-Sep-19 13:15</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Bagus</td>
+                  <td>Supervisor</td>
+                  <td>Confirmed</td>
+                  <td>05-Sep-19 13:25</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div> <!-- APPROVAL SEGEMNT -->
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- content -->
+
+
+
+
+@section Scripts{
+    
+<script>
+  $(function(){
+    'use strict'
+
+    var inputTime1 = new Cleave('#inputTime1', {
+      time: true,
+      timePattern: ['h', 'm']
+    });
+    var inputTime2 = new Cleave('#inputTime2', {
+      time: true,
+      timePattern: ['h', 'm']
+    });
+    var inputTime3 = new Cleave('#inputTime3', {
+      time: true,
+      timePattern: ['h', 'm']
+    });
+
+    $('.select2').select2({
+      placeholder: 'Choose one',
+      searchInputPlaceholder: 'Search options'
+    });
+  })
+</script>
+<script>const machineProblemRow = `<td>301 Minor Stop</td><td>Bobbin Putus</td><td>Mesin AUS</td><td>12:00</td><td>13:00</td><td>60 Min</td><td>Hengki</td><td>Done</td><td>CBM</td><td class="tx-center"><div class="btn-group"><i data-target="machine-problem" onclick="javascript:toEdit(this)" class="fa fa-edit"></i><i onclick="javascript:removeRow(this)" class="fa fa-trash"></i></div></td>`;
+    const machineProblemEditRow = `<td><select class="form-control select2">
+                                    <option label="Choose one"></option>
+                                    <option value="301">301 Minor Stop</option>
+                                    <option value="302">302 Proces Adjustment</option>
+                                    <option value="401">401 Breakdown</option>
+                                    <option value="501">501 Distruption of Material Flow</option>
+                                    <option value="601">601 Cleaning</option></select></td><td><input type="text" class="form-control" value="Bobbin Putus"></td><td><input type="text" class="form-control" value="Mesin AUS"></td><td><input type="text" class="form-control" value="12:00"></td><td><input type="text" class="form-control" value="13:00"></td><td><input type="text" class="form-control" disabled value="60 Min"></td><td><input type="text" class="form-control" value="Hengki"></td><td><select class="form-control select2"><option label="Choose one"></option><option value="1" selected>Done</option><option value="2">On Progres</option><option value="3">Pending</option></select></td><td><select class="form-control select2"><option label="Choose one"></option><option value="301">SLAC</option><option value="302" selected>CBM</option><option value="303">PM</option></select></td><td class="tx-center"><i data-target="machine-problem" onclick="javascript:toNormal(this)" class="fa fa-save"></i><i onclick="javascript:removeRow(this)" data-target="machine-problem" class="fa fa-trash"></i></td>`;
+    const machinePerformanceRow = `
+  <td>1019092304</td>
+  <td>60002</td>
+  <td>4128</td>
+  <td>1463.5</td>
+  <td>0.3</td>
+  <td>13.89</td>
+
+  <td>857.30</td>
+  <td>872.10</td>
+  <td>36.7</td>
+  <td>51.2</td>
+  <td>14.23</td>
+  <td>1729.40</td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i onclick="javascript:toEdit(this)" data-target="machine-performance" class="fa fa-edit"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+    const machinePerformanceEditRow = `
+  <td><input type="text" class="form-control" value="10191019092304"></td>
+  <td><input type="text" class="form-control" value="60002"></td>
+  <td><input type="text" class="form-control" value="4128"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="1463.5"></td>
+  <td><input type="text" class="form-control" placeholder="mm" value="0.3"></td>
+  <td><input type="text" class="form-control" placeholder="%" value="13.89"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="857.30"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="872.10"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="36.7"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="51.2"></td>
+  <td><input type="text" class="form-control" placeholder="%" value="14.23"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="">1729.40</td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i data-target="machine-performance" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+    const packingLineRow = `
+  <td>1019092304</td>
+  <td>70</td>
+  <td>700</td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i onclick="javascript:toEdit(this)" data-target="packing-line" class="fa fa-edit"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+    const packingLineEditRow = `
+  <td><input type="text" class="form-control" value="1019092304"></td>
+  <td><input type="text" class="form-control" value="70"></td>
+  <td><input type="text" class="form-control" placeholder="Kg" value="700"></td>
+  <td class="tx-center">
+  <div class="btn-group">
+  <i data-target="packing-line" onclick="javascript:toNormal(this)" class="fa fa-save"></i>
+  <i onclick="javascript:removeRow(this)" class="fa fa-trash"></i>
+  </div>
+  </td>`;
+    function toEdit(button) {
+        const target = $(button).data("target");
+        switch (target) {
+            case "machine-problem":
+                $(button).parents("tr").html(machineProblemEditRow);
+                break;
+            case "machine-performance":
+                $(button).parents("tr").html(machinePerformanceEditRow);
+                break;
+            case "packing-line":
+                $(button).parents("tr").html(packingLineEditRow);
+                break;
+        }
+    }
+    function toNormal(button) {
+        const target = $(button).data("target");
+        switch (target) {
+            case "machine-problem":
+                $(button).parents("tr").html(machineProblemRow);
+                break;
+            case "machine-performance":
+                $(button).parents("tr").html(machinePerformanceRow);
+                break;
+            case "packing-line":
+                $(button).parents("tr").html(packingLineRow);
+                break;
+        }
+    }
+    function addRow(button) {
+        const target = $(button).data("target");
+        switch (target) {
+            case "machine-problem":
+                $("#" + target).append($(`<tr>${machineProblemRow}</tr>`));
+                break;
+            case "machine-performance":
+                $("#" + target).append($(`<tr>${machinePerformanceRow}</tr>`));
+                break;
+            case "packing-line":
+                $("#" + target).append($(`<tr>${packingLineRow}</tr>`));
+                break;
+        }
+    }
+    function removeRow(button) {
+        $(button).parents("tr").remove();
+    }
+    $(document).ready(function () {
+        $('.tableWrapper thead tr').each(function () {
+            const top = $(this).position().top;
+            $(this).children().css({ "top": top });
+        });
+    });</script>
+}
+
+
+

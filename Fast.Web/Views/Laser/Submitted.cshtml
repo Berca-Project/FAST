@@ -1,0 +1,2228 @@
+﻿@model Fast.Web.Models.LPH.LPHEditModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+@* chanif: tambah css untuk select2 *@
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #c5e2ff;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .fas {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        /* chanif: tolong tambahkan css dari sini sampai bawah untuk memperbaiki tampilan select2 */
+.select2-container--default .select2-selection--single {
+	height: 25px;
+	min-height: 25px;
+}
+
+.select2-container--default .select2-selection--multiple {
+	min-height: 25px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	display: none;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+	font-size: 13px;
+	padding: 5px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+	font-size: 13px;
+	padding: 0 0 0 5px;
+}
+
+.select2-search--dropdown {
+	padding: 1px;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+	padding: 3px 5px;
+}
+
+.select2-results {
+	font-size: 13px;
+}
+
+.select2-results__option {
+	padding: 3px;
+}
+
+table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+	background-color: transparent
+}
+
+.select2-container--default .select2-search--inline .select2-search__field {
+	margin-top: 0;
+	padding: 0;
+}
+
+.select2-results__option[aria-selected=true] {
+	display: none;
+}
+    </style>
+}
+
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Laser</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">@Html.Raw(ViewBag.PageHeader)</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <!-- chanif: mending langsung kopi saja keseluruhan isi div di bawah ini, karena sepertinya sama semua isinya untuk semua LPH  -->
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="GeneralInfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" name="DateInfo" class="form-control" disabled id="txtDateInfo" value="">
+                                </div>
+                                <label class="col-2 col-form-label tx-right pd-r-0-f">Week</label>
+                                <div class="col-2">
+                                    <input type="text" name="WeekNumber" class="form-control" disabled id="txtWeekNumber" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Machine *</label>
+                                <div class="col-4">
+                                    <select class="form-control select2 mandatory" name="MachInfo" id="machInfo">
+                                        <option value="">Select Machine</option>
+                                        @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                        {
+                                            <option value="@(machine.Code)">@(machine.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Brand *</label>
+                                <div class="col-9">
+                                    <select class="form-control select2 mandatory" name="BrandInfo" id="brandInfo">
+                                        <option value="">Select Brand</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.Brand)
+                                        {
+                                            <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Prodtech*</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="ProdTech" id="prodTech" multiple>
+
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            @*<div class="form-group row">
+            <label class="col-3 col-form-label">Foreman</label>
+            <div class="col-8">
+                <select class="form-control select2 mandatory" name="Foreman" id="foreman">
+                    <option value="">Select Foreman</option>
+                    @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Foremans)
+                    {
+                        <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                    }
+                </select>
+            </div>
+        </div>*@
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label" style="padding-right: 3px;">Mechanic*</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="Mekanik" id="mekanik">
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Mechanics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Electrician *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="Electrician" id="elektrik">
+                                        <option value="">Select Electrician</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Electrics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Supervisor *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="TeamLeader" id="teamLeader">
+                                        <option value="">Select Team Leader</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">PO Number</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="PONumber">
+                                        <option value="">Select PO Number</option>
+                                        @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                        {
+                                            <option value="@(wpp.PONumber)">@(wpp.PONumber)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Shift / Group *</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control mandatory" name="Shift" id="shift" value="">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    @*<input type="text" class="form-control mandatory" name="Group" id="group" value="">*@
+                                    <select class="form-control select2 mandatory" name="Group" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.referenceGroup)
+                                        {
+                                            <option value="@(detail.Code)">@(detail.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">Start / Stop *</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStart" name="Start" class="form-control input-time" value="">
+                                    </div>
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStop" name="Stop" class="form-control input-time" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="HandoverLogbook">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="card-body">
+                        @*<div class="card-body row">
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <label class="col col-form-label font-weight-bold">Quality</label>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-6 col-form-label">
+                                Quality Flags
+                            </label>
+                            <div class="col-2">
+                                <input type="number" onkeypress="validateNumber(event)" placeholder="0" name="hlqualityFlags" class="form-control">*@
+                        @*<select class="form-control select2" name="hlqualityFlags">
+                        <option value="NA">NA</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>*@
+                        @*</div>
+                        <div class="col-4">
+                            <input type="text" name="hlqualityFlagsAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-6 col-form-label">
+                            Quality Incidents
+                        </label>
+                        <div class="col-2">
+                            <input type="number" onkeypress="validateNumber(event)" placeholder="0" name="hlqualityIncidents" class="form-control">*@
+                        @*<select class="form-control select2" name="hlqualityIncidents">
+                        <option value="NA">NA</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>*@
+                        @*</div>
+                                <div class="col-4">
+                                    <input type="text" name="hlqualityIncidentsAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">
+                                    Completition of VQI & CPQI selfinspection during the shift
+                                </label>
+                                <div class="col-2">
+                                    <select class="form-control select2" name="hlqualityCompletitionofVQI">
+                                        <option value="NA">NA</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" name="hlqualityCompletitionofVQIAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label class="col col-form-label font-weight-bold">&nbsp;</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">
+                                    SPC physical parameters out of control limits and/or trends breaking the SPC rule
+                                </label>
+                                <div class="col-2">
+                                    <select class="form-control select2" name="hlqualitySPC">
+                                        <option value="NA">NA</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" name="hlqualitySPCAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">
+                                    Incomplete documentation
+                                </label>
+                                <div class="col-2">
+                                    <select class="form-control select2" name="hlqualityIncompleteDoc">
+                                        <option value="NA">NA</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" name="hlqualityIncompleteDocAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-6 col-form-label">
+                                    Higher RR
+                                </label>
+                                <div class="col-2">
+                                    <select class="form-control select2" name="hlqualityHigherRR">
+                                        <option value="NA">NA</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" name="hlqualityHigherRRAction" class="form-control" placeholder="Mitigation/Immediate Correction Actions">
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="min-width:120px;">Stops and Location</th>
+                                        <th style="min-width:100px;"># of Stops</th>
+                                        <th style="min-width:120px;">Initial Root Cause (Describe the issue) / Action Taken &amp; Impact</th>
+                                        <th style="min-width:120px;">Action Taken in your shift</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logbook">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="StopAndLocation"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="NOfStop"></td>
+                                        <td><input type="text" class="form-control" name="InitialCause"></td>
+                                        <td><input type="text" class="form-control" name="ActionTaken"></td>
+                                        <td class="tx-center"><i data-target="logbook" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="width:50%;">Action proposed for next shift</th>
+                                        <th style="min-width:90px;">Owner</th>
+                                        <th style="min-width:70px;">Start Time</th>
+                                        <th style="min-width:70px;">End Time</th>
+                                        <th style="min-width:60px;">Duration (Min)</th>
+                                        <th style="min-width:100px;">Status</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="action">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="NextAction"></td>
+                                        <td><input type="text" class="form-control" name="NextOwner"></td>
+                                        <td><input type="text" class="form-control date" name="NextStart" id="start" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control date" name="NextEnd" id="end" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control disabled" disabled value="0" name="NextDurasi" id="duration"></td>
+                                        <td>
+                                            <select class="form-control select2" name="Status">
+                                                <option label="Choose one"></option>
+                                                <option value="ONPROGRESS">ONPROGRESS</option>
+                                                <option value="DONE">DONE</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i data-target="action" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+            <div class="col-8 mg-b-20" style="padding-left:5px">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Raw Material Stock</div>
+                    <div class="card-body">
+                        <div class="tableWrapper">
+                            <table class="table table-bordered table-hover table-striped" id="dtRawMaterial">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width: 10%">Code</th>
+                                        <th style="width: 10%">Unit</th>
+                                        <th style="width: 10%">Initial</th>
+                                        <th style="width: 15%">Batch No</th>
+                                        <th style="width: 10%">Receive</th>
+                                        <th style="width: 10%">Use</th>
+                                        <th style="width: 10%">Reject</th>
+                                        <th style="width: 10%">Final</th>
+                                        <th style="width: 10%">Sent to DIM</th>
+                                        <th width="115px"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="raw"></tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="Code">
+                                                <option value="">Select Brand</option>
+                                                @foreach (Fast.Web.Models.BrandModel brand in ViewBag.BrandCode)
+                                                {
+                                                    <option value="@(brand.Code)">@(brand.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" name="Unit" placeholder="pcs"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Initial"></td>
+                                        <td><input type="text" class="form-control" name="Batch"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Receive"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Use"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Reject"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Final"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Sentto"></td>
+                                        <td class="tx-center"><i data-target="raw" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam*</div>
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col" style="padding-top: 10px">
+                                <center>
+                                    <img id="image_0" data-toggle="modal" data-target="#photo-modal" data-method="add" data-target-table="cbw" src="~/Content/dashforge/assets/img/upload-img-mini.png" class="rounded mx-auto d-block" alt="insert image" width="auto">
+                                </center>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="tableWrapper" style="max-height:200px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th>File Name </th>
+                                        <th style="min-width:200px;">Note</th>
+                                        <th style="min-width:130px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cbw"></tbody>
+                                <tfoot>
+                                    <tr class="input" style="display:none;">
+                                        <td><input type="text" class="form-control" name="Filename"></td>
+                                        <td><input type="text" class="form-control" name="Remark"></td>
+                                        <td class="tx-center"><i data-target="cbw" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--CAPTURE BY WEBCAM-->
+
+            <div class="col-12 mg-b-20" style="padding-right:5px">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Product Tipp. Information
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:220px;">
+
+                            <table class="table table-bordered table-hover table-striped" style="overflow: auto;" id="dtProductTipp">
+                                <thead class="thead-info">
+                                    <tr>
+                                        @*<th style="width: 10%">Before</th>
+                                    <th style="width: 10%">After</th>*@
+                                        <th style="min-width:150px;">Brand</th>
+                                        <th style="min-width:100px;">Initial</th>
+                                        <th style="min-width:100px;">No Pallet</th>
+                                        <th style="min-width:100px;">Result</th>
+                                        <th style="min-width:100px;">No Pallet</th>
+                                        <th style="min-width:100px;">Kirim ke Gudang</th>
+                                        <th style="min-width:100px;">No Pallet</th>
+                                        <th style="min-width:100px;">Last </th>
+                                        <th style="min-width:100px;">No Pallet</th>
+                                        <th style="min-width:100px;">Reject</th>
+                                        <th style="min-width:100px;">Waste Paper (kg)</th>
+                                        <th style="min-width:50px;"></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        @*<td></td>
+                                    <td></td>*@
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="tipp"></tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        @*<td><input type="text" class="form-control" name="Before"></td>
+                                    <td><input type="text" class="form-control" name="After"></td>*@
+                                        <td>
+                                            <select class="form-control select2" name="Brand">
+                                                <option value="">Select Brand</option>
+                                                @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.Brand)
+                                                {
+                                                    <option value="[@(brand.Code)] @brand.Description">[@(brand.Code)] @brand.Description</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Initial"></td>
+                                        <td><input type="text" class="form-control" name="NoPalletInitial"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Result"></td>
+                                        <td><input type="text" class="form-control" name="NoPalletResult"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Kirim"></td>
+                                        <td><input type="text" class="form-control" name="NoPalletKirim"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Last"></td>
+                                        <td><input type="text" class="form-control" name="NoPalletLast"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="Reject"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="WastePaper"></td>
+                                        <td class="tx-center"><i data-target="tipp" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped" id="dtApproval">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- APPROVAL SEGMENT-->
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5><label>Take picture for Filter</label></h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <video autoplay="true" width="160" height="120" id="videoElement"> </video><br />
+                                        <button id="snapHat">Capture Image </button><br />
+                                    </center>
+                                </div>
+                                <div class="col-md-6">
+                                    <center>
+                                        <canvas id="snapshot" style="max-width: 160px !important"></canvas><br />
+                                        <p id="demo"></p>
+
+                                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5>Remark</h5>
+                            <hr />
+                            <center>
+                                <input type="text" class="form-control" id="photo-notes">
+                            </center>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;">Next</button>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade wizard-modal" id="photo-preview" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+                <center>
+                    <img id="photo-preview-image" style="width: 75%;margin-bottom: 20px;" /><br />
+                    <p id="photo-preview-name"></p>
+                </center>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+@section Scripts{
+
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+    <script type="text/javascript">
+          $('#btnHistory').on('click', function (e) {
+		    location.href = '@Url.Action("Index", "History")';
+          });
+
+        //$('#txtDateInfo').val(moment().format("ddd, DD-MMM-YY"));
+        //$('#txtWeekNumber').val(moment().week());
+    </script>
+    <script>
+        var dataNonNumericComponent = [
+            "hlsafetyTrigger",
+            "hlsafetyComment",
+            "hlquality",
+            "hlqualityComment",
+            "hlqualityFlags",
+            "hlqualityFlagsAction",
+            "hlqualityIncidents",
+            "hlqualityIncidentsAction",
+            "hlqualityCompletitionofVQI",
+            "hlqualityCompletitionofVQIAction",
+            "hlqualitySPC",
+            "hlqualitySPCAction",
+            "hlqualityIncompleteDoc",
+            "hlqualityIncompleteDocAction",
+            "hlqualityHigherRR",
+            "hlqualityHigherRRAction"
+        ];
+        var dataNumericComponent = [
+            "hlnoofstops",
+            "hlmtbf",
+            "hlcenterlineschecked",
+            "hlcenterlinesofl",
+            "hlensureCLDeviation",
+            "hlcilCompletion",
+            "hlplannedDuration",
+            "hlactualDuration",
+            "hlnumofDefectsFound",
+            "hlnumofDefectsFixed",
+            "hlensureReportedDHL",
+            "hlnumofBreakdown",
+            "hltotBreakdown",
+            "hlensurePMCard"
+        ];
+        var dataNonNumericValue = [
+            "hlsafetyTrigger",
+            "hlsafetyComment",
+            "hlquality",
+            "hlqualityComment",
+            "hlqualityFlags",
+            "hlqualityFlagsAction",
+            "hlqualityIncidents",
+            "hlqualityIncidentsAction",
+            "hlqualityCompletitionofVQI",
+            "hlqualityCompletitionofVQIAction",
+            "hlqualitySPC",
+            "hlqualitySPCAction",
+            "hlqualityIncompleteDoc",
+            "hlqualityIncompleteDocAction",
+            "hlqualityHigherRR",
+            "hlqualityHigherRRAction"
+        ];
+        var dataNumericValue = [
+            "hlnoofstops",
+            "hlmtbf",
+            "hlcenterlineschecked",
+            "hlcenterlinesofl",
+            "hlensureCLDeviation",
+            "hlcilCompletion",
+            "hlplannedDuration",
+            "hlactualDuration",
+            "hlnumofDefectsFound",
+            "hlnumofDefectsFixed",
+            "hlensureReportedDHL",
+            "hlnumofBreakdown",
+            "hltotBreakdown",
+            "hlensurePMCard"];
+        $(function () {
+            'use strict'
+            console.log("chanif");
+
+            /******************** PREFILLED ******************/
+            var model = JSON.parse($("#jsonModel").attr("data-json"));
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                const parent = tn[0];
+                tn.shift();
+                const child = tn.join("-");
+                const val = model.CompoVal[i].Value.Value;
+                let node = $("#" + parent + " " + type + "[name=" + child + "]");
+                var temp_val = decodeURIComponent(val ? val : "");
+                $(node).val(temp_val);
+                if (child == 'Group' && type == 'INPUT' && parent == 'GeneralInfo') {
+                    node = $("#" + parent + " " + "SELECT" + "[name=" + child + "]");
+                    $(node).val(temp_val);
+                }
+                if ($(node).hasClass("select2")) {
+	                if (temp_val.indexOf('___') !== -1) {
+		                temp_val = temp_val.split('___');
+		                $(node).val(temp_val);
+	                }
+	                $(node).trigger('change');
+                }	
+            }
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        const val = model.Extras[i].Value;
+                        data[model.Extras[i].FieldName] = decodeURIComponent(val ? val : "");
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                    }
+                }
+                configAle[table].data.push(data);
+            }
+            for (let prop in configAle) {
+                configAle[prop].data.reverse();
+                $("#" + prop).html(generateTable(configAle[prop].data, prop));
+                countSummary(prop);
+                ieFix();
+            }
+        });
+
+
+        /****************** END PREFILLED ****************/
+    </script>
+    <script>
+        function ieFix() {
+            //if (navigator.userAgent.search("Edge") >= 0) {
+            //    $(".tableWrapper:has(tfoot)").each(function () {
+            //        $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+            //        $(this).find("table").css({ "margin-bottom": "32px" });
+            //        $(this).css({ "overflow-y": "scroll" });
+            //        const ths = $(this).find("thead tr:first-child th");
+            //        $(this).find("tfoot td").each(function (i) {
+            //            $(this).css({ "min-width": $($(ths)[i]).width() + 20, "position": "static" });
+            //        });
+            //    });
+            //}
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            $(`#${targetTable} ~ tfoot tr.input td`).children("input, select").each(function () {
+                const name = $(this).prop("name");
+                r += `<td data-name="${name}">${data[name]}</td>`;
+            });
+
+            let useEdit = true;
+            let useDelete = true;
+            let additionalButtons = "";
+            if (configAle[targetTable].rowConfig !== undefined) {
+                if (configAle[targetTable].rowConfig.withEdit !== undefined)
+                    useEdit = configAle[targetTable].rowConfig.withEdit;
+                if (configAle[targetTable].rowConfig.withDelete !== undefined)
+                    useDelete = configAle[targetTable].rowConfig.withDelete;
+                if (configAle[targetTable].rowConfig.additionalButtons != undefined)
+                    additionalButtons = configAle[targetTable].rowConfig.additionalButtons(data);
+            }
+            r += `<td class="tx-center">`;
+            r += additionalButtons;
+            if (useEdit) r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            if (useDelete) r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const table = $(button).parents("table");
+            if (!$(table).data("edited")) {
+                $(table).data("edited", true);
+
+                const tds = $(button).parents("tr").children('td');
+                const inputTr = $(table).find('tr.input');
+                const inputTds = $(inputTr).children('td');
+                const tdsCount = $(tds).length;
+
+                $(tds).each(function (i, e) {
+                    const el = $(inputTds[i]).children()[0];
+                    if (i != tdsCount - 1) {
+                        const html = $(e).html();
+                        const newInput = $(el).clone();
+                        if (!$(el).hasClass("disabled"))
+                            $(newInput).prop("disabled", false);
+
+                        $(el).prop("disabled", true);
+                        $(newInput).val(html);
+                        $(e).html(newInput);
+                    } else {
+                        $(el).off("click");
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:normalData(this)");
+                        $(edit).removeClass("fa-edit");
+                        $(edit).addClass("fa-save");
+                    }
+                });
+            }
+            $('.select2').select2({
+		        allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            ieFix();
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    var ev = $._data(el, 'events');
+                    if (!(ev && ev.click))
+                        $(el).on("click", addToTable);
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target, data) {
+            $(target).html(generateTable(data, target));
+            countSummary(target);
+        }
+        $(document).ready(function () {
+            $('.select2').select2({
+		        allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+	            placeholder: 'Choose one or more',
+	            searchInputPlaceholder: 'Search options'
+            });	
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $(".add-to-table").on("click", addToTable);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        function addToTable(button) {
+            const targetTable = $(this).data("target");
+            const tds = $(this).parents("tr").children("td");
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(tds).each(function (tdIndex, td) {
+                const input = $(td).children();
+                if (input.attr("name") != undefined) {
+                    const name = input.attr("name");
+                    const val = input.val();
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            if ((input[0].nodeName.toLowerCase() === 'select')) {
+                                $(input[0]).siblings(".select2-container").css('border', '1px solid red');
+                                $(input[0]).siblings(".select2-container").css('border-radius', '0.25rem');
+                                $(input[0]).on('select2:select', function (e) {
+                                    $(input[0]).siblings(".select2-container").css('border', 'none');
+                                    $(input[0]).siblings(".select2-container").css('border-radius', '0');
+                                });
+                            } else if (input[0].value === "") {
+                                input[0].style.borderColor = "red";
+                                $(input[0]).on('click', function (e) {
+                                    input[0].style.borderColor = "rgb(192, 204, 218)";
+                                });
+                            }
+                            return false;
+                        }
+                    }
+                    if (input[0].type.toLowerCase() == "number") {
+                        var myRegexp = /^00+$/g;
+                        var match = myRegexp.exec(val);
+                        if (match != null) {
+                            alert("Please input a valid number");
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+            $(tds).each(function (i, td) {
+                const node = $(td).children();
+                $(node).val("");
+                if ($(node).hasClass("select2"))
+                    $(node).trigger('change');
+            });
+
+            if (configAle[targetTable].onAdd != undefined) {
+                if (configAle[targetTable].onAdd(newdata)) {
+                    return;
+                }
+            }
+            configAle[targetTable].data.push(newdata);
+            $("#" + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+            countSummary(targetTable);
+            ieFix();
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const summaryTds = $('#' + targetTable).parents('table').find('.summary-body').children();
+                $('#' + targetTable).parents('table').find('.input td').each(function (i, td) {
+                    const name = $(td).children().attr("name");
+                    if (rowData.hasOwnProperty(name))
+                        $(summaryTds[i]).html(rowData[name]);
+                });
+            }
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const table = $(button).parents("table");
+                releaseDisabledInput(table);
+                if (configAle[targetTable].onDelete != undefined) {
+                    if (configAle[targetTable].onDelete(id)) {
+                        return;
+                    }
+                }
+                deleteFromArray(id, configAle[targetTable].data);
+                $('#' + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                const table = $(button).parents("table");
+
+                if (configAle[targetTable].onSave != undefined) {
+                    if (configAle[targetTable].onSave(id)) {
+                        return;
+                    }
+                }
+                const index = findInArray(id, configAle[targetTable].data);
+                let shouldReturn = false;
+                var newdata = {
+                    id: uuidv4()
+                };
+                $(tds).each(function (tdIndex, e) {
+                    if (tdIndex != tdsCount - 1) {
+                        const name = $(e).data("name");
+                        const val = $($(e).children()[0]).val();
+                        if (configAle[targetTable].onValidate != undefined) {
+                            if (configAle[targetTable].onValidate(name, val)) {
+                                shouldReturn = true;
+                                return false;
+                            }
+                        }
+                        newdata[name] = val;
+                    } else {
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:editData(this)");
+                        $(edit).removeClass("fa-save");
+                        $(edit).addClass("fa-edit");
+                    }
+                });
+                if (shouldReturn) return;
+
+                configAle[targetTable].data[index] = newdata;
+                const row = generateRow(configAle[targetTable].data[index], targetTable);
+                $(button).parents("tr").html(row);
+
+                releaseDisabledInput(table);
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function countDuration(start, end, duration) {
+            var end = $('#' + end).val();
+            var start = $('#' + start).val();
+
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                if (startdate > enddate) {
+                    enddate = new Date(enddate);
+                    enddate.setDate(enddate.getDate() + 1);
+                }
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                $('#' + duration).val(diffMinutes);
+            }
+        };
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input, select, textarea').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+                    var tem_value = $(e).val();
+                    if (Array.isArray(tem_value)) {
+	                    tem_value = tem_value.join('___');
+                    }
+                    values.push({
+                        Value: tem_value,
+                        ValueType: $(e).attr('type') == "number" ? "Numeric" : "NonNumeric",
+                    });
+                });
+            });
+            return [components, values];
+        }
+
+        function collectAllData() {
+            let collectorArray = [];
+            for (var tableId in configAle) {
+                let tableColumnType = {};
+                $(`#${tableId} ~ tfoot tr.input td input`).each(function () {
+                    tableColumnType[$(this).prop("name")] = $(this).prop("type");
+                });
+                const data = configAle[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    if (configAle[tableId].onCollectDataRow != undefined) {
+                        data[i] = configAle[tableId].onCollectDataRow(data[i]);
+                    }
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let newInsertData = {
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: data[i][prop],
+                                ValueType: tableColumnType[prop] == "number" ? "Numeric" : "NonNumeric",
+                                RowNumber: i
+                            };
+                            if (configAle[tableId].onCollectDataSingle != undefined) {
+                                newInsertData = configAle[tableId].onCollectDataSingle(newInsertData);
+                            }
+                            collectorArray.push(newInsertData);
+                        }
+                    }
+                }
+            }
+            console.log(collectorArray);
+            return collectorArray;
+        }
+    </script>
+    <script>
+        /*
+                    * data = array untuk menyimpan data;
+                    * countSummary = dipanggil saat menghitung summary, return object dengan property sesuai dengan name pada `tfoot tr.input`;
+                    * onAdd(newData) = dipanggil sebelum menambah data, return boolean apakah harus ditambahkan atau tidak;
+                    * onDelete(idOfDeletedObject) = dipanggil sebelum menghapus data, return boolean apakah harus dihapus atau tidak;
+                    * onSave(idOfUpdatedObject) = dipanggil sebelum mengubah data, return boolean apakah harus diubah atau tidak;
+                    * onValidate(nameOfInput, valueOfInput) = validasi nilai saat tambah dan save, return boolean apakah harus diterus atau tidak;
+                    *
+                    * rowConfig = config untuk generate baris tabel;
+                    * - withEdit = menampilkan edit, default true;
+                    * - withDelete = menampilkan delete, default true;
+                    * - additionalButtons(data) = fungsi untuk yang akan mengembalikan button tambahan untuk tiap baris, return element html dalam string;
+                    */</script>
+    <script>
+        var rawData = [];
+        var tippData = [];
+        var logbookData = [];
+        var cbwData = [];
+        var actionData = [];
+        const configAle = {
+            cbw: {
+                data: cbwData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onDelete(id) {
+                    for (let j = 0; j < cbwData.length; j++) {
+                        if (cbwData[j].id == id) {
+                            for (let i = 0; i < imgContent.length; i++) {
+                                if (imgContent[i].name == cbwData[j].Filename) {
+                                    imgContent.splice(i, 1);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                },
+                onCollectDataSingle(data) {
+                    if (data.FieldName == "Filename") {
+                        data.ValueType = "ImageURL/" + data.Value + "/" + "Old";
+                        for (let i = 0; i < imgContent.length; i++) {
+                            if (imgContent[i].name == data.Value) {
+                                data.ValueType = "ImageURL/" + data.Value + "/" + "New";
+                                data.Value = imgContent[i].data;
+                                break;
+                            }
+                        }
+                    }
+                    return data;
+                },
+                rowConfig: {
+                    withEdit: false,
+                    withDelete: false,
+                    additionalButtons(data) {
+                        return `
+                <i data-toggle="modal" data-target="#photo-preview" onclick="javascript:setPreview('${data.Filename}')" class="fa fa-image"></i>
+                                    `;
+                    }
+                },
+            },
+            raw: {
+                data: rawData,
+                countSummary: function () {
+                    let rowData = {
+                        Initial: 0,
+                        Receive: 0,
+                        Use: 0,
+                        Reject: 0,
+                        Final: 0,
+                        Sentto: 0,
+                    };
+                    for (var i = 0; i < rawData.length; i++) {
+                        rowData.Initial += parseInt(rawData[i].Initial);
+                        rowData.Receive += parseInt(rawData[i].Receive);
+                        rowData.Use += parseInt(rawData[i].Use);
+                        rowData.Reject += parseInt(rawData[i].Reject);
+                        rowData.Final += parseInt(rawData[i].Final);
+                        rowData.Sentto += parseInt(rawData[i].Sentto);
+                    }
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            tipp: {
+                data: tippData,
+                countSummary: function () {
+                    let rowData = {
+                        Initial: 0,
+                        Result: 0,
+                        Kirim: 0,
+                        Last: 0,
+                        Reject: 0,
+                        WastePaper: 0,
+                    };
+                    for (var i = 0; i < tippData.length; i++) {
+                        rowData.Initial += parseInt(tippData[i].Initial);
+                        rowData.Result += parseInt(tippData[i].Result);
+                        rowData.Kirim += parseInt(tippData[i].Kirim);
+                        rowData.Last += parseInt(tippData[i].Last);
+                        rowData.Reject += parseInt(tippData[i].Reject);
+                        rowData.WastePaper += parseInt(tippData[i].WastePaper);
+                    }
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            logbook: {
+                data: logbookData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+              action: {
+                data: actionData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                  },
+                countSummary: function () {
+					let rowData = {};
+					let NextDurasi = 0;
+					for (var i = 0; i < actionData.length; i++) {
+						NextDurasi += parseInt(actionData[i].NextDurasi);
+					}
+					rowData.NextDurasi = NextDurasi;
+					return rowData;
+				},
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+        }
+        let isEditImage = null;
+        function setEditName(name) {
+            isEditImage = name;
+        }
+        function setPreview(name) {
+            for (let i = 0; i < imgContent.length; i++) {
+                if (imgContent[i].name == name) {
+                    $("#photo-preview-name").html(imgContent[i].name);
+                    $("#photo-preview-image").attr("src", imgContent[i].data);
+                    $('#photo-preview-image').attr('onclick', `printImage('`+imgContent[i].name+`')`);
+                    return;
+                }
+            }
+            for (let i = 0; i < cbwData.length; i++) {
+                if (cbwData[i].Filename == name) {
+                    $("#photo-preview-name").html(cbwData[i].Filename);
+                    $("#photo-preview-image").attr("src", fastApp.BaseUrl + "/Uploads/lph/laser/" + cbwData[i].Filename);
+                    $('#photo-preview-image').attr('onclick', `printImage('`+cbwData[i].Filename+`')`);
+                }
+            }
+        }</script>
+
+    <script>
+	$('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "Laser")",
+                  data: JSON.stringify({
+                      LPHID: @(Model.LPH.ID),
+					  machine: $('#machInfo').val()
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "Laser"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No previous submissions found",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+            })
+			
+         $('#btnApprove').click(function (e) {
+            var collectorArray = collectAllData(); // for LPH Extras
+            var collector = collectAllComponent();
+            var collectorComponent = collector[0];
+             var collectorValue = collector[1];
+             var comment = $('#comment_value').val();
+            var collectorApproval = [];
+
+            var detailSubmission = {
+                StartTime: $('#inputTimeStart').val(),
+                EndTime: $('#inputTimeStop').val(),
+                Shift: $('#shift').val(),
+            }
+             $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("Approval", "Laser")",
+                 data: JSON.stringify({
+                     id:@(Model.LPH.ID),
+                     comment: comment,
+                     detailExtras: collectorArray,
+                     //detailSubmission: detailSubmission,
+                     detailComponent: collectorComponent,
+                      detailValue: collectorValue
+
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+                      console.log(result.Status);
+					if (result.Status == 'True') {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.CreateSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright'
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000);
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.CreateFailed",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+
+        });
+
+        $('#btnReject').click(function (e) {
+
+            var comment = $('#comment_value').val();
+
+
+               $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("Rejected", "Laser")",
+                  data: JSON.stringify({
+                      id: @(Model.LPH.ID),
+                      comment: comment
+
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+                      console.log(result.Status);
+					if (result.Status == 'True') {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.CreateSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright'
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000);
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.CreateFailed",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+        });
+
+    </script>
+
+    <script>
+        var selected = null;     
+           
+            $(document).ready(function () {
+             var lphID = @(Model.LPH.ID);
+            $('#dtApproval').dataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "filter": false,
+                "bLengthChange": false,
+                "orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"order": [[ 3, "asc" ]],
+                "ajax": {
+                    "url": fastApp.BaseUrl + '/Laser/GetApproverList?lphid='+ lphID,
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columnDefs":
+                    [{
+                        "targets": [0],
+                      "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [1],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [2],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [3],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [4],
+                        "searchable": true,
+                        "orderable": true
+                    },
+
+                    ],
+
+                "columns": [
+
+                    { "data": "User", "name": "User", "title": "Name", "autoWidth": false },
+                    { "data": "Role", "name": "Role", "title": "Role", "autoWidth": false },
+                    { "data": "Status", "name": "Status", "title": "Status", "autoWidth": false },
+                    {
+                        "data": "ModifiedDate",
+                        render: function (data, type, row) {
+                            if (data)
+                                                                return moment(data).format("DD-MMM-YY HH:mm");
+                            else
+                                return '';
+                        }
+                    },
+                    { "data": "Notes", "name": "Notes", "title": "Notes", "autoWidth": false }
+                ],
+                "fnRowCallback": function (nRow, data, iDisplayIndex, iDisplayIndexFull) {
+                    $('td', nRow).css('background-color', data['Color']);
+                    $('#dtApproval_paginate')[0].style.display = "none";
+                }
+            });
+            $("#photo-modal").on('next', function (e, index, info) {
+                if (!newImage) {
+                    info.shouldReturn = true;
+                    return;
+                }
+                const tr = $('#cbw ~ tfoot tr.input');
+                switch (index) {
+                    case 0:
+                        $(this).find(".next").html("Add");
+                        break;
+                    case 1:
+                        info.shouldHide = true;
+                        if (isEditImage == null) {
+                            imgContent.push(newImage);
+                            $(tr).find('input[name="Filename"]').val(newImage.name);
+                            $(tr).find('input[name="Remark"]').val($("#photo-notes").val());
+                            $('.add-to-table[data-target="cbw"]').click();
+                        } else {
+                            let isOld = false;
+                            for (let i = 0; i < imgContent.length; i++) {
+                                if (imgContent[i].name == isEditImage) {
+                                    imgContent[i] = newImage;
+                                    isOld = true;
+                                }
+                            }
+                            if (!isOld) imgContent.push(newImage);
+                            for (let i = 0; i < cbwData.length; i++) {
+                                if (cbwData[i].Filename == isEditImage) {
+                                    cbwData[i].Filename = newImage.name;
+                                    cbwData[i].Remark = $("#photo-notes").val();
+                                }
+                            }
+                            $("#cbw").html(generateTable(configAle.cbw.data, "cbw"));
+                            ieFix();
+                            isEditImage = null;
+                        }
+                        console.log(imgContent, cbwData);
+                        break;
+                }
+            });
+            $('#photo-modal').on('hide', function (e) {
+                $(this).find(".next").html("Next");
+                $("#photo-notes").val("");
+                newImage = null;
+            });
+
+            
+
+        });
+    </script>
+
+    <script>
+        //chanif: matikan semua input
+            $(document).find('input,select,textarea').each(function(){
+                $(this).attr('disabled', 'disabled');
+            });
+
+            //chanif: matikan semua button tambah/edit/delete. delay 1 detik nunggu load semua
+            setTimeout(function (){
+                $(document).find('i,span').not('.fa-image').each(function () {
+                    $(this).prop("onclick", null).off("click");
+                });
+            }, 1000);
+
+            //chanif: jangan munculkan modal ketika gambar di-klik
+            $(document).find('img').each(function(){
+                $(this).attr("data-toggle", null);
+                $(this).attr("data-target", null);
+            });
+        var isUrlLink = false;
+        var isImg = [];
+        var imgContent = [];
+        var addIndex = -1;
+        var newImage = null;
+
+        function infoId(e) {
+            console.log("ID info : " + e.id);
+
+            for (var i = 0; i < imgContent.length; i++) {
+                isImg[i] = e.id == "image_" + (i + 1) + "";
+            }
+        }
+
+        function renderImage(link, state) {
+
+            if (link == null || link == "") {
+                isUrlLink = false;
+            }
+            else {
+
+                isUrlLink = true;
+                console.log("link " + link);
+                console.log("addIndex: " + addIndex);
+                let fn = new Date().getTime() + "_" + (Math.floor(Math.random() * 9999999999) + 1000000000) + ".jpeg";
+                newImage = {
+                        name: fn,
+                        data: link
+                    };
+                @*for (var i = 0; i < max; i++) {
+                    if (state == "image_" + (i + 1) + "") {
+                        imgContent[i] = link;
+                        document.getElementById("image_'+(i+1)+'"_show").innerHTML = '<img class="input - img rounded mx - auto d - block" src=' + imgContent[i] + ' id="image_'+(i+1)+'" data-toggle="modal" data-target="#photo - modal" width="auto" />';
+                    }
+                }*@
+
+            }
+        }
+
+    </script>
+
+    <script>
+        // Video Part
+        var video = document.querySelector("#videoElement");
+        var hdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var hhdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var vgaConstraints = {
+            video: {
+                mandatory: {
+                    maxWidth: 160,
+                    maxHeight: 120
+                }
+            }
+        };
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            document.getElementById("demo").innerHTML = "";
+
+            try {
+                navigator.getUserMedia(hhdConstraints, handleVideo, videoError);
+            } catch (error) {
+                navigator.getUserMedia(hdConstraints, handleVideo, videoError);
+            }
+        }
+
+        function handleVideo(stream) {
+            try {
+                this.srcObject = stream;
+            } catch (error) {
+                this.src = window.URL.createObjectURL(stream);
+            }
+        }
+
+        function videoError(e) {
+            // do something
+        }</script>
+
+    <script>
+        // Capture Image Part
+        var player = document.getElementById('videoElement');
+        var snapshotCanvas = document.getElementById('snapshot');
+        var captureButton = document.getElementById('capture');
+        var captureButton3 = document.getElementById('capture3');
+        var textBottom = document.getElementById('saveText');
+
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        var txfname = "img_text";
+        var XdatStr = 'date';
+
+        textBottom.addEventListener('click', function () {
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            XdateStr = dateStr;
+            txfname = 'IMG_' + dateStr;
+
+            saveTextAsFile(txfname);
+            pcanvas2blob().then(download2X);
+
+            document.getElementById("demo").innerHTML = "saved ";
+
+        });
+
+        captureButton.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Reading PDF417.";
+
+            var VH = 1080;
+            var VW = 1920;
+
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var buf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, buf);
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var b = _pdf417JS(buf, VH, VW, 1024);
+
+            var heapBu = new Uint8Array(Module.HEAPU8.buffer, buf, 1028);
+            var vanz = bin2Strung(heapBu);
+
+
+            if (b <= 0) {
+                vanz = "No Read.";
+            }
+
+            Module._free(buf);
+            document.getElementById("demo").innerHTML = vanz;
+
+        });
+
+        captureButton3.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = " OCRing MRZ. ";
+
+            var VH = 1080;
+            var VW = 1920;
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4; //1280*720*4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var bluf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, bluf);
+
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var c = _DLreadJS(bluf, VH, VW, 1024);
+
+            var heapBuc = new Uint8Array(Module.HEAPU8.buffer, bluf, 1028);
+            var vanc = bin2Strung(heapBuc);
+
+            if (c <= 0) {
+                vanc = "No Read.";
+            }
+            Module._free(bluf);
+            document.getElementById("demo").innerHTML = vanc;
+        });
+
+        snapHat.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Image captured";
+
+            takeASnap();
+            //.then(download);
+        });
+
+        var state = "";
+        function takeASnap() {
+
+            canvas.width = 1600;//video.videoWidth; // set its size to the one of the video
+            canvas.height = 1200;// video.videoHeight;
+            ctx.drawImage(video, 0, 0, 1600, 1200); // the video
+
+            var jpegUrl = ctx.canvas.toDataURL("image/jpeg"); // get base64 output - no longer using toBlob
+
+            for (var i = 0; i < isImg.length; i++) {
+                if (isImg[i] == true) {
+                    state = "image_" + (i + 1) + "";
+                }
+            }
+
+            renderImage(jpegUrl, state);
+        }
+
+        function pcanvas2blob() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+            });
+        }
+
+        function download2X(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            a.download = 'IMG_' + XdateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function download(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+
+            a.download = 'IMG_' + dateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+
+        function download_png(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            a.download = 'IMG_' + dateStr + '.png';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function canvaSnap() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/png'); // request a Blob from the canvas
+            });
+        }
+
+        function saveTextAsFile(txt_name) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var res = ocr_text.replace(/<br>/g, "\r\n");
+            var res2 = res.replace(/&lt;/g, '<');
+
+            var blab = new Blob([res2], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+
+            a.click();
+        }
+
+        function saveImageAndText(fname) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var blab = new Blob([ocr_text], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+            a.click();
+        }</script>
+
+    <script>
+        function bin2Strung(array) {
+            var result = "";
+            var max = 2048;
+            for (var i = 0; i < max; i++) {
+                var v = String.fromCharCode(array[i]);
+
+                if (array[i] == 10) {
+                    result += "<br/>";
+                }
+                else {
+                    if (array[i] == 60) {
+                        //result += "&#60";
+                        result += "&lt";
+                    }
+                    else {
+                        result += String.fromCharCode(array[i]);
+                    }
+                }
+                if (array[i] == 0) {
+                    i = max;
+                }
+            }
+            return result;
+        }
+
+        function myFunction() {
+            document.getElementById("demo").innerHTML = "Doing My Best!";
+        }</script>
+}
+
+<script>
+    function bin2Strung(array) {
+        var result = "";
+        var max = 2048;
+        for (var i = 0; i < max; i++) {
+            var v = String.fromCharCode(array[i]);
+
+            if (array[i] == 10) {
+                result += "<br/>";
+            }
+            else {
+                if (array[i] == 60) {
+                    //result += "&#60";
+                    result += "&lt";
+                }
+                else {
+                    result += String.fromCharCode(array[i]);
+                }
+            }
+            if (array[i] == 0) {
+                i = max;
+            }
+        }
+        return result;
+    }
+
+    function myFunction() {
+        document.getElementById("demo").innerHTML = "Doing My Best!";
+    }</script>
+<script>
+    function printImage(name) {
+        for (let i = 0; i < imgContent.length; i++) {
+            if (imgContent[i].name == name) {
+                let dataimage = new Image();
+                dataimage.src = imgContent[i].data;
+
+                let windowOpen = window.open("");
+                windowOpen.document.write(dataimage.outerHTML);
+                return;
+            }
+        }
+        for (let i = 0; i < cbwData.length; i++) {
+            if (cbwData[i].Filename == name) {
+                pwin = window.open(fastApp.BaseUrl + "/Uploads/lph/laser/" + cbwData[i].Filename, "_blank");
+            }
+        }
+
+    }
+</script>
+}

@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{02EDE18A-A076-4742-B4EA-C0A2E068B216}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Fast.Domain</RootNamespace>
+    <AssemblyName>Fast.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\OtherPemakaianBandrol.cs" />
+    <Compile Include="Entities\PMIDPemakaianBandrol.cs" />
+    <Compile Include="Entities\PMIDPemakaianBandrolSlof.cs" />
+    <Compile Include="Entities\PPReportYieldKreteks.cs" />
+    <Compile Include="Entities\PPReportYieldIMLs.cs" />
+    <Compile Include="Entities\PPReportYieldTargets.cs" />
+    <Compile Include="Entities\PPReportYieldOvs.cs" />
+    <Compile Include="Entities\PPReportYieldMCDiets.cs" />
+    <Compile Include="Entities\PPReportYieldWhites.cs" />
+    <Compile Include="Entities\PPReportYields.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\Blend.cs" />
+    <Compile Include="Entities\BrandConversion.cs" />
+    <Compile Include="Entities\EmployeeProfileAll.cs" />
+    <Compile Include="Entities\InputDaily.cs" />
+    <Compile Include="Entities\InputOV.cs" />
+    <Compile Include="Entities\InputTarget.cs" />
+    <Compile Include="Entities\MachineAllocation.cs" />
+    <Compile Include="Entities\ReportKPICRRConversion.cs" />
+    <Compile Include="Entities\ReportKPITarget.cs" />
+    <Compile Include="Entities\ReportKPIStickPerPack.cs" />
+    <Compile Include="Entities\ReportKPIWorkHour.cs" />
+    <Compile Include="Entities\ReportKPIRipperInfo.cs" />
+    <Compile Include="Entities\ReportKPITobaccoWeight.cs" />
+    <Compile Include="Entities\ReportKPIDust.cs" />
+    <Compile Include="Entities\ShuttleRequest.cs" />
+    <Compile Include="Entities\MealRequest.cs" />
+    <Compile Include="Entities\TrainingMachineType.cs" />
+    <Compile Include="Entities\TrainingTitle.cs" />
+    <Compile Include="Entities\MaterialCode.cs" />
+    <Compile Include="Entities\Brand.cs" />
+    <Compile Include="Entities\Calendar.cs" />
+    <Compile Include="Entities\CalendarHoliday.cs" />
+    <Compile Include="Entities\ChecklistApprover.cs" />
+    <Compile Include="Entities\ChecklistApproval.cs" />
+    <Compile Include="Entities\ChecklistSubmit.cs" />
+    <Compile Include="Entities\Checklist.cs" />
+    <Compile Include="Entities\ChecklistComponent.cs" />
+    <Compile Include="Entities\ChecklistValueHistory.cs" />
+    <Compile Include="Entities\ChecklistValue.cs" />
+    <Compile Include="Entities\ChecklistLocation.cs" />
+    <Compile Include="Entities\EmployeeOvertime.cs" />
+    <Compile Include="Entities\EmployeeLeave.cs" />
+    <Compile Include="Entities\EmployeeProfile.cs" />
+    <Compile Include="Entities\JobTitle.cs" />
+    <Compile Include="Entities\LPH.cs" />
+    <Compile Include="Entities\LPHApprovals.cs" />
+    <Compile Include="Entities\LPHComponents.cs" />
+    <Compile Include="Entities\LPHExtras.cs" />
+    <Compile Include="Entities\LPHLocations.cs" />
+    <Compile Include="Entities\LPHSubmissions.cs" />
+    <Compile Include="Entities\LPHValueHistories.cs" />
+    <Compile Include="Entities\LPHValues.cs" />
+    <Compile Include="Entities\Machine.cs" />
+    <Compile Include="Entities\ManPower.cs" />
+    <Compile Include="Entities\Menu.cs" />
+    <Compile Include="Entities\Location.cs" />
+    <Compile Include="Entities\MppChanges.cs" />
+    <Compile Include="Entities\PPLPH.cs" />
+    <Compile Include="Entities\PPLPHApprovals.cs" />
+    <Compile Include="Entities\PPLPHComponents.cs" />
+    <Compile Include="Entities\PPLPHExtras.cs" />
+    <Compile Include="Entities\PPLPHLocations.cs" />
+    <Compile Include="Entities\PPLPHSubmissions.cs" />
+    <Compile Include="Entities\PPLPHValueHistories.cs" />
+    <Compile Include="Entities\PPLPHValues.cs" />
+    <Compile Include="Entities\ReferenceDetail.cs" />
+    <Compile Include="Entities\Reference.cs" />
+    <Compile Include="Entities\AccessRight.cs" />
+    <Compile Include="Entities\ReportRemarks.cs" />
+    <Compile Include="Entities\Skill.cs" />
+    <Compile Include="Entities\Training.cs" />
+    <Compile Include="Entities\ReportKPIDIM.cs" />
+    <Compile Include="Entities\ReportKPIYield.cs" />
+    <Compile Include="Entities\ReportKPICRR.cs" />
+    <Compile Include="Entities\ReportKPIProdVol.cs" />
+    <Compile Include="Entities\UserLog.cs" />
+    <Compile Include="Entities\Role.cs" />
+    <Compile Include="Entities\User.cs" />
+    <Compile Include="Entities\UserRole.cs" />
+    <Compile Include="Entities\UserMachine.cs" />
+    <Compile Include="Entities\LocationMachineType.cs" />
+    <Compile Include="Entities\UserSkill.cs" />
+    <Compile Include="Entities\Mpp.cs" />
+    <Compile Include="Entities\UserMachineType.cs" />
+    <Compile Include="Entities\Weeks.cs" />
+    <Compile Include="Entities\WppStp.cs" />
+    <Compile Include="Entities\WppPrimary.cs" />
+    <Compile Include="Entities\WppPrim.cs" />
+    <Compile Include="Entities\Wpp.cs" />
+    <Compile Include="Entities\WppChanges.cs" />
+    <Compile Include="Interfaces\Repositories\IRepositoryBase.cs" />
+    <Compile Include="Interfaces\Repositories\IUnitOfWork.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldKreteksService.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldIMLsService.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldTargetsService.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldOvsService.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldMCDietsService.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldWhitesService.cs" />
+    <Compile Include="Interfaces\Services\IPPReportYieldsService.cs" />
+    <Compile Include="Interfaces\Services\IInputDailyService.cs" />
+    <Compile Include="Interfaces\Services\IInputOVService.cs" />
+    <Compile Include="Interfaces\Services\IInputTargetService.cs" />
+    <Compile Include="Interfaces\Services\IMachineAllocationService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPICRRConversionService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPITargetService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIDustService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPITobaccoWeightService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIStickPerPackService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIWorkHourService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIRipperInfoService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIDIMService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIYieldService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPICRRService.cs" />
+    <Compile Include="Interfaces\Services\IReportKPIProdVolService.cs" />
+    <Compile Include="Interfaces\Services\IShuttleRequestService.cs" />
+    <Compile Include="Interfaces\Services\IMealRequestService.cs" />
+    <Compile Include="Interfaces\Services\ITrainingTitleMachineTypeService.cs" />
+    <Compile Include="Interfaces\Services\ITrainingTitleService.cs" />
+    <Compile Include="Interfaces\Services\IBlendService.cs" />
+    <Compile Include="Interfaces\Services\IBrandConversionService.cs" />
+    <Compile Include="Interfaces\Services\IEmployeeAllService.cs" />
+    <Compile Include="Interfaces\Services\IMaterialCodeService.cs" />
+    <Compile Include="Interfaces\Services\IBrandService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistApproverService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistComponentService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistSubmitService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistApprovalService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistValueHistoryService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistValueService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistLocationService.cs" />
+    <Compile Include="Interfaces\Services\IChecklistService.cs" />
+    <Compile Include="Interfaces\Services\IEmployeeServiceOvertime.cs" />
+    <Compile Include="Interfaces\Services\IEmployeeLeaveService.cs" />
+    <Compile Include="Interfaces\Services\ILoggerService.cs" />
+    <Compile Include="Interfaces\Services\ILPHApprovalsService.cs" />
+    <Compile Include="Interfaces\Services\ILPHComponentsService.cs" />
+    <Compile Include="Interfaces\Services\ILPHExtrasService.cs" />
+    <Compile Include="Interfaces\Services\ILPHLocationsService.cs" />
+    <Compile Include="Interfaces\Services\ILPHService.cs" />
+    <Compile Include="Interfaces\Services\ILPHSubmissionsService.cs" />
+    <Compile Include="Interfaces\Services\ILPHValueHistoriesService.cs" />
+    <Compile Include="Interfaces\Services\ILPHValuesService.cs" />
+    <Compile Include="Interfaces\Services\IMppChangesService.cs" />
+    <Compile Include="Interfaces\Services\IManPowerService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHApprovalsService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHComponentsService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHExtrasService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHLocationsService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHSubmissionsService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHValueHistoriesService.cs" />
+    <Compile Include="Interfaces\Services\IPPLPHValuesService .cs" />
+    <Compile Include="Interfaces\Services\IReportRemarksService.cs" />
+    <Compile Include="Interfaces\Services\ITrainingService.cs" />
+    <Compile Include="Interfaces\Services\IUserRoleService.cs" />
+    <Compile Include="Interfaces\Services\IUserMachineService.cs" />
+    <Compile Include="Interfaces\Services\ILocationMachineTypeService.cs" />
+    <Compile Include="Interfaces\Services\IUserMachineTypeService.cs" />
+    <Compile Include="Interfaces\Services\IReferenceDetailService.cs" />
+    <Compile Include="Interfaces\Services\IReferenceService.cs" />
+    <Compile Include="Interfaces\Services\IMachineService.cs" />
+    <Compile Include="Interfaces\Services\ILocationService.cs" />
+    <Compile Include="Interfaces\Services\ISkillService.cs" />
+    <Compile Include="Interfaces\Services\IMppService.cs" />
+    <Compile Include="Interfaces\Services\ICalendarHolidayService.cs" />
+    <Compile Include="Interfaces\Services\ICalendarService.cs" />
+    <Compile Include="Interfaces\Services\IJobTitleService.cs" />
+    <Compile Include="Interfaces\Services\IEmployeeService.cs" />
+    <Compile Include="Interfaces\Services\IWeeksService.cs" />
+    <Compile Include="Interfaces\Services\IWppChangesService.cs" />
+    <Compile Include="Interfaces\Services\IWPPPrimaryService.cs" />
+    <Compile Include="Interfaces\Services\IWPPPrimService.cs" />
+    <Compile Include="Interfaces\Services\IWppStpService.cs" />
+    <Compile Include="Interfaces\Services\IWppService.cs" />
+    <Compile Include="Interfaces\Services\IMenuServiceService.cs" />
+    <Compile Include="Interfaces\Services\IAccessRightService.cs" />
+    <Compile Include="Interfaces\Services\IServiceBase.cs" />
+    <Compile Include="Interfaces\Services\IUserLogService.cs" />
+    <Compile Include="Interfaces\Services\IRoleService.cs" />
+    <Compile Include="Interfaces\Services\IUserService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\BlendService.cs" />
+    <Compile Include="Services\BrandConversionService.cs" />
+    <Compile Include="Services\PPReportYieldKreteksService.cs" />
+    <Compile Include="Services\PPReportYieldIMLsService.cs" />
+    <Compile Include="Services\PPReportYieldTargetsService.cs" />
+    <Compile Include="Services\PPReportYieldOvsService.cs" />
+    <Compile Include="Services\PPReportYieldMCDietsService.cs" />
+    <Compile Include="Services\PPReportYieldWhitesService.cs" />
+    <Compile Include="Services\PPReportYieldsService.cs" />
+    <Compile Include="Services\EmployeeAllService.cs" />
+    <Compile Include="Services\InputDailyService.cs" />
+    <Compile Include="Services\InputOVService.cs" />
+    <Compile Include="Services\InputTargetService.cs" />
+    <Compile Include="Services\MachineAllocationService.cs" />
+    <Compile Include="Services\MaterialCodeService.cs" />
+    <Compile Include="Services\BrandService.cs" />
+    <Compile Include="Services\ChecklistApproverService.cs" />
+    <Compile Include="Services\ChecklistComponentService.cs" />
+    <Compile Include="Services\ChecklistSubmitService.cs" />
+    <Compile Include="Services\ChecklistApprovalService.cs" />
+    <Compile Include="Services\ChecklistValueHistoryService.cs" />
+    <Compile Include="Services\ChecklistValueService.cs" />
+    <Compile Include="Services\ChecklistLocationService.cs" />
+    <Compile Include="Services\ChecklistService.cs" />
+    <Compile Include="Services\EmployeeOvertimeService.cs" />
+    <Compile Include="Services\EmployeeLeaveService.cs" />
+    <Compile Include="Services\LPHApprovalsService.cs" />
+    <Compile Include="Services\LPHComponentsService.cs" />
+    <Compile Include="Services\LPHExtrasService.cs" />
+    <Compile Include="Services\LPHLocationsService.cs" />
+    <Compile Include="Services\LPHService.cs" />
+    <Compile Include="Services\LPHSubmissionsService.cs" />
+    <Compile Include="Services\LPHValueHistoriesService.cs" />
+    <Compile Include="Services\LPHValuesService.cs" />
+    <Compile Include="Services\ReportKPITargetService.cs" />
+    <Compile Include="Services\ReportKPIDustService.cs" />
+    <Compile Include="Services\ReportKPIRipperInfoService.cs" />
+    <Compile Include="Services\ReportKPIStickPerPackService.cs" />
+    <Compile Include="Services\ReportKPIWorkHourService.cs" />
+    <Compile Include="Services\ReportKPITobaccoWeightService.cs" />
+    <Compile Include="Services\ReportKPICRRConversionService.cs" />
+    <Compile Include="Services\ReportKPIDIMService.cs" />
+    <Compile Include="Services\ReportKPICRRService.cs" />
+    <Compile Include="Services\ReportKPIYieldService.cs" />
+    <Compile Include="Services\ReportKPIProdVolService.cs" />
+    <Compile Include="Services\ShuttleRequestService.cs" />
+    <Compile Include="Services\MppChangesService.cs" />
+    <Compile Include="Services\ManPowerService.cs" />
+    <Compile Include="Services\PPLPHApprovalsService.cs" />
+    <Compile Include="Services\PPLPHComponentsService.cs" />
+    <Compile Include="Services\PPLPHExtrasService.cs" />
+    <Compile Include="Services\PPLPHLocationsService.cs" />
+    <Compile Include="Services\PPLPHService.cs" />
+    <Compile Include="Services\PPLPHSubmissionsService.cs" />
+    <Compile Include="Services\PPLPHValueHistoriesService.cs" />
+    <Compile Include="Services\PPLPHValuesService.cs" />
+    <Compile Include="Services\ReportRemarksService.cs" />
+    <Compile Include="Services\MealRequestService.cs" />
+    <Compile Include="Services\TrainingMachineTypeService.cs" />
+    <Compile Include="Services\TrainingTitleService.cs" />
+    <Compile Include="Services\TrainingService.cs" />
+    <Compile Include="Services\UserRoleService.cs" />
+    <Compile Include="Services\UserMachineService.cs" />
+    <Compile Include="Services\LocationMachineTypeService.cs" />
+    <Compile Include="Services\UserMachineTypeService.cs" />
+    <Compile Include="Services\ReferenceDetailService.cs" />
+    <Compile Include="Services\LocationService.cs" />
+    <Compile Include="Services\MppService.cs" />
+    <Compile Include="Services\CalendaryHolidayService.cs" />
+    <Compile Include="Services\CalendarService.cs" />
+    <Compile Include="Services\JobTitleService.cs" />
+    <Compile Include="Services\EmployeeService.cs" />
+    <Compile Include="Services\WeeksService.cs" />
+    <Compile Include="Services\WppChangesService.cs" />
+    <Compile Include="Services\WppPrimaryService.cs" />
+    <Compile Include="Services\WppPrimService.cs" />
+    <Compile Include="Services\WppStpService.cs" />
+    <Compile Include="Services\WppService.cs" />
+    <Compile Include="Services\SkillService.cs" />
+    <Compile Include="Services\ReferenceService.cs" />
+    <Compile Include="Services\MachineService.cs" />
+    <Compile Include="Services\MenuService.cs" />
+    <Compile Include="Services\AccessRightService.cs" />
+    <Compile Include="Services\ServiceBase.cs" />
+    <Compile Include="Services\UserLogService.cs" />
+    <Compile Include="Services\RoleService.cs" />
+    <Compile Include="Services\UserService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SQL\FAST_DEV.sql" />
+    <Content Include="SQL\FAST_DEV_chanif.sql" />
+    <Content Include="SQL\FAST_DEV_checklist_chanif.sql" />
+    <Content Include="SQL\FAST_DEV_LocationMachineTypes.sql" />
+    <Content Include="SQL\FAST_DEV_LPHApprovals.sql" />
+    <Content Include="SQL\FAST_DEV_MANPOWER_REFERENCE.sql" />
+    <Content Include="SQL\FAST_DEV_USERS.sql" />
+    <Content Include="SQL\FAST_INPUT_DAILY.sql" />
+    <Content Include="SQL\FAST_JOB_TITLE.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

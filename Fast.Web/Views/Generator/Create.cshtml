@@ -1,0 +1,87 @@
+﻿@model Fast.Web.Models.ChecklistModel
+@using Fast.Web.Resources;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Styles{
+
+}
+
+<div class="content content-fixed">
+	<div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+			<div>
+				<nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index","Generator")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Add</li>
+                    </ol>
+				</nav>
+				<h4 class="mg-b-0 tx-spacing--1">Add Checklist</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 mg-t-10">
+				<div class="card">
+					<div class="card-body">
+						@using (Html.BeginForm("Create", "Generator", FormMethod.Post))
+						{
+							@Html.AntiForgeryToken()
+
+							<div class="form-group row">
+								<label class="col-sm-2 col-form-label">Menu Title</label>
+								<div class="col-sm-10">
+									@Html.TextBoxFor(x => x.MenuTitle, null, new { @class = "form-control" })
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-2 col-form-label">Header</label>
+								<div class="col-sm-10">
+									@Html.TextBoxFor(x => x.Header, null, new { @class = "form-control" })
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-form-label col-sm-2 pt-0">Type</label>
+								<div class="col-sm-10">
+									<div class="custom-control custom-radio">
+										@Html.RadioButtonFor(x => x.Type, "singlepage", new { @class = "custom-control-input", @id = "singlepage" })
+										<label class="custom-control-label" for="singlepage">Single Page</label>
+									</div>
+									<div class="custom-control custom-radio">
+										@Html.RadioButtonFor(x => x.Type, "multitab", new { @class = "custom-control-input", @id = "multitab" })
+										<label class="custom-control-label" for="multitab">Multi Tab</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-form-label col-sm-2">Locations</div>
+								<div class="col-sm-10">
+									@Html.DropDownListFor(p => p.LocationIDs, (IEnumerable<SelectListItem>)ViewBag.LocationList, new { @class = "form-control select2", @multiple = "multiple" })
+								</div>
+							</div>
+
+							<button type="submit" class="btn btn-primary float-right">Save &amp; Next <i data-feather="arrow-right-circle" class="wd-10 mg-l-5"></i></button>
+						}
+
+					</div><!-- card-body -->
+				</div><!-- card -->
+			</div>
+		</div><!-- row -->
+	</div><!-- container -->
+</div><!-- content -->
+
+@section Scripts{
+	<script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('.select2').select2({
+				placeholder: 'Choose locations',
+				searchInputPlaceholder: 'Search options'
+			});
+		});
+	</script>
+}

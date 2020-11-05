@@ -1,0 +1,574 @@
+﻿@using Fast.Web.Resources;
+@model Fast.Web.Models.Report.ReportModel
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+@section Styles{
+    <style>
+        td,th{
+            border:3px solid grey;
+            padding:4px;
+
+        }
+        th {            
+            background-color:#066fcb;
+            color:white;
+            font-weight:bold;
+            text-align:center;
+        }
+        th, tr {
+            font-size:small;
+            width:135px;
+        }
+      
+
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Shift &amp; Daily</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Shift &amp; Daily</h4>
+            </div>
+            <div class="d-none d-md-block">
+                @*<button id="btnExportPDF" class="btn btn-sm pd-x-15 btn-outline-danger btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-pdf"></i> Export PDF</button>*@
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "InputDaily")'">
+                    <i data-feather="plus" class="mg-r-5"></i> Input Daily
+                </button>
+
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="location.href='@Url.Action("Index", "ReportInputTarget")'">
+                    <i data-feather="plus" class="mg-r-5"></i> Input Target
+                </button>
+
+                <button id="btnExportExcel" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export Excel</button>
+                <button id="btnSendEmail" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-envelope"></i> &nbsp; Send</button>
+            </div>
+        </div>    
+            <div class="row">
+                <div class="col-12 mg-b-20">
+                    <div class="card collect-component" id="Information">
+                        <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                        <div class="card-body d-flex">
+                            <div style="flex:2">
+                                <div class="form-group d-flex">
+                                    <label class="col-2" style="flex:1">Date</label>
+                                    <div style="flex:1">
+                                        <div class="input-group col-4">
+                                         
+                                            @Html.TextBoxFor(x => x.DateFilter, "{0:yyyy-mm-dd}", new { @class = "form-control", @id = "tbDate", autocomplete = "off" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Prod. Center</label>
+                                    <div class="col-7">
+                                        @Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Machine</label>
+                                    <div class="col-6">
+                                        <select class="form-control select2" name="machine">
+                                            <option label="Select Machine"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                          
+                            <div class="flex-1" style="max-width:50px;">
+                                <div class="form-group row">
+                                    <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!--INFORMATION-->
+
+
+                <div class="col-12 mg-b-20">
+                    <div class="card border-0">
+                        <ul id="line-tabs" class="nav nav-tabs">
+                        </ul>
+
+                        <div id="lines" class="carousel" data-pause="true">
+                            <div class="carousel-inner" id="carousel-inner">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="col-12 mg-b-20">
+                    <div class="card">
+                        <div class="card-header bg-primary tx-white tx-center font-weight-bold">Remarks</div>
+                        <div class="card-body">
+                            <div class="tableWrapper" style="max-height:400px;">
+                                <table class="table table-bordered table-hover table-striped" id="remarks"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div><!-- row -->
+        </div><!-- container -->
+</div><!-- content -->
+<!-- content -->
+
+
+
+@section Scripts{
+    <!-- Resources -->
+    <script src="~/Content/dashforge/lib/amcharts/core.js"></script>
+    <script src="~/Content/dashforge/lib/amcharts/charts.js"></script>
+    <script src="~/Content/dashforge/lib/amcharts/themes/animated.js"></script>
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script type="text/javascript">
+        function fixHeader() {
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+        }
+        function numberWithCommas(x) {
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+        function configTabs() {
+            $(this).siblings().children().removeClass("active");
+            $(this).children().toggleClass("active");
+            const index = $(this).index() + 1;
+            $("#lines .carousel-item.active").removeClass("active");
+            const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+            $(carouselItem).toggleClass("active");
+            fixHeader();
+        }
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+        }
+        let dateFilter = "";
+        let prodCenter = "";
+        let machine = "";
+        $(document).ready(function () {
+            $('#tbDate').datepicker({
+                format: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true
+            });
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+            $('.select2[data-mock-width]').on("select2:open", function () {
+                $(".select2-dropdown.select2-dropdown--below").css("min-width", $(this).data("mock-width"));
+            });
+            $("[name=ProdCenterID]").on("change", function () {
+                let opt = '<option label="Select Machine"></option><option value="All">All</option>';
+                const val = $(this).val();
+
+                $.ajax({
+                    type: "post",
+                    url: fastApp.BaseUrl + "/ShiftDaily/GetLinkUpList",
+                    data: {
+                        prodcenterID: $("[name=ProdCenterID]").val(),
+                    },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (result) {
+                        console.log(result);
+                        if (result.Status == "True") {
+                            for (let i = 0; i < result.Data.length; i++)
+                            opt += `<option value="${result.Data[i]}">${result.Data[i]}</option>`;
+                            $("[name=machine]").html(opt);
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                    complete: function () {
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+            })
+            $('#btnSearch').on('click', function () {
+                dateFilter = $("[id=tbDate]").val();
+                prodCenter = $('[name=ProdCenterID]').val();
+                machine = $("[name=machine]").val();
+                
+                if (dateFilter == "") {
+                    showError("Date can't be empty");
+                    return;
+                }
+                if (prodCenter == "") {
+                    showError("Production Center can't be empty");
+                    return;
+                }
+                if (machine == "") {
+                    showError("Machine can't be empty");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+
+                const dateToday = moment(dateFilter, "DD-MMM-YY");
+                const d1Date = dateToday.subtract(1, 'days').format("DD-MMM-YY");
+                const d2Date = dateToday.subtract(1, 'days').format("DD-MMM-YY");
+
+                $.ajax({
+                    type: "post",
+                    url: fastApp.BaseUrl + "/ShiftDaily/GetReportWithParam",
+                    data: { dtFilter: dateFilter, prodCenter: prodCenter , machine: machine},
+                    datatype: "json",
+                    success: function (result) {
+                        console.log(result);
+                        
+                        if (result.Status == "True") {
+                            const shifts = ["Shift 1", "Shift 2", "Shift 3"];
+                            const higherBetter = ["MTBF", "Uptime", "STRS", "Volume"];
+                            const lowerBetter = ["CRR", "VQI", "CPQI"];
+                            let tabs = "";
+                            let tableReport = "";
+                            for (let i = 0; i < result.linkupList.length; i++) {
+                                const linkup = result.linkupList[i];
+                                tabs += `<li class="nav-item"><a class="nav-link">${linkup.linkup}</a></li>`;
+                                let table = `<thead class="thead-info"><tr><th>KPI</th><th>Trend</th><th>${d2Date}</th><th>${d1Date}</th><th>${dateFilter}</th><th>WTD</th><th>MTD</th><th>MTG</th><th>Target</th></tr></thead><tbody>`;
+                                for (let j = 0; j < result.linkupList[i].data.length; j++) {
+                                    const data = result.linkupList[i].data[j];
+                                    const trend = data.trend > 0 ? "fa-caret-up" : data.trend < 0 ? "fa-caret-down" : "fa-caret-right";
+                                    let trendColor = "black";
+                                    if (higherBetter.findIndex(x => x == data.type) >= 0) trendColor = data.Target == data.sum.H ? "black" : data.Target > data.sum.H ? "red" : "green";
+                                    else if (lowerBetter.findIndex(x => x == data.type) >= 0) trendColor = data.Target == data.sum.H ? "black" : data.Target < data.sum.H ? "red" : "green";
+
+                                    let sh2val = parseFloat(data.sum.H2).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.sum.H2).toFixed(2));
+                                    let sh1val = parseFloat(data.sum.H1).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.sum.H1).toFixed(2));
+                                    let shval = parseFloat(data.sum.H).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.sum.H).toFixed(2));
+
+                                    let mtdval = parseFloat(data.MTD).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.MTD).toFixed(2));
+                                    let mtgval = parseFloat(data.MTG).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.MTG).toFixed(2));
+                                    let wtdval = parseFloat(data.WTD).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.WTD).toFixed(2));
+                                    let targetval = parseFloat(data.Target).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.Target).toFixed(2));
+
+                                    if (data.type == "Volume") {
+                                        sh2val = parseFloat(data.sum.H2).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.sum.H2).toFixed(0));
+                                        sh1val = parseFloat(data.sum.H1).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.sum.H1).toFixed(0));
+                                        shval = parseFloat(data.sum.H).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.sum.H).toFixed(0));
+                                        
+                                        mtdval = parseFloat(data.MTD).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.MTD).toFixed(0));
+                                        mtgval = parseFloat(data.MTG).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.MTG).toFixed(0));
+                                        wtdval = parseFloat(data.WTD).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.WTD).toFixed(0));
+                                        targetval = parseFloat(data.Target).toFixed(2) == 0 ? "0" : numberWithCommas(parseFloat(data.Target).toFixed(0));
+                                    }
+                                    let satuan = " (%)"; 
+                                    switch (data.type) {
+                                        case "Volume":
+                                            satuan = " (Mio Stick)";
+                                            break;
+                                        case "MTBF":
+                                            satuan = " (Min)";
+                                            break;
+                                        case "VQI":
+                                        case "CPQI":
+                                            satuan = " (Points)";
+                                            break;
+                                        case "Working Time":
+                                            satuan = " (Hours)";
+                                            break;
+                                    }
+                                    table += `<tr><td>${data.type}${satuan}</td><td><center><i style="color: ${trendColor};font-size: 20px;padding: 0;" class="fas ${trend}"></i></center></td><td>${sh2val}</td><td>${sh1val}</td><td>${shval}</td><td>${wtdval}</td><td>${mtdval}</td><td>${mtgval}</td><td>${targetval}</td></tr>`;
+                                    for (let k = 0; k < shifts.length; k++) {
+                                        const shift = shifts[k];
+                                        const s = shift.replace(" ", "");
+                                        let h2val = parseFloat(data[s].H2) == 0 ? "0" : numberWithCommas(parseFloat(data[s].H2).toFixed(2));
+                                        let h1val = parseFloat(data[s].H1) == 0 ? "0" : numberWithCommas(parseFloat(data[s].H1).toFixed(2));
+                                        let hval = parseFloat(data[s].H) == 0 ? "0" : numberWithCommas(parseFloat(data[s].H).toFixed(2));
+                                        if (data.type == "Volume") {
+                                            h2val = parseFloat(data[s].H2) == 0 ? "0" : numberWithCommas(parseFloat(data[s].H2).toFixed(0));
+                                            h1val = parseFloat(data[s].H1) == 0 ? "0" : numberWithCommas(parseFloat(data[s].H1).toFixed(0));
+                                            hval = parseFloat(data[s].H) == 0 ? "0" : numberWithCommas(parseFloat(data[s].H).toFixed(0));
+                                        }
+                                        table += `<tr><td></td><td>${shift}</td><td>${h2val}</td><td>${h1val}</td><td>${hval}</td><td></td><td></td><td></td><td></td></tr>`;
+                                    }
+                                }
+                                table += `</tbody>`;
+                                tableReport += `<div class="carousel-item">
+                                <div class="card">
+                                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">${linkup.linkup}</div>
+                                    <div class="card-body">
+                                        <div class="tableWrapper" style="max-height:400px;">
+                                            <table class="table table-bordered table-hover table-striped">
+                                                ${table}
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            }
+                            $("#line-tabs").html(tabs);
+                            $("#carousel-inner").html(tableReport);
+                            let tableRemarks = `<thead class="thead-info"><tr><th style="width: 10%;">Shift</th><th style="width: 15%;">Type</th><th>Focus</th><th>Action Plan</th></tr></thead><tbody>`;
+                            for (let i = 0; i < result.remarkList.length; i++) {
+                                const remark = result.remarkList[i];
+                                if (remark.remark != null && remark.remark != "" && remark.remark != "0") tableRemarks += `<tr><td>${remark.shift}</td><td>${remark.type}</td><td>${remark.remark}</td><td>${remark.actionplan}</td></tr>`;
+                            }
+                            $("#remarks").html(tableRemarks + "</tbody>");
+                            $("#line-tabs li").off('click', configTabs).on('click', configTabs);
+                            $("#line-tabs li:first-child").click();
+                            fixHeader();
+                        }
+                        $('#loading_overlay').addClass('d-none');
+                    },
+                });
+
+            });
+        });
+        
+        $('#btnSendEmail').on('click', function () {
+           if (dateFilter == "" || prodCenter == "" || machine == "") {
+                showError("Do search first!");
+                return;
+            }
+            var key = "S2F0YWthbmxhaCwg4oCcQWt1IGJlcmxpbmR1bmcga2VwYWRhIFR1aGFubnlhIG1hbnVzaWEsClJhamEgbWFudXNpYSwKc2VtYmFoYW4gbWFudXNpYSwKZGFyaSBrZWphaGF0YW4gKGJpc2lrYW4pIHNldGFuIHlhbmcgYmVyc2VtYnVueWksCnlhbmcgbWVtYmlzaWtrYW4gKGtlamFoYXRhbikga2UgZGFsYW0gZGFkYSBtYW51c2lhLApkYXJpIChnb2xvbmdhbikgamluIGRhbiBtYW51c2lhLuKAnQ==";
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "Get",
+                url: fastApp.BaseUrl + "/ShiftDailyUrlExcel/SentDailyEmailWithParam",
+                data: { key: key, date: dateFilter, prodCenter: prodCenter, lu: machine },
+                datatype: "json",
+                traditional: true,
+                success: function (result) {
+                    console.log(result);
+                },
+                complete: function() {
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        });
+
+        $("#btnExportExcel").on("click", function () {
+            if (dateFilter == "" || prodCenter == "" || machine == "") {
+                showError("Do search first!");
+                return;
+            }
+            $('#loading_overlay').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: fastApp.BaseUrl + "/ShiftDaily/GenerateShiftlyDailyWithParam",
+                data: { dtFilter: dateFilter, prodCenter: prodCenter, machine: machine },
+                datatype: "json",
+                success: function (result) {
+                    $('#loading_overlay').addClass('d-none');
+                    if (result.Status) {
+                        window.location = fastApp.BaseUrl + "/ShiftDaily/Download";
+                    }
+                },
+                complete: function () {
+                    $('#loading_overlay').addClass('d-none');
+                },
+            });
+        });
+
+    </script>
+}
+
+
+
+
+

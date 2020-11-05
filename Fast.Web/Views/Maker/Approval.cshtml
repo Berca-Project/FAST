@@ -1,0 +1,3607 @@
+﻿@model Fast.Web.Models.LPH.LPHEditModel
+@using Newtonsoft.Json;
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Approval Maker";
+    var selected = "";
+    var BeratSpec = 0;
+}
+
+@* chanif: tambah css untuk select2 *@
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+
+            .tableWrapper table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+                border: none;
+            }
+
+            .tableWrapper table tfoot td {
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+        .fa {
+            padding: 5px;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+        /* chanif: tolong tambahkan css dari sini sampai bawah untuk memperbaiki tampilan select2 */
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 25px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            display: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            font-size: 13px;
+            padding: 0 0 0 5px;
+        }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .select2-results__option[aria-selected=true] {
+            display: none;
+        }
+        
+        .fa {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .fas {
+            cursor: pointer;
+        }
+    </style>
+}
+
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">LPH Form</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Maker</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">LPH Maker</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <button id="goPrev" class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="chevron-left" class="wd-10 mg-r-5"></i> Prev</button>
+                @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#scan-modal"><i data-feather="file-text" class="wd-10 mg-r-5"></i> Scan</button>*@
+                <button id="btnHistory" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="clock" class="wd-10 mg-r-5"></i> History</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#photo-modal"><i data-feather="camera" class="wd-10 mg-r-5"></i> Photo</button>
+                <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" onclick="javascript:window.print()"><i data-feather="printer" class="wd-10 mg-r-5"></i> Print</button>
+            </div>
+        </div>
+        <div class="row">
+            <!-- chanif: mending langsung kopi saja keseluruhan isi div di bawah ini, karena sepertinya sama semua isinya untuk semua LPH  -->
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="generalInfo">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-5">
+                                    <input type="text" class="form-control information-datepicker mandatory" name="DateInfo" id="txtDateInfo" value="">
+                                </div>
+                                <label class="col-2 col-form-label tx-right pd-r-0-f">Week</label>
+                                <div class="col-2">
+                                    <input type="text" class="form-control" name="WeekNumber" id="txtWeekNumber" disabled value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Machine *</label>
+                                <div class="col-4">
+                                    <select class="form-control select2 mandatory" name="MachInfo" id="machInfo">
+                                        <option value="">Select Machine</option>
+                                        @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                        {
+                                            <option value="@(machine.Code)">@(machine.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Brand *</label>
+                                <div class="col-9">
+                                    <select class="form-control select2 mandatory" name="BrandInfo" id="brandInfo">
+                                        <option value="">Select Brand</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel brand in ViewBag.Brand)
+                                        {
+                                            <option value="@(brand.Code)">[@(brand.Code)] @brand.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Prodtech*</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="ProdTech" id="prodTech" multiple disabled>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Prodtechs)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Mechanic</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="Mekanik" id="mekanik" disabled>
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Mechanics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Electrician</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="Electrician" id="elektrik" disabled>
+                                        <option value="">Select Electrician</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Electrics)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Supervisor *</label>
+                                <div class="col-8">
+                                    <select class="form-control select2 mandatory" name="TeamLeader" id="teamLeader" disabled>
+                                        <option value="">Select Mechanic</option>
+                                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                                        {
+                                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label" style="padding-right: 3px;">PO Number</label>
+                                <div class="col-8">
+                                    <select class="form-control select2" name="PONumber">
+                                        <option value="">Select PO Number</option>
+                                        @foreach (Fast.Web.Models.WppModel wpp in ViewBag.WPP)
+                                        {
+                                            <option value="@(wpp.PONumber)">@(wpp.PONumber)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Shift / Group *</label>
+                                <div class="col-3">
+                                    <input type="text" class="form-control mandatory" name="Shift" id="shift" value="3">
+                                </div>
+                                <label class="col-1 col-form-label tx-center">/</label>
+                                <div class="col-3">
+                                    @*<input type="text" class="form-control mandatory" name="Group" id="group" value="C">*@
+                                    <select class="form-control select2 mandatory" name="Group" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach (Fast.Web.Models.ReferenceDetailModel detail in ViewBag.referenceGroup)
+                                        {
+                                            <option value="@(detail.Code)">@(detail.Code)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Start / Stop *</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStart" name="Start" class="form-control input-time mandatory" value="22:00">
+                                    </div>
+                                </div>
+                                <label class="col-1 col-form-label">/</label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input id="inputTimeStop" name="Stop" class="form-control input-time mandatory" value="06:00">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">CRR Data</label>
+                                <div class="col-3">
+                                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" data-toggle="modal" data-target="#crr-modal" id="crrbutton">Show</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">
+                        Handover Logbook
+                    </div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="min-width:120px;">Stops and Location</th>
+                                        <th style="min-width:100px;"># of Stops</th>
+                                        <th style="min-width:120px;">Initial Root Cause (Describe the issue) / Action Taken &amp; Impact</th>
+                                        <th style="min-width:120px;">Action Taken in your shift</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logbook">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="StopAndLocation"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="NOfStop"></td>
+                                        <td><input type="text" class="form-control" name="InitialCause"></td>
+                                        <td><input type="text" class="form-control" name="ActionTaken"></td>
+                                        <td class="tx-center"><i data-target="logbook" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="tableWrapper" style="max-height: 210px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr class="tx-center">
+                                        <th style="width:50%;">Action proposed for next shift</th>
+                                        <th style="min-width:90px;">Owner</th>
+                                        <th style="min-width:70px;">Start Time</th>
+                                        <th style="min-width:70px;">End Time</th>
+                                        <th style="min-width:60px;">Duration (Min)</th>
+                                        <th style="min-width:100px;">Status</th>
+                                        <th width="80px">Action</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="action">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control" name="NextAction"></td>
+                                        <td><input type="text" class="form-control" name="NextOwner"></td>
+                                        <td><input type="text" class="form-control date" name="NextStart" id="start" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control date" name="NextEnd" id="end" onblur="javascript:countDuration('start','end','duration')"></td>
+                                        <td><input type="text" class="form-control disabled" disabled value="0" name="NextDurasi" id="duration"></td>
+                                        <td>
+                                            <select class="form-control select2" name="Status">
+                                                <option label="Choose one"></option>
+                                                <option value="ONPROGRESS">ONPROGRESS</option>
+                                                <option value="DONE">DONE</option>
+                                            </select>
+                                        </td>
+                                        <td class="tx-center"><i data-target="action" class="fa fa-plus-circle add-to-table"></i></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- PROBLEM MESIN -->
+
+            <div class="col-5 mg-b-20">
+                <div class="card collect-component" id="MachinePerformance">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Machine Performance</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Total Cigarette Weight *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory" name="weight-value">
+                                </div>
+                                <label class="col-3 col-form-label">g</label>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Good Product *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory" name="good-product-value">
+                                </div>
+                                <label class="col-3 col-form-label">stick</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Lock Rate/Speed *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory" name="speed-value">
+                                </div>
+                                <label class="col-3 col-form-label">stick /minute</label>
+                            </div>
+                            <div class="form-group row">
+                                <label>&nbsp;</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-7 mg-b-20">
+                <div class="card collect-component" id="ProductionSampling">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">@*Weight Control*@Production Sampling</div>
+                    <div class="card-body row" style="margin:0;">
+                        <div class="col-2" style="padding-right:15px">
+                            <div class="form-group pd-b-5">
+                                <label class="col-form-label tx-center font-weight-bold p-0"></label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label" style="padding-bottom: 0">MLP / WIN1 *</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label" style="padding-bottom: 0">Hasil Timbang</label>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group pd-b-5">
+                                <label class="col-12 col-form-label tx-center font-weight-bold p-0">Rod</label>
+                            </div>
+                            <div class="form-group row">
+                                <select class="form-control col-10 mandatory" name="rodMLPBeginAcuan">
+                                    <option value="10">10</option>
+                                    <option value="50">50</option>
+                                    <option value="50">100</option>
+                                </select>
+                            </div>
+                            <div class="form-group row">
+                                <select class="form-control col-10 mandatory" name="rodTimbangBeginAcuan">
+                                    <option value="10">10</option>
+                                    <option value="50">50</option>
+                                    <option value="50">100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group pd-b-5">
+                                <label class="col-12 col-form-label tx-center font-weight-bold p-0">Beginning of the Shift</label>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory" name="rodMLPBegin">
+                                </div>
+                                <select class="col-5 form-control mandatory" name="rodMLPBeginSatuan">
+                                    <option value="10">mg</option>
+                                    <option value="50">g</option>
+                                </select>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="rodTimbangBegin">
+                                </div>
+                                <select class="col-4 form-control mandatory" name="rodTimbangBeginSatuan">
+                                    <option value="mg">mg</option>
+                                    <option value="g">g</option>
+                                </select>
+                                <i class="fa fa-weight col-2 mg-l-5 pd-3-f get-timbangan" style="font-size: 20px" title="Get data from weight scale"></i>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group row pd-b-5">
+                                <label class="col-12 col-form-label tx-center font-weight-bold p-0">Middle of the Shift</label>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="rodMLPMiddle">
+                                </div>
+                                <select class="col-5 form-control" name="rodMLPMiddleSatuan">
+                                    <option value="mg">mg</option>
+                                    <option value="g">g</option>
+                                </select>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control" name="rodTimbangMiddle">
+                                </div>
+                                <select class="col-4 form-control mandatory" name="rodTimbangMiddleSatuan">
+                                    <option value="mg">mg</option>
+                                    <option value="g">g</option>
+                                </select>
+                                <i class="fa fa-weight col-2 mg-l-5 pd-3-f get-timbangan" style="font-size: 20px" title="Get data from weight scale"></i>
+                            </div>
+                            <div class="form-group row">
+                                <label>&nbsp;</label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Transfer Cigarrete (Tray)</div>
+                    <div class="card-body">
+                        @*style="border:1px solid #ff0000"*@
+                        <div class="tableWrapper" style="max-height:160px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width:20%">Machine</th>
+                                        <th style="width:15%">Tf. In</th>
+                                        <th style="width:15%">Tf. Out</th>
+                                        <th>Cutfiller Conv.</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="transfercigarette">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td>
+                                            <select class="form-control select2" name="machine">
+                                                <option value="">Select Machine</option>
+                                                <option value="-">-</option>
+                                                @foreach (Fast.Web.Models.MachineModel machine in ViewBag.Machines)
+                                                {
+                                                    <option value="@(machine.Code)">@(machine.Code)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" name="tfIn" class="form-control"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" name="tfOut" class="form-control"></td>
+                                        <td><input type="text" class="form-control disabled" disabled name="cutfiller" id="cutFillerConv" value="0"></td>
+                                        <td class="tx-center">
+                                            <i data-target="transfercigarette" class="fa fa-plus-circle add-to-table"></i>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 mg-b-20">
+                <div class="card collect-component" id="WIN1">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">MLP/WIN1</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Heavy</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control  maxnumber" name="winheavy" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Light</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control  maxnumber" name="winlight" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Leakage</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control  maxnumber" name="winleakage" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">M Plug</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control  maxnumber" name="winmplug" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Reject</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control  maxnumber" name="winreject" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Otis *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory maxnumber" name="winotis" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Loose end *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory maxnumber" name="winlooseend" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Missing Filter *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory maxnumber" name="missingfilter" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Total Ventilation *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory maxnumber" name="totalventilation" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Air Tightness *</label>
+                                <div class="col-5">
+                                    <input type="number" onkeypress="validateNumber(event)" placeholder="0" class="form-control mandatory maxnumber" name="airtightness" max="100">
+                                </div>
+                                <label class="col-2 col-form-label">%</label>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div> <!--win1-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">TRS Rate</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:180px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width:8%">Date</th>
+                                        <th style="width:8%">Time</th>
+                                        <th style="width:16%">Actual Speed (sticks/min)</th>
+                                        <th style="width:8%">CTW Spec</th>
+                                        <th style="width:12%">TRS Sample (gr)</th>
+                                        <th style="width:14%">Sampling Time (min)</th>
+                                        <th style="width:12%">Recovery Rate (%)</th>
+                                        <th>Remark</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="trsrate">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control disabled" disabled id="datetoday" name="date"></td>
+                                        <td><input type="text" class="form-control disabled" disabled id="inputTime3" name="time"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" onblur="javascript:countRate()" class="form-control" placeholder="cpm" name="speed" id="trsSpeed"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="g" name="CTW" id="trsCTW"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" onblur="javascript:countRate()" class="form-control" placeholder="g" name="sample" id="trsSample"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" onblur="javascript:countRate()" class="form-control" placeholder="min" name="sampling_time" id="trsTime"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control disabled" placeholder="%" disabled name="recovery" id="trsRate"></td>
+                                        <td><input type="text" class="form-control" name="remark"></td>
+                                        <td class="tx-center">
+                                            <i data-target="trsrate" class="fa fa-plus-circle add-to-table"></i>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Winnower Rate</div>
+                    <div class="card-body">
+                        <div class="tableWrapper" style="max-height:180px">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info">
+                                    <tr>
+                                        <th style="width:8%">Date</th>
+                                        <th style="width:8%">Time</th>
+                                        <th style="width:16%">Actual Speed (sticks/min)</th>
+                                        <th style="width:8%">CTW Spec</th>
+                                        <th style="width:14%">Winnower Sample (gr)</th>
+                                        <th style="width:14%">Sampling Time (min)</th>
+                                        <th style="width:10%">Recovery Rate (%)</th>
+                                        <th>Remark</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <td></td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody id="Winnowerrate">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="input">
+                                        <td><input type="text" class="form-control disabled" disabled id="Winnowerdatetoday" name="date"></td>
+                                        <td><input type="text" class="form-control disabled" disabled id="WinnowerinputTime3" name="time"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" onblur="javascript:countWinnowerRate()" class="form-control" placeholder="cpm" name="WinnowerSpeed" id="WinnowerSpeed"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control" placeholder="g" name="WinnowerCTW" id="WinnowerCTW"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" onblur="javascript:countWinnowerRate()" class="form-control" placeholder="g" name="WinnowerSample" id="WinnowerSample"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" onblur="javascript:countWinnowerRate()" class="form-control" placeholder="min" name="WinnowerTime" id="WinnowerTime"></td>
+                                        <td><input type="number" onkeypress="validateNumber(event)" class="form-control disabled" placeholder="%" disabled name="WinnowerRate" id="WinnowerRate"></td>
+                                        <td><input type="text" class="form-control" name="remark"></td>
+                                        <td class="tx-center">
+                                            <i data-target="Winnowerrate" class="fa fa-plus-circle add-to-table"></i>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mg-b-20">
+                <div class="card" id="webcam-div">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Capture by Webcam *</div>
+                    <div class="card-body d-flex input-img-card">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_1_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_1" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_1_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Tipping Adhesion Front 1</i></label>
+                                        <i onclick="printImage('image_1_show','image_1')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_4_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_4" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_4_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Tipping Adhesion Front 2</i></label>
+                                        <i onclick="printImage('image_4_show','image_4')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_2_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_2" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_2_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Slacing reject</i></label>
+                                        <i onclick="printImage('image_2_show','image_2')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_3_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_3" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_3_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Tipping Adhesion Rear 1</i></label>
+                                        <i onclick="printImage('image_3_show','image_3')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_5_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_5" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_5_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Tipping Adhesion Rear 2</i></label>
+                                        <i onclick="printImage('image_5_show','image_5')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_6_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_6" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_6_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Splicing Cigarette Paper 1</i></label>
+                                        <i onclick="printImage('image_6_show','image_6')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body d-flex input-img-card">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_7_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_7" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_7_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Splicing Cigarette Paper 2</i></label>
+                                        <i onclick="printImage('image_7_show','image_7')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_8_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_8" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_8_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Splicing Cigarette Paper 3</i></label>
+                                        <i onclick="printImage('image_8_show','image_8')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_9_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_9" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_9_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Splicing Tipping Paper 1</i></label>
+                                        <i onclick="printImage('image_9_show','image_9')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_10_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_10" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_10_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Splicing Tipping Paper 2</i></label>
+                                        <i onclick="printImage('image_10_show','image_10')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <div class="col-12" id="image_11_hide">
+                                    <center>
+                                        <img src="~/Content/dashforge/assets/img/upload-img-mini.png" id="image_11" class="input-img rounded mx-auto d-block " onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;">
+                                    </center>
+                                </div>
+                                <div class="col-12" id="image_11_show">
+                                </div>
+                                <div class="col">
+                                    <center>
+                                        <label class="col-12 col-form-label"><i>Splicing Tipping Paper 3</i></label>
+                                        <i onclick="printImage('image_11_show','image_11')" class="btn-sm btn-primary fa fa-eye"></i>
+                                    </center>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-12 mg-b-20">
+                <div class="card">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Approval</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover table-striped" id="dtApproval">
+                            <thead class="thead-info">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                    @*<th>Approver</th>*@
+                                    <th style="width:15%;">Date &amp; Time</th>
+                                    <th style="width:40%;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- APPROVAL SEGEMNT -->
+            <div class="col-12 mg-b-20 ">
+                <div class="d-none d-md-block float-right">
+                    <button id="btnApprove" class="btn btn-sm pd-x-15 btn-primary btn-uppercase"><i data-feather="check" class="wd-10 mg-r-5"></i> Approve</button>
+                    <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5" data-toggle="modal" data-target="#comment-modal"><i data-feather="slash" class="wd-10 mg-r-5"></i> Revise</button>
+                </div>
+            </div>
+
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div class="modal fade" id="comment-modal" role="dialog">
+    <div class="modal-dialog" style="max-width:50%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="detail-header" style="font-size:1rem;font-weight:bold;">Comment</div>
+                <hr>
+                <textarea type="text" id="comment_value" class="form-control" style="height:75px"></textarea>
+                <hr>
+                <div style="min-height:30px">
+                    <button type="button" class="btn btn-xs btn-primary mg-l-5" style="float:right" id="btnReject">Revise</button>
+                    <button type="button" class="btn btn-xs btn-white" style="float:right" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade wizard-modal" id="photo-modal" role="dialog">
+    <div class="modal-dialog modal-lg" style="min-width:90%;height:auto;">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                <div class="close"><i data-dismiss="modal" class="fa fa-times"></i></div>
+
+                <div id="carousel" class="carousel slide" data-pause="true">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <h5>Take For</h5>
+                            <hr />
+                            <center>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="t_front" class="wizard-button btn btn-primary">Tipping Adhesion Front 1</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="t_front2" class="wizard-button btn btn-primary">Tipping Adhesion Front 2</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="slacing" class="wizard-button btn btn-primary">Slacing Reject</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="t_rear" class="wizard-button btn btn-primary">Tipping Adhesion Rear 1</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="t_rear2" class="wizard-button btn btn-primary">Tipping Adhesion Rear 2</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="s_cigarette1" class="wizard-button btn btn-primary">Splicing Cigarette Paper 1</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="s_cigarette2" class="wizard-button btn btn-primary">Splicing Cigarette Paper 2</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="s_cigarette3" class="wizard-button btn btn-primary">Splicing Cigarette Paper 3</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="s_tipping1" class="wizard-button btn btn-primary">Splicing Tipping Paper 1</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="s_tipping2" class="wizard-button btn btn-primary">Splicing Tipping Paper 2</button>
+                                <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="s_tipping3" class="wizard-button btn btn-primary">Splicing Tipping Paper 3</button>
+                            </center>
+                        </div>
+
+                        <div class="carousel-item">
+                            <h5><label id="title"></label></h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <select id="videoSource"><option value="" selected="selected"></option></select><br />
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <center>
+                                        <video autoplay="true" width="500" height="300" id="videoElement"> </video><br />
+                                        @*<button id="rotate" rotate="true" onclick="rotateCamera(true)">Rotate </button>*@ 
+                                        <button id="snapHat">Capture Image </button><br />
+                                    </center>
+                                </div>
+                                <div class="col-md-6">
+                                    <center>
+                                        <canvas id="snapshot" style="max-width: 500px;max-height: 300px !important"></canvas><br />
+                                        <p id="demo"></p>
+
+                                        <button id="capture" hidden>Read PDF417</button>  @*don't remove *@
+                                        <button id="capture3" hidden>OCR ID </button>  @*don't remove*@
+                                        <button id="saveText" hidden>Save Text + Image </button>   @*don't remove *@
+                                    </center>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <button onclick="javascript:wizardButtonSetSelection(this)" type="button" id="btnNextPhoto" class="btn btn-xs btn-primary next" style="float:right;display:none;">Add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="jsonModel" data-json='@Html.Raw(JsonConvert.SerializeObject(Model))' />
+@section Scripts{
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Scripts/webcam_help/main.js"></script>
+    <script src="~/Scripts/webcam_help/MRZ_417_230119.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+
+    <script type="text/javascript">
+        'use strict'
+
+        //$("#txtDateInfo").val(moment().format("ddd, DD-MMM-YY"));
+        //$("#txtWeekNumber").val(moment().week());
+
+        $("#datetoday").val(moment().format("DD-MMM-YY"));
+        $("#inputTime3").val(moment().format("hh:mm"));
+        $("#Winnowerdatetoday").val(moment().format("DD-MMM-YY"));
+        $("#WinnowerinputTime3").val(moment().format("hh:mm"));
+
+          $('#btnHistory').on('click', function (e) {
+		    location.href = '@Url.Action("Index", "History")';
+          });
+        $('.information-datepicker').toArray().forEach(function (field) {
+            $(field).datepicker({
+                todayHighlight: true,
+                format: 'D, dd-M-yy',
+                startDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+                //maxDate: 2,
+                //minDate: -2,
+            });
+        });
+        $('input[type=text]').on('input', function (e) {
+            var val = e.currentTarget.value;
+            var myRegexp = /^[a-zA-Z0-9\s\.\,\:]*/m;
+            var match = myRegexp.exec(val);
+            console.log(match);
+            if (match == null) {
+                if (e.preventDefault) e.preventDefault(); //normal browsers
+                e.returnValue = false; //IE
+            } else {
+                if (match.join('') != val) {
+                    e.currentTarget.value = e.currentTarget.value.substring(0, e.currentTarget.value.length-1);
+                     e.preventDefault(); //normal browsers
+                    e.returnValue = false; //IE
+                }
+            }
+        });
+    </script>
+
+    <script>
+
+        $(function () {
+            'use strict'
+            /******************** PREFILLED ******************/
+            var model = JSON.parse($("#jsonModel").attr("data-json"));
+            console.log(model);
+
+            for (var i = 0; i < model.CompoVal.length; i++) {
+                const tn = model.CompoVal[i].Component.ComponentName.split("-");
+                const type = model.CompoVal[i].Component.ComponentType.trim();
+                const parent = tn[0];
+                tn.shift();
+                const child = tn.join("-");
+                const val = model.CompoVal[i].Value.Value;
+                let node = $("#" + parent + " " + type + "[name=" + child + "]");
+                var temp_val = decodeURIComponent(val ? val : "");
+                $(node).val(temp_val);
+                if (child == 'Group' && type == 'INPUT' && parent == 'generalInfo') {
+                    node = $("#" + parent + " " + "SELECT" + "[name=" + child + "]");
+                    $(node).val(temp_val);
+                }
+                if ($(node).hasClass("select2")) {
+                    if (temp_val.indexOf('___') !== -1) {
+                        temp_val = temp_val.split('___');
+                        $(node).val(temp_val);
+                    }
+                    $(node).trigger('change');
+                }
+                if ($(node).data('datepicker')) {
+					var date = temp_val.substr(5, 9).split("-");
+					var months = moment.monthsShort();
+					date[1]=months.indexOf(date[1])+1;
+					if(date[1]<10){
+						date[1]='0'+date[1];
+					}                        
+					temp_val = '20'+date[2]+'-'+date[1]+'-'+date[0];
+                    $(node).datepicker('setDate', new Date(temp_val)).datepicker('fill');
+                }
+
+
+                if (model.CompoVal[i].Component.ComponentName == "Tipping Adhesion Front 1") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_1_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_1" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_1_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_1" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_1_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_1" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Slacing reject") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_2_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_2" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_2_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_2" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_2_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_2" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Tipping Adhesion Rear 1") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_3_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_3" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_3_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_3" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_3_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_3" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Tipping Adhesion Front 2") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_4_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_4" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_4_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_4" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_4_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_4" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Tipping Adhesion Rear 2") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_5_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_5" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_5_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_5" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_5_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_5" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Splicing Cigarette Paper 1") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_6_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_6" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_6_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_6" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_6_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_6" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Splicing Cigarette Paper 2") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_7_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_7" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_7_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_7" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_7_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_7" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Splicing Cigarette Paper 3") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_8_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_8" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_8_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_8" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_8_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_8" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Splicing Tipping Paper 1") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_9_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_9" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_9_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_9" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_9_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_9" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Splicing Tipping Paper 2") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_10_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_10" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_10_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_10" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_10_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_10" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+                if (model.CompoVal[i].Component.ComponentName == "Splicing Tipping Paper 3") {
+                    if (model.CompoVal[i].Value.Value == "_no_image.png") {
+                        document.getElementById("image_11_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_11" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    } else {
+                        document.getElementById("image_11_show").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_11" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                        document.getElementById("image_11_hide").innerHTML = '<img class="input-img rounded mx-auto d-block" id="image_11" src="' + fastApp.BaseUrl + '/Uploads/lph/maker/' + decodeURIComponent(model.CompoVal[i].Value.Value) + '" onclick="infoId(this)" data-toggle="modal" data-target="#photo-modal" style="max-width:180px;" />';
+                    }
+                }
+            }
+
+            while (model.Extras.length > 0) {
+                const lastIndex = model.Extras.length - 1;
+                const table = model.Extras[lastIndex].HeaderName;
+                const row = model.Extras[lastIndex].RowNumber;
+                let data = {
+                    id: uuidv4()
+                };
+                for (let i = lastIndex; i >= 0; i--) {
+                    if (model.Extras[i].HeaderName == table && model.Extras[i].RowNumber == row) {
+                        data[model.Extras[i].FieldName] = decodeURIComponent(model.Extras[i].Value);
+                        if (model.Extras.length == 1) model.Extras = [];
+                        else model.Extras.splice(i, 1);
+                        console.log(model.Extras.length);
+                    }
+                }
+                configAle[table].data.push(data);
+            }
+
+            for (let prop in configAle) {
+                configAle[prop].data.reverse();
+                $("#" + prop).html(generateTable(configAle[prop].data, prop));
+                countSummary(prop);
+                ieFix();
+            }
+
+
+            /****************** END PREFILLED ****************/
+            // chanif: comment 2 baris di bawah ini, biar ndak replace data prefilling dari server
+            //$('#txtDateInfo').val(moment().format("ddd, DD-MMM-YY"));
+            //$('#txtWeekNumber').val(moment().week());
+
+            basicFunction();
+        });
+        function basicFunction() {
+
+            /*  chanif: $('.select2').start diganti jadi $('.select2').select2 */
+            $('.select2').select2({
+                allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            $('#prodTech').select2('destroy');
+            $('#prodTech').select2({
+                placeholder: 'Choose one or more',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            $(document).find('.input-time').each(function () {
+                var cleave = new Cleave($(this), {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            })
+        }
+        function ieFix() {
+            //if (navigator.userAgent.search("Edge") >= 0) {
+            //    $(".tableWrapper:has(tfoot)").each(function () {
+            //        $(this).find("tfoot tr.input").css({ "position": "fixed", "bottom": "-0.5px" });
+            //        $(this).find("table").css({ "margin-bottom": "32px" });
+            //        $(this).css({ "overflow-y": "scroll" });
+            //        const ths = $(this).find("thead tr:first-child th");
+            //        $(this).find("tfoot td").each(function (i) {
+            //            $(this).css({ "min-width": $($(ths)[i]).width() + 20, "position": "static" });
+            //        });
+            //    });
+            //}
+        }
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+
+        function generateRow(data, targetTable) {
+            let r = "";
+            $(`#${targetTable} ~ tfoot tr.input td`).children("input, select").each(function () {
+                const name = $(this).prop("name");
+                r += `<td data-name="${name}">${data[name]}</td>`;
+            });
+
+
+            let useEdit = true;
+            let useDelete = true;
+            let additionalButtons = "";
+            if (configAle[targetTable].rowConfig !== undefined) {
+                if (configAle[targetTable].rowConfig.withEdit !== undefined)
+                    useEdit = configAle[targetTable].rowConfig.withEdit;
+                if (configAle[targetTable].rowConfig.withDelete !== undefined)
+                    useDelete = configAle[targetTable].rowConfig.withDelete;
+                if (configAle[targetTable].rowConfig.additionalButtons != undefined)
+                    additionalButtons = configAle[targetTable].rowConfig.additionalButtons(data);
+            }
+            r += `<td class="tx-center">`;
+            r += additionalButtons;
+            if (useEdit) r += `<i onclick="javascript:editData(this)" data-id="${data.id}" data-target-table="${targetTable}" class="fa fa-edit edit"></i>`;
+            if (useDelete) r += `<span onClick="javascript:deleteData(this)" data-id="${data.id}" data-target-table="${targetTable}"><i class="fa fa-trash"></i></span>`;
+            r += `</td >`;
+            return r;
+        }
+        function generateTable(arr, targetTable) {
+            if (arr.length == 0) return "";
+            let rows = "";
+            for (var i = arr.length - 1; i >= 0; i--) {
+                rows += '<tr>';
+                rows += generateRow(arr[i], targetTable);
+                rows += '</tr>';
+            }
+            return rows;
+        }
+        function findInArray(id, crr) {
+            for (var i = 0; i < crr.length; i++) {
+                if (crr[i].id == id) {
+                    return i;
+                }
+            }
+        }
+        function deleteFromArray(id, crr) {
+            crr.splice(findInArray(id, crr), 1);
+            return crr;
+        }
+        function editData(button) {
+            const table = $(button).parents("table");
+            if (!$(table).data("edited")) {
+                $(table).data("edited", true);
+
+                const tds = $(button).parents("tr").children('td');
+                const inputTr = $(table).find('tr.input');
+                const inputTds = $(inputTr).children('td');
+                const tdsCount = $(tds).length;
+
+                $(tds).each(function (i, e) {
+                    const el = $(inputTds[i]).children()[0];
+                    if (i != tdsCount - 1) {
+                        const html = $(e).html();
+                        const newInput = $(el).clone();
+                        if (!$(el).hasClass("disabled"))
+                            $(newInput).prop("disabled", false);
+
+                        $(el).prop("disabled", true);
+                        $(newInput).val(html);
+                        $(e).html(newInput);
+                    } else {
+                        $(el).off("click");
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:normalData(this)");
+                        $(edit).removeClass("fa-edit");
+                        $(edit).addClass("fa-save");
+                    }
+                });
+            }
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $('.select2').select2({
+                allowClear: true,
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            $('[name=tfIn]').focusout(function () {
+                CutfillerConversion();
+            });
+            $('[name=tfOut]').focusout(function () {
+                CutfillerConversion();
+            });
+            ieFix();
+        }
+        function releaseDisabledInput(table) {
+            $(table).data("edited", false);
+            const tds = $(table).find('tr.input td');
+            const tdsCount = $(tds).length;
+            $(tds).each(function (i, e) {
+                const el = $(e).children()[0];
+                if (i != tdsCount - 1) {
+                    if (!$(el).hasClass("disabled"))
+                        $(el).prop("disabled", false);
+                } else {
+                    var ev = $._data(el, 'events');
+                    if (!(ev && ev.click))
+                        $(el).on("click", addToTable);
+                }
+            });
+        }
+        function wizardButtonSetSelection(button) {
+            selected = $(button).html();
+            wizardButtonNext(button);
+        }
+        function wizardButtonNext(button) {
+            const modal = $(button).parents(".modal");
+            const carousel = $(modal).find('.carousel');
+            const index = $(carousel).find('.carousel-item.active').index();
+            const stepper = $(modal).find('.stepper');
+
+            var info = { shouldReturn: false, shouldHide: false };
+            $(modal).trigger("next", [index, info]);
+            if (info.shouldReturn) return;
+            if (info.shouldHide) { $(modal).modal('hide'); return; }
+
+            $(stepper).children('.active').removeClass("active");
+
+            $(carousel).carousel('next');
+            $(stepper).children(`.stepper-step:nth-child(${index + 2})`).toggleClass("active");
+            $(modal).find(".prev").show();
+        };
+        function generateWizardButton(arr) {
+            let r = "";
+            for (var i = 0; i < arr.length; i++) {
+                r += `<button type="button" class="wizard-button btn btn-primary" onclick="javascript:wizardButtonSetSelection(this)">${arr[i]}</button>`;
+            }
+            return r;
+        }
+        function startupSetup(target, data) {
+            $(target).html(generateTable(data, target));
+            countSummary(target);
+        }
+
+        function getTimbangan() {
+            var url = 'http://localhost:9000/api/scalereader/weight';
+            $.ajax({
+                url: url,
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: "callback",
+                success: function (data) {
+                    $('input[name="rodTimbangBegin"].unlocked').val(data.Weight);
+                    $('input[name="rodTimbangMiddle"].unlocked').val(data.Weight);
+                },
+                error: function (httpReq, status, exception) {
+                    console.log("timbangan not found");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            /*
+            setInterval(getTimbangan, 1000);
+            $(document).on("click", ".lock-timbangan", function () {
+                $(this).removeClass("lock-timbangan");
+                $(this).removeClass("fa-lock");
+                $(this).addClass("unlock-timbangan");
+                $(this).addClass("fa-lock-open");
+
+                $(this).prev().prev().find('input').first().removeClass("unlocked");
+                $(this).prev().prev().find('input').first().addClass("locked");
+                $(this).prev().prev().find('input').first().attr("disabled", true);
+            });
+            $(document).on("click", ".unlock-timbangan", function () {
+                $(this).removeClass("unlock-timbangan");
+                $(this).removeClass("fa-lock-open");
+                $(this).addClass("lock-timbangan");
+                $(this).addClass("fa-lock");
+
+                $(this).prev().prev().find('input').first().removeClass("locked");
+                $(this).prev().prev().find('input').first().addClass("unlocked");
+                $(this).prev().prev().find('input').first().attr("disabled", false);
+            });
+            */
+
+            $(document).on("click", ".get-timbangan", function () {
+                $this = $(this);
+                var url = 'http://localhost:9000/api/scalereader/weight';
+                $.ajax({
+                    url: url,
+                    dataType: "jsonp",
+                    jsonp: false,
+                    jsonpCallback: "callback",
+                    success: function (data) {
+                        $this.prev().prev().find('input').first().val(data.Weight);
+                    },
+                    error: function (httpReq, status, exception) {
+                        alert("Weight scale not found");
+                    }
+                });
+            });
+
+            $('.date').toArray().forEach(function (field) {
+                new Cleave(field, {
+                    time: true,
+                    timePattern: ['h', 'm']
+                });
+            });
+            $(".add-to-table").on("click", addToTable);
+            $('.tableWrapper thead tr').each(function () {
+                const top = $(this).position().top;
+                $(this).children().css({ "top": top });
+            });
+            $(".wizard-modal .next").click(wizardButtonNext);
+            $(".wizard-modal .prev").click(function () {
+                const modal = $(this).parents(".modal");
+                const carousel = $(modal).find('.carousel');
+                const stepper = $(modal).find('.stepper');
+                const index = $(carousel).find('.carousel-item.active').index();
+
+                $(stepper).children('.active').removeClass("active");
+
+                $(carousel).carousel('prev');
+                $(stepper).children(`.stepper-step:nth-child(${index})`).toggleClass("active");
+                if (index == 1) $(modal).find(".prev").hide();
+            });
+            $('.wizard-modal').on('hidden.bs.modal', function (e) {
+                const carousel = $(this).find('.carousel');
+                const stepper = $(this).find('.stepper');
+                $(this).find('.active').removeClass("active");
+                $(stepper).children(".stepper-step:first-child").toggleClass("active");
+                $(carousel).find(".carousel-item:first-child").toggleClass("active");
+                $(this).trigger("hide");
+                $(this).find(".prev").hide();
+            });
+        });
+        function addToTable(button) {
+            const targetTable = $(this).data("target");
+            const tds = $(this).parents("tr").children("td");
+            var newdata = {
+                id: uuidv4()
+            };
+            let shouldReturn = false;
+            $(tds).each(function (tdIndex, td) {
+                const input = $(td).children();
+                if (input.attr("name") != undefined) {
+                    const name = input.attr("name");
+                    const val = input.val();
+                    if (configAle[targetTable].onValidate != undefined) {
+                        if (configAle[targetTable].onValidate(name, val)) {
+                            shouldReturn = true;
+                            if ((input[0].nodeName.toLowerCase() === 'select')) {
+                                $(input[0]).siblings(".select2-container").css('border', '1px solid red');
+                                $(input[0]).siblings(".select2-container").css('border-radius', '0.25rem');
+                                $(input[0]).on('select2:select', function (e) {
+                                    $(input[0]).siblings(".select2-container").css('border', 'none');
+                                    $(input[0]).siblings(".select2-container").css('border-radius', '0');
+                                });
+                            } else if (input[0].value === "") {
+                                input[0].style.borderColor = "red";
+                                $(input[0]).on('click', function (e) {
+                                    input[0].style.borderColor = "rgb(192, 204, 218)";
+                                });
+                            }
+                            return false;
+                        }
+                    }
+                    if (input[0].type.toLowerCase() == "number") {
+                        var myRegexp = /^00+$/g;
+                        var match = myRegexp.exec(val);
+                        if (match != null) {
+                            alert("Please input a valid number");
+                            shouldReturn = true;
+                            return false;
+                        }
+                    }
+                    newdata[name] = val;
+                }
+            });
+            if (shouldReturn) return;
+            $(tds).each(function (i, td) {
+                const node = $(td).children();
+                $(node).val("");
+                if ($(node).hasClass("select2"))
+                    $(node).trigger('change');
+            });
+
+            if (configAle[targetTable].onAdd != undefined) {
+                if (configAle[targetTable].onAdd(newdata)) {
+                    return;
+                }
+            }
+            configAle[targetTable].data.push(newdata);
+            $("#" + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+            countSummary(targetTable);
+            ieFix();
+        }
+        function countSummary(targetTable) {
+            if (configAle[targetTable].countSummary != undefined) {
+                const rowData = configAle[targetTable].countSummary();
+                const summaryTds = $('#' + targetTable).parents('table').find('.summary-body').children();
+                $('#' + targetTable).parents('table').find('.input td').each(function (i, td) {
+                    const name = $(td).children().attr("name");
+                    if (rowData.hasOwnProperty(name))
+                        $(summaryTds[i]).html(rowData[name]);
+                });
+            }
+        }
+        function deleteData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const table = $(button).parents("table");
+                releaseDisabledInput(table);
+                if (configAle[targetTable].onDelete != undefined) {
+                    if (configAle[targetTable].onDelete(id)) {
+                        return;
+                    }
+                }
+                deleteFromArray(id, configAle[targetTable].data);
+                $('#' + targetTable).html(generateTable(configAle[targetTable].data, targetTable));
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function normalData(button) {
+            if (confirm("Are you sure?")) {
+                const id = $(button).data("id");
+                const targetTable = $(button).data("target-table");
+                const tds = $(button).parents("tr").children('td');
+                const tdsCount = $(tds).length;
+                const table = $(button).parents("table");
+
+                if (configAle[targetTable].onSave != undefined) {
+                    if (configAle[targetTable].onSave(id)) {
+                        return;
+                    }
+                }
+                const index = findInArray(id, configAle[targetTable].data);
+                let shouldReturn = false;
+                var newdata = {
+                    id: uuidv4()
+                };
+                $(tds).each(function (tdIndex, e) {
+                    if (tdIndex != tdsCount - 1) {
+                        const name = $(e).data("name");
+                        const val = $($(e).children()[0]).val();
+                        if (configAle[targetTable].onValidate != undefined) {
+                            if (configAle[targetTable].onValidate(name, val)) {
+                                shouldReturn = true;
+                                return false;
+                            }
+                        }
+                        newdata[name] = val;
+                    } else {
+                        const edit = $(e).find(".edit");
+                        $(edit).attr("onclick", "javascript:editData(this)");
+                        $(edit).removeClass("fa-save");
+                        $(edit).addClass("fa-edit");
+                    }
+                });
+                if (shouldReturn) return;
+
+                configAle[targetTable].data[index] = newdata;
+                const row = generateRow(configAle[targetTable].data[index], targetTable);
+                $(button).parents("tr").html(row);
+
+                releaseDisabledInput(table);
+                countSummary(targetTable);
+                ieFix();
+            }
+        }
+        function countDuration(start, end, duration) {
+            var end = $('#' + end).val();
+            var start = $('#' + start).val();
+
+            if (start != "" && end != "") {
+                end = end.split(':');
+                start = start.split(':');
+                var d = new Date();
+                var startdate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), start[0], start[1]);
+                var enddate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), end[0], end[1]);
+
+                if (startdate > enddate) {
+                    enddate = new Date(enddate);
+                    enddate.setDate(enddate.getDate() + 1);
+                }
+
+                var diffTime = enddate - startdate;
+                var diffMinutes = Math.ceil(diffTime / 60000);
+                if (diffMinutes == NaN) {
+                    $('#' + duration).val(0);
+                } else {
+                    $('#' + duration).val(diffMinutes);
+                }
+            }
+        };</script>
+    <script>
+        /*
+             * name = id dari tbody;
+             * data = array untuk menyimpan data;
+             * countSummary = dipanggil saat menghitung summary, return object dengan property sesuai dengan name pada `tfoot tr.input`;
+             * onAdd(newData) = dipanggil sebelum menambah data, return boolean apakah harus ditambahkan atau tidak;
+             * onDelete(idOfDeletedObject) = dipanggil sebelum menghapus data, return boolean apakah harus dihapus atau tidak;
+             * onSave(idOfUpdatedObject) = dipanggil sebelum mengubah data, return boolean apakah harus diubah atau tidak;
+             * onValidate(nameOfInput, valueOfInput) = validasi nilai saat tambah dan save, return boolean apakah harus diterus atau tidak;
+             *
+             * rowConfig = config untuk generate baris tabel;
+             * - withEdit = menampilkan edit, default true;
+             * - withDelete = menampilkan delete, default true;
+             * - additionalButtons(data) = fungsi untuk yang akan mengembalikan button tambahan untuk tiap baris, return element html dalam string;
+             */
+
+        var logbookData = [];
+        var actionData = [];
+        var transfercigaretteData = [];
+        var trsrateData = [];
+        var WinnowerrateData = [];
+        const configAle = {
+            logbook: {
+                data: logbookData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+            },
+            action: {
+                data: actionData,
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                countSummary: function () {
+                    let rowData = {};
+                    let NextDurasi = 0;
+                    for (var i = 0; i < actionData.length; i++) {
+                        NextDurasi += parseInt(actionData[i].NextDurasi);
+                    }
+                    rowData.NextDurasi = NextDurasi;
+                    return rowData;
+                },
+                onAdd: function (newData) {
+                    console.log(newData);
+                },
+            },
+            transfercigarette: {
+                data: transfercigaretteData,
+                countSummary: function () {
+                    let rowData = {};
+                    let tfIn = 0;
+                    let tfOut = 0;
+                    let cutfiller = 0;
+                    for (var i = 0; i < transfercigaretteData.length; i++) {
+                        tfIn += parseInt(transfercigaretteData[i].tfIn);
+                        tfOut += parseInt(transfercigaretteData[i].tfOut);
+                        cutfiller += parseFloat(transfercigaretteData[i].cutfiller);
+                    }
+                    rowData.tfIn = tfIn;
+                    rowData.tfOut = tfOut;
+                    rowData.cutfiller = cutfiller.toFixed(2);;
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    $('#cutFillerConv').val(0);
+                },
+            },
+            trsrate: {
+                data: trsrateData,
+                countSummary: function () {
+                    let rowData = {};
+                    let speed = 0;
+                    let CTW = 0;
+                    let sample = 0.0;
+                    let sampling_time = 0;
+                    let recovery = 0.0;
+                    let Beratcutfillerr = 0.0;
+                    for (var i = 0; i < trsrateData.length; i++) {
+                        Beratcutfillerr += parseFloat(trsrateData[i].speed) * parseFloat(trsrateData[i].sampling_time) * parseFloat(trsrateData[i].CTW) / 1000;
+                        speed += parseInt(trsrateData[i].speed);
+                        CTW += parseInt(trsrateData[i].CTW);
+                        sample += Number.parseFloat(trsrateData[i].sample);
+                        sampling_time += parseInt(trsrateData[i].sampling_time);
+                        //recovery += Number.parseFloat(trsrateData[i].recovery);
+                    }
+                    rowData.speed = speed;
+                    rowData.CTW = CTW;
+                    rowData.sample = sample;
+                    rowData.sampling_time = sampling_time;
+
+                    //rowData.recovery = recovery / trsrateData.length;
+                    recovery = sample / parseFloat(Beratcutfillerr);
+                    rowData.recovery = recovery.toFixed(2);
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    newData.date = moment().format("DD-MMM-YY");
+                    newData.time = moment().format("hh:mm");
+                    $("#datetoday").val(moment().format("DD-MMM-YY"));
+                    $("#inputTime3").val(moment().format("hh:mm"));
+
+                },
+            },
+            Winnowerrate: {
+                data: WinnowerrateData,
+                countSummary: function () {
+                    let rowData = {};
+                    let speed = 0;
+                    let CTW = 0;
+                    let sample = 0.0;
+                    let sampling_time = 0;
+                    let WinnowerRate = 0.0;
+                    let Beratcutfillerr = 0.0;
+                    for (var i = 0; i < WinnowerrateData.length; i++) {
+                        Beratcutfillerr += parseFloat(WinnowerrateData[i].WinnowerSpeed) * parseFloat(WinnowerrateData[i].WinnowerTime) * parseFloat(WinnowerrateData[i].WinnowerCTW) / 1000;
+                        speed += parseInt(WinnowerrateData[i].WinnowerSpeed);
+                        CTW += parseInt(WinnowerrateData[i].WinnowerCTW);
+                        sample += Number.parseFloat(WinnowerrateData[i].WinnowerSample);
+                        sampling_time += parseInt(WinnowerrateData[i].WinnowerTime);
+                        //recovery += Number.parseFloat(trsrateData[i].recovery);
+                    }
+                    rowData.WinnowerSpeed = speed;
+                    rowData.WinnowerCTW = CTW;
+                    rowData.WinnowerSample = sample;
+                    rowData.WinnowerTime = sampling_time;
+
+                    //rowData.recovery = recovery / trsrateData.length;
+                    WinnowerRate = sample / parseFloat(Beratcutfillerr);
+                    rowData.WinnowerRate = WinnowerRate.toFixed(2);
+                    return rowData;
+                },
+                onValidate(name, val) {
+                    if (val == "") {
+                        alert("Value can't be empty");
+                        return true;
+                    }
+                    return false;
+                },
+                onAdd: function (newData) {
+                    newData.date = moment().format("DD-MMM-YY");
+                    newData.time = moment().format("hh:mm");
+                    $("#Winnowerdatetoday").val(moment().format("DD-MMM-YY"));
+                    $("#WinnowerinputTime3").val(moment().format("hh:mm"));
+                    $("#Winnowerdatetoday").val(moment().format("DD-MMM-YY"));
+                    $("#WinnowerinputTime3").val(moment().format("hh:mm"));
+                },
+            },
+        }
+
+    </script>
+    <script>
+        var selectedPhotoCategory = null;
+        var selected = null;
+
+        function defaultDisplay() {
+            $("#image_1_show").hide();
+            $("#image_1_hide").show();
+
+            $("#image_2_show").hide();
+            $("#image_2_hide").show();
+
+            $("#image_3_show").hide();
+            $("#image_3_hide").show();
+
+            $("#image_4_show").hide();
+            $("#image_4_hide").show();
+
+            $("#image_5_show").hide();
+            $("#image_5_hide").show();
+
+            $("#image_6_show").hide();
+            $("#image_6_hide").show();
+
+            $("#image_7_show").hide();
+            $("#image_7_hide").show();
+
+            $("#image_8_show").hide();
+            $("#image_8_hide").show();
+
+            $("#image_9_show").hide();
+            $("#image_9_hide").show();
+
+            $("#image_10_show").hide();
+            $("#image_10_hide").show();
+
+            $("#image_11_show").hide();
+            $("#image_11_hide").show();
+        }
+
+        function switchDisplay() {
+            if (isImg1 == true) {
+                $("#image_1_show").show();
+                $("#image_1_hide").hide();
+            }
+            if (isImg2 == true) {
+                $("#image_2_show").show();
+                $("#image_2_hide").hide();
+            }
+            if (isImg3 == true) {
+                $("#image_3_show").show();
+                $("#image_3_hide").hide();
+            }
+            if (isImg4 == true) {
+                $("#image_4_show").show();
+                $("#image_4_hide").hide();
+            }
+            if (isImg5 == true) {
+                $("#image_5_show").show();
+                $("#image_5_hide").hide();
+            }
+
+            if (isImg6 == true) {
+                $("#image_6_show").show();
+                $("#image_6_hide").hide();
+            }
+            if (isImg7 == true) {
+                $("#image_7_show").show();
+                $("#image_7_hide").hide();
+            }
+            if (isImg8 == true) {
+                $("#image_8_show").show();
+                $("#image_8_hide").hide();
+            }
+            if (isImg9 == true) {
+                $("#image_9_show").show();
+                $("#image_9_hide").hide();
+            }
+            if (isImg10 == true) {
+                $("#image_10_show").show();
+                $("#image_10_hide").hide();
+            }
+
+            if (isImg11 == true) {
+                $("#image_11_show").show();
+                $("#image_11_hide").hide();
+            }
+        }
+
+        var isUrlLink = false;
+        var img1Content, img2Content, img3Content, img4Content, img5Content, img6Content, img7Content, img8Content, img9Content, img10Content, img11Content = "";
+        var isImg1, isImg2, isImg3, isImg4, isImg5, isImg6, isImg7, isImg8, isImg9, isImg10, isImg11 = false;
+        var imageIndex = 0;
+
+        function infoId(e) {
+            showhidecanvas(true);
+            $('#webcam-error-submit').remove();
+            if (e.id == "image_1") {
+                $("#t_front").click();
+                isImg1 = true;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_2") {
+                $("#slacing").click();
+                isImg1 = false;
+                isImg2 = true;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_3") {
+                $("#t_rear").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = true;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_4") {
+                $("#t_front2").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = true;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_5") {
+                $("#t_rear2").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = true;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_6") {
+                $("#s_cigarette1").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = true;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_7") {
+                $("#s_cigarette2").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = true;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_8") {
+                $("#s_cigarette3").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = true;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_9") {
+                $("#s_tipping1").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = true;
+                isImg10 = false;
+                isImg11 = false;
+            }
+            if (e.id == "image_10") {
+                $("#s_tipping2").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = true;
+                isImg11 = false;
+            }
+            if (e.id == "image_11") {
+                $("#s_tipping3").click();
+                isImg1 = false;
+                isImg2 = false;
+                isImg3 = false;
+                isImg4 = false;
+                isImg5 = false;
+                isImg6 = false;
+                isImg7 = false;
+                isImg8 = false;
+                isImg9 = false;
+                isImg10 = false;
+                isImg11 = true;
+            }
+        }
+
+        function renderImage(link, state) {
+
+            if (link == null || link == "") {
+                isUrlLink = false;
+            }
+            else {
+
+                isUrlLink = true;
+                console.log("link " + link);
+                console.log("state: " + state);
+                if (state == "image_1") {
+                    img1Content = link;
+                    document.getElementById("image_1_show").innerHTML = '<img src=' + img1Content + ' onclick="infoId(this)" id="image_1" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_2") {
+                    img2Content = link;
+                    document.getElementById("image_2_show").innerHTML = '<img src=' + img2Content + ' onclick="infoId(this)" id="image_2" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_3") {
+                    img3Content = link;
+                    document.getElementById("image_3_show").innerHTML = '<img src=' + img3Content + ' onclick="infoId(this)" id="image_3" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_4") {
+                    img4Content = link;
+                    document.getElementById("image_4_show").innerHTML = '<img src=' + img4Content + ' onclick="infoId(this)" id="image_4" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_5") {
+                    img5Content = link;
+                    document.getElementById("image_5_show").innerHTML = '<img src=' + img5Content + ' onclick="infoId(this)" id="image_5" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_6") {
+                    img6Content = link;
+                    document.getElementById("image_6_show").innerHTML = '<img src=' + img6Content + ' onclick="infoId(this)" id="image_6" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_7") {
+                    img7Content = link;
+                    document.getElementById("image_7_show").innerHTML = '<img src=' + img7Content + ' onclick="infoId(this)" id="image_7" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_8") {
+                    img8Content = link;
+                    document.getElementById("image_8_show").innerHTML = '<img src=' + img8Content + ' onclick="infoId(this)" id="image_8" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_9") {
+                    img9Content = link;
+                    document.getElementById("image_9_show").innerHTML = '<img src=' + img9Content + ' onclick="infoId(this)" id="image_9" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_10") {
+                    img10Content = link;
+                    document.getElementById("image_10_show").innerHTML = '<img src=' + img10Content + ' onclick="infoId(this)" id="image_10" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+                if (state == "image_11") {
+                    img11Content = link;
+                    document.getElementById("image_11_show").innerHTML = '<img src=' + img11Content + ' onclick="infoId(this)" id="image_11" class="input-img rounded mx-auto d-block" data-toggle="modal" data-target="#photo-modal" alt="insert image" style="max-width:180px;"/>';
+                }
+
+            }
+        }
+
+        $("#t_front").click(function () {
+            isImg1 = true;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#t_front2").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = true;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#slacing").click(function () {
+            isImg1 = false;
+            isImg2 = true;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#t_rear").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = true;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#t_rear2").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = true;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+        $("#s_cigarette1").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = true;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#s_cigarette2").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = true;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#s_cigarette3").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = true;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#s_tipping1").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = true;
+            isImg10 = false;
+            isImg11 = false;
+        });
+
+        $("#s_tipping2").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = true;
+            isImg11 = false;
+        });
+        $("#s_tipping3").click(function () {
+            isImg1 = false;
+            isImg2 = false;
+            isImg3 = false;
+            isImg4 = false;
+            isImg5 = false;
+            isImg6 = false;
+            isImg7 = false;
+            isImg8 = false;
+            isImg9 = false;
+            isImg10 = false;
+            isImg11 = true;
+        });
+
+        $(document).ready(function () {
+
+            defaultDisplay();
+
+            $("#photo-modal").on('next', function (e, index, info) {
+                if (!selected) {
+                    info.shouldReturn = true;
+                    return;
+                }
+
+                switch (index) {
+                    case 0:
+                        const carousel = $(this).find('.carousel-item.active').next();
+                        $(carousel).find("#title").html("Take picture for " + selected);
+                        selectedPhotoCategory = selected;
+                        break;
+                    case 1:
+                        renderImage(jpegUrl, state);
+                        info.shouldHide = true;
+                        if (isUrlLink == true) switchDisplay();
+                        else defaultDisplay();
+                        break;
+                }
+            });
+            $('#photo-modal').on('hide', function (e) {
+                $(this).find(".next").hide();
+                selected = null;
+            });
+
+        });</script>
+    <script>
+        // Video Part
+        var video = document.querySelector("#videoElement");
+        var hdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var hhdConstraints = { video: { mandatory: { minWidth: 160, minHeight: 120 } } };
+        var vgaConstraints = {
+            video: {
+                mandatory: {
+                    maxWidth: 160,
+                    maxHeight: 120
+                }
+            }
+        }
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            document.getElementById("demo").innerHTML = "";
+
+            try {
+                navigator.getUserMedia(hhdConstraints, handleVideo, videoError);
+            } catch (error) {
+                navigator.getUserMedia(hdConstraints, handleVideo, videoError);
+            }
+        }
+
+        function handleVideo(stream) {
+            try {
+                this.srcObject = stream;
+            } catch (error) {
+                this.src = window.URL.createObjectURL(stream);
+            }
+        }
+
+        function videoError(e) {
+            // do something
+        }
+    </script>
+
+    <script>
+        // Capture Image Part
+        var player = document.getElementById('videoElement');
+        var snapshotCanvas = document.getElementById('snapshot');
+        var captureButton = document.getElementById('capture');
+        var captureButton3 = document.getElementById('capture3');
+        var textBottom = document.getElementById('saveText');
+
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        var txfname = "img_text";
+        var XdatStr = 'date';
+
+        textBottom.addEventListener('click', function () {
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            XdateStr = dateStr;
+            txfname = 'IMG_' + dateStr;
+
+            saveTextAsFile(txfname);
+            pcanvas2blob().then(download2X);
+
+            document.getElementById("demo").innerHTML = "saved ";
+
+        });
+
+        captureButton.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Reading PDF417.";
+
+            var VH = 1080;
+            var VW = 1920;
+
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var buf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, buf);
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var b = _pdf417JS(buf, VH, VW, 1024);
+
+            var heapBu = new Uint8Array(Module.HEAPU8.buffer, buf, 1028);
+            var vanz = bin2Strung(heapBu);
+
+
+            if (b <= 0) {
+                vanz = "No Read.";
+            }
+
+            Module._free(buf);
+            document.getElementById("demo").innerHTML = vanz;
+
+        });
+
+        captureButton3.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = " OCRing MRZ. ";
+
+            var VH = 1080;
+            var VW = 1920;
+            VH = video.videoHeight;
+            VW = video.videoWidth;
+
+            ctx.canvas.width = VW;
+            ctx.canvas.height = VH;
+
+            ctx.drawImage(video, 0, 0);
+
+            var imgd = ctx.getImageData(0, 0, VW, VH);
+            var pix = imgd.data;
+
+            var nDataBytes = VH * VW * 4; //1280*720*4;
+
+            var pdf417Heap = new Uint8Array(Module.HEAPU8.buffer, 1028);
+
+            var bluf = Module._malloc(nDataBytes);
+            Module.HEAPU8.set(pix, bluf);
+
+
+            // Draw the ImageData at the given (x,y) coordinates.
+            ctx.putImageData(imgd, 0, 0);
+
+            var c = _DLreadJS(bluf, VH, VW, 1024);
+
+            var heapBuc = new Uint8Array(Module.HEAPU8.buffer, bluf, 1028);
+            var vanc = bin2Strung(heapBuc);
+
+            if (c <= 0) {
+                vanc = "No Read.";
+            }
+            Module._free(bluf);
+            document.getElementById("demo").innerHTML = vanc;
+        });
+
+        snapHat.addEventListener('click', function () {
+            document.getElementById("demo").innerHTML = "Image captured";
+
+            takeASnap();
+            showhidecanvas(false);
+            //.then(download);
+        });
+
+        var state = "";
+        var jpegUrl;
+        function takeASnap() {
+
+            canvas.width = 1280;//video.videoWidth; // set its size to the one of the video
+            canvas.height = 720;// video.videoHeight;
+            ctx.drawImage(video, 0, 0, 1280, 720); // the video
+
+            jpegUrl = ctx.canvas.toDataURL("image/jpeg"); // get base64 output - no longer using toBlob
+
+            if (isImg1 == true) {
+                state = "image_1";
+            }
+            if (isImg2 == true) {
+                state = "image_2";
+            }
+            if (isImg3 == true) {
+                state = "image_3";
+            }
+            if (isImg4 == true) {
+                state = "image_4";
+            }
+            if (isImg5 == true) {
+                state = "image_5";
+            }
+            if (isImg6 == true) {
+                state = "image_6";
+            }
+            if (isImg7 == true) {
+                state = "image_7";
+            }
+            if (isImg8 == true) {
+                state = "image_8";
+            }
+            if (isImg9 == true) {
+                state = "image_9";
+            }
+            if (isImg10 == true) {
+                state = "image_10";
+            }
+            if (isImg11 == true) {
+                state = "image_11";
+            }
+
+            
+        }
+
+        function pcanvas2blob() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+            });
+        }
+
+        function download2X(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            a.download = 'IMG_' + XdateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function download(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+
+            a.download = 'IMG_' + dateStr + '.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+
+        function download_png(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var temp = new Date();
+            var minth = 1 + temp.getMonth();
+            var dateStr = temp.getFullYear() + '_' +
+                minth + '_' +
+                temp.getDate() + '-' +
+                temp.getHours() + '_' +
+                temp.getMinutes() + '_' +
+                temp.getSeconds();
+            a.download = 'IMG_' + dateStr + '.png';
+            document.body.appendChild(a);
+            a.click();
+        }
+
+        function canvaSnap() {
+            return new Promise((res, rej) => {
+                canvas.toBlob(res, 'image/png'); // request a Blob from the canvas
+            });
+        }
+
+        function saveTextAsFile(txt_name) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var res = ocr_text.replace(/<br>/g, "\r\n");
+            var res2 = res.replace(/&lt;/g, '<');
+
+            var blab = new Blob([res2], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+
+            a.click();
+        }
+
+        function saveImageAndText(fname) {
+
+            var ocr_text = document.getElementById("demo").innerHTML
+            var blab = new Blob([ocr_text], { type: 'text/plain' });
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blab);
+            a.download = txt_name + '.txt';
+            document.body.appendChild(a);
+            a.click();
+        }
+    </script>
+
+    <script>
+
+        function bin2Strung(array) {
+            var result = "";
+            var max = 2048;
+            for (var i = 0; i < max; i++) {
+                var v = String.fromCharCode(array[i]);
+
+                if (array[i] == 10) {
+                    result += "<br/>";
+                }
+                else {
+                    if (array[i] == 60) {
+                        //result += "&#60";
+                        result += "&lt";
+                    }
+                    else {
+                        result += String.fromCharCode(array[i]);
+                    }
+                }
+                if (array[i] == 0) {
+                    i = max;
+                }
+            }
+            return result;
+        }
+
+        function myFunction() {
+            document.getElementById("demo").innerHTML = "Doing My Best!";
+        }
+    </script>
+    <script>
+         function collectImageComponent() {
+                var collectorComponent = [];
+
+                var cTipping_Adhesion_FrontComponent = {};
+                cTipping_Adhesion_FrontComponent.ComponentType = "Image";
+                cTipping_Adhesion_FrontComponent.ComponentName = "Tipping Adhesion Front 1";
+                cTipping_Adhesion_FrontComponent.OrderNum = 1;
+
+                var cTipping_Adhesion_FrontComponent2 = {};
+                cTipping_Adhesion_FrontComponent2.ComponentType = "Image";
+                cTipping_Adhesion_FrontComponent2.ComponentName = "Tipping Adhesion Front 2";
+                cTipping_Adhesion_FrontComponent2.OrderNum = 4;
+
+                var cSlacing_rejectComponent = {};
+                cSlacing_rejectComponent.ComponentType = "Image";
+                cSlacing_rejectComponent.ComponentName = "Slacing reject";
+                cSlacing_rejectComponent.OrderNum = 2;
+
+                var cTipping_Adhesion_RearComponent = {};
+                cTipping_Adhesion_RearComponent.ComponentType = "Image";
+                cTipping_Adhesion_RearComponent.ComponentName = "Tipping Adhesion Rear 1";
+                cTipping_Adhesion_RearComponent.OrderNum = 3;
+
+                var cTipping_Adhesion_RearComponent2 = {};
+                cTipping_Adhesion_RearComponent2.ComponentType = "Image";
+                cTipping_Adhesion_RearComponent2.ComponentName = "Tipping Adhesion Rear 2";
+                cTipping_Adhesion_RearComponent2.OrderNum = 5;
+
+                var cSplicing_Cigarette_PaperComponent1 = {};
+                cSplicing_Cigarette_PaperComponent1.ComponentType = "Image";
+                cSplicing_Cigarette_PaperComponent1.ComponentName = "Splicing Cigarette Paper 1";
+                cSplicing_Cigarette_PaperComponent1.OrderNum = 6;
+
+                var cSplicing_Cigarette_PaperComponent2 = {};
+                cSplicing_Cigarette_PaperComponent2.ComponentType = "Image";
+                cSplicing_Cigarette_PaperComponent2.ComponentName = "Splicing Cigarette Paper 2";
+                cSplicing_Cigarette_PaperComponent2.OrderNum = 7;
+
+                var cSplicing_Cigarette_PaperComponent3 = {};
+                cSplicing_Cigarette_PaperComponent3.ComponentType = "Image";
+                cSplicing_Cigarette_PaperComponent3.ComponentName = "Splicing Cigarette Paper 3";
+                cSplicing_Cigarette_PaperComponent3.OrderNum = 8;
+
+                var cSplicing_Tipping_PaperComponent1 = {};
+                cSplicing_Tipping_PaperComponent1.ComponentType = "Image";
+                cSplicing_Tipping_PaperComponent1.ComponentName = "Splicing Tipping Paper 1";
+                cSplicing_Tipping_PaperComponent1.OrderNum = 9;
+
+                var cSplicing_Tipping_PaperComponent2 = {};
+                cSplicing_Tipping_PaperComponent2.ComponentType = "Image";
+                cSplicing_Tipping_PaperComponent2.ComponentName = "Splicing Tipping Paper 2";
+                cSplicing_Tipping_PaperComponent2.OrderNum = 10;
+
+                var cSplicing_Tipping_PaperComponent3 = {};
+                cSplicing_Tipping_PaperComponent3.ComponentType = "Image";
+                cSplicing_Tipping_PaperComponent3.ComponentName = "Splicing Tipping Paper 3";
+                cSplicing_Tipping_PaperComponent3.OrderNum = 11;
+
+                collectorComponent.push(cTipping_Adhesion_FrontComponent);
+                collectorComponent.push(cTipping_Adhesion_FrontComponent2);
+                collectorComponent.push(cSlacing_rejectComponent);
+                collectorComponent.push(cTipping_Adhesion_RearComponent);
+                collectorComponent.push(cTipping_Adhesion_RearComponent2);
+                collectorComponent.push(cSplicing_Cigarette_PaperComponent1);
+                collectorComponent.push(cSplicing_Cigarette_PaperComponent2);
+                collectorComponent.push(cSplicing_Cigarette_PaperComponent3);
+                collectorComponent.push(cSplicing_Tipping_PaperComponent1);
+                collectorComponent.push(cSplicing_Tipping_PaperComponent2);
+                collectorComponent.push(cSplicing_Tipping_PaperComponent3);
+
+                return collectorComponent;
+            }
+            function collectImageValue(Shift) {
+                var webcamImage = {};
+                var collectorValue = [];
+
+                webcamImage.Tipping_Adhesion_Front = $('#image_1_show').find('#image_1').first().attr('src');
+                webcamImage.Slacing_reject = $('#image_2_show').find('#image_2').first().attr('src');
+                webcamImage.Tipping_Adhesion_Rear = $('#image_3_show').find('#image_3').first().attr('src');
+                webcamImage.Tipping_Adhesion_Front2 = $('#image_4_show').find('#image_4').first().attr('src');
+                webcamImage.Tipping_Adhesion_Rear2 = $('#image_5_show').find('#image_5').first().attr('src');
+                webcamImage.Splicing_Cigarette_Paper1 = $('#image_6_show').find('#image_6').first().attr('src');
+                webcamImage.Splicing_Cigarette_Paper2 = $('#image_7_show').find('#image_7').first().attr('src');
+                webcamImage.Splicing_Cigarette_Paper3 = $('#image_8_show').find('#image_8').first().attr('src');
+                webcamImage.Splicing_Tipping_Paper1 = $('#image_9_show').find('#image_9').first().attr('src');
+                webcamImage.Splicing_Tipping_Paper2 = $('#image_10_show').find('#image_10').first().attr('src');
+                webcamImage.Splicing_Tipping_Paper3 = $('#image_11_show').find('#image_11').first().attr('src');
+
+                var cTipping_Adhesion_Front = {};
+                cTipping_Adhesion_Front.Value=webcamImage.Tipping_Adhesion_Front;
+                cTipping_Adhesion_Front.ValueType = "ImageURL";
+                cTipping_Adhesion_Front.Shift = Shift;
+
+                var cTipping_Adhesion_Front2 = {};
+                cTipping_Adhesion_Front2.Value=webcamImage.Tipping_Adhesion_Front2;
+                cTipping_Adhesion_Front2.ValueType = "ImageURL";
+                cTipping_Adhesion_Front2.Shift = Shift;
+
+                var cSlacing_reject = {};
+                cSlacing_reject.Value = webcamImage.Slacing_reject;
+                cSlacing_reject.ValueType = "ImageURL";
+                cSlacing_reject.Shift = Shift;
+
+                var cTipping_Adhesion_Rear = {};
+                cTipping_Adhesion_Rear.Value = webcamImage.Tipping_Adhesion_Rear;
+                cTipping_Adhesion_Rear.ValueType = "ImageURL";
+                cTipping_Adhesion_Rear.Shift = Shift;
+
+                var cTipping_Adhesion_Rear2 = {};
+                cTipping_Adhesion_Rear2.Value = webcamImage.Tipping_Adhesion_Rear2;
+                cTipping_Adhesion_Rear2.ValueType = "ImageURL";
+                cTipping_Adhesion_Rear2.Shift = Shift;
+
+                var cSplicing_Cigarette_Paper1 = {};
+                cSplicing_Cigarette_Paper1.Value=webcamImage.Splicing_Cigarette_Paper1;
+                cSplicing_Cigarette_Paper1.ValueType = "ImageURL";
+                cSplicing_Cigarette_Paper1.Shift = Shift;
+
+                var cSplicing_Cigarette_Paper2 = {};
+                cSplicing_Cigarette_Paper2.Value=webcamImage.Splicing_Cigarette_Paper2;
+                cSplicing_Cigarette_Paper2.ValueType = "ImageURL";
+                cSplicing_Cigarette_Paper2.Shift = Shift;
+
+                var cSplicing_Cigarette_Paper3 = {};
+                cSplicing_Cigarette_Paper3.Value = webcamImage.Splicing_Cigarette_Paper3;
+                cSplicing_Cigarette_Paper3.ValueType = "ImageURL";
+                cSplicing_Cigarette_Paper3.Shift = Shift;
+
+                var cSplicing_Tipping_Paper1 = {};
+                cSplicing_Tipping_Paper1.Value = webcamImage.Splicing_Tipping_Paper1;
+                cSplicing_Tipping_Paper1.ValueType = "ImageURL";
+                cSplicing_Tipping_Paper1.Shift = Shift;
+
+                var cSplicing_Tipping_Paper2 = {};
+                cSplicing_Tipping_Paper2.Value = webcamImage.Splicing_Tipping_Paper2;
+                cSplicing_Tipping_Paper2.ValueType = "ImageURL";
+                cSplicing_Tipping_Paper2.Shift = Shift;
+
+                var cSplicing_Tipping_Paper3 = {};
+                cSplicing_Tipping_Paper3.Value = webcamImage.Splicing_Tipping_Paper3;
+                cSplicing_Tipping_Paper3.ValueType = "ImageURL";
+                cSplicing_Tipping_Paper3.Shift = Shift;
+
+                collectorValue.push(cTipping_Adhesion_Front);
+                collectorValue.push(cTipping_Adhesion_Front2);
+                collectorValue.push(cSlacing_reject);
+                collectorValue.push(cTipping_Adhesion_Rear);
+                collectorValue.push(cTipping_Adhesion_Rear2);
+                collectorValue.push(cSplicing_Cigarette_Paper1);
+                collectorValue.push(cSplicing_Cigarette_Paper2);
+                collectorValue.push(cSplicing_Cigarette_Paper3);
+                collectorValue.push(cSplicing_Tipping_Paper1);
+                collectorValue.push(cSplicing_Tipping_Paper2);
+                collectorValue.push(cSplicing_Tipping_Paper3);
+
+                return collectorValue;
+            }
+        function collectAllData() {
+            let collectorArray = [];
+            for (var tableId in configAle) {
+                let tableColumnType = {};
+                $(`#${tableId} ~ tfoot tr.input td input`).each(function () {
+                    tableColumnType[$(this).prop("name")] = $(this).prop("type");
+                });
+                const data = configAle[tableId].data;
+                for (let i = 0; i < data.length; i++) {
+                    for (var prop in data[i]) {
+                        if (Object.prototype.hasOwnProperty.call(data[i], prop)) {
+                            if (prop == "id") continue;
+                            let val = data[i][prop];
+                            if (configAle[tableId].onCollectData != undefined) {
+                                val = configAle[tableId].onCollectData(prop, val);
+                            }
+                            console.log(prop, val);
+                            collectorArray.push({
+                                HeaderName: tableId,
+                                FieldName: prop,
+                                Value: val,
+                                ValueType: tableColumnType[prop] == "number" ? "Numeric" : "NonNumeric",
+                                RowNumber: i
+                            });
+                            console.log(collectorArray);
+                        }
+                    }
+                }
+            }
+            return collectorArray;
+        }
+        function collectAllComponent() {
+            let components = [];
+            let values = [];
+            $('.collect-component').each(function (i, p) {
+                const id = $(p).prop("id");
+                $(this).find('input, select, textarea').each(function (i2, e) {
+                    components.push({
+                        ComponentType: $(e).prop('nodeName'),
+                        ComponentName: id + "-" + $(e).prop('name'),
+                    })
+                    var tem_value = $(e).val();
+                    if (Array.isArray(tem_value)) {
+	                    tem_value = tem_value.join('___');
+                    }
+                    values.push({
+                        Value: tem_value,
+                        ValueType: $(e).attr('type') == "number" ? "Numeric" : "NonNumeric",
+                    });
+                });
+            });
+            return [components, values];
+        }
+
+		$('#goPrev').click(function () {
+                $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("CheckPrev", "Maker")",
+                  data: JSON.stringify({
+                      LPHID: @(Model.LPH.ID),
+					  machine: $('#machInfo').val()
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+					if (result.Status) {
+						//ketika data ada, munculkan dalam window baru
+                        window.open("@(Url.Action("Submitted", "Maker"))?lphid="+result.LPHID+"&type=1", "window baru", "height=400,width=1300");
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "No previous submissions found",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+            })
+            var statusScroll = true;
+            function checkMandatory() {
+                var mandatory = $(".mandatory");
+                const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                var status = true;
+                for (var i = 0; i < mandatory.length; i++) {
+                    if (($(mandatory[i])[0].nodeName.toLowerCase() === 'select') && $(mandatory[i])[0].value === "") {
+                        if (statusScroll == true) {
+                            window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                            statusScroll = false;
+                        }
+                        $(mandatory[i]).siblings(".select2-container").css('border', '1px solid red');
+                        $(mandatory[i]).siblings(".select2-container").css('border-radius', '0.25rem');
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('select2:select', function (e) {
+                            $(e.target).siblings(".select2-container").css('border', 'none');
+                            $(e.target).siblings(".select2-container").css('border-radius', '0');
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    } else if ($(mandatory[i])[0].value === "") {
+                        if (statusScroll == true) {
+                            window.scrollTo(0, Math.max(0, $(mandatory[i]).offset().top - headerHeight- 100));
+                            statusScroll = false;
+                        }
+                        $(mandatory[i])[0].style.borderColor = "red";
+                        $(mandatory[i]).parent().prepend($('<span>', {
+                            style: "color:red; display:block; float:left;",
+                            id: "mandatory-error-" + i,
+                            html: '!',
+                            class: 'row'
+                        }));
+                        $(mandatory[i]).on('click', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        $(mandatory[i]).on('focus', function (e) {
+                            e.target.style.borderColor = "rgb(192, 204, 218)";
+                            $(e.target).parent().find('span.row').remove();
+                        });
+                        status = false;
+                    }
+                }
+                return status;
+            }
+            function checkPhotoMandatory() {
+                for (var i = 1; i < 12; i++) {
+                    var imageUrl = $("#image_" + i + "_show").find('#image_' + i).first().attr('src');
+                    if (imageUrl != null && imageUrl !== "") {
+                        console.log("i="+i);
+                        return true;
+                    }
+                }
+                $('#webcam-error-submit').remove();
+                $('#webcam-div').append($('<div>', {
+                    style: "color:red; display:block; float:left; text-align:center;",
+                    id: "webcam-error-submit",
+                    html: 'Please insert at least one photo',
+                    class: 'row card-body'
+                }));
+                const headerHeight = $(".navbar.navbar-header.navbar-header-fixed").outerHeight();
+                if (statusScroll == true) {
+                    window.scrollTo(0, Math.max(0, $('#webcam-div').offset().top - headerHeight - 100));
+                    statusScroll = false;
+                }
+                return false;
+            }
+        $('#btnApprove').click(function (e) {
+            statusScroll = true;
+            var checkM = checkMandatory();
+            var checkP = checkPhotoMandatory();
+
+            if (checkM && checkP) {
+
+                $('#loading_overlay').removeClass('d-none');
+                var timeStart = $('#inputTimeStart').val();
+                var timeEnd = $('#inputTimeStop').val();
+                var Shift = $('#shift').val();
+
+                var collectorArray = collectAllData(); // for LPH Extras
+                var collector = collectAllComponent();
+                var collectorComponent = collector[0];
+                var collectorValue = collector[1];
+                var image_component = collectImageComponent();
+                var image_values = collectImageValue(Shift);
+
+                for (var i = 0; i < image_component.length; i++) {
+                    collectorComponent.push(image_component[i]);
+                    collectorValue.push(image_values[i]);
+                }
+
+                var detailSubmission = {};
+                detailSubmission.StartTime = timeStart.toString();
+                detailSubmission.EndTime = timeEnd.toString();
+                detailSubmission.Shift = $('#shift').val();
+
+                var comment = $('#comment_value').val();
+
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Approval", "Maker")",
+                    data: JSON.stringify({
+                        id: @(Model.LPH.ID),
+                        comment: comment,
+                        detailExtras: collectorArray, detailSubmission: detailSubmission, detailComponent: collectorComponent,
+                        detailValue: collectorValue
+                    }), contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        console.log(result.Status);
+                        if (result.Status == 'True') {
+                            var notice = new PNotify({
+                                title: "@UIResources.Confirmation",
+                                text: "@UIResources.ApprovalSucceed",
+                                width: "400px",
+                                type: 'success',
+                                addclass: 'stack-bottomright'
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+
+                            setTimeout(function () { window.location.href = "@(Url.Action("Index", "Approval"))"; }, 3000);
+                        }
+                        else {
+                            var notice = new PNotify({
+                                title: "@UIResources.ErrorMessage",
+                                text: "@UIResources.ApprovalFailed",
+                                width: "400px",
+                                type: 'error',
+                                addclass: 'stack-bottomright',
+                                hide: false,
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+
+                            notice.get().click(function () {
+                                notice.remove();
+                            });
+                        }
+                    }
+                });
+            } else {
+                var notice = new PNotify({
+						title: "Warning",
+						text: "Submit failed, input field with red border, and photo can't be empty",
+						width: "400px",
+                        type: 'error',
+                        addclass: 'stack-bottomright',
+						hide: false,
+						buttons: {
+							sticker: false
+						}
+                });
+                setTimeout(function(){
+                        notice.remove();
+                }, 8000);
+            }
+        });
+
+        $('#btnReject').click(function (e) {
+
+            var comment = $('#comment_value').val();
+
+
+               $.ajax({
+                  type: "POST",
+                  url: "@Url.Action("Rejected", "Maker")",
+                  data: JSON.stringify({
+                      id: @(Model.LPH.ID),
+                      comment: comment
+
+                  }),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (result) {
+                      console.log(result.Status);
+					if (result.Status == 'True') {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.RejectSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright'
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+                        });
+
+                        setTimeout(function () { window.location.href = "@(Url.Action("Index", "Approval"))"; }, 3000);
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.ApprovalFailed",
+							width: "400px",
+                            type: 'error',
+                            addclass: 'stack-bottomright',
+							hide: false,
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+								notice.remove();
+							});
+						}
+                    }
+                });
+        });
+
+            $("#brandInfo").change(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetBeratSpec", "Maker")",
+                    data: JSON.stringify({
+                        Brand: $("#brandInfo").val(),
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.Status) {
+                            BeratSpec = parseFloat(result.Data);
+                            console.log(BeratSpec);
+                        }
+                        else {
+                            BeratSpec = 0;
+                        }
+                    }
+                });
+            });
+    </script>
+    <script>
+
+        $('[name=tfIn]').focusout(function () {
+            CutfillerConversion();
+        });
+        $('[name=tfOut]').focusout(function () {
+            CutfillerConversion();
+        });
+
+
+        //function CutfillerConversion() {
+        //    var tfIN = $('[name=tfIn]').val();
+        //    var tfOUT = $('[name=tfOut]').val();
+
+        //    if (tfOUT != "" && tfIN) {
+        //        var total = (tfIN - tfOUT) * BeratSpec;;
+        //        $('[name=cutfiller]').val(total.toFixed(2));
+        //    }
+        //};
+        function CutfillerConversion() {
+            let codebrand = $('#brandInfo').val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetCTW", "Maker")",
+                data: JSON.stringify({
+                    brand: codebrand
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var tfin = $('[name=tfIn]').val();
+                    var tfout = $('[name=tfOut]').val();
+                    var Bspec = result.Data;
+                    console.log(Bspec);
+                    console.log(tfout);
+                    console.log(tfin);
+                    if (tfout != "" && tfin != "" && Bspec != null) {
+                        var total = (parseFloat(tfin) - parseFloat(tfout)) * parseFloat(Bspec);
+                        $('[name=cutfiller]').val(total.toFixed(2));
+                    } else {
+                        $('[name=cutfiller]').val(0);
+                    }
+                }
+            });
+            //var tfIN = $('[name=tfIn]').val();
+            //var tfOUT = $('[name=tfOut]').val();
+
+            //if (tfOUT != "" && tfIN) {
+            //    var total = (tfIN - tfOUT) * BeratSpec;
+            //    $('[name=cutfiller]').val(total.toFixed(2));
+            //}
+        };
+
+        function countRate() {
+            var trsSpeed = $('#trsSpeed').val();
+            var trsCTW = $('#trsCTW').val();
+            var trsSample = $('#trsSample').val();
+            var trsTime = $('#trsTime').val();
+
+            if (trsSpeed != "" && trsCTW != "" && trsSample != "" && trsTime != "") {
+
+                //var rate = 100000 * trsSample / trsTime / (trsSpeed * trsCTW)
+                //$('#trsRate').val(rate.toFixed(2));
+                var Beratcutfiller = trsSpeed * trsTime * trsCTW / 1000;
+                var rate = trsSample / Beratcutfiller;
+                console.log(Beratcutfiller);
+                console.log(rate);
+                $('#trsRate').val(rate.toFixed(2));
+            }
+        };
+
+        $('#trsSpeed').on('input',function () {
+
+            countRate();
+
+        });
+        $('#trsCTW').on('input',function () {
+
+            countRate();
+        });
+        $('#trsSample').on('input',function () {
+
+            countRate();
+        });
+        $('#trsTime').on('input',function () {
+
+            countRate();
+        });
+        $('.maxnumber').on('input', function () {
+            if ($(this).closest('.maxnumber').val() > 100) {
+                $(this).closest('.maxnumber').val($(this).closest('.maxnumber').data('val'));
+            }
+            $(this).closest('.maxnumber').data('val', $(this).closest('.maxnumber').val());
+        });
+    </script>
+    <script>
+        $('#brandInfo').on('change', function () {
+            let codebrand = $('#brandInfo').val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetCTW", "Maker")",
+                data: JSON.stringify({
+                    brand: codebrand
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $('#WinnowerCTW').val(result.Data);
+                    $('#trsCTW').val(result.Data);
+                }
+            });
+        });
+        function countWinnowerRate() {
+            var winnowerSpeed = $('#WinnowerSpeed').val();
+            var winnowerCTW = $('#WinnowerCTW').val();
+            var winnowerSample = $('#WinnowerSample').val();
+            var winnowerTime = $('#WinnowerTime').val();
+
+
+
+            if (winnowerSpeed != "" && winnowerCTW != "" && winnowerSample != "" && winnowerTime != "") {
+
+                //var rate = 100000 * trsSample / trsTime / (trsSpeed * trsCTW)
+                //$('#trsRate').val(rate.toFixed(2));
+                var winnowerBeratcutfiller = winnowerSpeed * winnowerTime * winnowerCTW /1000;
+                var winnowerrate = winnowerSample / winnowerBeratcutfiller;
+                console.log(winnowerBeratcutfiller);
+                console.log(winnowerrate);
+                $('#WinnowerRate').val(winnowerrate.toFixed(2));
+
+            }
+        };
+
+        $('#WinnowerSpeed').on('input',function () {
+            countWinnowerRate()
+
+        });
+        $('#WinnowerCTW').on('input',function () {
+            countWinnowerRate()
+        });
+        $('#WinnowerSample').on('input',function () {
+            countWinnowerRate()
+
+        });
+        $('#WinnowerTime').on('input',function () {
+            countWinnowerRate()
+
+        });
+    </script>
+
+    <script>
+        var selected = null;
+
+        $(document).ready(function () {
+            var lphID = @(Model.LPH.ID);
+              $('#dtApproval').dataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "filter": false,
+                "bLengthChange": false,
+                "orderMulti": false,
+                "pageLength": 10,
+                "destroy": true,
+				"order": [[ 3, "asc" ]],
+                "ajax": {
+                    "url": fastApp.BaseUrl + '/Maker/GetApproverList?lphid='+ lphID,
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columnDefs":
+                    [{
+                        "targets": [0],
+                      "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [1],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [2],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [3],
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "targets": [4],
+                        "searchable": true,
+                        "orderable": true
+                        },
+                     //{
+                     //       "targets": [5],
+                     //       "searchable": true,
+                     //       "orderable": true
+                     //   },
+
+                    ],
+
+                "columns": [
+
+                    { "data": "User", "name": "User", "title": "Name", "autoWidth": false },
+                    { "data": "Role", "name": "Role", "title": "Role", "autoWidth": false },
+                    { "data": "Status", "name": "Status", "title": "Status", "autoWidth": false },
+                    //{ "data": "Approver", "name": "Approver", "title": "Approver", "autoWidth": false },
+                    {
+                        "data": "ModifiedDate",
+                        render: function (data, type, row) {
+                            if (data)
+                                return moment(data).format("DD-MMM-YY HH:mm");
+                            else
+                                return '';
+                        }
+                    },
+                    { "data": "Notes", "name": "Notes", "title": "Notes", "autoWidth": false }
+                ],
+                "fnRowCallback": function (nRow, data, iDisplayIndex, iDisplayIndexFull) {
+                    $('td', nRow).css('background-color', data['Color']);
+                    $('#dtApproval_paginate')[0].style.display = "none";
+                }
+            });
+
+        });</script>
+    <script>
+        function detectBrowser() {
+            var ua = navigator.userAgent, tem,
+                M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+            if (/trident/i.test(M[1])) {
+                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                return 'IE ' + (tem[1] || '');
+            }
+            if (M[1] === 'Chrome') {
+                tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
+                if (tem != null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+            }
+            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
+            if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+            return M.join(' ');
+        };
+        if (detectBrowser().indexOf("Chrome") < 0) {
+            $('input[type=number]').toArray().forEach(function (field) {
+                $(field).attr("placeholder", "0");
+                new Cleave(field, {
+                    numeral: true,
+                    numeralDecimalScale: 3,
+                    numeralThousandsGroupStyle: 'none',
+                    //numeralDecimalMark: ',',
+                    //delimiter: '.',
+                    numeralPositiveOnly: $(field).hasClass("number-positive"),
+                });
+                $(field).on("keyup", function (e) {
+                    if (e.keyCode == 190) {
+                        let val = $(this).val();
+                        const i = val.lastIndexOf(".");
+                        let a = val.length > 1 ? val.substring(i - 1, i) : "-";
+                        if (isNaN(a)) $(this).val(val.slice(0, i) + "0.");
+                    }
+                });
+            });
+        }
+    </script>
+    <script>
+
+        function getctw() {
+            let codebrand = $('#brandInfo').val();
+            console.log(codebrand);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetCTW", "Maker")",
+                data: JSON.stringify({
+                    brand: codebrand
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $('#trsCTW').val(result.Data);
+
+                }
+            });
+        }
+    </script>
+    <script>
+        function printImage(element, child) {
+            const imagedata = $('#' + element).find('#' + child).attr('src');
+            if (imagedata.length > 200) {
+                let dataimage = new Image();
+                let windowOpen = window.open("");
+                dataimage.src = imagedata;
+                windowOpen.document.write(dataimage.outerHTML);
+                console.log(imagedata);
+                return;
+            } else {
+                pwin = window.open(imagedata, "_blank");
+            }
+
+        }
+    </script>
+    <script>
+        //hide canvas waktu pertama buka webcam
+        function showhidecanvas(hidecanvas) {
+            if (hidecanvas == true) {
+                $('canvas').hide();
+                $('#demo').hide();
+                $('#btnNextPhoto').hide();
+                hidecanvas = false;
+            } else {
+                $('canvas').show();
+                $('#demo').show();
+                $('#btnNextPhoto').show();
+                hidecanvas = true;
+            }
+        }
+        //function rotateCamera(rotate) {
+        //    if (rotate == true) {
+        //        $('#videoElement').css('transform', 'rotate(90deg)');
+        //        $('#videoElement').attr('width', '300');
+        //        $('#rotate').attr('onclick', 'rotateCamera(false)');
+        //        $('#rotate').attr('onclick', 'false');
+        //    }
+        //    else{
+        //        $('#videoElement').css('transform', 'rotate(360deg)');
+        //        $('#videoElement').attr('width', '500');
+        //        $('#rotate').attr('onclick', 'rotateCamera(true)');
+        //        $('#rotate').attr('rotate', 'true');
+        //    }
+            
+        //}
+    </script>
+
+}

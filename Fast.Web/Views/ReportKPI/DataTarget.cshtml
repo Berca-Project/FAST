@@ -1,0 +1,200 @@
+﻿@model Fast.Web.Models.Report.DataKPITargetModel
+@using Fast.Web.Resources;
+
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<!-- Specific Page Vendor CSS -->
+<style>
+    .dataTables_scrollHead table, .dataTables_scrollBody table {
+        width: 1200px !important;
+    }
+</style>
+
+<div class="card-header">
+    <div class="row pd-r-10-f">
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Production Center</label>
+            <select class="form-control select2" id="PC" name="PC">
+                <option value="">All Production Center</option>
+                <option value="PB" @(ViewBag.PC == "PB" ? "selected" : "")>PB - SIS Sukorejo</option>
+                <option value="PJ" @(ViewBag.PC == "PJ" ? "selected" : "")>PJ - Sampoerna Sukorejo</option>
+                <option value="PK" @(ViewBag.PC == "PK" ? "selected" : "")>PK - Sampoerna Karawang</option>
+                <option value="PI" @(ViewBag.PC == "PI" ? "selected" : "")>PI - PMID Karawang</option>
+            </select>
+        </div>
+
+        <div class="col-sm-4">
+        </div>
+
+        <div class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-3 mg-t-30"><button onclick="refresh()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-search mg-r-10"></i> Search</button></div>
+                <div class="col-sm-3 mg-t-30"><button onclick="downloadData('Target')" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-download mg-r-10"></i> Download</button></div>
+                <div class="col-sm-3 mg-t-30"><button onclick="modalUploadData('Target')" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-upload mg-r-10"></i> Upload Data</button></div>
+                <div class="col-sm-3 mg-t-30"><button onclick="modalAddData()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-plus mg-r-10"></i> Add Data</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card-body">
+    <table class="table table-bordered dodatatable">
+        <thead class="thead-primary font-weight-bold">
+            <tr>
+                <td>Production Center</td>
+                <td>KPI</td>
+                <td>Internal target</td>
+                <td>OB Target</td>
+                <th>Inserted By</th>
+                <th>Inserted Date</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in Model.Data)
+            {
+                <tr>
+                    <td>@data.ProductionCenter</td>
+                    <td>@data.KPI</td>
+                    <td>@data.TargetInternal</td>
+                    <td>@data.TargetOB</td>
+                    <td>@data.ModifiedBy</td>
+                    <td>@(((DateTime)data.ModifiedDate).ToString("dd-MMM-yy HH:mm"))</td>
+                    <td class="text-center">
+                        <a class="btn-default tx-black" title="Edit Data" href="#" onclick="editdata(this, @(data.ID))"><i class="fa fa-edit"></i></a>
+                        <a class="btn-default tx-black" title="Delete Data" href="#" onclick="deletedata(@(data.ID))"><i class="fa fa-trash"></i></a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalEditData" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:500px;">
+        <div class="modal-content" id="FormEdit">
+            <form action="@Url.Action("EditTarget", "ReportKPI")" class="form-horizontal" method="post">
+                <div class="modal-header pd-20">
+                    <h4 class="tx-18 tx-sm-20 mg-b-2" id="ModalTitle"></h4>
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+                    <div class="">
+                        <input name="ID" type="hidden" value="">
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Production Center</label>
+                            <div class="col-sm-8">
+                                <select class="form-control select2" name="ProductionCenter">
+                                    <option value="ID">All Production Center</option>
+                                    <option value="PB">PB - SIS Sukorejo</option>
+                                    <option value="PJ">PJ - Sampoerna Sukorejo</option>
+                                    <option value="PK">PK - Sampoerna Karawang</option>
+                                    <option value="PI">PI - PMID Karawang</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">KPI</label>
+                            <div class="col-sm-8">
+                                <select class="form-control select2" name="KPI">
+                                    <option value="Volume">Volume</option>
+                                    <option value="Uptime">Uptime</option>
+                                    <option value="CRR">CRR</option>
+                                    <option value="ActYield">Actual Wet Yield</option>
+                                    <option value="DIMWaste">DIM Waste</option>
+                                    <option value="TaxStampWaste">Tax Stamp Waste</option>
+                                    <option value="Claimable">Claimable</option>
+
+                                    <optgroup label="DIM Loss Tree">
+                                        <option value="FilterRod">Filter Rod</option>
+                                        <option value="HingeLidBlank">Hinge Lid Blank</option>
+                                        <option value="InnerLiner">Inner Liner</option>
+                                        <option value="TippingPaper">Tipping Paper</option>
+                                        <option value="WrappingFilm">Wrapping Film</option>
+                                        <option value="InnerFrame">Inner Frame</option>
+                                        <option value="CigarettePaper">Cigarette Paper</option>
+                                    </optgroup>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Target Internal</label>
+                            <div class="col-sm-8">
+                                <input type="number" step="any" class="form-control" name="TargetInternal" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Target OB</label>
+                            <div class="col-sm-8">
+                                <input type="number" step="any" class="form-control" name="TargetOB" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+
+
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<script type="text/javascript">
+    function modalAddData() {
+        $("#ModalTitle").text("Add Data Targets");
+        $('input[name ="ID"]').val(0);
+        $('input[name ="ProductionCenter"]').val("");
+        $('input[name ="KPI"]').val("");
+        $('input[name ="TargetInternal"]').val(0);
+        $('input[name ="TargetOB"]').val(0);
+        $("#modalEditData").modal();
+    };
+
+    function editdata(e, id) {
+        $tr = $(e).closest('tr');
+        console.log($tr.find("td:eq(1)").text());
+        $("#ModalTitle").text("Edit Data Targets");
+        $('input[name ="ID"]').val(id);
+        $('input[name ="ProductionCenter"]').val($tr.find("td:eq(0)").text());
+        $('input[name ="KPI"]').val($tr.find("td:eq(1)").text());
+        $('input[name ="TargetInternal"]').val($tr.find("td:eq(2)").text());
+        $('input[name ="TargetOB"]').val($tr.find("td:eq(3)").text());
+
+        $("#modalEditData").modal();
+    }
+
+    function refresh() {
+        $('#loading_overlay').removeClass('d-none');
+        $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/DataTarget?PC=" + $('#PC').val(), function () {
+            $('#loading_overlay').addClass('d-none');
+        });
+    }
+
+    function deletedata(id) {
+        if (confirm("Do you really want to delete this data?")) {
+            $.get(fastApp.BaseUrl + "/ReportKPI/DeleteTarget/" + id, function (data) {
+                refresh();
+            });
+        }
+    }
+
+    function downloadData(data) {
+        window.open(fastApp.BaseUrl + "/ReportKPI/DownloadXls?data=" + data + "&PC=" + $('#PC').val(), '_blank');
+    }
+
+    $('.dodatatable').DataTable({
+        order: [],
+        //responsive: true,
+        language: {
+            searchPlaceholder: 'Search...',
+            sSearch: '',
+            lengthMenu: '_MENU_ items/page',
+        }
+    });
+    $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+
+</script>

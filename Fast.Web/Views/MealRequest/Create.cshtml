@@ -1,0 +1,269 @@
+﻿@model Fast.Web.Models.MealRequestModel
+@using Fast.Web.Resources;
+
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link href="~/Content/theme/css/jquery-ui-1.9.2.css" rel="stylesheet" />
+
+<style>
+	.fixedHeight {
+		font-size: 14px;
+		max-height: 300px;
+		margin-bottom: 10px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.ui-helper-hidden-accessible {
+		display: none;
+	}
+
+	.select2-container--default .select2-selection--multiple .select2-selection__choice {
+		color: white;
+	}
+
+	.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+		color: red;
+	}
+
+	.marginRadio {
+		margin-top: 10px;
+	}
+</style>
+
+@using (Html.BeginForm("Create", "MealRequest", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewMealRequest</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-2">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.CostCenter</label>
+				</div>
+				<div class="col-10">
+					@Html.DropDownListFor(x => x.CostCenter, (IEnumerable<SelectListItem>)ViewBag.CostCenterList, new { @class = "form-control", @id = "ddlCostCenter", @required = "required" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Period</label>
+				</div>
+				<div class="col-4">
+					@Html.TextBoxFor(x => x.StartDate, "{0:dd-MMM-yy}", new { @class = "form-control", @id = "tbStartDate", @required = "required" })
+				</div>
+				<div class="col-4">
+					@Html.TextBoxFor(x => x.EndDate, "{0:dd-MMM-yy}", new { @class = "form-control", @id = "tbEndDate", @required = "required" })
+				</div>
+			</div>
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Shift</label>
+				</div>
+				<div class="col-8 d-flex marginRadio">
+					<div class="flex-1">
+						<label>@Html.RadioButtonFor(model => model.Shift, "1") &nbsp;1</label>
+					</div>
+					<div class="flex-1">
+						<label>@Html.RadioButtonFor(model => model.Shift, "2") &nbsp;2</label>
+					</div>
+					<div class="flex-1">
+						<label>@Html.RadioButtonFor(model => model.Shift, "3") &nbsp;3</label>
+					</div>
+					<div class="flex-1">
+						<label>@Html.RadioButtonFor(model => model.Shift, "NS", new { Checked = "checked" }) &nbsp;NS</label>
+					</div>					
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.ProdCenter</label>
+				</div>
+				<div class="col-8">
+					@Html.DropDownListFor(x => x.ProductionCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProductionCenter", @required = "required" })
+				</div>
+			</div>
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Department</label>
+				</div>
+				<div class="col-8">
+					@Html.DropDownListFor(x => x.Department, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Canteen</label>
+				</div>
+				<div class="col-8">
+					@Html.DropDownListFor(x => x.Canteen, (IEnumerable<SelectListItem>)ViewBag.CanteenList, new { @class = "form-control", @id = "ddlCanteen", @required = "required" })
+				</div>
+			</div>
+			<div class="flex-1 row">
+				<div class="col-4">
+				</div>
+				<div class="col-8" style="display:none">
+					@Html.TextBoxFor(x => x.EmployeeID, null, new { @class = "form-control", @id = "tbEmployeeID" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.HmsPIC</label>
+				</div>
+				<div class="col-8">
+					@Html.TextBoxFor(x => x.EmployeeFullname, null, new { @class = "form-control", @id = "tbFullName", @placeholder = "Type emp name or id ...", @required = "required", @onkeypress="return blockSpecialChar(event)" })
+				</div>
+			</div>
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Phone</label>
+				</div>
+				<div class="col-8">
+					@Html.TextBoxFor(x => x.Phone, null, new { @class = "form-control", @id = "tbEmpPhone" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.TotalGuest</label>
+				</div>
+				<div class="col-8">
+					@Html.TextBoxFor(x => x.TotalGuest, null, new { @class = "form-control", @id = "tbTotalGuest", @required = "required" })
+				</div>
+			</div>
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.GuestType</label>
+				</div>
+				<div class="col-8 d-flex marginRadio">
+					<div class="flex-1">
+						<label>@Html.RadioButtonFor(model => model.GuestType, "Internal", new { Checked = "checked" }) &nbsp;Internal</label>
+					</div>
+					<div class="flex-1">
+						<label>@Html.RadioButtonFor(model => model.GuestType, "External") &nbsp;External</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Company</label>
+				</div>
+				<div class="col-8">
+					@Html.TextBoxFor(x => x.Company, null, new { @class = "form-control", @id = "tbCompany" })
+				</div>
+			</div>
+			<div class="flex-1 row">
+				<div class="col-4">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Guest</label>
+				</div>
+				<div class="col-8">
+					@Html.TextBoxFor(x => x.Guest, null, new { @class = "form-control", @id = "tbGuest" })
+				</div>
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="flex-1 row">
+				<div class="col-2">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.Purpose</label>
+				</div>
+				<div class="col-10">
+					@Html.TextBoxFor(x => x.Purpose, null, new { @class = "form-control", @id = "tbPurpose" })
+				</div>
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script src="~/Content/theme/js/jquery-1.10.0.min.js"></script>
+<script src="~/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+<script src="~/Content/theme/lib/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#tbStartDate').datepicker({
+			format: "dd-M-yy",
+			changeMonth: true,
+			changeYear: true,
+			minDate: new Date
+		});
+
+		$('#tbEndDate').datepicker({
+			format: "dd-M-yy",
+			changeMonth: true,
+			changeYear: true,
+			minDate: new Date
+		});
+
+		$("#empty-message").text("");
+
+		$("#tbFullName").autocomplete({
+			delay: 750,
+			source: function (request, response) {
+				$.ajax({
+					url: fastApp.BaseUrl + '/MealRequest/AutoComplete/',
+					data: "{ 'prefix': '" + request.term + "'}",
+					dataType: "json",
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.length == 0) {
+							$("#empty-message").css('color', 'red');
+							$("#empty-message").text("Data does not exist in Employee List");
+						} else {
+							$("#empty-message").text("");
+							response($.map(data, function (item) {
+								return $.trim(item.EmployeeID) + " - " + item.FullName;
+							}))
+						}
+					},
+					error: function (response) {
+						alert(response.responseText);
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					}
+				});
+			},
+			select: function (e, i) {
+				var res = i.item.label.split(" - ");
+				if (res[0]) {
+					$("#tbEmployeeID").val(res[0]);
+				}
+			},
+			minLength: 1
+		});
+
+		$("#tbFullName").autocomplete("widget").addClass("fixedHeight");
+
+		$('#tbFullName').keyup(function () {
+			if ($("#tbFullName").val() == '') {
+				$("#empty-message").text("");
+			}
+		});
+	});
+</script>

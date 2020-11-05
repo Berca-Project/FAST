@@ -1,0 +1,172 @@
+﻿@model Fast.Web.Models.Report.DataKPIKPIDIMModel
+@using Fast.Web.Resources;
+
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<!-- Specific Page Vendor CSS -->
+<style>
+    .dataTables_scrollHead table, .dataTables_scrollBody table {
+        width: 6000px !important;
+    }
+</style>
+
+<div class="card-header">
+    <div class="row pd-r-10-f">
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Production Center</label>
+            <select class="form-control select2" id="PC" name="PC">
+                <option value="">All Production Center</option>
+                <option value="PB" @(ViewBag.PC == "PB" ? "selected" : "")>PB - SIS Sukorejo</option>
+                <option value="PJ" @(ViewBag.PC == "PJ" ? "selected" : "")>PJ - Sampoerna Sukorejo</option>
+                <option value="PK" @(ViewBag.PC == "PK" ? "selected" : "")>PK - Sampoerna Karawang</option>
+                <option value="PI" @(ViewBag.PC == "PI" ? "selected" : "")>PI - PMID Karawang</option>
+            </select>
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Year</label>
+            <input class="form-control text-right" id="year" type="number" value="@ViewBag.Year">
+        </div>
+        <div class="col-sm-2 form-group">
+            <label class="d-block">Week</label>
+            <input class="form-control text-right" id="week" type="number" value="@ViewBag.Week" placeholder="Empty = All Week">
+        </div>
+
+        <div class="col-sm-2 mg-t-30"><button onclick="refresh()" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-search mg-r-10"></i> Search</button></div>
+        <div class="col-sm-2 mg-t-30"><button onclick="downloadData('DIM')" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-download mg-r-10"></i> Download</button></div>
+        <div class="col-sm-2 mg-t-30"><button onclick="modalUploadData('DIM')" class="btn pd-x-15 btn-primary btn-uppercase btn-block"><i class="fa fa-upload mg-r-10"></i> Upload Data</button></div>
+
+    </div>
+</div>
+<div class="card-body">
+    <table class="table table-bordered dodatatable">
+        <thead class="thead-primary font-weight-bold">
+            <tr>
+                <td>Company Code</td>
+                <td>Production Center</td>
+                <td>Issuing Plant</td>
+                <th>Year</th>
+                <th>Week</th>
+                <td>Process Order</td>
+                <td>Component</td>
+                <td>Material Description</td>
+                <td>Base Unit</td>
+                <td>Origin Group</td>
+                <td>Description</td>
+                <td>TMC</td>
+                <td>Standard Price</td>
+                <td>Currency</td>
+                <td>Lead Material</td>
+                <td>Lead Material Desc</td>
+                <td>GR Quantity</td>
+                <td>GR Qty With Addbacks</td>
+                <td>BaseUnit</td>
+                <td>Std Usg Qty</td>
+                <td>Std Usg Val</td>
+                <td>Waste Factor Qty</td>
+                <td>Waste Factor Value</td>
+                <td>Std Usg Qty Waste</td>
+                <td>Std Usg Val Waste</td>
+                <td>Goods Issue Qty</td>
+                <td>Goods Issue Value</td>
+                <td>Stock Take Quantity</td>
+                <td>Stock Take Value</td>
+                <td>Tot Actual Cons Qty</td>
+                <td>Tot Actual Cons Val</td>
+                <td>Use Dev Qty</td>
+                <td>Use Dev Qty %</td>
+                <td>Usg Dev Val</td>
+                <td>Use Dev Val %</td>
+                <td>Use Dev Qty Waste</td>
+                <td>Use Dev Qty Waste %</td>
+                <td>Use Dev Val Waste</td>
+                <td>Use Dev Val Waste %</td>
+                <th>Inserted By</th>
+                <th>Inserted Date</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in Model.Data)
+            {
+            <tr>
+                <td>@data.CompanyCode</td>
+                <td>@data.ProductionCenter</td>
+                <td>@data.IssuingPlant</td>
+                <td>@data.Year</td>
+                <td>@data.Week</td>
+                <td>@data.ProcessOrder</td>
+                <td>@data.Component</td>
+                <td>@data.MaterialDescription</td>
+                <td>@data.BaseUnit</td>
+                <td>@data.OriginGroup</td>
+                <td>@data.Description</td>
+                <td>@data.TMC</td>
+                <td>@data.StandardPrice</td>
+                <td>@data.Currency</td>
+                <td>@data.LeadMaterial</td>
+                <td>@data.LeadMaterialDesc</td>
+                <td>@data.GRQuantity</td>
+                <td>@data.GRQtyWithAddbacks</td>
+                <td>@data.BaseUnit2</td>
+                <td>@data.StdUsgQty</td>
+                <td>@data.StdUsgVal</td>
+                <td>@data.WasteFactorQty</td>
+                <td>@data.WasteFactorValue</td>
+                <td>@data.StdUsgQtyWaste</td>
+                <td>@data.StdUsgValWaste</td>
+                <td>@data.GoodsIssueQty</td>
+                <td>@data.GoodsIssueValue</td>
+                <td>@data.StockTakeQuantity</td>
+                <td>@data.StockTakeValue</td>
+                <td>@data.TotActualConsQty</td>
+                <td>@data.TotActualConsVal</td>
+                <td>@data.UseDevQty</td>
+                <td>@data.UseDevQtyPercent</td>
+                <td>@data.UsgDevVal</td>
+                <td>@data.UseDevValPercent</td>
+                <td>@data.UseDevQtyWaste</td>
+                <td>@data.UseDevQtyWastePercent</td>
+                <td>@data.UseDevValWaste</td>
+                <td>@data.UseDevValWastePercent</td>
+                <td>@data.ModifiedBy</td>
+                <td>@(((DateTime)data.ModifiedDate).ToString("dd-MMM-yy HH:mm"))</td>
+                <td><a class="btn-default tx-black" title="Delete Data" href="#" onclick="deletedata(@(data.ID))"><i class="fa fa-trash"></i></a></td>
+            </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function refresh() {
+        $('#loading_overlay').removeClass('d-none');
+        $("#main_container").load(fastApp.BaseUrl + "/ReportKPI/DataDIM?year=" + $('#year').val() + "&week=" + $('#week').val()+ "&PC=" + $('#PC').val(), function () {
+            $('#loading_overlay').addClass('d-none');
+        });
+    }
+
+    function deletedata(id) {
+        if (confirm("Do you really want to delete this data?")) {
+            $.get(fastApp.BaseUrl + "/ReportKPI/DeleteDIM/" + id, function (data) {
+                refresh();
+            });
+        }
+    }
+
+    function downloadData(data) {
+        window.open(fastApp.BaseUrl + "/ReportKPI/DownloadXls?data=" + data + "&year=" + $('#year').val() + "&week=" + $('#week').val()+ "&PC=" + $('#PC').val(), '_blank');
+    }
+
+    $('.dodatatable').DataTable({
+        scrollX: true,
+        order: [],
+        //responsive: true,
+        language: {
+            searchPlaceholder: 'Search...',
+            sSearch: '',
+            lengthMenu: '_MENU_ items/page',
+        }
+    });
+    $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+
+</script>

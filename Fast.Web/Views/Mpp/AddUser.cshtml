@@ -1,0 +1,174 @@
+﻿@model Fast.Web.Models.MppModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("AddUser", "Mpp", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.EmployeeMachine, new { @Id = "EmployeeMachine" })
+	@Html.HiddenFor(x => x.LocationID, new { @Id = "LocationID" })
+	@Html.HiddenFor(x => x.LocID, new { @Id = "LocID" })
+	@Html.HiddenFor(x => x.LocType, new { @Id = "LocType" })
+	@Html.HiddenFor(x => x.Shift, new { @Id = "Shift" })
+	@Html.HiddenFor(x => x.GroupName, new { @Id = "GroupName" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Add</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Date</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.Date, "{0:dd-MMM-yy}", new { @class = "form-control hasDatepick", @id = "txtDate" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Machine</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.EmployeeMachine, null, new { @class = "form-control", @id = "tbEmployeeMachine", @disabled = "disabled" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppNormal">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Shift</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.Shift, null, new { @class = "form-control", @id = "tbShift", @disabled = "disabled" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.JobTitle</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.JobTitle, (IEnumerable<SelectListItem>)ViewBag.JobTitles, new { @class = "form-control", @id = "ddlJobTitle" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Status</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.StatusMPP, (IEnumerable<SelectListItem>)ViewBag.StatusMppList, new { @class = "form-control", @id = "ddlStatusMpp" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppNormal">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Employee</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.EmployeeID, (IEnumerable<SelectListItem>)ViewBag.UserList, new { @class = "form-control", @id = "ddlEmployee" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppLS d-none">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.EmpShiftOneList</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.EmployeeIDLS1, (IEnumerable<SelectListItem>)ViewBag.UserList, new { @class = "form-control", @id = "ddlEmployeeLS1" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10 mppLS d-none">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.EmpShiftThreeList</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.EmployeeIDLS2, (IEnumerable<SelectListItem>)ViewBag.UserList, new { @class = "form-control", @id = "ddlEmployeeLS2" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.GroupType</label>
+			</div>
+			<div class="col-7">
+				@Html.DropDownListFor(x => x.GroupType, (IEnumerable<SelectListItem>)ViewBag.GroupTypeList, new { @class = "form-control", @id = "ddlGroupType1" })
+			</div>
+		</div>
+		<div class="row row-sm mg-b-10" id="divGroupName">
+			<div class="col-4">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.GroupName</label>
+			</div>
+			<div class="col-7">
+				@Html.TextBoxFor(x => x.GroupName, null, new { @class = "form-control", @id = "ddlGroupName", @disabled = "disabled" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$('#ddlGroupType1').change(function () {
+		if ($('#ddlGroupType1').val() == "NS") {
+			$('#divGroupName').hide();
+		} else {
+			$('#divGroupName').show();
+		}
+	});
+
+    $('.hasDatepick').datepicker({
+        format: 'd-M-yy',
+        minDate: 0,
+    });
+
+    $('#ddlStatusMpp').change(function () {
+        console.log($('#ddlStatusMpp').val());
+        if ($('#ddlStatusMpp').val() == "Normal") {
+            $('.mppNormal').removeClass('d-none');
+            $('.mppLS').addClass('d-none');
+        } else {
+            $('.mppLS').removeClass('d-none');
+            $('.mppNormal').addClass('d-none');
+        }
+    });
+
+    $('#txtDate, #tbShift, #ddlJobTitle, #ddlStatusMpp').change(function () {
+
+        var data = { machineCode: $('#tbEmployeeMachine').val(), locID: '@Model.LocID', locType : '@Model.LocType', date: $('#txtDate').val(), shift: $('#tbShift').val(), JobTitle: $('#ddlJobTitle').val(), StatusMpp: $('#ddlStatusMpp').val() };
+        console.log(data);
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetUserList", "MPP")",
+            data: data,
+            datatype: "json",
+			traditional: true,
+            success: function (data) {
+                if ($('#ddlStatusMpp').val() == "Normal") {
+                    var ddlTemp = "";
+				    for (var i = 0; i < data[0].length; i++) {
+					    ddlTemp = ddlTemp + '<option value=' + data[0][i].Value + '>' + data[0][i].Text + '</option>';
+				    }
+				    $('#ddlEmployee').html(ddlTemp);
+                } else {
+                    var ddlTemp = "<option value='0'>- Please Select -</option>";
+				    for (var i = 0; i < data[0].length; i++) {
+					    ddlTemp = ddlTemp + '<option value=' + data[0][i].Value + '>' + data[0][i].Text + '</option>';
+				    }
+                    $('#ddlEmployeeLS1').html(ddlTemp);
+
+                    ddlTemp = "<option value='0'>- Please Select -</option>";
+				    for (var i = 0; i < data[1].length; i++) {
+					    ddlTemp = ddlTemp + '<option value=' + data[1][i].Value + '>' + data[1][i].Text + '</option>';
+				    }
+				    $('#ddlEmployeeLS2').html(ddlTemp);
+                }
+
+			}
+        });
+    });
+
+
+</script>

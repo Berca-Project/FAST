@@ -1,0 +1,147 @@
+﻿@model Fast.Web.Models.MppModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("AddUserFromStatus", "Mpp", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.EmployeeID, new { @Id = "EmployeeID" })
+	@Html.HiddenFor(x => x.EmployeeName, new { @Id = "EmployeeName" })
+	@Html.HiddenFor(x => x.Date, new { @Id = "Date" })
+	@Html.HiddenFor(x => x.Location, new { @Id = "Location" })
+	@Html.HiddenFor(x => x.LocationID, new { @Id = "LocationID" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Add</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+	<div class="row row-sm mg-b-10">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Date</label>
+		</div>
+		<div class="col-7">
+			@Html.TextBoxFor(x => x.Date, "{0:dd-MMM-yy}", new { @class = "form-control hasDatepick", @id = "tbDate", @disabled = "disabled" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Employee</label>
+		</div>
+		<div class="col-7">
+			@Html.TextBoxFor(x => x.EmployeeName, null, new { @class = "form-control", @id = "txtEmpName", @disabled = "disabled" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Machine</label>
+		</div>
+		<div class="col-7">
+			@Html.DropDownListFor(x => x.EmployeeMachine, (IEnumerable<SelectListItem>)ViewBag.MachineList, new { @class = "form-control", @id = "ddlMachine" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10 mppNormal">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Shift</label>
+		</div>
+		<div class="col-7">
+			@Html.DropDownListFor(x => x.Shift, (IEnumerable<SelectListItem>)ViewBag.Shift, new { @class = "form-control", @id = "tbShift" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.JobTitle</label>
+		</div>
+		<div class="col-7">
+			@Html.DropDownListFor(x => x.JobTitle, (IEnumerable<SelectListItem>)ViewBag.JobTitles, new { @class = "form-control", @id = "ddlJobTitle" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Status</label>
+		</div>
+		<div class="col-7">
+			@Html.DropDownListFor(x => x.StatusMPP, (IEnumerable<SelectListItem>)ViewBag.StatusMppList, new { @class = "form-control", @id = "ddlStatusMpp" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.GroupType</label>
+		</div>
+		<div class="col-7">
+			@Html.DropDownListFor(x => x.GroupType, (IEnumerable<SelectListItem>)ViewBag.GroupTypeList, new { @class = "form-control", @id = "ddlGroupType1" })
+		</div>
+	</div>
+	<div class="row row-sm mg-b-10" id="divGroupName">
+		<div class="col-4">
+			<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">@UIResources.GroupName</label>
+		</div>
+		<div class="col-7">
+			@Html.DropDownListFor(x => x.GroupName, (IEnumerable<SelectListItem>)ViewBag.GroupNameList, new { @class = "form-control", @id = "ddlGroupName" })
+		</div>
+	</div>
+</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal" id="btnCancel">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#ddlGroupType1').change(function () {
+			if ($('#ddlGroupType1').val() == "NS") {
+				$('#divGroupName').hide();
+			} else {
+				$('#divGroupName').show();
+			}
+		});
+	});
+
+    $('.hasDatepick').datepicker({
+        format: 'd-M-yy',
+        minDate: 0,
+    });
+
+    $("form#ModalForm").submit(function(e){
+        e.preventDefault();
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddUserFromStatus", "MPP")",
+            data: $('form#ModalForm').serialize(),
+            success: function (data) {
+				// refresh aja
+                $('#btnSearch').trigger("click");
+
+                // munculkan pesan sukses/error
+                var notice = new PNotify({
+                    title: data.Status,
+                    delay: 5000,
+                    text: data.Text,
+                    width: "400px",
+                    type: data.Type,
+                    addclass: 'stack-bottomright'
+                });
+
+                notice.get().click(function () {
+                    notice.remove();
+                });
+
+                $(document).click(function () {
+                    PNotify.removeAll()
+                })
+			},
+			complete: function () {
+				$('#btnCancel').trigger("click");
+			}
+        });
+    });
+
+</script>

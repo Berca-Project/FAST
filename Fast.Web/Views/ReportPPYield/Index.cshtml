@@ -1,0 +1,2906 @@
+﻿@model Fast.Web.Models.Report.PPReportYieldUploadModel
+@using Fast.Web.Resources;
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = "Index";
+}
+@section Styles{
+    <style>
+        td.table-cell-mc {
+            background-color: lightgoldenrodyellow;
+        }
+        .dataTables_scrollHead table, .dataTables_scrollBody table {
+            width: 2500px !important;
+        }
+
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+
+        table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+            background-color: transparent
+        }
+    </style>
+}
+
+@section CSS_lib{
+    <!-- Specific Page Vendor CSS -->
+    <link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+}
+
+
+<div class="content content-fixed ">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Yield</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Yield</h4>
+            </div>
+            <div class="d-none d-md-block">
+                <h5 style="display:inline;">Select Type : </h5>
+                <select id="select_source" class="form-control wd-150-f d-inline input-lg mg-r-15">
+                    @if (ViewBag.isWest == 0)
+                    {
+                    <option value="1">Clove</option>
+                    <option value="2">Kretek</option>
+                    <option value="3">White</option>
+                    <option value="4">Diet</option>
+                    }
+                    else
+                    {
+                    <option value="5">Kretek</option>
+                    <option value="6">White</option>
+                    }
+                </select>
+                <button id="buttonexcel1" class="btn dtButton pd-x-0"></button>
+                <button id="buttonexcel2" class="btn dtButton pd-x-0" style="display: none;"></button>
+                <button id="buttonexcel3" class="btn dtButton pd-x-0" style="display: none;"></button>
+                <button id="buttonexcel4" class="btn dtButton pd-x-0" style="display: none;"></button>
+                <button id="buttonexcel4b" class="btn dtButton pd-x-0" style="display: none;"></button>
+                <button id="buttonexcel5" class="btn dtButton pd-x-0" style="display: none;"></button>
+                <button id="buttonexcel6" class="btn dtButton pd-x-0" style="display: none;"></button>
+                <div data-toggle="modal" class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase" id="btnUpload"><i data-feather="upload" class="wd-10 mg-r-5"></i>Upload</div>
+                @*<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>
+                    <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-file-excel"></i>Template</button>*@
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="downloadTemplate">
+                    <i data-feather="download" class="mg-r-5"></i> @UIResources.Template
+                </button>
+
+            </div>
+        </div>
+        <div class="row lph-form">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group col-12" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label tx-right">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label">Prod. Center</label>
+                                    <div class="col-6">
+                                        <select class="form-control select2" name="prodCenter">
+                                            <option label="Select Prod. Center"></option>
+                                            <option value="pp">PP - PP White - Karawang</option>
+                                            <option value="pk">PK - PP Kretek - Karawang</option>
+                                            <option value="pj">PJ - PP Kretek - Sukorejo</option>
+                                            <option value="pb">PB - PP White - SIS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider-text divider-vertical"></div>
+                            <div class="flex-1">
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Filter Line</label>
+                                    <div class="col-7">
+                                        <select class="form-control select2" name="line">
+                                            <option label="Select Line"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1" style="max-width:90px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3 mg-b-10"><i data-feather="search"></i> Search</button>
+                                <button id="btnCalculate" class="btn btn-sm  btn-success btn-uppercase pd-y-3"><i class="fas fa-calculator"></i> Calculate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="safetydevice">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Yield</div>
+                    <div class="card-body row">
+                        <div class="col-12" id="yieldClove" style="display: none;min-height:330px;min-width:100%">
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Year</th>
+                                        <th style="min-width:90px;">Week</th>
+                                        <th style="min-width:90px;">Input</th>
+                                        <th style="min-width:90px;">MC Input</th>
+                                        <th style="min-width:90px;">Dry input</th>
+                                        <th style="min-width:90px;">Non Bom</th>
+                                        <th style="min-width:90px;">MC Non Bom</th>
+                                        <th style="min-width:90px;">Dry Non Bom</th>
+                                        <th style="min-width:90px;">Casing</th>
+                                        <th style="min-width:90px;">Dry Matter</th>
+                                        <th style="min-width:90px;">Dry Casing</th>
+                                        <th style="min-width:90px;">Output</th>
+                                        <th style="min-width:90px;">MC Output</th>
+                                        <th style="min-width:90px;">Dry Output</th>
+                                        <th style="min-width:90px;">DryYield</th>
+                                        <th style="min-width:90px;">WetYield</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12" id="yieldKretek" style="display: none;min-height:330px;min-width:100%">
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Year</th>
+                                        <th style="min-width:90px;">Week</th>
+                                        <th style="min-width:90px;">Blend</th>
+                                        <th style="min-width:90px;">DryYield</th>
+                                        <th style="min-width:90px;">WetYield</th>
+                                        <th style="min-width:90px;">Leaf (Kg)</th>
+                                        <th style="min-width:90px;">Leaf (%)</th>
+                                        <th style="min-width:90px;">Clove (Kg)</th>
+                                        <th style="min-width:90px;">Clove (%)</th>
+                                        <th style="min-width:90px;">CRES (Kg)</th>
+                                        <th style="min-width:90px;">CRES (%)</th>
+                                        <th style="min-width:90px;">DIET (Kg)</th>
+                                        <th style="min-width:90px;">DIET (%)</th>
+                                        <th style="min-width:90px;">RTC (Kg)</th>
+                                        <th style="min-width:90px;">RTC (%)</th>
+                                        <th style="min-width:120px;">Small Lamina (Kg)</th>
+                                        <th style="min-width:120px;">Small Lamina (%)</th>
+                                        <th style="min-width:90px;">CSF (Kg)</th>
+                                        <th style="min-width:90px;">CSF (%)</th>
+                                        <th style="min-width:140px;">Infeed Material (Wet)</th>
+                                        <th style="min-width:140px;">Infeed Material (Dry)</th>
+                                        <th style="min-width:90px;">BC Wet</th>
+                                        <th style="min-width:90px;">Dry Matter</th>
+                                        <th style="min-width:90px;">AC</th>
+                                        <th style="min-width:90px;">Dry Matter</th>
+                                        <th style="min-width:90px;">Cut Filler</th>
+                                        <th style="min-width:90px;">Non Bom</th>
+                                        <th style="min-width:90px;">CF Dry</th>
+                                        <th style="min-width:90px;">Non Bom Dry</th>
+                                        <th style="min-width:120px;">CF Dry Exclude</th>
+                                        <th style="min-width:90px;">Final OV</th>
+                                        <th style="min-width:90px;">Non Bom MC</th>
+                                    </tr>
+                                    @*<tr>
+                        <th style="min-width:90px;">Year</th>
+                        <th style="min-width:90px;">Week</th>
+                        <th style="min-width:90px;">Blend</th>
+                        <th style="min-width:90px;">Leaf (Kg)</th>
+                        <th style="min-width:90px;">Leaf (%)</th>
+                        <th style="min-width:90px;">Clove (Kg)</th>
+                        <th style="min-width:90px;">Clove (%)</th>
+                        <th style="min-width:90px;">CRES (Kg)</th>
+                        <th style="min-width:90px;">CRES (%)</th>
+                        <th style="min-width:90px;">DIET (Kg)</th>
+                        <th style="min-width:90px;">DIET (%)</th>
+                        <th style="min-width:90px;">RTC (Kg)</th>
+                        <th style="min-width:90px;">RTC (%)</th>
+                        <th style="min-width:90px;">Small Lamina (Kg)</th>
+                        <th style="min-width:90px;">Small Lamina (%)</th>
+                        <th style="min-width:90px;">CSF (Kg)</th>
+                        <th style="min-width:90px;">CSF (%)</th>
+                        <th style="min-width:90px;">Infeed Material (Wet Kg)</th>
+                        <th style="min-width:90px;">Infeed Material (Dry Kg)</th>
+                        <th style="min-width:90px;">BC (Wet Kg)</th>
+                        <th style="min-width:90px;">BC Dry Matter (%)</th>
+                        <th style="min-width:90px;">AC (Wet Kg)</th>
+                        <th style="min-width:90px;">AC Dry Matter (%)</th>
+                        <th style="min-width:90px;">Cut Filler (Kg)</th>
+                        <th style="min-width:90px;">Non Bom (Kg)</th>
+                        <th style="min-width:90px;">CF (Dry Kg)</th>
+                        <th style="min-width:90px;">Non Bom (Dry Kg)</th>
+                        <th style="min-width:90px;">CF Dry Exclude (Kg)</th>
+                        <th style="min-width:90px;">Average Final OV (%)</th>
+                        <th style="min-width:90px;">Non Bom MC (%)</th>
+                        <th style="min-width:90px;">DryYield</th>
+                        <th style="min-width:90px;">WetYield</th>
+                    </tr>*@
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12" id="yieldWhite" style="display: none;min-height:330px;min-width:100%">
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Year</th>
+                                        <th style="min-width:90px;">Week</th>
+                                        <th style="min-width:90px;">Blend</th>
+                                        <th style="min-width:90px;">Infeed Material Wet</th>
+                                        <th style="min-width:90px;">Infeed Material Dry</th>
+                                        <th style="min-width:90px;">Sum Input Material Dry</th>
+                                        <th style="min-width:90px;">Cut Filler</th>
+                                        <th style="min-width:90px;">RS_Addback</th>
+                                        <th style="min-width:90px;">CF Dry</th>
+                                        <th style="min-width:90px;">RS_ADD Dry</th>
+                                        <th style="min-width:90px;">CSF Dry Exclude</th>
+                                        <th style="min-width:90px;">RS_Addback Wet</th>
+                                        <th style="min-width:90px;">Avg Final OV</th>
+                                        <th style="min-width:90px;">RS_Addback Percen</th>
+                                        <th style="min-width:90px;">Dry Yield</th>
+                                        <th style="min-width:90px;">Wet Yield</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12" id="yieldMCDiet" style="display: none;min-width:100%;margin-bottom:20px">
+                            <h4>MC Diet</h4>
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="max-width:60px;">Year</th>
+                                        <th style="max-width:60px;">Week</th>
+                                        <th style="max-width:90px;">MC Flake</th>
+                                        <th style="max-width:90px;">MC Krosok</th>
+                                        <th style="max-width:90px;">CVIB-0069</th>
+                                        <th style="max-width:90px;">CSFR-0022</th>
+                                        <th style="max-width:90px;">DSCL-0034</th>
+                                        <th style="max-width:90px;">CVIB-0070</th>
+                                        <th style="max-width:90px;">RV-0054</th>
+                                        <th style="max-width:90px;">DM</th>
+                                        <th style="max-width:90px;">Flake (Kg)</th>
+                                        <th style="max-width:90px;">MC Packing</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12" id="yieldDiet" style="display: none;min-height:330px;min-width:100%">
+                            <h4>Yield Diet</h4>
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Year</th>
+                                        <th style="min-width:90px;">Week</th>
+                                        <th style="min-width:90px;">Date</th>
+                                        <th style="min-width:90px;">Blend</th>
+                                        <th style="min-width:90px;">Ops</th>
+                                        <th style="min-width:90px;">CVIB-0069</th>
+                                        <th style="min-width:90px;">CSFR-0022</th>
+                                        <th style="min-width:90px;">DSCL-0034</th>
+                                        <th style="min-width:90px;">CVIB-0070</th>
+                                        <th style="min-width:90px;">RV-0054</th>
+                                        <th style="min-width:90px;">Input</th>
+                                        <th style="min-width:90px;">Output</th>
+                                        <th style="min-width:90px;">Wet Yield</th>
+                                        <th style="min-width:90px;">Dry Yield</th>
+                                        <th style="min-width:90px;">Casing</th>
+                                        <th style="min-width:90px;">Dry Input</th>
+                                        <th style="min-width:90px;">Dry Casing</th>
+                                        <th style="min-width:90px;">Dry Waste</th>
+                                        <th style="min-width:90px;">Wet Waste</th>
+                                        <th style="min-width:90px;">Dust Waste</th>
+                                        <th style="min-width:120px;">Hot Dust Waste</th>
+                                        <th style="min-width:90px;">CNG/SOLAR</th>
+                                        <th style="min-width:90px;">STEM</th>
+                                        <th style="min-width:90px;">Awal</th>
+                                        <th style="min-width:90px;">Terima</th>
+                                        <th style="min-width:90px;">Akhir</th>
+                                        <th style="min-width:90px;">Pakai</th>
+                                        <th style="min-width:90px;">Rate CO2</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @*Yield West*@
+                        <div class="col-12" id="yieldKretekWest" style="display: none;min-height:330px;min-width:100%">
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th colspan="13">WET YIELD</th>
+                                        <th colspan="18">DRY YIELD</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:90px;">SAP</th>
+                                        <th style="min-width:90px;">BATCH ID</th>
+                                        <th style="min-width:90px;">BLEND CODE</th>
+                                        <th style="min-width:110px;">PACKING WET</th>
+                                        <th style="min-width:90px;">TOBACCO</th>
+                                        <th style="min-width:90px;">IS/CRES</th>
+                                        <th style="min-width:90px;">ET</th>
+                                        <th style="min-width:90px;">RTC</th>
+                                        <th style="min-width:90px;">CLOVE</th>
+                                        <th style="min-width:90px;">RS/OS</th>
+                                        <th style="min-width:90px;">CSF</th>
+                                        <th style="min-width:90px;">YIELD</th>
+                                        <th style="min-width:90px;">TARGET</th>
+
+                                        <th style="min-width:90px;">Tobacco</th>
+                                        <th style="min-width:90px;">IS/CRES</th>
+                                        <th style="min-width:90px;">RTC</th>
+                                        <th style="min-width:90px;">ET</th>
+                                        <th style="min-width:90px;">CLOVE</th>
+                                        <th style="min-width:90px;">CSF</th>
+                                        <th style="min-width:90px;">OfSpec</th>
+                                        <th style="min-width:90px;">Final OV</th>
+                                        <th style="min-width:90px;">Invoice OV</th>
+                                        <th style="min-width:90px;">DM BC</th>
+                                        <th style="min-width:90px;">BC</th>
+                                        <th style="min-width:90px;">BS</th>
+                                        <th style="min-width:90px;">AC</th>
+                                        <th style="min-width:90px;">PACKING</th>
+                                        <th style="min-width:90px;">YIELD</th>
+                                        <th style="min-width:90px;">DM AC</th>
+                                        <th style="min-width:90px;">Dry Casing</th>
+                                        <th style="min-width:90px;">Dry AC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12" id="yieldWhiteWest" style="display: none;min-height:330px;min-width:100%">
+                            <table class="table table-bordered table-hover table-striped" style="min-height:50px;">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th colspan="10">WET YIELD</th>
+                                        <th colspan="17">DRY YIELD</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="min-width:90px;">SAP</th>
+                                        <th style="min-width:90px;">BATCH ID</th>
+                                        <th style="min-width:90px;">BLEND CODE</th>
+                                        <th style="min-width:110px;">PACKING WET</th>
+                                        <th style="min-width:90px;">TOBACCO</th>
+                                        <th style="min-width:90px;">IS</th>
+                                        <th style="min-width:90px;">ET</th>
+                                        <th style="min-width:90px;">SL</th>
+                                        <th style="min-width:90px;">RS</th>
+                                        <th style="min-width:90px;">YIELD</th>
+                                        <th style="min-width:90px;">Tobacco</th>
+                                        <th style="min-width:90px;">IS</th>
+                                        <th style="min-width:90px;">ET</th>
+                                        <th style="min-width:90px;">SL</th>
+                                        <th style="min-width:90px;">RS</th>
+                                        <th style="min-width:90px;">Final OV</th>
+                                        <th style="min-width:90px;">Invoice OV</th>
+                                        <th style="min-width:90px;">DM BS</th>
+                                        <th style="min-width:90px;">DM BT</th>
+                                        <th style="min-width:90px;">DM BC</th>
+                                        <th style="min-width:90px;">DM AC</th>
+                                        <th style="min-width:90px;">BS</th>
+                                        <th style="min-width:90px;">BT</th>
+                                        <th style="min-width:90px;">BC</th>
+                                        <th style="min-width:90px;">AC</th>
+                                        <th style="min-width:90px;">PACKING</th>
+                                        <th style="min-width:90px;">YIELD</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        @*<div class="tableWrapper col-12" style="min-height:330px;">
+            <table class="table table-bordered table-hover table-striped">
+                <thead class="thead-info tx-center">
+                    <tr>
+                        <th rowspan="2" style="min-width:90px;">Blend</th>
+                        <th rowspan="2" style="min-width:90px;">Ops Nb</th>
+                        <th rowspan="2" style="min-width:90px;">PO Nb</th>
+                        <th rowspan="2" style="min-width:90px;">Leaf</th>
+                        <th rowspan="2" style="min-width:90px;">CRES</th>
+                        <th rowspan="2" style="min-width:90px;">RTC</th>
+                        <th rowspan="2" style="min-width:90px;">DIET</th>
+                        <th rowspan="2" style="min-width:90px;">Small</th>
+                        <th rowspan="2" style="min-width:90px;">CSF</th>
+                        <th rowspan="2" style="min-width:90px;">Clove</th>
+                        <th colspan="2" style="min-width:90px;">Non Bom</th>
+                        <th rowspan="2" style="min-width:90px;">BC</th>
+                        <th rowspan="2" style="min-width:90px;">AC</th>
+                        <th rowspan="2" style="min-width:90px;">Output</th>
+                        <th rowspan="2" style="min-width:90px;">Yield</th>
+                    </tr>
+                </thead>
+                <tbody id="yield">
+                </tbody>
+            </table>
+        </div>*@
+                    </div>
+                </div>
+            </div><!-- Yield -->
+
+        </div><!-- container -->
+    </div><!-- content -->
+</div>    <!-- content -->
+<!-- Yield Clove -->
+<div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("Upload", "ReportPPYield", FormMethod.Post, new { encType = "multipart/form-data", @id = "UploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Upload</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Upload Data Yield Clove</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="form-group ">
+                        <div class="form-control-static">
+                            <span class="btn btn-success fileinput-button btn-block">
+                                <input name="PostedFilename" id="customFile" required="required" type="file" accept=".xls, .xlsx" value="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+<!-- Yield White -->
+<div class="modal fade" id="modalUploadWhite" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("UploadWhite", "ReportPPYield", FormMethod.Post, new { encType = "multipart/form-data", @id = "UploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Upload</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Upload Data Yield White</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="form-group ">
+                        <div class="form-control-static">
+                            <span class="btn btn-success fileinput-button btn-block">
+                                <input name="PostedFilename" id="customFile" required="required" type="file" accept=".xls, .xlsx" value="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+<!-- Yield Kretek -->
+<div class="modal fade" id="modalUploadKretek" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("UploadKretek", "ReportPPYield", FormMethod.Post, new { encType = "multipart/form-data", @id = "UploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Upload</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Upload Data Yield Kretek</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="row form-group" style="margin-right:10px;margin-left:10px;">
+                        <div class="col-4">
+                            <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Week, Year <span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-7">
+                            @Html.TextBoxFor(x => x.WeekYear, null, new { @class = "form-control", @id = "tbWeekYear", @required = "required", @type = "week" })
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-right:10px;margin-left:10px;margin-top:20px;">
+                        <div class="form-control-static">
+                            <span class="btn btn-success fileinput-button btn-block">
+                                <input name="PostedFilename" id="customFile" required="required" type="file" accept=".xls, .xlsx" value="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+<!-- Yield Diet -->
+<div class="modal fade" id="modalUploadDiet" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("UploadDiet", "ReportPPYield", FormMethod.Post, new { encType = "multipart/form-data", @id = "UploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i data-feather="share" class="wd-60 ht-60"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Upload</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Upload MC Diet</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+                <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+                    <div class="row form-group" style="margin-right:10px;margin-left:10px;">
+                        <div class="col-4">
+                            <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Start Week, Year <span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-7">
+                            @Html.TextBoxFor(x => x.WeekYear, null, new { @class = "form-control", @id = "tbWeekYear", @required = "required", @type = "week" })
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-right:10px;margin-left:10px;margin-top:20px;">
+                        <div class="form-control-static">
+                            <span class="btn btn-success fileinput-button btn-block">
+                                <input name="PostedFilename" id="customFile" required="required" type="file" accept=".xls, .xlsx" value="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Upload</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+
+    <script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+    <script src="~/Content/theme/lib/datatable-export/exportaction.js"></script>
+    <style>
+        .dataTables_scrollBody thead tr {
+            visibility: collapse
+        }
+    </style>
+    <script>
+        var HeaderClove = ["Year","Week","Input","MC Input","Dry input","Non Bom","MC Non Bom","Dry Non Bom","Casing","Dry Matter","Dry Casing","Output","MC Output","Dry Output","DryYield","WetYield"];
+        var HeaderKretek = ["Year","Week","Blend","DryYield","WetYield","Leaf (Kg)","Leaf (%)","Clove (Kg)","Clove (%)","CRES (Kg)","CRES (%)","DIET (Kg)","DIET (%)","RTC (Kg)","RTC (%)","Small Lamina (Kg)","Small Lamina (%)","CSF (Kg)","CSF (%)","Infeed Material (Wet)","Infeed Material (Dry)","BC Wet","Dry Matter","AC","Dry Matter","Cut Filler","Non Bom","CF Dry","Non Bom Dry","CF Dry Exclude","Final OV","Non Bom MC"];
+        var HeaderWhite = ["Year","Week","Blend","Infeed Material Wet","Infeed Material Dry","Sum Input Material Dry","Cut Filler","RS_Addback","CF Dry","RS_ADD Dry","CSF Dry Exclude","RS_Addback Wet","Avg Final OV","RS_Addback Percen","DryYield","WetYield"];
+        var HeaderDiet = ["Year","Week","Date","Blend","Ops","CVIB-0069","CSFR-0022","DSCL-0034","CVIB-0070","RV-0054","Input","Output","Wet Yield","Dry Yield","Casing","Dry Input","Dry Casing","Dry Waste","Wet Waste","Dust Waste","Hot Dust Waste","CNG/SOLAR","STEM","Awal","Terima","Akhir","Pakai","Rate CO2"];
+        var HeaderMCDiet = ["Year","Week","MC Flake","MC Krosok","CVIB-0069","CSFR-0022","DSCL-0034","CVIB-0070","RV-0054","DM","Flake (KG)","MC Packing"];
+         var HeaderKretekWest = ["SAP","BATCH ID","BLEND CODE","PACKING WET","TOBACCO","IS/CRES","ET","RTC","CLOVE","RS/OS","CSF","YIELD WET","TARGET","Tobacco","IS/CRES","RTC","ET","CLOVE","CSF","OfSpec","Final OV","Invoice OV","DM BC","BC","BS","AC","PACKING","YIELD DRY","DM AC","Dry Casing","Dry AC"];
+         var HeaderWhiteWest = ["SAP","BATCH ID","BLEND CODE","PACKING WET","TOBACCO","IS","ET","SL","RS","YIELD WET","Tobacco","IS","ET","SL","RS","Final OV","Invoice OV","DM BS","DM BT","DM BC","DM AC","BS","BT","BC","AC","PACKING","YIELD DRY"];
+        
+
+        function SetExcelDownload(type) {
+                console.log("Type Awal: " + type);
+            if (type == "0") {
+                console.log("Type : " + type);
+                $('#buttonexcel1').html("");
+                var buttons1 = new $.fn.dataTable.Buttons(tableClove, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield Clove',
+                            "exportOptions": {
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderClove[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel1'));
+            } else if (type == "1") {
+                console.log("Type : " + type);
+                $('#buttonexcel2').html("");
+                var buttons2 = new $.fn.dataTable.Buttons(tableKretek, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield Kretek',
+                            "exportOptions": {
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderKretek[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel2'));
+            } else if (type == "2") {
+                console.log("Type : " + type);
+                $('#buttonexcel3').html("");
+                var buttons3 = new $.fn.dataTable.Buttons(tableWhite, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield White',
+                            "exportOptions": {
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderWhite[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel3'));
+            } else if (type == "3") {
+                console.log("Type : " + type);
+                $('#buttonexcel4').html("");
+                $('#buttonexcel4b').html("");
+                var buttons4b = new $.fn.dataTable.Buttons(tableMCDiet, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export MC',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield MC Diet',
+                            "exportOptions": {
+                                //columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderMCDiet[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel4b'));
+                var buttons4 = new $.fn.dataTable.Buttons(tableDiet, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export Yield',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield Diet',
+                            "exportOptions": {
+                                //columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderDiet[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel4'));
+            }else if (type == "4") {
+                console.log("Type : " + type);
+                $('#buttonexcel5').html("");
+                var buttons5 = new $.fn.dataTable.Buttons(tableKretekWest, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield Kretek',
+                            "exportOptions": {
+                                //columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderWhiteWest[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel5'));
+            }else if (type == "5") {
+                console.log("Type : " + type);
+                $('#buttonexcel6').html("");
+                var buttons6 = new $.fn.dataTable.Buttons(tableWhiteWest, {
+                    buttons: [
+                        {
+                            "text": '<i class="fa fa-lg fa-file-excel"></i> Export',
+                            "extend": 'excel',
+                            "className": 'btn btn-outline-secondary btn-sm btn-uppercase',
+                            "title": 'Yield White',
+                            "exportOptions": {
+                                //columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return HeaderKretekWest[columnIdx];
+                                    }
+                                }
+                            },
+                            "extension": '.xlsx'
+                        }
+                    ]
+                }).container().appendTo($('#buttonexcel6'));
+            }
+        }
+    </script>
+    <script>
+        var tableClove,tableKretek,tableWhite,tableDiet,tableMCDiet,tableKretekWest;
+            $('#select_source').change(function () {
+                        $('#downloadTemplate').show();
+                        $('#btnUpload').show();
+                switch ($(this).val()) {
+                    case "1":
+                        $('#yieldClove').show();
+                        $('#yieldKretek').hide();
+                        $('#yieldWhite').hide();
+                        $('#yieldDiet').hide();
+                        $('#yieldMCDiet').hide();
+                        $('#yieldKretekWest').hide();
+                        $('#yieldWhiteWest').hide();
+                        $('#btnCalculate').hide();
+                        $('#buttonexcel1').show();
+                        $('#buttonexcel2').hide();
+                        $('#buttonexcel3').hide();
+                        $('#buttonexcel4').hide();
+                        $('#buttonexcel4b').hide();
+                        $('#buttonexcel5').hide();
+                        $('#buttonexcel6').hide();
+                        $('#btnCalculate').hide();
+                        break;
+                    case "2":
+                        $('#yieldClove').hide();
+                        $('#yieldKretek').show();
+                        $('#yieldWhite').hide();
+                        $('#yieldDiet').hide();
+                        $('#yieldMCDiet').hide();
+                        $('#yieldKretekWest').hide();
+                        $('#yieldWhiteWest').hide();
+                        $('#btnCalculate').hide();
+                        $('#buttonexcel1').hide();
+                        $('#buttonexcel2').show();
+                        $('#buttonexcel3').hide();
+                        $('#buttonexcel4').hide();
+                        $('#buttonexcel4b').hide();
+                        $('#buttonexcel5').hide();
+                        $('#buttonexcel6').hide();
+                        $('#btnCalculate').hide();
+                        break;
+                    case "3":
+                        $('#yieldClove').hide();
+                        $('#yieldKretek').hide();
+                        $('#yieldWhite').show();
+                        $('#yieldDiet').hide();
+                        $('#yieldMCDiet').hide();
+                        $('#yieldKretekWest').hide();
+                        $('#yieldWhiteWest').hide();
+                        $('#btnCalculate').hide();
+                        $('#buttonexcel1').hide();
+                        $('#buttonexcel2').hide();
+                        $('#buttonexcel3').show();
+                        $('#buttonexcel4').hide();
+                        $('#buttonexcel4b').hide();
+                        $('#buttonexcel5').hide();
+                        $('#buttonexcel6').hide();
+                        $('#btnCalculate').hide();
+                        break;
+                    case "4":
+                        $('#yieldClove').hide();
+                        $('#yieldKretek').hide();
+                        $('#yieldWhite').hide();
+                        $('#yieldDiet').show();
+                        $('#yieldMCDiet').show();
+                        $('#yieldKretekWest').hide();
+                        $('#yieldWhiteWest').hide();
+                        $('#btnCalculate').hide();
+                        $('#buttonexcel1').hide();
+                        $('#buttonexcel2').hide();
+                        $('#buttonexcel3').hide();
+                        $('#buttonexcel4').show();
+                        $('#buttonexcel4b').show();
+                        $('#buttonexcel5').hide();
+                        $('#buttonexcel6').hide();
+                        $('#btnCalculate').hide();
+                        break;
+                    case "5":
+                        $('#yieldClove').hide();
+                        $('#yieldKretek').hide();
+                        $('#yieldWhite').hide();
+                        $('#yieldDiet').hide();
+                        $('#yieldMCDiet').hide();
+                        $('#yieldKretekWest').show();
+                        $('#yieldWhiteWest').hide();
+                        $('#btnCalculate').show();
+                        $('#buttonexcel1').hide();
+                        $('#buttonexcel2').hide();
+                        $('#buttonexcel3').hide();
+                        $('#buttonexcel4').hide();
+                        $('#buttonexcel4b').hide();
+                        $('#buttonexcel5').show();
+                        $('#buttonexcel6').hide();
+                        $('#btnCalculate').show();
+                        $('#downloadTemplate').hide();
+                        $('#btnUpload').hide();
+                        break;
+                    case "6":
+                        $('#yieldClove').hide();
+                        $('#yieldKretek').hide();
+                        $('#yieldWhite').hide();
+                        $('#yieldDiet').hide();
+                        $('#yieldMCDiet').hide();
+                        $('#yieldKretekWest').hide();
+                        $('#yieldWhiteWest').show();
+                        $('#btnCalculate').show();
+                        $('#buttonexcel1').hide();
+                        $('#buttonexcel2').hide();
+                        $('#buttonexcel3').hide();
+                        $('#buttonexcel4').hide();
+                        $('#buttonexcel4b').hide();
+                        $('#buttonexcel5').hide();
+                        $('#buttonexcel6').show();
+                        $('#btnCalculate').show();
+                        $('#downloadTemplate').hide();
+                        $('#btnUpload').hide();
+                        break;
+                    default:
+                        break;
+                }
+                $('#btnSearch').click();
+            });
+
+            $('#btnUpload').on('click', function () {
+                switch ($('#select_source').val()) {
+                    case "1":
+                        $('#modalUpload').modal('show');
+                        break;
+                    case "2":
+                        $('#modalUploadKretek').modal('show');
+                        break;
+                    case "3":
+                        $('#modalUploadWhite').modal('show');
+                        break;
+                    case "4":
+                        $('#modalUploadDiet').modal('show');
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            $('#downloadTemplate').on('click', function () {
+                switch ($('#select_source').val()) {
+                    case "1":
+                        location.href = '@Url.Action("DownloadYieldPPTemplate", "ReportPPYield")';
+                        break;
+                    case "2":
+                        location.href = '@Url.Action("DownloadYieldKretekPPTemplate", "ReportPPYield")';
+                        break;
+                    case "3":
+                        location.href = '@Url.Action("DownloadYieldWhitePPTemplate", "ReportPPYield")';
+                        break;
+                    case "4":
+                        location.href = '@Url.Action("DownloadYieldDietPPTemplate", "ReportPPYield")';
+                        break;
+                    default:
+                        break;
+                }
+
+            });
+            $('#btnSearch').on('click', function () {
+                //var dateFilter = $('#flDate').val();
+                //var shiftFilter = $('#shift').val() != "" ? $('#shift').val() : "";
+                //var lphTypeFilter = $('#lphtype').val();
+                //var source = $('#source').val();
+                //var main_source = $('#select_source').val();
+                //var location1 = $('.selection-location').val();
+                //var location2 = $('.selection-department').val();
+                //var location3 = $('.selection-subdepartment').val();
+                const param = {
+                    StartDate: $("[name=start]").val(),
+                    EndDate: $("[name=end]").val(),
+                };
+                if (param.StartDate == "") {
+                    showError("Start Date can't be empty");
+                    return;
+                }
+                if (param.EndDate == "") {
+                    showError("End Date can't be empty");
+                    return;
+                }
+                $('#loading_overlay').removeClass('d-none');
+
+                if ($('#select_source').val() == "1") {
+                    tableClove = $('#yieldClove table').dataTable({
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "searching": false,
+                        "lengthMenu": [[10, 25, 50, 100, 1000], ['10', '25', '50', '100', '1000']],
+                        //"filter": true,
+                        "orderMulti": false,
+                        "pageLength": 10,
+                        "destroy": true,
+                        "order": [[0, "desc"]],
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetData",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "visible": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false
+                            }, {
+                                "targets": [10],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [12],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [13],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [14],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [15],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            ],
+                        "columns": [
+                            { "data": "Year", "name": "Year", "autoWidth": false },
+                            { "data": "Week", "name": "Week", "autoWidth": true },
+                            { "data": "Input", "name": "Input", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "MCInput", "name": "MCInput", "autoWidth": true },
+                            { "data": "DryInput", "name": "DryInput", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "NonBom", "name": "NonBom", "autoWidth": true },
+                            { "data": "MCNonBom", "name": "MCNonBom", "autoWidth": true },
+                            { "data": "DryNonBom", "name": "DryNonBom", "autoWidth": true },
+                            { "data": "Casing", "name": "Casing", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "DryMatter", "name": "DryMatter", "autoWidth": true },
+                            { "data": "DryCasing", "name": "DryCasing", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Output", "name": "Output", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "MCOutput", "name": "MCOutput", "autoWidth": true },
+                            { "data": "DryOutput", "name": "DryOutput", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DryYield", "name": "DryYield", "autoWidth": true,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "WetYield", "name": "WetYield", "autoWidth": true,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+
+                        ]
+                    });
+                    SetExcelDownload("0");
+                }
+                else if ($('#select_source').val() == "2") {
+                    tableKretek = $('#yieldKretek table').dataTable({
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "searching": false,
+                        "lengthMenu": [[10, 25, 50, 100, 1000], ['10', '25', '50', '100', '1000']],
+                        //"filter": true,
+                        //"orderMulti": false,
+                        "pageLength": 10,
+                        "destroy": true,
+                        //"order": [[0, "desc"]],
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetDataKretek",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "rowCallback": function (row, data, index) {
+                            if (data.Year == '') {
+                                $('td', row).css('background-color', '#d8eafe');
+                            }
+                        },
+                        //,
+                        //'rowCallback': function (row, data, index) {
+                        //    console.log("Rowval " + data[0]);
+                        //    if (row == 0) {
+                        //        $('td', nRow).css('background-color', '#F39B9B');
+                        //    }
+                        //},
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false
+                            }, {
+                                "targets": [10],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [12],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [13],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [14],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [15],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [16],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [17],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [18],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [19],
+                                "searchable": false,
+                                "orderable": false,
+                            }, {
+                                "targets": [20],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [21],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [22],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [23],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [24],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [25],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [26],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [27],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [28],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [29],
+                                "searchable": false,
+                                "orderable": false,
+                            },
+                            {
+                                "targets": [30],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [31],
+                                "searchable": false,
+                                "orderable": false,
+                            }
+                            ],
+                        "columns": [
+                            { "data": "Year", "name": "Year", "autoWidth": false ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Week", "name": "Week", "autoWidth": false ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Blend", "name": "Blend", "autoWidth": false },
+                            {
+                                "data": "DryYield", "name": "DryYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "WetYield", "name": "WetYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Leaf", "name": "Leaf", "autoWidth": false },
+                            { "data": "LeafOV", "name": "LeafOV", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "Clove", "name": "Clove", "autoWidth": false },
+                            { "data": "CloveOV", "name": "CloveOV", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "CRES", "name": "CRES", "autoWidth": false },
+                            { "data": "CRESOV", "name": "CRESOV", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "DIET", "name": "DIET", "autoWidth": false },
+                            { "data": "DIETOV", "name": "DIETOV", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "RTC", "name": "RTC", "autoWidth": false },
+                            { "data": "RTCOV", "name": "RTCOV", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "SmallLamina", "name": "SmallLamina", "autoWidth": false },
+                            { "data": "SmallLaminaOV", "name": "SmallLaminaOV", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "CloveSteamFlake", "name": "CloveSteamFlake", "autoWidth": false },
+                            { "data": "CloveSteamFlakeOV", "name": "CloveSteamFlakeOV", "class":"table-cell-mc", "autoWidth": false },
+                            {
+                                "data": "InfeedMaterialWet", "name": "InfeedMaterialWet", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "InfeedMaterialDry", "name": "InfeedMaterialDry", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "BCWet", "name": "BCWet", "autoWidth": false },
+                            { "data": "BCDryMatter", "name": "BCDryMatter", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "ACWet", "name": "ACWet", "autoWidth": false },
+                            { "data": "ACDryMatter", "name": "ACDryMatter", "class":"table-cell-mc", "autoWidth": false },
+                            { "data": "CutFiller", "name": "CutFiller", "autoWidth": false },
+                            {
+                                "data": "Addback", "name": "Addback", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "CFDry", "name": "CFDry", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "AddbackDry", "name": "AddbackDry", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "CFDryExclude", "name": "CFDryExclude", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "AvgFinalOV", "name": "AvgFinalOV", "class":"table-cell-mc", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "AddbackMC", "name": "AddbackMC", "class":"table-cell-mc", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                        ]
+                    });
+                    SetExcelDownload("1");
+                }
+                else if ($('#select_source').val() == "3") {
+                    tableWhite = $('#yieldWhite table').dataTable({
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "searching": false,
+                        "lengthMenu": [[10, 25, 50, 100, 1000], ['10', '25', '50', '100', '1000']],
+                        //"filter": true,
+                        "orderMulti": false,
+                        "pageLength": 10,
+                        "destroy": true,
+                        "order": [[0, "desc"]],
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetDataWhite",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "rowCallback": function (row, data, index) {
+                            if (data.Year == '') {
+                                $('td', row).css('background-color', '#d8eafe');
+                            }
+                        },
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "visible": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false,
+                                // "className": "tx-center"
+                            }, {
+                                "targets": [10],
+                                "searchable": false,
+                                //"visible": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [12],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [13],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [14],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [15],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            ],
+                        "columns": [
+                            { "data": "Year", "name": "Year", "autoWidth": false ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Week", "name": "Week", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Blend", "name": "Blend", "autoWidth": true },
+                            { "data": "InfeedMaterialWet", "name": "InfeedMaterialWet", "autoWidth": true },
+                            { "data": "InfeedMaterialDry", "name": "InfeedMaterialDry", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "SumInputMaterialDry", "name": "SumInputMaterialDry", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "CutFiller", "name": "CutFiller", "autoWidth": true },
+                            { "data": "RS_Addback", "name": "RS_Addback", "autoWidth": true },
+                            { "data": "CFDry", "name": "CFDry", "autoWidth": true },
+                            { "data": "RS_AddDry", "name": "RS_AddDry", "autoWidth": true },
+                            { "data": "CFDryExclude", "name": "CFDryExclude", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "RS_AddbackWet", "name": "RS_AddbackWet", "autoWidth": true ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(3);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "AvgFinalOV", "name": "AvgFinalOV", "autoWidth": true },
+                            { "data": "RS_AddbackPercen", "name": "RS_AddbackPercen", "autoWidth": true },
+                            {
+                                "data": "DryYield", "name": "DryYield", "autoWidth": true,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "WetYield", "name": "WetYield", "autoWidth": true,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                        ]
+                    });
+                    SetExcelDownload("2");
+                }
+                else if ($('#select_source').val() == "4") {
+                    tableMCDiet = $('#yieldMCDiet table').dataTable({
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "orderMulti": false,
+                        "destroy": true,
+                        "searching": false,
+                        "info": false,
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetDataMCDiet",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "visible": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false,
+                            },
+                            {
+                                "targets": [10],
+                                "searchable": false,
+                                "orderable": false,
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false,
+                            }
+                            ],
+                        "columns": [
+                            { "data": "Year", "name": "Year", "autoWidth": false },
+                            { "data": "Week", "name": "Week", "autoWidth": false },
+                            { "data": "MCFlake", "name": "MCFlake", "autoWidth": false },
+                            { "data": "MCKrosok", "name": "MCKrosok", "autoWidth": false },
+                            { "data": "CVIB0069", "name": "CVIB0069", "autoWidth": false },
+                            { "data": "CSFR0022", "name": "CSFR0022", "autoWidth": false },
+                            { "data": "DSCL0034", "name": "DSCL0034", "autoWidth": false },
+                            { "data": "CVIB0070", "name": "CVIB0070", "autoWidth": false },
+                            { "data": "RV0054", "name": "RV0054", "autoWidth": false },
+                            { "data": "DM", "name": "DM", "autoWidth": false },
+                            { "data": "Flake", "name": "Flake", "autoWidth": false },
+                            { "data": "MCPacking", "name": "MCPacking", "autoWidth": false }
+                        ]
+                    });
+                    tableDiet = $('#yieldDiet table').dataTable({
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "searching": false,
+                        "lengthMenu": [[10, 25, 50, 100, 1000], ['10', '25', '50', '100', '1000']],
+                        //"filter": true,
+                        "orderMulti": false,
+                        "pageLength": 10,
+                        "destroy": true,
+                        "order": [[0, "desc"]],
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetDataDiet",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "rowCallback": function (row, data, index) {
+                            if (data.Year == '') {
+                                $('td', row).css('background-color', '#d8eafe');
+                            }
+                        },
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "visible": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false,
+                            }, {
+                                "targets": [10],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [12],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [13],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [14],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [15],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [16],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [17],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [18],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [19],
+                                "searchable": false,
+                                "orderable": false,
+                            }, {
+                                "targets": [20],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [21],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [22],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [23],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [24],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [25],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [26],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [27],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            ],
+                        "columns": [
+                            { "data": "Year", "name": "Year", "autoWidth": false ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Week", "name": "Week", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                             },
+                            {
+                                "data": "Date", "name": "Date", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return moment(data).format("DD-MMM-YY") == "01-Jan-01" ? "" : moment(data).format("DD-MMM-YY");
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Blend", "name": "Blend", "autoWidth": false },
+                            { "data": "Ops", "name": "Ops", "autoWidth": false ,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data == 0 ? "" : data;
+                                    else
+                                        return '';
+                                }
+                             },
+                            { "data": "CVIB0069", "name": "CVIB0069", "autoWidth": false },
+                            { "data": "CSFR0022", "name": "CSFR0022", "autoWidth": false },
+                            { "data": "DSCL0034", "name": "DSCL0034", "autoWidth": false },
+                            { "data": "CVIB0070", "name": "CVIB0070", "autoWidth": false },
+                            { "data": "RV0054", "name": "RV0054", "autoWidth": false },
+                            { "data": "Input", "name": "Input", "autoWidth": false },
+                            { "data": "Output", "name": "Output", "autoWidth": false },
+                            {
+                                "data": "WetYield", "name": "WetYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DryYield", "name": "DryYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "Casing", "name": "Casing", "autoWidth": false },
+                            {
+                                "data": "DryInput", "name": "DryInput", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DryCasing", "name": "DryCasing", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return parseFloat(data).toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DryWaste", "name": "DryWaste", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "WetWaste", "name": "WetWaste", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DustWaste", "name": "DustWaste", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "HotDustWaste", "name": "HotDustWaste", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return (parseFloat(data) * 100).toFixed(2) + " %";
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "CGNSolar", "name": "CGNSolar", "autoWidth": false },
+                            { "data": "STEAM", "name": "STEAM", "autoWidth": false },
+                            { "data": "Awal", "name": "Awal", "autoWidth": false },
+                            { "data": "Terima", "name": "Terima", "autoWidth": false },
+                            { "data": "Akhir", "name": "Akhir", "autoWidth": false },
+                            { "data": "Pakai", "name": "Pakai", "autoWidth": false },
+                            { "data": "RateCO2", "name": "RateCO2", "autoWidth": false },
+
+                        ]
+                    });
+                    SetExcelDownload("3");
+                }
+                else if ($('#select_source').val() == "5") {
+                    console.log("Pilihan : " + $('#select_source').val());
+                    tableKretekWest = $('#yieldKretekWest table').dataTable({
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "searching": true,
+                        "lengthMenu": [[10, 25, 50, 100, 1000], ['10', '25', '50', '100', '1000']],
+                        //"filter": true,
+                        "orderMulti": false,
+                        "pageLength": 10,
+                        "destroy": true,
+                        "order": [[0, "desc"]],
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetViewDataKretekWest",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false
+                            }, {
+                                "targets": [10],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [12],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [13],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [14],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [15],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [16],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [17],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [18],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [19],
+                                "searchable": false,
+                                "orderable": false,
+                            }, {
+                                "targets": [20],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [21],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [22],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [23],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [24],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [25],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [26],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [27],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [28],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [29],
+                                "searchable": false,
+                                "orderable": false,
+                            },
+                            {
+                                "targets": [30],
+                                "searchable": false,
+                                "orderable": false
+                            }
+                            ],
+                        "columns": [
+                            { "data": "SAPID", "name": "SAPID", "autoWidth": false },
+                            { "data": "BatchIdent", "name": "BatchIdent", "autoWidth": false },
+                            { "data": "BlendCode", "name": "BlendCode", "autoWidth": false },
+                            { "data": "ProducedQTY", "name": "ProducedQTY", "autoWidth": false },
+                            { "data": "Tobacco", "name": "Tobacco", "autoWidth": false },
+                            { "data": "TotalStems", "name": "TotalStems", "autoWidth": false },
+                            { "data": "TotalExpandedTobacco", "name": "TotalExpandedTobacco", "autoWidth": false },
+                            { "data": "TotalSmallLamina", "name": "TotalSmallLamina", "autoWidth": false },
+                            { "data": "TotalCloves", "name": "TotalCloves", "autoWidth": false },
+                            { "data": "TotalOffspec", "name": "TotalOffspec", "autoWidth": false },
+                            { "data": "CSF", "name": "CSF", "autoWidth": false },
+                            {
+                                "data": "WetYield", "name": "WetYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "WetTarget", "name": "WetTarget", "autoWidth": false },
+                            { "data": "DryTobacco", "name": "DryTobacco", "autoWidth": false },
+                            { "data": "DryISCRES", "name": "DryISCRES", "autoWidth": false },
+                            { "data": "DryRTC", "name": "DryRTC", "autoWidth": false },
+                            { "data": "DryET", "name": "DryET", "autoWidth": false },
+                            { "data": "DryCLOVE", "name": "DryCLOVE", "autoWidth": false },
+                            { "data": "DryCSF", "name": "DryCSF", "autoWidth": false },
+                            { "data": "DryOfSpec", "name": "DryOfSpec", "autoWidth": false },
+                            { "data": "FinalOV", "name": "FinalOV", "autoWidth": false },
+                            { "data": "InvoiceOV", "name": "InvoiceOV", "autoWidth": false },
+                            { "data": "DMBC", "name": "DMBC", "autoWidth": false },
+                            { "data": "TotalBrightCasing", "name": "TotalBrightCasing", "autoWidth": false },
+                            { "data": "TotalBurleySpray", "name": "TotalBurleySpray", "autoWidth": false },
+                            { "data": "TotalAfterCut", "name": "TotalAfterCut", "autoWidth": false },
+                            {
+                                "data": "Packing", "name": "Packing", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DryYield", "name": "DryYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "DMAC", "name": "DMAC", "autoWidth": false },
+                            { "data": "DryCasing", "name": "DryCasing", "autoWidth": false },
+                            { "data": "DryAC", "name": "DryAC", "autoWidth": false }
+                        ]
+                    });
+                    SetExcelDownload("4");
+
+                } else if ($('#select_source').val() == "6") {
+                    tableWhiteWest = $('#yieldWhiteWest table').dataTable({
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "processing": true,
+                        "serverSide": true,
+                        "searching": true,
+                        "lengthMenu": [[10, 25, 50, 100, 1000], ['10', '25', '50', '100', '1000']],
+                        //"filter": true,
+                        "orderMulti": false,
+                        "pageLength": 10,
+                        "destroy": true,
+                        "order": [[0, "desc"]],
+                        "ajax": {
+                            "url": fastApp.BaseUrl + "/ReportPPYield/GetViewDataWhiteWest",
+                            "data": param,
+                            "type": "POST",
+                            "datatype": "json",
+                        },
+                        "drawCallback": function (settings) {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        "columnDefs":
+                            [{
+                                "targets": [0],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [2],
+                                "searchable": true,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [3],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [4],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [5],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [6],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [7],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [8],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [9],
+                                "searchable": false,
+                                "orderable": false
+                            }, {
+                                "targets": [10],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [11],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [12],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [13],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [14],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [15],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [16],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [17],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [18],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [19],
+                                "searchable": false,
+                                "orderable": false,
+                            }, {
+                                "targets": [20],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [21],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [22],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [23],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [24],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [25],
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                "targets": [26],
+                                "searchable": false,
+                                "orderable": false
+                            }
+                            ],
+                        "columns": [
+                            { "data": "SAPID", "name": "SAPID", "autoWidth": false },
+                            { "data": "BatchIdent", "name": "BatchIdent", "autoWidth": false },
+                            { "data": "BlendCode", "name": "BlendCode", "autoWidth": false },
+                            { "data": "ProducedQTY", "name": "ProducedQTY", "autoWidth": false },
+                            { "data": "Tobacco", "name": "Tobacco", "autoWidth": false },
+                            { "data": "TotalStems", "name": "TotalStems", "autoWidth": false },
+                            { "data": "TotalExpandedTobacco", "name": "TotalExpandedTobacco", "autoWidth": false },
+                            { "data": "TotalSmallLamina", "name": "TotalSmallLamina", "autoWidth": false },
+                            { "data": "TotalRipperShorts", "name": "TotalRipperShorts", "autoWidth": false },
+                            {
+                                "data": "WetYield", "name": "WetYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "DryTobacco", "name": "DryTobacco", "autoWidth": false },
+                            { "data": "DryISCRES", "name": "DryISCRES", "autoWidth": false },
+                            { "data": "DryET", "name": "DryET", "autoWidth": false },
+                            { "data": "DrySL", "name": "DrySL", "autoWidth": false },
+                            { "data": "DryRS", "name": "DryRS", "autoWidth": false },
+                            { "data": "FinalOV", "name": "FinalOV", "autoWidth": false },
+                            {
+                                "data": "InvoiceOV", "name": "InvoiceOV", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            { "data": "DMBS", "name": "DMBS", "autoWidth": false },
+                            { "data": "DMBT", "name": "DMBT", "autoWidth": false },
+                            { "data": "DMBC", "name": "DMBC", "autoWidth": false },
+                            { "data": "DMAC", "name": "DMAC", "autoWidth": false },
+                            { "data": "BS", "name": "BS", "autoWidth": false },
+                            { "data": "BT", "name": "BT", "autoWidth": false },
+                            { "data": "BC", "name": "BC", "autoWidth": false },
+                            { "data": "AC", "name": "AC", "autoWidth": false },
+                            {
+                                "data": "Packing", "name": "Packing", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            },
+                            {
+                                "data": "DryYield", "name": "DryYield", "autoWidth": false,
+                                render: function (data, type, row) {
+                                    if (data)
+                                        return data.toFixed(2);
+                                    else
+                                        return '';
+                                }
+                            }
+                        ]
+                    });
+                    SetExcelDownload("5");
+                }
+            });
+       
+    </script>
+    <script>
+        function showError(errorMsg) {
+            var notice = new PNotify({
+	            title: "@UIResources.ErrorMessage",
+	            text: errorMsg,
+	            width: "400px",
+                type: 'error',
+                addclass: 'stack-bottomright',
+	            hide: false,
+	            buttons: {
+		            sticker: false
+	            }
+            });
+
+            notice.get().click(function () {
+	            notice.remove();
+            });
+            setTimeout(function(){
+                notice.remove();
+            }, 3000);
+        }
+         $('#btnCalculate').click(function () {
+            const param = {
+                StartDate: $("[name=start]").val(),
+                EndDate: $("[name=end]").val(),
+            };
+            if (param.StartDate == "") {
+                showError("Start Date can't be empty");
+                return;
+            }
+            if (param.EndDate == "") {
+                showError("End Date can't be empty");
+                return;
+             }
+             $('#loading_overlay').removeClass('d-none');
+             var urlYield="";
+             if ($('#select_source').val() == "5") {
+                 urlYield = "@Url.Action("GetDataKretekWest", "ReportPPYield")";
+             } else if ($('#select_source').val() == "6") {
+                 urlYield = "@Url.Action("GetDataWhiteWest", "ReportPPYield")";
+             }
+            $.ajax({
+                type: "POST",
+                url: urlYield,
+                data: JSON.stringify(param),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $('#loading_overlay').addClass('d-none');
+                    $('#btnSearch').click();
+                },
+                error: function (result) {
+                    $('#loading_overlay').addClass('d-none');
+                    var notice = new PNotify({
+                        title: "@UIResources.ErrorMessage",
+                        text: "Gagal mengambil data",
+                        width: "400px",
+                        type: 'error',
+                        addclass: 'stack-bottomright',
+                        hide: false,
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                    setTimeout(function () {
+                        notice.remove();
+                    }, 3000);
+
+                    notice.get().click(function () {
+                        notice.remove();
+                    });
+                }
+            });
+        });
+            var result = "@ViewBag.Result";
+		    if (result != "") {
+			    if (result == "True") {
+				    var message = "@ViewBag.Message";
+
+				    var notice = new PNotify({
+					    title: "@UIResources.Confirmation",
+					    text: message,
+					    width: "400px",
+					    type: 'success',
+					    addclass: 'stack-bottomright',
+					    delay: 2000
+				    });
+
+				    notice.get().click(function () {
+					    notice.remove();
+				    });
+			    }
+			    else {
+				    var error = "@ViewBag.ErrorMessage";
+
+				    var notice = new PNotify({
+					    title: "@UIResources.ErrorMessage",
+					    text: error,
+					    width: "400px",
+					    type: 'error',
+					    addclass: 'stack-bottomright',
+					    delay: 2000
+				    });
+
+				    notice.get().click(function () {
+					    notice.remove();
+				    });
+			    }
+            }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            if (@ViewBag.isWest == 0) {
+                $('#yieldClove').show();
+                $('#yieldKretekWest').hide();
+            } else {
+                $('#yieldClove').hide();
+                $('#yieldKretekWest').show();
+            }
+            $('#yieldKretek').hide();
+            $('#yieldWhite').hide();
+            $('#yieldDiet').hide();
+            $('#yieldMCDiet').hide();
+            $('#yieldKretekWest').hide();
+            $('#btnCalculate').hide();
+
+            $('.input-daterange').datepicker({
+                //calendarWeeks: true,
+                autoclose: true,
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'dd-M-yy',
+                language: 'id-ID',
+            });
+            $(".input-daterange [name=start]").datepicker('setDate', 'today');
+            $(".input-daterange [name=end]").datepicker('setDate', 'today');
+
+            $("[name='weekStart']").val(moment().format("W"));
+            $("[name='weekEnd']").val(moment().format("W"));
+
+            tableClove = $('#yieldClove table').dataTable({
+                "scrollX": true,
+                "autoWidth": false
+            });
+            tableKretek = $('#yieldKretek table').dataTable({
+                "scrollX": true,
+                "autoWidth": false
+            });
+            tableWhite = $('#yieldWhite table').dataTable({
+                "scrollX": true,
+                "autoWidth": false
+            });
+            tableDiet = $('#yieldDiet table').dataTable({
+                "scrollX": true,
+                "autoWidth": false
+            });
+            tableMCDiet = $('#yieldMCDiet table').dataTable({
+                "scrollX": true,
+                "autoWidth": false
+            });
+            tableMCDiet = $('#yieldKretekWest table').dataTable({
+                "scrollX": true,
+                "autoWidth": false
+            });
+            //$(".input-daterange [name='start']").val('');
+            //$(".input-daterange [name='end']").val('');
+
+            $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                //$("[name='end']").datepicker('setStartDate', selected.date);
+                $("[name='weekStart']").val(moment(selected.date).format("W"));
+            });
+            $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                //$("[name='start']").datepicker('setEndDate', selected.date);
+                $("[name='weekEnd']").val(moment(selected.date).format("W"));
+            });
+
+            //Handle state upload
+            if (@ViewBag.YieldState) {
+                $('#select_source').val("@ViewBag.YieldState");
+                $('#select_source').trigger("change");
+            }
+            if (@ViewBag.isWest == 0) {
+                SetExcelDownload("0");
+            } else {
+                SetExcelDownload("4");
+                $('#btnCalculate').show();
+            }
+        });
+    </script>
+
+}

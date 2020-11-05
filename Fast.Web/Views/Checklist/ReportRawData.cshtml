@@ -1,0 +1,207 @@
+﻿@model Fast.Web.Models.ChecklistReportModel
+@using Fast.Web.Resources;
+@using System.Globalization
+@using Newtonsoft.Json;
+
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Styles{
+    <style>
+
+    </style>
+}
+
+<div class="content content-fixed" style="min-width: 1290px !important;">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Fast</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Checklist")">CMS Checklist</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Raw Data</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report (Raw Data) for @(Model.Checklist.MenuTitle)</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-t-10">
+                <div class="card">
+                    <div class="card-header">
+                        @using (Html.BeginForm("ReportRawData", "Checklist", FormMethod.Get, new { @class = "preventDoubleSubmission", @autocomplete = "false", encType = "multipart/form-data" }))
+                        {
+                            <input type="hidden" name="download" value="1" />
+
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label>Location:</label>
+                                    <div class="input-group">
+                                        <select name="location1" class="form-control selection-location">
+                                            <option value="">All Locations</option>
+                                        </select>
+                                        <select name="location2" class="form-control selection-department">
+                                            <option value="">All Department</option>
+                                        </select>
+                                        <select name="location3" class="form-control selection-subdepartment">
+                                            <option value="">All Sub Depart</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-md-3">
+                                    <label>Date Range</label>
+                                    <div class="input-group">
+                                        <input id="dateFrom" value="@(ViewBag.DateFrom.ToString("dd-MMM-yy"))" name="dateFrom" type="text" class="form-control hasDatepicker" placeholder="Start Date" />
+                                        <input id="dateTo" value="@(ViewBag.DateTo.ToString("dd-MMM-yy"))" name="dateTo" type="text" class="form-control hasDatepicker" placeholder="End Date" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-1">
+                                    <label>Shift</label>
+                                    <select name="shift" class="form-control">
+                                        <option value="" selected>All Shift</option>
+                                        <option value="s1" @("s1" == ViewBag.shift ? "selected" : "")>Shift 1</option>
+                                        <option value="s2" @("s2" == ViewBag.shift ? "selected" : "")>Shift 2</option>
+                                        <option value="s3" @("s3" == ViewBag.shift ? "selected" : "")>Shift 3</option>
+                                        <option value="ls1" @("ls1" == ViewBag.shift ? "selected" : "")>LongShift 1</option>
+                                        <option value="ls2" @("ls2" == ViewBag.shift ? "selected" : "")>LongShift 2</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-2 offset-md-2">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="form-control btn btn-primary tx-white" id="generate"><i class="fas fa-file-excel"></i> Download Raw Data</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.SubmitCount == 0)
+                        {
+                            <div class="alert alert-outline alert-primary d-flex align-items-center" role="alert">
+                                <i data-feather="alert-circle" class="mg-r-10"></i> No Data Found
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div><!-- row -->
+    </div><!-- container -->
+</div><!-- content -->
+
+<div id="jsonLocationTree" data-json='@Html.Raw(JsonConvert.SerializeObject(ViewBag.LocationTree))' />
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('.hasDatepicker').datepicker({
+                format: 'd-M-yy'
+            });
+
+            /******************************* LOCATION TANPA AJAX *********************************/
+
+            var LocationTree = JSON.parse($("#jsonLocationTree").attr("data-json"));
+
+            console.log(LocationTree);
+
+            var select_locat = $('select.selection-location');
+            select_locat.append('<option label="Choose "></option>');
+
+            for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                select_locat.append('<option value='+LocationTree.ProductionCenters[i].LocationID+'>' + LocationTree.ProductionCenters[i].Description + '</option>')
+            }
+
+            $('.selection-location').select2({
+                width: "33.33%",
+                placeholder: 'Select Location',
+                searchInputPlaceholder: 'Search options'
+            });
+
+            $('.selection-department, .selection-subdepartment').select2({width: "33.33%"});
+
+            var locat_selected;
+            $(document).on("change",".selection-location",function(){
+                locat_selected = $(this).select2("val");
+                console.log(locat_selected);
+
+                $('.selection-department').select2('destroy');
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-department').empty();
+                $('.selection-subdepartment').empty();
+
+                var select_depart = $('select.selection-department');
+                select_depart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        select_depart.append('<optgroup label="'+LocationTree.ProductionCenters[i].Description+'">')
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            select_depart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Description + '</option>')
+                        }
+                        select_depart.append('</optgroup>')
+                    }
+                }
+
+                $('.selection-department').select2({
+                    width: "33.33%",
+                    placeholder: 'Select Department',
+                    searchInputPlaceholder: 'Search options'
+                });
+                $('.selection-subdepartment').select2();
+            });
+
+            $(document).on("change",".selection-department",function(){
+                var department_selected = $(this).select2("val");
+                console.log(department_selected);
+
+                $('.selection-subdepartment').select2('destroy');
+                $('.selection-subdepartment').empty();
+
+                var select_subdepart = $('select.selection-subdepartment');
+                select_subdepart.append('<option label="Choose "></option>');
+
+                for (var i = 0; i < LocationTree.ProductionCenters.length; i++) {
+                    if ($.inArray(LocationTree.ProductionCenters[i].LocationID.toString(), locat_selected) >= 0) {
+                        for (var j = 0; j < LocationTree.ProductionCenters[i].Departments.length; j++) {
+                            if ($.inArray(LocationTree.ProductionCenters[i].Departments[j].LocationID.toString(), department_selected) >= 0) {
+                                select_subdepart.append('<optgroup label="' + LocationTree.ProductionCenters[i].Description+ " - " + LocationTree.ProductionCenters[i].Departments[j].Description + '">')
+                                for (var k = 0; k < LocationTree.ProductionCenters[i].Departments[j].SubDepartments.length; k++) {
+                                    select_subdepart.append('<option value='+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].LocationID +'>' + LocationTree.ProductionCenters[i].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].Code+"-"+LocationTree.ProductionCenters[i].Departments[j].SubDepartments[k].Description + '</option>')
+                                }
+                                select_subdepart.append('</optgroup>')
+                            }
+                        }
+                    }
+                }
+
+                $('.selection-subdepartment').select2({
+                    width: "33.33%",
+                    placeholder: 'Select Sub Department',
+                    searchInputPlaceholder: 'Search options'
+                });
+            });
+
+
+            var location1 = getUrlParameter('location1');
+            if (typeof location1 !== "undefined") {
+                $('#location_detail').show();
+                $('.selection-location').val(location1).change();
+
+                var location2 = getUrlParameter('location2');
+                if (typeof location2 !== "undefined") {
+                    $('.selection-department').val(location2).change();
+
+                    var location3 = getUrlParameter('location3');
+                    if (typeof location3 !== "undefined") {
+                        $('.selection-subdepartment').val(location3).change();
+                    }
+                }
+            }
+        });
+
+    </script>
+}

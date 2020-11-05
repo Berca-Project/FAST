@@ -1,0 +1,103 @@
+﻿@model Fast.Web.Models.AccessRightDBModel
+@using Fast.Web.Resources;
+
+@using (Html.BeginForm("Edit", "AccessRight", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.ID, new { @Id = "ID" })
+	@Html.HiddenFor(x => x.IsDeleted, new { @Id = "IsDeleted" })
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.EditAccessRight</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-sm-6">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Role</label>
+				@Html.DropDownListFor(p => p.RoleName, (IEnumerable<SelectListItem>)ViewBag.RoleList, new { @class = "form-control", @id = "ddlrole" })
+			</div>
+			<div class="col-sm-6">
+				<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Menu</label>
+				@Html.DropDownListFor(x => x.MenuID, (IEnumerable<SelectListItem>)ViewBag.MenuList, new { @class = "form-control", @id = "ddlMenu" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script type="text/javascript">
+		$(document).ready(function () {
+
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			var error = "@ViewBag.ErrorMessage";
+
+			if (result != "") {
+				if (result == "True") {
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: "@UIResources.UploadSucceed",
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					if (error == "") {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.UploadFailed",
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: error,
+							width: "400px",
+							type: 'error',
+							hide: false,
+							addclass: 'stack-bottomright',
+							buttons: {
+								sticker: false
+							}
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			}
+		});
+</script>
+
+

@@ -1,0 +1,971 @@
+﻿@model Fast.Web.Models.CalendarHolidayModel
+@using Fast.Web.Resources;
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/theme/lib/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet" />
+	<link href="~/Content/dashforge/assets/css/dashforge.demo.css" rel="stylesheet" />
+}
+@section Styles{
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.CalendarHolidayList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.CalendarHolidayManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+						<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+					</button>
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+						<i data-feather="repeat" class="mg-r-5"></i> Load All
+					</button>
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddHoliday">
+						<i data-feather="plus" class="mg-r-5"></i> @UIResources.NEW
+					</button>
+				</div>
+			</div>
+		</div><!-- End content header -->
+		<div data-label="Filter" class="df-example demo-table dtMarginTop">
+			<div class="row">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Country</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry1" })
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ProdCenter</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter1" })
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Department</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment1" })
+				</div>
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.SubDepart</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment1" })
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-sm-1">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Year</label>
+				</div>
+				<div class="col-sm-2">
+					@Html.DropDownListFor(x => x.Year, (IEnumerable<SelectListItem>)ViewBag.YearList, new { @class = "form-control", @id = "ddlYear" })
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-md-2">
+					<button id="btnSearch" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block">Search</button>
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-2">
+				</div>
+			</div>
+		</div>
+		<br />
+		<div data-label="Holiday Data" class="df-example demo-table dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="holidayTable">
+				<thead>
+					<tr>
+						<th>@UIResources.ID</th>
+						<th>@UIResources.Location</th>
+						<th>@UIResources.Year</th>
+						<th>@UIResources.Month</th>
+						<th>@UIResources.Date</th>
+						<th>@UIResources.Information</th>
+						<th>@UIResources.ModifiedDate</th>
+						<th>@UIResources.ModifiedBy</th>
+						<th>@UIResources.Action</th>
+						<th></th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditCalendarHoliday" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:500px;">
+		<div class="modal-content" id="OpenDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddHoliday" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:500px;">
+		<div class="modal-content">
+			@using (Html.BeginForm("AddHoliday", "Calendar", FormMethod.Post, new { @class = "form-horizontal", @id = "ModalForm" }))
+			{
+				@Html.AntiForgeryToken()
+				<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+					<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</a>
+					<div class="media align-items-center">
+						<span class="tx-color-03 d-none d-sm-block"><i data-feather="calendar" class="wd-60 ht-60"></i></span>
+						<div class="media-body mg-sm-l-20">
+							<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewCalendarHoliday</h4>
+							<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+						</div>
+					</div><!-- media -->
+				</div><!-- modal-header -->
+				<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Country</label>
+						</div>
+						<div class="col-7">
+							@Html.DropDownListFor(x => x.CountryID, (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control", @id = "ddlCountry" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.ProductionCenter</label>
+						</div>
+						<div class="col-7">
+							@Html.DropDownListFor(x => x.ProdCenterID, (IEnumerable<SelectListItem>)ViewBag.ProductionCenterList, new { @class = "form-control", @id = "ddlProdCenter" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Department</label>
+						</div>
+						<div class="col-7">
+							@Html.DropDownListFor(x => x.DepartmentID, (IEnumerable<SelectListItem>)ViewBag.DepartmentList, new { @class = "form-control", @id = "ddlDepartment" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.SubDepartment</label>
+						</div>
+						<div class="col-7">
+							@Html.DropDownListFor(x => x.SubDepartmentID, (IEnumerable<SelectListItem>)ViewBag.SubDepartmentList, new { @class = "form-control", @id = "ddlSubDepartment" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Type</label>
+						</div>
+						<div class="col-7">
+							@Html.DropDownListFor(x => x.Color, (IEnumerable<SelectListItem>)ViewBag.ColorList, new { @class = "form-control", @id = "ddlColor" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Date</label>
+						</div>
+						<div class="col-7">
+							@Html.TextBoxFor(x => x.Date, null, new { @class = "form-control", @id = "tbDate", @required = "required" })
+						</div>
+					</div>
+					<div class="row row-sm mg-b-10">
+						<div class="col-4">
+							<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">@UIResources.Description</label>
+						</div>
+						<div class="col-7">
+							@Html.TextBoxFor(x => x.Description, null, new { @class = "form-control", @id = "tbDescription", @required = "required" })
+						</div>
+					</div><!-- modal-body -->
+				</div>
+				<div class="modal-footer pd-x-20 pd-y-15">
+					<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+					<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+				</div>
+			}
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/dataTables.buttons.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.flash.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.html5.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/buttons.print.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/jszip.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/pdfmake.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/vfs_fonts.js"></script>
+	<script src="~/Content/theme/lib/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+	<script src="~/Content/theme/lib/datatable-export/exportaction.js"></script>
+	<script type="text/javascript">
+        $('#ddlCountry1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/GetProductionCenterByCountryID",
+				data: { id: $('#ddlCountry1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlProdCenter1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlProdCenter1').html(ddlTemp);
+					$('#ddlDepartment1').html("<select id='ddlDepartment1'><option value='0'>- Please Select -</option></select>");
+					$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+		$('#ddlProdCenter1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/GetDepartmentByProdCenterID",
+				data: { id: $('#ddlProdCenter1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlDepartment1').html(ddlTemp);
+					$('#ddlSubDepartment1').html("<select id='ddlSubDepartment1'><option value='0'>- Please Select -</option></select>");
+				}
+			});
+		});
+		$('#ddlDepartment1').change(function () {
+			$.ajax({
+				type: "post",
+				url: fastApp.BaseUrl + "/Calendar/GetSubDepartmentByDepartmentID",
+				data: { id: $('#ddlDepartment1').val() },
+				datatype: "json",
+				traditional: true,
+				success: function (data) {
+					var ddlTemp = "<select id='ddlSubDepartment1'>";
+					for (var i = 0; i < data.length; i++) {
+						ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+					}
+					ddlTemp = ddlTemp + '</select>';
+					$('#ddlSubDepartment1').html(ddlTemp);
+				}
+			});
+		});
+
+        var locationId = 0;
+		var locationType = 'country';
+
+		$('#btnSearch').on('click', function () {
+			if ($('#ddlProdCenter1').val() == '0') {
+				locationId = $('#ddlCountry1').val();
+				locationType = 'country';
+			} else if ($('#ddlDepartment1').val() == '0') {
+				locationId = $('#ddlProdCenter1').val();
+				locationType = 'productioncenter';
+			} else if ($('#ddlSubDepartment1').val() == '0') {
+				locationId = $('#ddlDepartment1').val();
+				locationType = 'department';
+			} else {
+				locationId = $('#ddlSubDepartment1').val();
+				locationType = 'subdepartment';
+			}
+
+			var table11 = $('#holidayTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"destroy": true,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Calendar/GetAllHolidayWithParam",
+					"data": { locID: locationId, locType: locationType, year : $('#ddlYear').val() },
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [6],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false,						
+					},
+					{
+						"targets": [8],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": false,
+						"orderable": false,
+						"visible": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("YYYY");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("MMMM");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD");
+							else
+								return '';
+						}
+					},
+					{ "data": "Description", "name": "Description", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "SupervisorName", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditCalendarHoliday" title="Edit"><i class="fa fa-edit"></i></button>'+
+								   '<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] + '\',\'' + full['Description'] + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					},
+					{ "data": "Color", "name": "Color", "autoWidth": false }
+				],
+
+                "fnRowCallback": function( nRow, data, iDisplayIndex, iDisplayIndexFull ) {
+	                $('td', nRow).css('background-color', data['Color']);
+                }
+			});
+		});
+
+		$('#loadAll').on('click', function () {
+			$('#holidayTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Calendar/GetAllHoliday",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [6],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false,
+					},
+					{
+						"targets": [8],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": false,
+						"orderable": false,
+						"visible": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("YYYY");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("MMMM");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD");
+							else
+								return '';
+						}
+					},
+					{ "data": "Description", "name": "Description", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "SupervisorName", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditCalendarHoliday" title="Edit"><i class="fa fa-edit"></i></button>'+
+								   '<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] + '\',\'' + full['Description'] + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					},
+					{ "data": "Color", "name": "Color", "autoWidth": false }
+				],
+
+                "fnRowCallback": function( nRow, data, iDisplayIndex, iDisplayIndexFull ) {
+	                $('td', nRow).css('background-color', data['Color']);
+                }
+			});
+		});
+
+		$(document).ready(function () {
+			$('select#ddlColor option').each(function() {
+				var option = $(this);
+				option.css(
+						'background-color',
+						option.val()
+				);
+				option.css(
+						'color',
+						'black'
+				);
+			});
+
+			$('#ddlColor').change(function () {
+				if ($('#ddlColor').val() == "0") {
+					$("#ddlColor").css("background-color", "white");
+				} else {
+					$("#ddlColor").css("background-color", $('#ddlColor').val());
+				}
+			});
+
+			var table = $('#holidayTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/Calendar/GetAllHoliday",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [6],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false,
+					},
+					{
+						"targets": [8],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": false,
+						"orderable": false,
+						"visible": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("YYYY");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("MMMM");
+							else
+								return '';
+						}
+					},
+					{
+						"data": "Date",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD");
+							else
+								return '';
+						}
+					},
+					{ "data": "Description", "name": "Description", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "SupervisorName", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+							return '<button class="btn-menu btn-default" onclick="RenderActions(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditCalendarHoliday" title="Edit"><i class="fa fa-edit"></i></button>'+
+								   '<button class="btn-menu btn-default" onclick="Delete(\'' + full['ID'] + '\',\'' + full['Description'] + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					},
+					{ "data": "Color", "name": "Color", "autoWidth": false }
+				],
+
+                "fnRowCallback": function( nRow, data, iDisplayIndex, iDisplayIndexFull ) {
+	                $('td', nRow).css('background-color', data['Color']);
+                }
+			});
+
+			var buttons = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-file-pdf"></i> PDF',
+						"extend": 'pdf',
+						"className": 'btn btn-sm pd-x-15 btn-white btn-uppercase',
+						"title": 'Master Calendar Holiday List',
+						"extension": '.pdf',
+						"exportOptions": {
+							columns: [ 1, 2, 3, 4]
+						},
+						"customize": function (doc) {
+							doc.content[1].table.widths =
+								Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+						},
+						"titleAttr": 'PDF',
+						"action": exportaction
+					}
+				]
+			}).container().appendTo($('#buttonpdf'));
+
+			var buttons1 = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-file-excel"></i> Excel',
+						"extend": 'excel',
+						"className": 'btn btn-sm pd-x-15 btn-white btn-uppercase',
+						"title": 'Master Calendar Holiday List',
+						"extension": '.xlsx',
+						"exportOptions": {
+							columns: [ 1, 2, 3, 4]
+						},
+						"titleAttr": 'EXCEL',
+						"action": exportaction
+					}
+				]
+			}).container().appendTo($('#buttonexcel'));
+
+			var buttons2 = new $.fn.dataTable.Buttons(table, {
+				buttons: [
+					{
+						"text": '<i class="fa fa-lg fa-print"></i> Print',
+						"extend": 'print',
+						"title": 'Master Calendar Holiday List',
+						"className": 'btn btn-sm pd-x-15 btn-white btn-uppercase',
+						"exportOptions": {
+							columns: [ 1, 2, 3, 4]
+						},
+						"titleAttr": 'PRINT',
+						"action": exportaction
+					}
+				]
+			}).container().appendTo($('#buttonprint'));
+
+			$('#tbDate').datepicker({
+				format: "dd-M-yy",
+				changeMonth: true,
+				changeYear: true,
+				minDate: new Date
+			});
+
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			var error = "@ViewBag.ErrorMessage";
+
+			if (result != "") {
+				if (result == "True") {
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: "@UIResources.CreateSucceed",
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					if (error == "") {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.CreateFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: error,
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				}
+			}
+
+			$('#ddlCountry').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Calendar/GetProductionCenterByCountryID",
+					data: { id: $('#ddlCountry').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlProdCenter'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlProdCenter').html(ddlTemp);
+						$('#ddlDepartment').html("<select id='ddlDepartment'><option value='0'>- Please Select -</option></select>");
+						$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlProdCenter').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Calendar/GetDepartmentByProdCenterID",
+					data: { id: $('#ddlProdCenter').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlDepartment').html(ddlTemp);
+						$('#ddlSubDepartment').html("<select id='ddlSubDepartment'><option value='0'>- Please Select -</option></select>");
+					}
+				});
+			});
+
+			$('#ddlDepartment').change(function () {
+				$.ajax({
+					type: "post",
+					url: fastApp.BaseUrl + "/Calendar/GetSubDepartmentByDepartmentID",
+					data: { id: $('#ddlDepartment').val() },
+					datatype: "json",
+					traditional: true,
+					success: function (data) {
+						var ddlTemp = "<select id='ddlSubDepartment'>";
+						for (var i = 0; i < data.length; i++) {
+							ddlTemp = ddlTemp + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+						}
+						ddlTemp = ddlTemp + '</select>';
+						$('#ddlSubDepartment').html(ddlTemp);
+					}
+				});
+			});
+		});
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function RenderActions(id) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/Calendar/EditHoliday/" + id);
+		};
+
+		var Delete = function (ID, Name) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(Name));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteHoliday(ID);
+			});
+		}
+
+		function DeleteHoliday(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/Calendar/DeleteHoliday?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						location.reload();
+					}, 1000);
+				}
+			});
+		}
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			var locationID = 0;
+			if ($('#ddlProdCenter1').val() == '0') {
+				locationID = 1;
+			} else if ($('#ddlDepartment1').val() == '0') {
+				locationID = $('#ddlProdCenter1').val();
+			} else if ($('#ddlSubDepartment1').val() == '0') {
+				locationID = $('#ddlDepartment1').val();
+			} else {
+				locationID = $('#ddlSubDepartment1').val();
+			}
+
+			location.href = '@Url.Action("GenerateExcelHoliday", "Calendar")?locID=' + locationID + '&year=' + $('#ddlYear').val();
+        };
+	</script>
+}

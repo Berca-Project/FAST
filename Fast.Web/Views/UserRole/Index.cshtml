@@ -1,0 +1,436 @@
+﻿@model Fast.Web.Models.UserRoleModel
+@using Fast.Web.Resources;
+@section CSS_lib{
+	<!-- Specific Page Vendor CSS -->
+	<link href="~/Content/dashforge/lib/typicons.font/typicons.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+	<link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet" />
+}
+@section Styles{
+	<style>
+		.select2-container--default .select2-selection--multiple .select2-selection__choice {
+			color: white;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+			color: red;
+		}
+	</style>
+}
+
+<div class="content content-fixed bd-b">
+	<div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+		<div class="d-sm-flex align-items-center justify-content-between">
+			<div>
+				<h4 class="mg-b-5">@UIResources.UserExtraRoleList</h4>
+				<p class="mg-b-0 tx-color-03">@UIResources.UserRoleManagement</p>
+			</div>
+			<div class="mg-t-20 mg-sm-t-0">
+				<div class="row">
+					<button class="btn btn-outline-secondary btn-sm pd-x-15 btn-uppercase dtAddButton" onclick="GenerateExcel()">
+						<span><i class="fa fa-lg fa-file-excel"></i> EXCEL</span>
+					</button>
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" id="loadAll">
+						<i data-feather="repeat" class="mg-r-5"></i> Load All
+					</button>
+					<button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddUserRole" onclick="CreateActions()">
+						<i data-feather="plus" class="mg-r-5"></i> @UIResources.NEW
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div data-label="Example" class="df-example demo-table dtMarginTop">
+			<table class="table table-bordered table-striped mb-none border-bottom-0 table-fast" id="userRoleTable">
+				<thead>
+					<tr>
+						<th>@UIResources.ID</th>
+						<th>@UIResources.EmployeeID</th>
+						<th>@UIResources.Username</th>
+						<th>@UIResources.FullName</th>
+						<th>@UIResources.PositionDesc</th>
+						<th>@UIResources.RoleList</th>
+						<th>@UIResources.Location</th>
+						<th>@UIResources.ModifiedDate</th>
+						<th>@UIResources.ModifiedBy</th>
+						<th>@UIResources.Action</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalEditUserRole" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" role="document" style="max-width:450px;">
+		<div class="modal-content" id="OpenDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="modalAddUserRole" tabindex="-1" userRole="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" userRole="document" style="max-width:600px;">
+		<div class="modal-content" id="CreateDialog">
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" userRole="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered wd-sm-650" userRole="document">
+		<div class="modal-content">
+			<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-30">
+				<a href="" userRole="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+				<div class="media align-items-center">
+					<span class="tx-color-03 d-none d-sm-block"><i data-feather="x-circle" class="wd-60 ht-60"></i></span>
+					<div class="media-body mg-sm-l-20">
+						<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.Confirmation</h4>
+					</div>
+				</div><!-- media -->
+			</div><!-- modal-header -->
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03" id="deleteconfirm"></label>
+				</div>
+			</div><!-- modal-body -->
+			<div class="modal-footer pd-x-20 pd-y-15">
+				<button type="button" class="btn btn-white" data-dismiss="modal" id="modal-btn-cancel">@UIResources.NO</button>
+				<button type="submit" class="btn btn-primary" id="modal-btn-ok">@UIResources.YES</button>
+			</div>
+		</div><!-- modal-content -->
+	</div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+	<!-- Specific Page Vendor -->
+	<script src="~/Content/dashforge/lib/prismjs/prism.js"></script>
+	<script src="~/Content/dashforge/lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="~/Content/dashforge/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+	<script src="~/Content/dashforge/lib/select2/js/select2.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#ddlRole').select2({
+				dropdownParent: $('#modalAddUserRole')
+			});
+
+			var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+			var result = "@ViewBag.Result";
+			if (result != "") {
+				if (result == "True") {
+					var message = "@ViewBag.Message";
+
+					var notice = new PNotify({
+						title: "@UIResources.Confirmation",
+						text: message,
+						width: "400px",
+						type: 'success',
+						addclass: 'stack-bottomright',
+						stack: stack_bottomright,
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+				else {
+					var error = "@ViewBag.ErrorMessage";
+
+					var notice = new PNotify({
+						title: "@UIResources.ErrorMessage",
+						text: error,
+						width: "400px",
+						type: 'error',
+						addclass: 'stack-bottomright',
+						delay: 2000
+					});
+
+					notice.get().click(function () {
+						notice.remove();
+					});
+				}
+			}
+
+			var table = $('#userRoleTable').dataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/UserRole/GetAllByLocation",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [8],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": false,
+                        "orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Employee.EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "UserName", "name": "UserName", "autoWidth": true },
+					{ "data": "Employee.FullName", "name": "FullName", "autoWidth": true },
+					{ "data": "Employee.PositionDesc", "name": "PositionDesc", "autoWidth": true },
+					{ "data": "RoleList", "name": "RoleList", "autoWidth": true },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "ModifiedBy", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+								return '<button class="btn-menu btn-default" onclick="EditAction(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditUserRole" title="Edit"><i class="fa fa-edit"></i></button>' +
+									'<button class="btn-menu btn-default" onclick="DeleteAction(\'' + full['UserID'] + '\',\'' + full['Employee'].FullName + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					}
+				]
+			});
+		});
+
+		$('#loadAll').on('click', function () {
+			$('#userRoleTable').DataTable({
+				"autoWidth": false,
+				"processing": true,
+				"serverSide": true,
+				"filter": true,
+				"orderMulti": false,
+				"pageLength": 10,
+				"destroy": true,
+				"ajax": {
+					"url": fastApp.BaseUrl + "/UserRole/GetAll",
+					"type": "POST",
+					"datatype": "json"
+				},
+
+				"columnDefs":
+					[{
+						"targets": [0],
+						"searchable": false,
+						"visible": false,
+						"orderable": false
+					},
+					{
+						"targets": [1],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [2],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [3],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [4],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [5],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [6],
+						"searchable": true,
+						"orderable": true
+					},
+					{
+						"targets": [7],
+						"searchable": false,
+						"orderable": false
+					},
+					{
+						"targets": [8],
+                        "searchable": false,
+                        "orderable": false
+					},
+					{
+						"targets": [9],
+                        "searchable": false,
+                        "orderable": false
+					}
+					],
+
+				"columns": [
+					{ "data": "ID", "name": "ID", "autoWidth": false },
+					{ "data": "Employee.EmployeeID", "name": "EmployeeID", "autoWidth": true },
+					{ "data": "UserName", "name": "UserName", "autoWidth": true },
+					{ "data": "Employee.FullName", "name": "FullName", "autoWidth": true },
+					{ "data": "Employee.PositionDesc", "name": "PositionDesc", "autoWidth": true },
+					{ "data": "RoleList", "name": "RoleList", "autoWidth": true },
+					{ "data": "Location", "name": "Location", "autoWidth": true },
+					{
+						"data": "ModifiedDate",
+						render: function (data, type, row) {
+							if (data)
+								return moment(data).format("DD-MMM-YY HH:mm");
+							else
+								return '';
+						}
+					},
+					{ "data": "ModifiedBy", "name": "ModifiedBy", "autoWidth": true },
+					{
+						"render": function (data, type, full, meta) {
+								return '<button class="btn-menu btn-default" onclick="EditAction(\'' + full['ID'] + '\')" data-toggle="modal" data-target="#modalEditUserRole" title="Edit"><i class="fa fa-edit"></i></button>' +
+									'<button class="btn-menu btn-default" onclick="DeleteAction(\'' + full['UserID'] + '\',\'' + full['Employee'].FullName + '\')" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+						}
+					}
+				]
+			});
+		});
+
+		function EditAction(userRoleID) {
+			$("#OpenDialog").load(fastApp.BaseUrl + "/UserRole/Edit/" + userRoleID);
+		};
+
+		function CreateActions() {
+			$("#CreateDialog").load(fastApp.BaseUrl + "/UserRole/Create");
+		};
+
+		var DeleteAction = function (ID, DisplayName) {
+			$("#deleteconfirm").empty();
+			$("#deleteconfirm").append("@UIResources.DeleteConfirmation");
+			$("#deleteconfirm").append($('<span>').css('color', 'Red').text(DisplayName));
+			$("#deleteconfirm").append(" ?");
+			$("#deleteModal").modal('show');
+			$("#modal-btn-ok").unbind().one("click", function () {
+				$("#deleteModal").modal('hide');
+				DeleteUserRole(ID);
+			});
+		}
+
+		var stack_bottomright = { "dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15 };
+
+		function DeleteUserRole(Id) {
+			$.ajax({
+				url: fastApp.BaseUrl + '/UserRole/Delete?id=' + Id,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							stack: stack_bottomright,
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/UserRole/Index';
+					}, 1000);
+				}
+			});
+		}
+
+		function GenerateExcel() {
+			var notice = new PNotify({
+				title: "Generating Excel file",
+				text: "Please wait a few seconds....",
+				addclass: 'stack-bottomright',
+				width: "400px",
+				type: 'success',
+				stack: stack_bottomright,
+			});
+
+			notice.get().click(function () {
+				notice.remove();
+			});
+
+			location.href = '@Url.Action("ExportExcel", "UserRole")';
+		};
+	</script>
+}
+

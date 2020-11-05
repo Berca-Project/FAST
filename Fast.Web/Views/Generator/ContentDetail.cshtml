@@ -1,0 +1,205 @@
+﻿@model List<Fast.Web.Models.ChecklistComponentModel>
+@using Fast.Web.Resources;
+
+@{
+	App.dictionary = new Dictionary<string, string> {
+		{ "container_full"    ,"Container Full Width" },
+		{ "container_divider" ,"Container Divider" },
+		{ "group"             ,"Group" },
+		{ "button_ok"         ,"Button OK" },
+		{ "button_nok"        ,"Button NOK" },
+		{ "input_text"        ,"Input Text" },
+		{ "input_number"      ,"Input Number" },
+		{ "input_date"        ,"Input Date" },
+		{ "input_checkbox"    ,"Input Checkbox" },
+		{ "label"             ,"Label" },
+		{ "images"            ,"Images" }
+	};
+
+	App.counter = -1;
+}
+
+@helper TreeView(List<Fast.Web.Models.ChecklistComponentModel> components, long parent)
+{
+    /*
+	var temp_components = components.FindAll(x => x.Parent == parent);
+
+	foreach (var item in temp_components)
+	{
+		item.ComponentType = item.ComponentType.Trim();
+		var sub_components = components.FindAll(x => x.Parent == item.ID);
+		App.counter++;
+
+		<input name="[@App.counter].ID" type="hidden" value="@item.ID">
+		<input name="[@App.counter].ChecklistID" type="hidden" value="@item.ChecklistID">
+		<input name="[@App.counter].ComponentType" type="hidden" value="@item.ComponentType">
+
+		if (item.ComponentType == "container_full" || item.ComponentType == "container_divider" || item.ComponentType == "group")
+		{
+			<div class="card mg-b-10 @(item.ComponentType == "container_divider"?"flex-1":"")">
+				<div class="card-header @(item.ComponentType == "container_full"?"tx-white bg-info":item.ComponentType == "container_divider"?"tx-white bg-primary":"tx-white bg-secondary")">
+					@App.dictionary[item.ComponentType]
+					<div class="d-flex float-right search-container wd-200 justify-content-end">
+						<div class="search-form search-form-expanding">
+							<input type="text" name="[@App.counter].AdditionalClass" class="form-control" placeholder="Additional CSS class">
+							<button class="btn float-right" type="button"><i data-feather="settings"></i></button>
+						</div>
+					</div>
+				</div>
+				<div class="card-body @(item.ComponentType == "container_full"?"d-flex":"")">
+					@if (sub_components.Count > 0)
+					{
+						@TreeView(components, item.ID)
+					}
+				</div>
+			</div>
+		}
+		else if (item.ComponentType == "label" || item.ComponentType == "input_checkbox")
+		{
+			<div class="form-group pos-relative-f">
+				<input type="text" name="[@App.counter].ComponentName" class="form-control" placeholder="Enter @(item.ComponentType == "label"?"label text":"checkbox label") here">
+				<div class="d-flex pos-absolute search-container wd-200 justify-content-end" style="top:6px;right:6px">
+					<div class="search-form search-form-expanding">
+						<input type="text" name="[@App.counter].AdditionalClass" class="form-control" placeholder="Additional CSS class">
+						<button class="btn float-right" type="button"><i data-feather="settings"></i></button>
+					</div>
+				</div>
+			</div>
+		}
+		else if (item.ComponentType == "images")
+		{
+			<div class="form-group pos-relative-f">
+				<div class="custom-file">
+					<input type="file" class="custom-file-input" id="upload@(App.counter)" name="[@App.counter].ComponentFile" accept="image/*">
+					<label class="custom-file-label" for="upload@(App.counter)">Upload your images here</label>
+				</div>
+				<div class="d-flex pos-absolute search-container wd-200 justify-content-end" style="top:6px;right:6px;z-index:5">
+					<div class="search-form search-form-expanding">
+						<input type="text" name="[@App.counter].AdditionalClass" class="form-control" placeholder="Additional CSS class">
+						<button class="btn float-right" type="button"><i data-feather="settings"></i></button>
+					</div>
+				</div>
+			</div>
+		}
+		else
+		{
+			<div class="form-group pos-relative-f">
+				<input type="text" class="form-control" value="@App.dictionary[item.ComponentType]" disabled>
+				<div class="d-flex pos-absolute search-container wd-200 justify-content-end" style="top:6px;right:6px">
+					<div class="search-form search-form-expanding">
+						<input type="text" name="[@App.counter].AdditionalClass" class="form-control" placeholder="Additional CSS class">
+						<button class="btn float-right" type="button"><i data-feather="settings"></i></button>
+					</div>
+				</div>
+			</div>
+		}
+	}
+    */
+}
+
+@section Styles{
+	<style>
+		.card-header {
+			padding: 7px 7px 7px 15px;
+		}
+
+		.card-body {
+			padding: 10px;
+		}
+
+		.search-form-expanding {
+			min-width: 26px;
+			height: 25px;
+		}
+
+			.search-form-expanding .form-control {
+				height: 25px;
+			}
+
+			.search-form-expanding button {
+				height: 25px;
+				width: 25px;
+			}
+
+		.custom-file-label::after {
+			width: 100px;
+		}
+	</style>
+}
+
+<div class="mail-wrapper">
+	<div class="mail-sidebar">
+		<div class="mail-sidebar-body">
+			<div class="pd-t-30 pd-b-50">
+			</div>
+		</div><!-- mail-sidebar-body -->
+	</div><!-- mail-sidebar -->
+
+	<div class="mail-content">
+		<div class="mail-content-header">
+			<div class="media">
+				<div class="media-body media-body mg-l-30 mg-b-10">
+					<h6 class="mg-b-2 tx-13">[@ViewBag.Checklist.MenuTitle] @ViewBag.Checklist.Header</h6>
+					<span class="d-block tx-11 tx-color-03"><b>Locations: </b>@(String.Join(", ", ViewBag.Locations))</span>
+				</div><!-- media-body -->
+			</div><!-- media -->
+		</div><!-- mail-content-header -->
+		<div class="mail-content-body">
+			<div class="card">
+				<div class="card-body">
+					@using (Html.BeginForm("ContentDetail", "Generator", FormMethod.Post, new { encType = "multipart/form-data" }))
+					{
+						@Html.AntiForgeryToken()
+						@Html.Hidden("ID", (long)ViewBag.Checklist.ID)
+						@TreeView(Model, 0)
+
+						<button type="submit" class="btn btn-primary float-right mg-t-20">Save &amp; See The Result <i data-feather="arrow-right-circle" class="wd-10 mg-l-5"></i></button>
+					}
+				</div><!-- card-body -->
+			</div><!-- card -->
+		</div><!-- mail-content-body -->
+	</div><!-- mail-content -->
+</div><!-- mail-wrapper -->
+
+@section Scripts{
+	<script src="~/Content/dashforge/lib/jquery-sortable/js/jquery-sortable-min.js"></script>
+
+	<script type="text/javascript">
+		/*
+		$('[data-toggle="tooltip"]').tooltip()
+
+		new PerfectScrollbar('.mail-sidebar-body', {
+			suppressScrollX: true
+		});
+		*/
+
+		new PerfectScrollbar('.mail-content-body', {
+			suppressScrollX: true
+		});
+
+
+		$(document).ready(function () {
+			$('.search-form-expanding button').on('click', function (e) {
+				e.preventDefault()
+				$(this).parent().toggleClass('expand');
+			})
+
+			// Collapse expanding search
+			$('.search-form-expanding .form-control').on('focusout', function (e) {
+				if ($(this).val() === '') {
+					$(this).parent().removeClass('expand');
+				}
+			})
+
+			$("form").on("change", "input[type='file']", function () {
+				$(this).parent().find('label').html($(this).val().replace(/.*(\/|\\)/, ''));
+			});
+
+			$("ol.dragable.dragdrop").sortable({
+				group: 'no-drop',
+				drop: false,
+				drag: false,
+			});
+		});
+	</script>
+}

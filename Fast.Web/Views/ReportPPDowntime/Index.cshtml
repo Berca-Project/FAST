@@ -1,0 +1,2401 @@
+﻿@model Fast.Web.Models.Report.PPReportDowntimeModel
+@using Fast.Web.Resources;
+@{
+    ViewBag.Title = "Index";
+}
+@section CSS_lib{
+    <link href="~/Content/dashforge/lib/select2/css/select2.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Content/dashforge/lib/datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet">
+}
+@section Styles{
+    <style>
+        .flex-input {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .flex-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .tableWrapper {
+            position: relative;
+            overflow: auto;
+            max-height: 150px;
+            transform: translateZ(0);
+        }
+
+            .tableWrapper table {
+                border-collapse: separate;
+                width: 100%;
+                border: none;
+            }
+
+            .tableWrapper thead th, .tableWrapper thead td {
+                position: -webkit-sticky;
+                position: sticky;
+                background: #066fcb;
+                z-index: 100;
+            }
+
+            .tableWrapper table tfoot td {
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+                z-index: 100;
+                overflow: hidden;
+            }
+
+            .tableWrapper .input td {
+                background: white;
+            }
+
+            .tableWrapper .summary-body td, .tableWrapper .summary-body th {
+                font-weight: bold;
+                background-color: #d8eafe;
+                color: #000;
+            }
+
+            .tableWrapper .summary-body.hidden td, .tableWrapper .summary-body.hidden th {
+                padding: unset;
+                border: 0;
+            }
+
+        .fa, .fas {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            position: relative;
+            margin-top: 10px;
+        }
+
+            .modal-body .close {
+                padding: 5px;
+                position: absolute;
+                top: -5px;
+                right: 5px;
+                font-size: 15px;
+                color: black;
+                z-index: 1000;
+            }
+
+        .stepper {
+            position: relative;
+        }
+
+            .stepper:before {
+                top: 15px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background: #f1f1f1;
+                z-index: 0;
+            }
+
+        .stepper-step {
+            text-align: center;
+            position: relative;
+        }
+
+            .stepper-step.active .stepper-btn {
+                background: #37b6fa;
+                color: white;
+                font-weight: 500;
+                border: 0
+            }
+
+        .stepper-btn {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+            background: #e6e6e6;
+            color: #9c9c9c;
+        }
+
+        .wizard-button {
+            margin: 5px;
+        }
+
+            .wizard-button.active {
+                filter: brightness(0.75);
+            }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                font-size: 13px;
+                padding: 5px;
+            }
+
+        .select2-search--dropdown {
+            padding: 1px;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 3px 5px;
+        }
+
+        .select2-results {
+            font-size: 13px;
+        }
+
+        .select2-results__option {
+            padding: 3px;
+        }
+    </style>
+}
+
+
+<div class="content content-fixed lph-form">
+    <div class="container-fluid pd-x-0 pd-lg-x-10 pd-xl-x-0">
+        <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                        <li class="breadcrumb-item"><a href="#">Report</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Report Downtime</li>
+                    </ol>
+                </nav>
+                <h4 class="mg-b-0 tx-spacing--1">Report Downtime</h4>
+            </div>
+            <div class="d-none d-md-block">
+                @*<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i class="wd-10 mg-r-5 fas fa-sync-alt"></i> &nbsp; Refresh</button>*@
+                <button class="btn btn-sm pd-x-15 btn-outline-success btn-uppercase mg-l-5" id="extractData"><i class="wd-10 mg-r-5 fas fa-file-excel"></i> Export Excel</button>
+
+                <button class="btn btn-primary btn-sm pd-x-15 btn-uppercase dtAddButton" data-toggle="modal" data-target="#modalAddDowntime">
+                    <i data-feather="plus" class="mg-r-5"></i> Entry DT
+                </button>
+                @if (ViewBag.isSupervisor)
+                {
+                    <button class="btn btn-success btn-sm pd-x-15 btn-uppercase" data-toggle="modal" id="btnValidate">
+                        <i data-feather="check" class="mg-r-5"></i> Validate
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="Information">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Information</div>
+                    <div class="card-body d-flex">
+                        <div style="flex:2">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Date</label>
+                                <div class="col-9">
+                                    <!--  chanif: isi tanggal, week, shift, dll sama dg punya LPH SP -->
+                                    @*<input type="text" class="form-control datepicker" name="Date">*@
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <input type="text" class=" form-control" name="start" />
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class=" form-control" name="end" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Week</label>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" disabled name="weekStart">
+                                        <label>&nbsp; to &nbsp;</label>
+                                        <input type="text" class="form-control" disabled name="weekEnd" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Filter Line</label>
+                                <div class="col-7">
+                                    <select class="form-control select2" name="line">
+                                        <option label="Select Line"></option>
+                                        @if (ViewBag.isWest == 1)
+                                        {
+                                            <optgroup label="PP Kretek - Karawang">
+                                                <option value="DTAssignHMSCloveTable">Clove Line</option>
+                                                <option value="DTAssignHMSCresTable">CRES Line</option>
+                                                <option value="DTAssignHMSCsfTable">CSF Line</option>
+                                                <option value="DTAssignHMSKitchenTable">Kitchen Line</option>
+                                                <option value="DTAssignHMSKretekTable">Lamina Kretek</option>
+                                                <option value="DTAssignHMSRtcTable">RTC Line</option>
+                                            </optgroup>
+                                            <optgroup label="PP White - Karawang">
+                                                <option value="DTAssignPMIDIsTable">IS White</option>
+                                                <option value="DTAssignPMIDWhiteTable">Lamina White</option>
+                                            </optgroup>
+                                        }
+                                        else
+                                        {
+                                            <optgroup label="PP Kretek - Sukorejo">
+                                                <option value="EDTAssignClove">Clove Line</option>
+                                                <option value="EDTAssignHMSCresTable">CRES Line</option>
+                                                <option value="EDTAssignCSF">CSF Line</option>
+                                                <option value="EDTAssignDiet">Diet Line</option>
+                                                <option value="EDTAssignKitchen">Kitchen Line</option>
+                                                <option value="EDTAssignKretek">Lamina Kretek</option>
+                                                <option value="EDTAssignRTC">RTC Line</option>
+                                                <option value="EDTAssignStem" style="display: none;">Stem Line</option>
+                                            </optgroup>
+                                            <optgroup label="PP White - Sukorejo">
+                                                <option value="EDTAssignWhite">Lamina White</option>
+                                            </optgroup>
+
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Area</label>
+                                <div class="col-7">
+                                    <select name="area" class="form-control">
+                                        <option value="All Area">All Area</option>
+                                        @*<option value="Infeed DCC">Infeed DCCC</option>
+                                            <option value="Cutting">Cutting</option>
+                                            <option value="FTD">FTD</option>
+                                            <option value="Addback">Addback</option>
+                                            <option value="Packing">Packing</option>
+                                            <option value="F2SPM">F2SPM</option>*@
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1">
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Equipment</label>
+                                <div class="col-7">
+                                    <select name="equipment" class="form-control">
+                                        <option value="All Equipment">All Equipment</option>
+                                        @*<option value="Cutter 400.140/145">Cutter 400.140/145</option>*@
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 col-form-label">Batch No</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" name="batch" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider-text divider-vertical"></div>
+                        <div class="flex-1" style="max-width:50px;">
+                            <div class="form-group row">
+                                <button id="btnSearch" class="btn btn-sm  btn-primary btn-uppercase pd-y-3"><i data-feather="search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--INFORMATION-->
+
+            <div class="col-12 mg-b-20">
+                <div class="card collect-component" id="safetydevice">
+                    <div class="card-header bg-primary tx-white tx-center font-weight-bold">Downtime</div>
+                    <div class="card-body row">
+
+                        <div class="tableWrapper col-12" style="min-height:330px;">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-info tx-center">
+                                    <tr>
+                                        <th style="min-width:90px;">Batch ID</th>
+                                        <th style="min-width:140px;">Start Date Time</th>
+                                        <th style="min-width:140px;">End Date Time</th>
+                                        <th style="min-width:90px;">Duration</th>
+                                        <th style="min-width:150px;">Log User</th>
+                                        <th style="min-width:150px;">Validated By</th>
+                                        <th style="min-width:140px;">Submit Date Time</th>
+                                        <th style="min-width:110px;">Line Prod</th>
+                                        <th style="min-width:120px;">DT Type</th>
+                                        <th style="min-width:90px;">Category</th>
+                                        <th style="min-width:130px;">DT Source</th>
+                                        <th style="min-width:120px;">Description</th>
+                                        <th style="min-width:180px;"><i class="fas fa-info-circle"></i>Remark</th>
+                                        <th style="min-width:110px;">Status</th>
+                                        @*<th style="min-width:110px;">Modified By</th>
+                                            <th style="min-width:140px;">Modified Date</th>*@
+                                        <th style="min-width:110px;">Action</th>
+                                    </tr>
+                                    <tr class="summary-body">
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th id="sumDuration">0</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        @*<th></th>
+                                            <th></th>*@
+                                    </tr>
+                                </thead>
+                                <tbody id="downtime">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- row -->
+
+        </div><!-- container -->
+    </div><!-- content -->
+</div><!-- content -->
+
+<div class="modal fade" id="modalEditDowntime" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+        <div class="modal-content" id="OpenDialog">
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+<div class="modal fade" id="modalAddDowntime" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width:750px;">
+        <div class="modal-content" id="CreateDowntime">
+            @using (Html.BeginForm("AddNew", "ReportPPDowntime", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+                    <a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                    <div class="media align-items-center">
+                        <span class="tx-color-03 d-none d-sm-block"><i class="fa fa-user-plus fa-3x"></i></span>
+                        <div class="media-body mg-sm-l-20">
+                            <h4 class="tx-18 tx-sm-20 mg-b-2">Add New</h4>
+                            <p class="tx-13 tx-color-03 mg-b-0">Add New Downtime</p>
+                        </div>
+                    </div><!-- media -->
+                </div><!-- modal-header -->
+        <div class="modal-body pd-sm-t-30 pd-sm-b-40 pd-sm-x-30">
+            @*<div class="row row-sm mg-b-10">
+            <div class="flex-1 row">
+                <div class="col-4">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Filter Line</label>
+                </div>
+                <div class="col-8">
+                    <select class="form-control select2" name="ApproverEmployeeID">
+                        @foreach (Fast.Web.Models.EmployeeModel employee in ViewBag.Leaders)
+                        {
+                            <option value="@(employee.EmployeeID)">[@(employee.EmployeeID)] @employee.FullName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="flex-1 row">
+            </div>
+        </div>*@
+            <div class="row row-sm mg-b-10">
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Filter Line</label>
+                    </div>
+                    <div class="col-8">
+                        <select class="form-control select2" name="FilterLine">
+                            <option label="Select Line"></option>
+                            @if (ViewBag.isWest == 1)
+                            {
+                                <optgroup label="PP Kretek - Karawang">
+                                    <option value="DTAssignHMSCloveTable">Clove Line</option>
+                                    <option value="DTAssignHMSCresTable">CRES Line</option>
+                                    <option value="DTAssignHMSCsfTable">CSF Line</option>
+                                    <option value="DTAssignHMSKitchenTable">Kitchen Line</option>
+                                    <option value="DTAssignHMSKretekTable">Lamina Kretek</option>
+                                    <option value="DTAssignHMSRtcTable">RTC Line</option>
+                                </optgroup>
+                                <optgroup label="PP White - Karawang">
+                                    <option value="DTAssignPMIDIsTable">IS White</option>
+                                    <option value="DTAssignPMIDWhiteTable">Lamina White</option>
+                                </optgroup>
+                            }
+                            else
+                            {
+                                <optgroup label="PP Kretek - Sukorejo">
+                                    <option value="EDTAssignClove">Clove Line</option>
+                                    <option value="EDTAssignHMSCresTable">CRES Line</option>
+                                    <option value="EDTAssignCSF">CSF Line</option>
+                                    <option value="EDTAssignDiet">Diet Line</option>
+                                    <option value="EDTAssignKitchen">Kitchen Line</option>
+                                    <option value="EDTAssignKretek">Lamina Kretek</option>
+                                    <option value="EDTAssignRTC">RTC Line</option>
+                                    <option value="EDTAssignStem" style="display: none;">Stem Line</option>
+                                </optgroup>
+                                <optgroup label="PP White - Sukorejo">
+                                    <option value="EDTAssignWhite">Lamina White</option>
+                                </optgroup>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Area</label>
+                    </div>
+                    <div class="col-8">
+                        <select name="LineProd" class="form-control">
+                            @*<option value="Infeed DCC">Infeed DCCC</option>
+                        <option value="Cutting">Cutting</option>
+                        <option value="FTD">FTD</option>
+                        <option value="Addback">Addback</option>
+                        <option value="Packing">Packing</option>
+                        <option value="F2SPM">F2SPM</option>*@
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-sm mg-b-10">
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Start Date Time</label>
+                    </div>
+                    <div class="col-5">
+                        <input class="form-control datepicker" id="txtStartDate" name="StartDate" required="required" type="text" value="">
+                    </div>
+                    <div class="col-3">
+                        <input class="form-control time" id="txtStarTime" name="StartTime" required="required" type="text" value="">
+                    </div>
+                </div>
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">End Date Time</label>
+                    </div>
+                    <div class="col-5">
+                        <input class="form-control datepicker" id="txtEndDate" name="EndDate" required="required" type="text" value="">
+                    </div>
+                    <div class="col-3">
+                        <input class="form-control time" id="txtEndTime" name="EndTime" required="required" type="text" value="">
+                    </div>
+                </div>
+            </div>
+            <div class="row row-sm mg-b-10">
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Batch ID</label>
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control number" id="txtBatchID" name="BatchID" required="required" type="text" value="">
+                    </div>
+                </div>
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">DT Type</label>
+                    </div>
+                    <div class="col-8">
+                        <select class="form-control select2" name="PlanUnplan" id="txtPlanUnplan" required="required">
+                            <option value="ZDT">ZDT</option>
+                            <option value="PDT">PDT</option>
+                            <option value="UPDT">UPDT</option>
+                            <option value="XDT">XDT</option>
+                        </select>
+                        @*<input class="form-control" id="txtPlanUnplan" name="PlanUnplan" required="required" type="text" value="">*@
+                    </div>
+                </div>
+            </div>
+            <div class="row row-sm mg-b-10">
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Category</label>
+                    </div>
+                    <div class="col-8">
+                        <select class="form-control select2" id="txtCategory" name="Category" required="required">
+                        </select>
+                        @*<input class="form-control" id="txtCategory" name="Category" required="required" type="text" value="">*@
+                    </div>
+                </div>
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">DT Source</label>
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control" id="txtUpDownStream" name="UpDownStream" required="required" type="text" value="">
+                    </div>
+                </div>
+            </div>
+            <div class="row row-sm mg-b-10">
+                @*<div class="flex-1 row">
+                <div class="col-4">
+                    <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Issue</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control" id="txtIssue" name="Issue" required="required" type="text" value="">
+                </div>
+            </div>*@
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Description</label>
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control" id="txtDescription" name="Description" required="required" type="text" value="">
+                    </div>
+                </div>
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Equipment</label>
+                    </div>
+                    <div class="col-8">
+                        <select id="txtRemark" name="Remark" class="form-control">
+                        </select>
+                        @*<input class="form-control" id="txtRemark" name="Remark" required="required" type="text" value="">*@
+                    </div>
+                </div>
+            </div>
+            <div class="row row-sm mg-b-10">
+
+                <div class="flex-1 row">
+                    <div class="col-4">
+                        <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-t-10 tx-color-03">Status</label>
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control" id="txtStatus" name="Status" required="required" type="text" value="">
+                    </div>
+                </div>
+                <div class="flex-1 row">
+                </div>
+            </div>
+        </div><!-- modal-body -->
+                <div class="modal-footer pd-x-20 pd-y-15">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@UIResources.Save</button>
+                </div>
+            }
+        </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+@section Scripts{
+    <script src="~/Content/dashforge/lib/feather-icons/feather.min.js"></script>
+    <script src="~/Content/dashforge/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.stack.js"></script>
+    <script src="~/Content/dashforge/lib/jquery.flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/dashforge/lib/chart.js/Chart.bundle.min.js"></script>
+
+
+
+    <script src="~/Content/dashforge/assets/js/dashforge.sampledata.js"></script>
+
+    <script src="~/Content/dashforge/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/Content/dashforge/assets/js/dashforge.settings.js"></script>
+
+
+
+    <script src="~/Content/dashforge/lib/cleave.js/cleave.min.js"></script>
+    <script src="~/Content/dashforge/lib/moment/moment.js"></script>
+    <script src="~/Content/dashforge/lib/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+
+    <script>
+        const line2 = {
+            DTAssignHMSCloveTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 40115"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 43030",
+                                "Weight Belt 43031"
+                            ],
+                        },
+                        {
+                            opt: "Cutting Drying",
+                            value: "Cutting,Drying",
+                            equipment: [
+                                "Cutter 46060",
+                                "Cutter 46075",
+                                "Weight Belt 46135",
+                                "Weight Belt 46140"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSCresTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed Conditioning",
+                            value: "Infeed,Conditioning",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Cutting Drying",
+                            value: "Cutting,Drying",
+                            equipment: [
+                                "Cutter 55065",
+                                "Cutter 55066",
+                                "Weight Belt 55105"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSCsfTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Microwave",
+                            value: "Microwave",
+                            equipment: [
+                                "Weight Belt 60102",
+                                "Weight Belt 60202",
+                                "Weight Belt 60302",
+                            ],
+                        },
+                        {
+                            opt: "Flavour",
+                            value: "Flavour",
+                            equipment: [
+                                "Cylinder 60132"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSKitchenTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Invert Sugar",
+                            value: "Invert Sugar",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Burley",
+                            value: "Burley Spray",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Bright",
+                            value: "Bright Casing",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "After Cut",
+                            value: "After Cut",
+                            equipment: [
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSKretekTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed DCCC RJ",
+                            value: "Infeed RJ,DCCC RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "Infeed DCCC KR",
+                            value: "Infeed KR,DCCC KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "CUTR-0019",
+                                "CUTR-0020"
+                            ],
+                        },
+                        {
+                            opt: "FTD",
+                            value: "FTD",
+                            equipment: [
+                                "Weight Belt 45060"
+                            ],
+                        },
+                        {
+                            opt: "Addback",
+                            value: "Addback",
+                            equipment: [
+                                "Weight Belt 600.010"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Charger"
+                            ],
+                        },
+                        {
+                            opt: "F2SKM",
+                            value: "F2SKM",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSRtcTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Infeed"
+                            ],
+                        },
+                        {
+                            opt: "Crushing",
+                            value: "Crushing",
+                            equipment: [
+                                "Crushing"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Line 1",
+                                "Line 2",
+                                "Line 3",
+                                "Line 4",
+                                "Line 5",
+                                "Line 6"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Packing"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignPMIDIsTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Tipping Process",
+                            value: "Tipping Process",
+                            equipment: [
+                            ],
+                        }
+                    ],
+                },
+            ],
+            DTAssignPMIDWhiteTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed DCCC",
+                            value: "Infeed,DCCC",
+                            equipment: [
+                                "Weight Belt 320.050"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 400.140",
+                                "Cutter 400.145"
+                            ],
+                        },
+                        {
+                            opt: "FTD",
+                            value: "FTD",
+                            equipment: [
+                                "Weight Belt 45030"
+                            ],
+                        },
+                        {
+                            opt: "Addback",
+                            value: "Addback",
+                            equipment: [
+                                "Weight Belt 620.150"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Topping 8080"
+                            ],
+                        },
+                        {
+                            opt: "F2SPM",
+                            value: "F2SPM",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+
+            EDTAssignClove: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 40115"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 43030",
+                                "Weight Belt 43031"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 46060",
+                                "Cutter 46075"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Weight Belt 46135",
+                                "Weight Belt 46140"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignHMSCresTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 55065",
+                                "Cutter 55066"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Weight Belt 55105"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                        {
+                            opt: "Cutting & Drying",
+                            value: "CRES - CUTTING & DRYING",
+                            equipment: [
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignCSF: [
+                {
+                    opts: [
+                        {
+                            opt: "Microwave",
+                            value: "Microwave",
+                            equipment: [
+                                "Weight Belt 60102",
+                                "Weight Belt 60202",
+                                "Weight Belt 60302",
+                            ],
+                        },
+                        {
+                            opt: "Flavour",
+                            value: "Flavour",
+                            equipment: [
+                                "Cylinder 60132"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignDiet: [
+                {
+                    opts: [
+                        {
+                            opt: "-",
+                            value: "-",
+                            equipment: [
+                                "-",
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignKitchen: [
+                {
+                    opts: [
+                        {
+                            opt: "Invert Sugar",
+                            value: "Invert Sugar",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Burley",
+                            value: "Burley Spray",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Bright",
+                            value: "Bright Casing",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "After Cut",
+                            value: "After Cut",
+                            equipment: [
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignKretek: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed Rajangan",
+                            value: "Infeed RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "Infeed Krosok",
+                            value: "Infeed KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "DCCC Rajangan",
+                            value: "DCCC RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "DCCC Krosok",
+                            value: "DCCC KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "CUTR-0019",
+                                "CUTR-0020"
+                            ],
+                        },
+                        {
+                            opt: "FTD",
+                            value: "FTD",
+                            equipment: [
+                                "Weight Belt 45060"
+                            ],
+                        },
+                        {
+                            opt: "Addback",
+                            value: "Addback",
+                            equipment: [
+                                "Weight Belt 600.010"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Charger"
+                            ],
+                        },
+                        {
+                            opt: "F2SKM",
+                            value: "F2SKM",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignRTC: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Infeed"
+                            ],
+                        },
+                        {
+                            opt: "Crushing",
+                            value: "Crushing",
+                            equipment: [
+                                "Crushing"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Line 1",
+                                "Line 2",
+                                "Line 3",
+                                "Line 4",
+                                "Line 5",
+                                "Line 6"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Packing"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignWhite: [
+                {
+                    opts: [
+                        {
+                            opt: "Tipping Process",
+                            value: "Tipping Process",
+                            equipment: [
+                            ],
+                        }
+                    ],
+                },
+            ],
+
+            EDTAssignStem: [
+                {
+                    opts: [
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Cutting & Drying",
+                            value: "CRES - CUTTING & DRYING",
+                            equipment: [
+                                "Split 1",
+                                "Split 2",
+                                "Split 3",
+                                "Abort",
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
+        
+    const line = {
+            DTAssignHMSCloveTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 40115"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 43030",
+                                "Weight Belt 43031"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 46060",
+                                "Cutter 46075"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Weight Belt 46135",
+                                "Weight Belt 46140"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSCresTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 55065",
+                                "Cutter 55066"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Weight Belt 55105"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSCsfTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Microwave",
+                            value: "Microwave",
+                            equipment: [
+                                "Weight Belt 60102",
+                                "Weight Belt 60202",
+                                "Weight Belt 60302",
+                            ],
+                        },
+                        {
+                            opt: "Flavour",
+                            value: "Flavour",
+                            equipment: [
+                                "Cylinder 60132"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSKitchenTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Invert Sugar",
+                            value: "Invert Sugar",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Burley",
+                            value: "Burley Spray",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Bright",
+                            value: "Bright Casing",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "After Cut",
+                            value: "After Cut",
+                            equipment: [
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSKretekTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed Rajangan",
+                            value: "Infeed RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "Infeed Krosok",
+                            value: "Infeed KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "DCCC Rajangan",
+                            value: "DCCC RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "DCCC Krosok",
+                            value: "DCCC KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "CUTR-0019",
+                                "CUTR-0020"
+                            ],
+                        },
+                        {
+                            opt: "FTD",
+                            value: "FTD",
+                            equipment: [
+                                "Weight Belt 45060"
+                            ],
+                        },
+                        {
+                            opt: "Addback",
+                            value: "Addback",
+                            equipment: [
+                                "Weight Belt 600.010"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Charger"
+                            ],
+                        },
+                        {
+                            opt: "F2SKM",
+                            value: "F2SKM",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignHMSRtcTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Infeed"
+                            ],
+                        },
+                        {
+                            opt: "Crushing",
+                            value: "Crushing",
+                            equipment: [
+                                "Crushing"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Line 1",
+                                "Line 2",
+                                "Line 3",
+                                "Line 4",
+                                "Line 5",
+                                "Line 6"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Packing"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            DTAssignPMIDIsTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Tipping Process",
+                            value: "Tipping Process",
+                            equipment: [
+                            ],
+                        }
+                    ],
+                },
+            ],
+            DTAssignPMIDWhiteTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 320.050"
+                            ],
+                        },
+                        {
+                            opt: "DCCC",
+                            value: "DCCC",
+                            equipment: [
+                                "Weight Belt 320.050"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 400.140",
+                                "Cutter 400.145"
+                            ],
+                        },
+                        {
+                            opt: "FTD",
+                            value: "FTD",
+                            equipment: [
+                                "Weight Belt 45030"
+                            ],
+                        },
+                        {
+                            opt: "Addback",
+                            value: "Addback",
+                            equipment: [
+                                "Weight Belt 620.150"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Topping 8080"
+                            ],
+                        },
+                        {
+                            opt: "F2SPM",
+                            value: "F2SPM",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+
+            EDTAssignClove: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 40115"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 43030",
+                                "Weight Belt 43031"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 46060",
+                                "Cutter 46075"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Weight Belt 46135",
+                                "Weight Belt 46140"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignHMSCresTable: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Conditioning",
+                            value: "Conditioning",
+                            equipment: [
+                                "Weight Belt 50040"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "Cutter 55065",
+                                "Cutter 55066"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Weight Belt 55105"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                        {
+                            opt: "Cutting & Drying",
+                            value: "CRES - CUTTING & DRYING",
+                            equipment: [
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignCSF: [
+                {
+                    opts: [
+                        {
+                            opt: "Microwave",
+                            value: "Microwave",
+                            equipment: [
+                                "Weight Belt 60102",
+                                "Weight Belt 60202",
+                                "Weight Belt 60302",
+                            ],
+                        },
+                        {
+                            opt: "Flavour",
+                            value: "Flavour",
+                            equipment: [
+                                "Cylinder 60132"
+                            ],
+                        },
+                        {
+                            opt: "LinkUp",
+                            value: "LinkUp",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignDiet: [
+                {
+                    opts: [
+                        {
+                            opt: "-",
+                            value: "-",
+                            equipment: [
+                                "-",
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignKitchen: [
+                {
+                    opts: [
+                        {
+                            opt: "Invert Sugar",
+                            value: "Invert Sugar",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Burley",
+                            value: "Burley Spray",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Bright",
+                            value: "Bright Casing",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "After Cut",
+                            value: "After Cut",
+                            equipment: [
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignKretek: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed Rajangan",
+                            value: "Infeed RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "Infeed Krosok",
+                            value: "Infeed KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "DCCC Rajangan",
+                            value: "DCCC RJ",
+                            equipment: [
+                                "Weight Belt 100.045"
+                            ],
+                        },
+                        {
+                            opt: "DCCC Krosok",
+                            value: "DCCC KR",
+                            equipment: [
+                                "Weight Belt 200.045"
+                            ],
+                        },
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                                "CUTR-0019",
+                                "CUTR-0020"
+                            ],
+                        },
+                        {
+                            opt: "FTD",
+                            value: "FTD",
+                            equipment: [
+                                "Weight Belt 45060"
+                            ],
+                        },
+                        {
+                            opt: "Addback",
+                            value: "Addback",
+                            equipment: [
+                                "Weight Belt 600.010"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Charger"
+                            ],
+                        },
+                        {
+                            opt: "F2SKM",
+                            value: "F2SKM",
+                            equipment: [
+                                "LinkUp"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignRTC: [
+                {
+                    opts: [
+                        {
+                            opt: "Infeed",
+                            value: "Infeed",
+                            equipment: [
+                                "Infeed"
+                            ],
+                        },
+                        {
+                            opt: "Crushing",
+                            value: "Crushing",
+                            equipment: [
+                                "Crushing"
+                            ],
+                        },
+                        {
+                            opt: "Drying",
+                            value: "Drying",
+                            equipment: [
+                                "Line 1",
+                                "Line 2",
+                                "Line 3",
+                                "Line 4",
+                                "Line 5",
+                                "Line 6"
+                            ],
+                        },
+                        {
+                            opt: "Packing",
+                            value: "Packing",
+                            equipment: [
+                                "Packing"
+                            ],
+                        },
+                    ],
+                },
+            ],
+            EDTAssignWhite: [
+                {
+                    opts: [
+                        {
+                            opt: "Tipping Process",
+                            value: "Tipping Process",
+                            equipment: [
+                            ],
+                        }
+                    ],
+                },
+            ],
+
+            EDTAssignStem: [
+                {
+                    opts: [
+                        {
+                            opt: "Cutting",
+                            value: "Cutting",
+                            equipment: [
+                            ],
+                        },
+                        {
+                            opt: "Cutting & Drying",
+                            value: "CRES - CUTTING & DRYING",
+                            equipment: [
+                                "Split 1",
+                                "Split 2",
+                                "Split 3",
+                                "Abort",
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
+        const dttype = {
+            ZDT: [
+                {
+                    opts: [
+                        { opt: "Production Run", value: "Production Run" }
+                    ],
+                },
+            ],
+            PDT: [
+                {
+                    opts: [
+                        {opt:"Startup", value: "Startup" },
+                        {opt:"CO", value: "CO" },
+                        {opt:"BCO", value: "BCO" },
+                        {opt:"CIL", value: "CIL" },
+                        {opt:"PM", value: "PM" },
+                        {opt:"Training", value: "Training" },
+                        {opt:"Testing & Trial", value: "Testing & Trial" },
+                        {opt:"Others", value: "Other" }
+                    ],
+                },
+            ],
+            UPDT: [
+                {
+                    opts: [
+                        {opt:"Process Failure", value: "PF" },
+                        {opt:"Breakdown", value: "BR" },
+                        {opt:"Minor Stop", value: "MS" }
+                    ],
+                },
+            ],
+            XDT: [
+                {
+                    opts: [
+                        {opt:"No Demand", value: "ND" }
+                    ],
+                },
+            ],
+        }
+        $(document).ready(function () {
+            $("[name=line]").on("change", function () {
+                let opt = '<option value="All Area">All Area</option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < line2[val].length; i++) {
+                    for (let j = 0; j < line2[val][i].opts.length; j++)
+                        opt += `<option value="${line2[val][i].opts[j].value}">${line2[val][i].opts[j].opt}</option>`;
+                }
+                $("[name=area]").html(opt);
+                $("[name=area]").trigger("change");
+            });
+            $("[name=area]").on("change", function () {
+                let opt = '<option value="All Equipment">All Equipment</option>';
+                const lineSelected = $("[name=line]").val();
+                const area = $(this).val();
+                if (lineSelected != "") for (let i = 0; i < line2[lineSelected].length; i++) {
+                    for (let j = 0; j < line2[lineSelected][i].opts.length; j++)
+                        if (line2[lineSelected][i].opts[j].value == area) {
+                            for (let k = 0; k < line2[lineSelected][i].opts[j].equipment.length; k++)
+                                opt += `<option value="${line2[lineSelected][i].opts[j].equipment[k]}">${line2[lineSelected][i].opts[j].equipment[k]}</option>`;
+                            break;
+                        }
+                }
+                $("[name=equipment]").html(opt);
+            });
+
+            $("[name=FilterLine]").on("change", function () {
+                let opt = '';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < line[val].length; i++) {
+                    for (let j = 0; j < line[val][i].opts.length; j++)
+                        opt += `<option value="${line[val][i].opts[j].value}">${line[val][i].opts[j].opt}</option>`;
+                }
+                $("[name=LineProd]").html(opt);
+                $("[name=LineProd]").trigger("change");
+            });
+            $("[name=LineProd]").on("change", function () {
+                let opt = '';
+                const lineSelected = $("[name=FilterLine]").val();
+                const area = $(this).val();
+                if (lineSelected != "") for (let i = 0; i < line[lineSelected].length; i++) {
+                    for (let j = 0; j < line[lineSelected][i].opts.length; j++)
+                        if (line[lineSelected][i].opts[j].value == area) {
+                            for (let k = 0; k < line[lineSelected][i].opts[j].equipment.length; k++)
+                                opt += `<option value="${line[lineSelected][i].opts[j].equipment[k]}">${line[lineSelected][i].opts[j].equipment[k]}</option>`;
+                            break;
+                        }
+                }
+                $("[name=Remark]").html(opt);
+            });
+            $("[name=PlanUnplan]").on("change", function () {
+                let opt = '';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < dttype[val].length; i++) {
+                    for (let j = 0; j < dttype[val][i].opts.length; j++)
+                        opt += `<option value="${dttype[val][i].opts[j].value}">${dttype[val][i].opts[j].opt}</option>`;
+                }
+                $("[name=Category]").html(opt);
+            });
+            $("[name=PlanUnplan]").trigger("change");
+        });
+    </script>
+    <script>
+            function fulfillTime(a) {
+                switch (a.length) {
+                    //case 0: return "00:00";
+                    case 1: return a + "0:00";
+                    case 3: return a + "00";
+                    case 4: return a + "0";
+                }
+                return a;
+            }
+
+            function RenderActions(id, table) {
+                $("#OpenDialog").load(fastApp.BaseUrl + "/ReportPPDowntime/Edit?id=" + id + "&table=" + table);
+            };
+            function RenderActionDeletes(id, table) {
+                if (confirm("Are you sure?")) {
+                    DeleteDowntime(id, table);
+                }
+            };
+            function DeleteDowntime(Id,Table) {
+			$.ajax({
+				url: fastApp.BaseUrl + "/ReportPPDowntime/Delete?id=" + Id + "&table=" + Table,
+				type: 'POST',
+				success: function (result) {
+					if (result.Status) {
+						var notice = new PNotify({
+							title: "@UIResources.Confirmation",
+							text: "@UIResources.DeleteSucceed",
+							width: "400px",
+							type: 'success',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+					else {
+						var notice = new PNotify({
+							title: "@UIResources.ErrorMessage",
+							text: "@UIResources.DeleteFailed",
+							width: "400px",
+							type: 'error',
+							addclass: 'stack-bottomright',
+							delay: 2000
+						});
+
+						notice.get().click(function () {
+							notice.remove();
+						});
+					}
+				},
+				complete: function (data) {
+					setTimeout(function () {
+						window.location.href = fastApp.BaseUrl + '/ReportPPDowntime/Index';
+					}, 1000);
+				}
+			});
+		}
+            $(document).ready(function () {
+                $('input').attr('autocomplete', 'off');
+
+                $('.datepicker').toArray().forEach(function (field) {
+                    $(field).datepicker({
+                        autoclose: true,
+                        todayHighlight: true,
+                        format: 'dd-M-yy',
+                    });
+                });
+                $('.time').toArray().forEach(function (field) {
+                    $(field).attr("placeholder", "00:00");
+                    new Cleave(field, {
+                        time: true,
+                        timePattern: ['h', 'm']
+                    });
+                    $(field).blur(function () {
+                        $(this).val(fulfillTime($(this).val()));
+                    });
+                });
+                $('.input-daterange').datepicker({
+                    autoclose: true,
+                    calendarWeeks: true,
+                    enableOnReadonly: true,
+                    todayHighlight: true,
+                    format: 'dd-M-yy',
+                    language: 'id-ID',
+                });
+                $('.number, .number-positive').toArray().forEach(function (field) {
+                    new Cleave(field, {
+                        numeral: true,
+                        numeralDecimalScale: 0,
+                        numeralThousandsGroupStyle: 'none',
+                        //numeralDecimalMark: ',',
+                        //delimiter: '.',
+                        numeralPositiveOnly: $(field).hasClass("number-positive"),
+                    });
+                    $(".input-daterange [name='start']").on('changeDate', function (selected) {
+                        $("[name='end']").datepicker('setStartDate', selected.date);
+                        $("[name='weekStart']").val(moment(selected.date).format("W"));
+                    });
+                    $(".input-daterange [name='end']").on('changeDate', function (selected) {
+                        $("[name='start']").datepicker('setEndDate', selected.date);
+                        $("[name='weekEnd']").val(moment(selected.date).format("W"));
+                    });
+
+                    $("#line-tabs li").click(function () {
+                        $(this).siblings().children().removeClass("active");
+                        $(this).children().toggleClass("active");
+                        const index = $(this).index() + 1;
+                        $("#lines .carousel-item.active").removeClass("active");
+                        const carouselItem = $('#lines .carousel-item:nth-child(' + index + ')');
+                        $(carouselItem).toggleClass("active");
+                        $(carouselItem).find('.tableWrapper thead tr').each(function () {
+                            const top = $(this).position().top;
+                            $(this).children().css({ "top": top });
+                        });
+                        ieFix();
+                    });
+                });
+            let yesterday = ( d => new Date(d.setDate(d.getDate()-1)) )(new Date);
+            $(".input-daterange [name='start']").datepicker('setDate', yesterday);
+            $(".input-daterange [name='end']").datepicker('setDate', yesterday);
+            });
+    </script>
+
+    <script>
+
+            var result = "@ViewBag.Result";
+		    if (result != "") {
+			    if (result == "True") {
+				    var message = "@ViewBag.Message";
+
+				    var notice = new PNotify({
+					    title: "@UIResources.Confirmation",
+					    text: message,
+					    width: "400px",
+					    type: 'success',
+					    addclass: 'stack-bottomright',
+					    delay: 2000
+				    });
+
+				    notice.get().click(function () {
+					    notice.remove();
+				    });
+			    }
+			    else {
+				    var error = "@ViewBag.ErrorMessage";
+
+				    var notice = new PNotify({
+					    title: "@UIResources.ErrorMessage",
+					    text: error,
+					    width: "400px",
+					    type: 'error',
+					    addclass: 'stack-bottomright',
+					    delay: 2000
+				    });
+
+				    notice.get().click(function () {
+					    notice.remove();
+				    });
+			    }
+            }
+
+    </script>
+
+    <script>
+        $("#btnShowHide").click(function () {
+            var x = document.getElementById("collapseExample");
+            if (x.style.display === 'none') {
+                x.style.display = '';
+                $('.tableWrapper thead tr').each(function () {
+                    const top = $(this).position().top;
+                    $(this).children().css({
+                        "top": top,
+                        "position": "sticky",
+                        "z-index": "100",
+                    });
+                });
+                $(this).text("Hide Table");
+            } else {
+                x.style.display = 'none';
+                $(this).text("Show Table");
+            }
+        });
+    </script> @*hide button*@
+
+
+    <!------------------------ STICKY ------------------------------------>
+    <script>
+        $('.tableWrapper thead tr').each(function () {
+            const top = $(this).position().top;
+            $(this).children().css({
+                "top": top,
+                "position": "sticky",
+                "z-index": "100",
+            });
+        });
+    </script>
+
+    <!------------------------ DROP DOWN FILTER LOCATION ---------------------------------->
+    <script>
+        const $tmpDiv = $('<div/>');
+        htmlEncode = (value) => $tmpDiv.text(value).html();
+        htmlDecode = (value) => $tmpDiv.html(value).text();
+        $(document).ready(function () {
+            $(".selectable-section").hide();
+            $("[name=prodCenter]").on("change", function () {
+                let opt = '<option label="Select Line"></option>';
+                const val = $(this).val();
+                if (val != "") for (let i = 0; i < loc[val].length; i++) {
+                    opt += `<optgroup label="${loc[val][i].groupname}">`;
+                    for (let j = 0; j < loc[val][i].opts.length; j++)
+                        opt += `<option value="${loc[val][i].opts[j].opt}">${loc[val][i].opts[j].opt}</option>`;
+                    opt += `</optgroup>`;
+                }
+                $("[name=line]").html(opt);
+            })
+        });
+    </script>
+
+
+    <!------------------------ ACT BTN SEARCH ------------------------------------>
+    <script>
+            var searchResult = null;
+            function showError(errorMsg) {
+                var notice = new PNotify({
+	                title: "@UIResources.ErrorMessage",
+	                text: errorMsg,
+	                width: "400px",
+                    type: 'error',
+                    addclass: 'stack-bottomright',
+	                hide: false,
+	                buttons: {
+		                sticker: false
+	                }
+                });
+
+                notice.get().click(function () {
+	                notice.remove();
+                });
+            }
+            $(document).ready(function () {
+
+                $("#extractData").on("click", function () {
+                    if (searchResult == null) {
+                        showError("Empty data!");
+                        return;
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("ExtractExcel", "ReportPPDowntime")",
+                        data: JSON.stringify({
+                            data: JSON.stringify(searchResult),
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function () {
+                            window.location = "@Url.Action("DownloadExcel", "ReportPPDowntime")";
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                    });
+                });
+                var startDate = null;
+                var endDate = null;
+                var filterLine = null;
+                var filterBatch = null;
+                var filterArea = null;
+                var filterEquipment = null;
+                $("#btnSearch").on("click", function () {
+
+                    startDate = $("[name=start]").val();
+                    if (startDate == "") {
+                        showError("Start Date can't be empty");
+                        return;
+                    }
+                    endDate = $("[name=end]").val();
+                    if (endDate == "") {
+                        showError("End Date can't be empty");
+                        return;
+                    }
+                    filterLine = $("[name=line]").val();
+                    if (filterLine == "") {
+                        showError("Filter Line can't be empty");
+                        return;
+                    }
+                    $('#loading_overlay').removeClass('d-none');
+
+                    filterBatch = $("[name=batch]").val();
+                    filterArea = $("[name=area]").val();
+                    filterEquipment = htmlEncode($("[name=equipment]").val());
+                    $.ajax({
+                        type: "post",
+                        url: fastApp.BaseUrl + "/ReportPPDowntime/GetReportWithParam",
+                        data: {
+                            startDate: startDate,
+                            endDate: endDate,
+                            type: filterLine,
+                            batch: filterBatch,
+                            area: filterArea,
+                            equipment: filterEquipment,
+                        },
+                        datatype: "json",
+                        traditional: true,
+                        success: function (result) {
+                            console.log(result);
+                            if (result.Status == "True") {
+                                searchResult = JSON.parse(result.Data);
+                                let rowView = "";
+                                var sumDuration = 0;
+                                for (let i = 0; i < searchResult.length; i++) {
+                                    searchResult[i].StartDateTime = moment(searchResult[i].StartDateTime).format("DD-MMM-YY HH:mm").toUpperCase();
+                                    searchResult[i].EndDateTime = moment(searchResult[i].EndDateTime).format("DD-MMM-YY HH:mm").toUpperCase();
+                                    searchResult[i].SubmitDateTime = moment(searchResult[i].SubmitDateTime).format("DD-MMM-YY HH:mm").toUpperCase();
+                                    const rowData = searchResult[i];
+                                    var backgroud = ``;
+                                    if (i != 0) {
+                                        const prevrowData = searchResult[i - 1];
+                                        if (rowData.StartDateTime != prevrowData.EndDateTime) {
+                                            backgroud = `style="background-color: #ffcccc;"`;
+                                        }
+                                    }
+                                    rowView += `
+                                    <tr `;
+                                    rowView += backgroud;
+                                    rowView += `>
+                                        <td>${rowData.BatchID}</td>
+                                        <td>${rowData.StartDateTime}</td>
+                                        <td>${rowData.EndDateTime}</td>
+                                        <td>${parseFloat(rowData.Duration).toFixed(2)}</td>
+                                        <td>${rowData.LogUser}</td>
+                                        <td>${(rowData.ApprovedBy == null ? "" : rowData.ApprovedBy)}</td>
+                                        <td>${rowData.SubmitDateTime}</td>
+                                        <td>${rowData.LineProd}</td>
+                                        <td>${rowData.PlanUnplan}</td>
+                                        <td>${rowData.Category}</td>
+                                        <td>${rowData.UpDownStream}</td>
+                                        <td>${rowData.Description}</td>
+                                        <td>${rowData.Remark}</td>
+                                        <td>${rowData.Status}</td>
+                                        <td>`;
+
+                                    if (rowData.ApprovedBy == null || "@ViewBag.isSupervisor" == "True") {
+
+                                        rowView += '<i onclick="RenderActions(\'' + rowData.ID + '\',\'' + filterLine + '\')" data-toggle="modal" data-target="#modalEditDowntime" class="fa fa-edit"></i>';
+                                        rowView += '<i onclick="RenderActionDeletes(\'' + rowData.ID + '\',\'' + filterLine + '\')" class="fa fa-trash"></i>';
+                                        //rowView += '<button class="btn-menu btn-default" onclick="RenderActions(\'' + rowData.ID + '\',\''+filterLine+'\')" data-toggle="modal" data-target="#modalEditDowntime" title="Edit"><i class="fa fa-edit"></i></button>'
+                                        // rowView += '<button class="btn-menu btn-default" onclick="RenderActionDeletes(\'' + rowData.ID + '\',\''+filterLine+'\')" title="Delete"><i class="fa fa-trash"></i></button>'
+                                    }
+                                    rowView += `</td></tr>`;
+                                    sumDuration += parseFloat(rowData.Duration);
+                                }
+
+                                $("#downtime").html(rowView);
+                                $("#sumDuration").html(sumDuration.toFixed(2));
+                            }
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                        complete: function () {
+                            $('#loading_overlay').addClass('d-none');
+                        },
+                    });
+
+                });
+
+                $("#btnValidate").on("click", function () {
+                    if (confirm("Are you sure?")) {
+                        $.ajax({
+                            type: "post",
+                            url: fastApp.BaseUrl + "/ReportPPDowntime/ValidateDowntime",
+                            data: {
+                                startDate: startDate,
+                                endDate: endDate,
+                                type: filterLine,
+                                batch: filterBatch,
+                                area: filterArea,
+                                equipment: filterEquipment,
+                            },
+                            datatype: "json",
+                            traditional: true,
+                            success: function (result) {
+                                console.log(result);
+                                if (result.Status == "True") {
+                                    searchResult = JSON.parse(result.Data);
+                                    let rowView = "";
+                                    var sumDuration = 0;
+                                    for (let i = 0; i < searchResult.length; i++) {
+                                        const rowData = searchResult[i];
+                                        var backgroud = ``;
+                                        if (i != 0) {
+                                            const prevrowData = searchResult[i - 1];
+                                            if (moment(rowData.StartDateTime).format("DD-MMM-YY HH:mm").toUpperCase() != moment(prevrowData.EndDateTime).format("DD-MMM-YY HH:mm").toUpperCase()) {
+                                                backgroud = `style="background-color: #ffcccc;"`;
+                                                console.log(moment(rowData.StartDateTime).format("DD-MMM-YY HH:mm").toUpperCase() + " ::: " + moment(prevrowData.EndDateTime).format("DD-MMM-YY HH:mm").toUpperCase())
+                                            }
+                                        }
+                                        rowView += `
+                                    <tr `;
+                                        rowView += backgroud;
+                                        rowView += `>
+                                        <td>${rowData.BatchID}</td>
+                                        <td>${moment(rowData.StartDateTime).format("DD-MMM-YY HH:mm").toUpperCase()}</td>
+                                        <td>${moment(rowData.EndDateTime).format("DD-MMM-YY HH:mm").toUpperCase()}</td>
+                                        <td>${parseFloat(rowData.Duration).toFixed(2)}</td>
+                                        <td>${rowData.LogUser}</td>
+                                        <td>${(rowData.ApprovedBy == null ? "" : rowData.ApprovedBy)}</td>
+                                        <td>${moment(rowData.SubmitDateTime).format("DD-MMM-YY HH:mm").toUpperCase()}</td>
+                                        <td>${rowData.LineProd}</td>
+                                        <td>${rowData.PlanUnplan}</td>
+                                        <td>${rowData.Category}</td>
+                                        <td>${rowData.UpDownStream}</td>
+                                        <td>${rowData.Description}</td>
+                                        <td>${rowData.Remark}</td>
+                                        <td>${rowData.Status}</td>
+                                        <td>`;
+
+                                        if (rowData.ApprovedBy == null || "@ViewBag.isSupervisor" == "True") {
+
+                                            rowView += '<i onclick="RenderActions(\'' + rowData.ID + '\',\'' + filterLine + '\')" data-toggle="modal" data-target="#modalEditDowntime" class="fa fa-edit"></i>';
+                                            rowView += '<i onclick="RenderActionDeletes(\'' + rowData.ID + '\',\'' + filterLine + '\')" class="fa fa-trash"></i>';
+                                            //rowView += '<button class="btn-menu btn-default" onclick="RenderActions(\'' + rowData.ID + '\',\''+filterLine+'\')" data-toggle="modal" data-target="#modalEditDowntime" title="Edit"><i class="fa fa-edit"></i></button>'
+                                            // rowView += '<button class="btn-menu btn-default" onclick="RenderActionDeletes(\'' + rowData.ID + '\',\''+filterLine+'\')" title="Delete"><i class="fa fa-trash"></i></button>'
+                                        }
+                                        rowView += `</td></tr>`;
+                                        sumDuration += parseFloat(rowData.Duration);
+                                    }
+
+                                    $("#downtime").html(rowView);
+                                    $("#sumDuration").html(sumDuration.toFixed(2));
+                                }
+                                $('#loading_overlay').addClass('d-none');
+                            },
+                            complete: function () {
+                                $('#loading_overlay').addClass('d-none');
+                            },
+                        });
+                    }
+                });
+
+                var foundFilter = "@ViewBag.FilterFound";
+                if (foundFilter != "") {
+                    if (foundFilter == "True") {
+                        $('[name=start]').val("@ViewBag.DateStart");
+                        $('[name=end]').val("@ViewBag.DateEnd");
+                        $('[name=line]').val("@ViewBag.FilterLine");
+                        $('[name=line]').trigger("change");
+                        $('[name=area]').val("@ViewBag.Area");
+                        $('[name=area]').trigger("change");
+                        $('[name=equipment]').val("@ViewBag.Equipment");
+                        $('[name=batch]').val("@ViewBag.BatchNo");
+
+                        $("[name='weekStart']").val(moment($('[name=start]').val()).format("W"));
+                        $("[name='weekEnd']").val(moment($('[name=end]').val()).format("W"));
+
+                        $('#btnSearch').trigger("click");
+                    }
+                }
+            });
+    </script>
+
+    <!------------------------ DATEPICKER ------------------------------------>
+
+}

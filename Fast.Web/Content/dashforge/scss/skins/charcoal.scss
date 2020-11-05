@@ -1,0 +1,198 @@
+
+// template and bootstrap override variables
+@import "../variables";
+@import "../bootstrap/variables";
+
+// template and bootstrap mixins
+@import "../mixins";
+@import "../bootstrap/mixins";
+
+// bootstrap
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
+
+
+$skin-text-01:        #fff;
+$skin-text-02:        #d6dbe1;
+$skin-text-03:        #8f9dae;
+$skin-text-04:        #65768b;
+
+$skin-ui-01:          #546273;
+$skin-ui-02:          #3a4450;
+$skin-ui-03:          #2d353e;
+
+/***** HEADER *****/
+
+.df-logo {
+  color: $skin-text-01;
+  span { color: $skin-text-03; }
+  @include hover-focus() { color: #fff; }
+}
+
+.navbar-header {
+  background-color: $skin-ui-03;
+  border-bottom-width: 0;
+
+  .burger-menu {
+    color: $skin-text-04;
+    @include hover-focus() { color: $skin-text-02; }
+  }
+
+  .dropdown-menu {
+    border-top-width: 0;
+    box-shadow: 0 1px 10px 1px rgba($skin-ui-03,.16);
+  }
+
+  .dropdown-message,
+  .dropdown-notification {
+    .dropdown-link {
+      color: $skin-text-03;
+      @include hover-focus() { color: #fff; }
+    }
+
+    .dropdown-menu { margin-top: 16.5px; }
+  }
+
+  .dropdown-profile {
+    .dropdown-link {
+      @include hover-focus() {
+        .avatar img { background-color: $skin-ui-02; }
+      }
+    }
+
+    .dropdown-menu {
+      @include media-breakpoint-up(lg) {
+        margin-top: 14px;
+      }
+    }
+
+    .dropdown-item {
+      width: auto;
+      margin: 0 -10px;
+      padding: 5px 10px;
+
+      @include hover-focus() {
+        background-color: rgba($color-ui-02, .7);
+        color: $color-text-02;
+      }
+
+      + .dropdown-item { margin-top: 0; }
+    }
+  }
+
+  .navbar-right {
+    .search-link {
+      color: $skin-text-03;
+      @include hover-focus() { color: #fff; }
+    }
+  }
+}
+
+.navbar-menu-wrapper {
+  background-color: lighten($skin-ui-03, 2%);
+  @include media-breakpoint-up(lg) { background-color: transparent; }
+}
+
+.navbar-menu {
+  .nav-label { color: darken($skin-text-04, 8%); }
+
+  .nav-item {
+    &.active {
+      &.with-sub {
+        .nav-link {
+          color: #fff;
+          &::after { border-color: #fff; }
+        }
+      }
+
+      .nav-link {
+        &::before { background-color: #fff; }
+        .feather { color: #fff; }
+      }
+    }
+  }
+
+  .nav-link {
+    font-weight: $font-weight-medium;
+    color: $skin-text-03;
+
+    .feather { color: $skin-text-04; }
+
+    @include hover-focus() { color: #fff; }
+  }
+}
+
+.navbar-menu-header {
+  background-color: $skin-ui-03;
+  border-bottom-color: rgba($color-text-03, .1);
+
+  a:last-child {
+    color: rgba($color-text-03, .5);
+    @include hover-focus() { color: $color-text-03; }
+  }
+}
+
+.navbar-menu-sub {
+  border-left-color: rgba($skin-ui-01, .3);
+
+  @include media-breakpoint-up(lg) {
+    border-top-width: 0;
+    border-color: $border-color;
+    padding: 15px 15px;
+    top: 42px;
+    box-shadow: 0 1px 10px 1px rgba($skin-ui-03,.1);
+
+    &::before { opacity: 0; }
+
+    .nav-sub-item {
+      + .nav-sub-item { margin-top: 0; }
+    }
+
+    ul {
+      min-width: 180px;
+
+      + ul {
+        margin-left: 15px;
+        padding-left: 15px;
+      }
+    }
+  }
+
+  .nav-label {
+    color: rgba($color-text-03, .5);
+
+    @include media-breakpoint-up(lg) {
+      color: $color-text-03;
+      margin-bottom: 10px;
+      padding-top: 5px;
+      padding-left: 10px;
+    }
+  }
+
+  .nav-sub-link {
+    color: $skin-text-03;
+    @include hover-focus() { color: #fff; }
+
+    @include media-breakpoint-up(lg) {
+      color: $color-text-02;
+      padding: 6px 10px;
+      @include border-radius();
+
+      @include hover-focus() {
+        color: $color-text-02;
+        background-color: lighten($color-ui-02, 2%);
+      }
+    }
+  }
+}
+
+// Aside
+.aside.minimize {
+  .nav-aside .nav-label + .nav-item::before {
+    border-top-color: rgba(#fff, .05);
+  }
+}
+
+.aside-header {
+  background-color: darken($skiJpcC5jbG9zZVxuICB9O1xufTtcblxuXG5mdW5jdGlvbiBpc1ByZXZXaGl0ZXNwYWNlKGJvZHksIGksIGlzUm9vdCkge1xuICBpZiAoaSA9PT0gdW5kZWZpbmVkKSB7XG4gICAgaSA9IGJvZHkubGVuZ3RoO1xuICB9XG5cbiAgLy8gTm9kZXMgdGhhdCBlbmQgd2l0aCBuZXdsaW5lcyBhcmUgY29uc2lkZXJlZCB3aGl0ZXNwYWNlIChidXQgYXJlIHNwZWNpYWxcbiAgLy8gY2FzZWQgZm9yIHN0cmlwIG9wZXJhdGlvbnMpXG4gIGxldCBwcmV2ID0gYm9keVtpIC0gMV0sXG4gICAgICBzaWJsaW5nID0gYm9keVtpIC0gMl07XG4gIGlmICghcHJldikge1xuICAgIHJldHVybiBpc1Jvb3Q7XG4gIH1cblxuICBpZiAocHJldi50eXBlID09PSAnQ29udGVudFN0YXRlbWVudCcpIHtcbiAgICByZXR1cm4gKHNpYmxpbmcgfHwgIWlzUm9vdCA/ICgvXFxyP1xcblxccyo/JC8pIDogKC8oXnxcXHI/XFxuKVxccyo/JC8pKS50ZXN0KHByZXYub3JpZ2luYWwpO1xuICB9XG59XG5mdW5jdGlvbiBpc05leHRXaGl0ZXNwYWNlKGJvZHksIGksIGlzUm9vdCkge1xuICBpZiAoaSA9PT0gdW5kZWZpbmVkKSB7XG4gICAgaSA9IC0xO1xuICB9XG5cbiAgbGV0IG5leHQgPSBib2R5W2kgKyAxXSxcbiAgICAgIHNpYmxpbmcgPSBib2R5W2kgKyAyXTtcbiAgaWYgKCFuZXh0KSB7XG4gICAgcmV0dXJuIGlzUm9vdDtcbiAgfVxuXG4gIGlmIChuZXh0LnR5cGUgPT09ICdDb250ZW50U3RhdGVtZW50Jykge1xuICAgIHJldHVybiAoc2libGluZyB8fCAhaXNSb290ID8gKC9eXFxzKj9cXHI/XFxuLykgOiAoL15cXHMqPyhcXHI/XFxufCQpLykpLnRlc3QobmV4dC5vcmlnaW5hbCk7XG4gIH1cbn1cblxuLy8gTWFya3MgdGhlIG5vZGUgdG8gdGhlIHJpZ2h0IG9mIHRoZSBwb3NpdGlvbiBhcyBvbWl0dGVkLlxuLy8gSS5lLiB7e2Zvb319JyAnIHdpbGwgbWFyayB0aGUgJyAnIG5vZGUgYXMgb21pdHRlZC5cbi8vXG4vLyBJZiBpIGlzIHVuZGVmaW5lZCwgdGhlbiB0aGUgZmlyc3QgY2hpbGQgd2lsbCBiZSBtYXJrZWQgYXMgc3VjaC5cbi8vXG4vLyBJZiBtdWxpdHBsZSBpcyB0cnV0aHkgdGhlbiBhbGwgd2hpdGVzcGFjZSB3aWxsIGJlIHN0cmlwcGVkIG91dCB1bnRpbCBub24td2hpdGVzcGFjZVxuLy8gY29udGVudCBpcyBtZXQuXG5mdW5jdGlvbiBvbWl0UmlnaHQoYm9keSwgaSwgbXVsdGlwbGUpIHtcbiAgbGV0IGN1cnJlbnQgPSBib2R5W2kgPT0gbnVsbCA/IDAgOiBpICsgMV07XG4gIGlmICghY3VycmVudCB8fCBjdXJyZW50LnR5cGUgIT09ICdDb250ZW50U3RhdGVtZW50JyB8fCAoIW11bHRpcGxlICYmIGN1cnJlbnQucmlnaHRTdHJpcHBlZCkpIHtcbiAgICByZXR1cm47XG4gIH1cblxuICBsZXQgb3JpZ2luYWwgPSBjdXJyZW50LnZhbHVlO1xuICBjdXJyZW50LnZhbHVlID0gY3VycmVudC52YWx1ZS5yZXBsYWNlKG11bHRpcGxlID8gKC9eXFxzKy8pIDogKC9eWyBcXHRdKlxccj9cXG4/LyksICcnKTtcbiAgY3VycmVudC5yaWdodFN0cmlwcGVkID0gY3VycmVudC52YWx1ZSAhPT0gb3JpZ2luYWw7XG59XG5cbi8vIE1hcmtzIHRoZSBub2RlIHRvIHRoZSBsZWZ0IG9mIHRoZSBwb3NpdGlvbiBhcyBvbWl0dGVkLlxuLy8gSS5lLiAnICd7e2Zvb319IHdpbGwgbWFyayB0aGUgJyAnIG5vZGUgYXMgb21pdHRlZC5cbi8vXG4vLyBJZiBpIGlzIHVuZGVmaW5lZCB0aGVuIHRoZSBsYXN0IGNoaWxkIHdpbGwgYmUgbWFya2VkIGFzIHN1Y2guXG4vL1xuLy8gSWYgbXV

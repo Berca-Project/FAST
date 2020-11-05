@@ -1,0 +1,154 @@
+﻿@model Fast.Web.Models.BrandConversionModel
+@using Fast.Web.Resources;
+
+<!-- Specific Page Vendor CSS -->
+<link href="~/Content/dashforge/lib/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link href="~/Content/theme/css/jquery-ui-1.9.2.css" rel="stylesheet" />
+<style>
+	.fixedHeight {
+		font-size: 14px;
+		max-height: 300px;
+		margin-bottom: 10px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.ui-helper-hidden-accessible {
+		display: none;
+	}
+</style>
+
+@using (Html.BeginForm("Create", "BrandConversion", FormMethod.Post, new { @class = "form-horizontal", @id = "AddModalForm" }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-header pd-y-20 pd-x-20 pd-sm-x-50">
+		<a href="" role="button" class="close pos-absolute t-15 r-15" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</a>
+		<div class="media align-items-center">
+			<span class="tx-color-03 d-none d-sm-block"><i class="fa fa-edit" style="font-size:48px;"></i></span>
+			<div class="media-body mg-sm-l-20">
+				<h4 class="tx-18 tx-sm-20 mg-b-2">@UIResources.AddNewBrandConversion</h4>
+				<p class="tx-13 tx-color-03 mg-b-0">@UIResources.FillAllRequiredFields</p>
+			</div>
+		</div><!-- media -->
+	</div><!-- modal-header -->
+	<div class="modal-body pd-sm-t-20 pd-sm-b-20 pd-sm-x-30">
+		<div class="row row-sm mg-b-10">
+			<div class="col-2">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Brand</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.BrandCode, null, new { @class = "form-control", @id = "tbBrandCode", @placeholder = "Type your keyword here...", @onkeypress="return blockSpecialChar(event)" })
+			</div>
+			<div class="col-2">
+			</div>
+			<div class="col-10">
+				<p id="empty-message"></p>
+			</div>
+			<div class="col-2">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Value1</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.Value1, null, new { @class = "form-control", @id = "tbValue1" })
+			</div>
+			<div class="col-2">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.UOM1</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.UOM1, null, new { @class = "form-control", @id = "tbUOM1" })
+			</div>
+			<div class="col-2">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Value2</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.Value2, null, new { @class = "form-control", @id = "tbValue2" })
+			</div>
+			<div class="col-2">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.UOM2</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.UOM2, null, new { @class = "form-control", @id = "tbUOM2" })
+			</div>
+			<div class="col-2">
+				<label class="col-form-label mg-b-5 tx-color-03">@UIResources.Notes</label>
+			</div>
+			<div class="col-10">
+				@Html.TextBoxFor(x => x.Notes, null, new { @class = "form-control", @id = "tbNotes" })
+			</div>
+		</div>
+	</div><!-- modal-body -->
+	<div class="modal-footer pd-x-20 pd-y-15">
+		<button type="button" class="btn btn-white" data-dismiss="modal">@UIResources.Cancel</button>
+		<button type="submit" class="btn btn-primary">@UIResources.Save</button>
+	</div>
+}
+
+<script src="~/Content/theme/js/jquery-1.10.0.min.js"></script>
+<script src="~/Content/theme/js/jquery-ui-1.9.2.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#empty-message").text("");
+
+		$('#tbBrandCode').keyup(function () {
+			if ($("#tbBrandCode").val() == '') {
+				$("#empty-message").text("");
+			}
+		});
+
+		$("#tbBrandCode").autocomplete({
+			delay: 1000,
+			source: function (request, response) {
+				$.ajax({
+					url: fastApp.BaseUrl + '/BrandConversion/AutoComplete/',
+					data: "{ 'prefix': '" + request.term + "'}",
+					dataType: "json",
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					success: function (data) {
+						if (data.length == 0) {
+							$("#empty-message").css('color', 'red');
+							$("#empty-message").text("Data does not exist in Brand List");
+						} else {
+							$("#empty-message").text("");
+							response($.map(data, function (item) {
+								return $.trim(item.Code) + " - " + item.Description;;
+							}))
+						}
+					},
+					error: function (response) {
+						alert(response.responseText);
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					}
+				});
+			},
+			select: function (e, i) {
+				var res = i.item.label.split(" - ");
+				if (res[0]) {
+					$("#tbBrandCode").val(res[0]);
+				}
+			},
+			minLength: 1
+		});
+
+		$("#tbBrandCode").autocomplete("widget").addClass("fixedHeight");
+	});
+
+	function OnCancel() {
+		window.location.href = fastApp.BaseUrl + '/BrandConversion/Index';
+	};
+
+	function ValidateLocation() {
+		if ($('#tbBrandCode').val() == '') {
+			$("#empty-message").css('color', 'red');
+			$("#empty-message").text("Please select a brand from brand List");
+			return (false);
+		}
+
+		document.getElementById('AddModalForm').submit();
+		return (true);
+	}
+</script>
